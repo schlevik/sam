@@ -7,7 +7,7 @@ from stresstest.graph import Path
 
 
 class QuestionType(Enum):
-    Score = auto()
+    Score   = auto()
 
 
 class QuestionTarget(Enum):

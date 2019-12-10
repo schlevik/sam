@@ -4,6 +4,8 @@ from typing import Callable
 import networkx as nx
 from ailog import Loggable
 
+from stresstest.stringify import Stringifier
+
 
 class Path(Loggable):
     def __init__(self):
@@ -16,8 +18,14 @@ class Path(Loggable):
     def __str__(self):
         return str(self.steps)
 
+    def __repr__(self):
+        return repr(self.steps)
 
-def random_strategy(node: str, graph: nx.Graph, *args, **kwargs):
+    def stringify(self, stringifier: Stringifier):
+        return stringifier.to_string(self.steps)
+
+
+def random_strategy(node: str, graph: nx.Graph, *args, **kwargs) -> str:
     return random.choice(list(graph.neighbors(node)))
 
 

@@ -8,6 +8,12 @@ from ailog import Loggable
 from pyvis.network import Network
 
 
+def load_graph(path) -> nx.Graph:
+    with open(path, 'r') as f:
+        g = nx.read_graphml(path)
+    return expand(convert(g))
+
+
 def convert(graph: nx.Graph) -> nx.Graph:
     """
     Converts a graph where nodes are referred to as numbers to a graph
