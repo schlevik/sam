@@ -1,56 +1,38 @@
 import random
-from enum import Enum, auto
 
 from ailog import Loggable
 
 from stresstest.graph import Path
-
-
-class QuestionType(Enum):
-    Score   = auto()
-
-
-class QuestionTarget(Enum):
-    Overall = auto()
-    Team = auto()
-    Player = auto()
-
-
-class Answer(Loggable):
-    ...
+from stresstest.stringify import Stringifier
+from stresstest.util import alphnum
 
 
 class Question(Loggable):
-    def __init__(self, question_type: QuestionType,
-                 question_target: QuestionTarget, answer: Answer):
-        ...
+    def __init__(self, question_type, answer_type):
+        self.question_type = question_type
+        self.answer_type = answer_type
+
+    def stringify(self, stringifier: Stringifier):
+        return stringifier.to_string_question(self)
+
+    def __repr__(self):
+        return f"{self.question_type} {self.answer_type}"
 
 
-def is_applicable_type(question_type: QuestionType, path: Path) -> bool:
-    return True
-
-
-def is_applicable_target(question_target: QuestionTarget,
-                         question_type: QuestionType,
-                         path: Path) -> bool:
-    return True
-
-
-def instantiate():
-    ...
-
-
-def generate_question(path: Path) -> Question:
+def generate_question(path: Path, question_conf) -> Question:
+    alphnum_path = [alphnum(p) for p in path.steps]
     # get random question type, question target
-    question_type = random.sample(
-        [t for t in QuestionType if
-         is_applicable_type(t, path)], 1)[0]
-    question_target = random.sample(
-        [t for t in QuestionType if
-         is_applicable_target(t, question_type, path)], 1)[0]
-    # instantiate
-
+    question_type = random.choice(
+        [alphnum(e) for e in question_conf['question-type'].keys() if
+         alphnum(e) in alphnum_path])
+    answer_type = random.choice(
+        [alphnum(e) for e in question_conf['answer-type'].keys() if
+         alphnum(e) in alphnum_path])
+    q = Question(question_type, answer_type)
     # generate answer
-    answer = Answer()
     # return question
-    return Question(question_type, question_target, answer)
+    return q
+
+
+def generate_answer(path: Path, question: Question):
+    return path.stringified[question.answer_type]

@@ -1,7 +1,9 @@
 import os
+import random
 import shutil
+import string
 import tempfile
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Mapping
 
 import networkx as nx
 from ailog import Loggable
@@ -107,3 +109,12 @@ class PyVisPrinter(Loggable):
         name = os.path.join(self.path, f'.html')
         vis.options.physics = False
         vis.show(name)
+
+
+def random_sample_keys(cfg: Mapping):
+    return random.sample(list(cfg.keys()))
+
+
+def alphnum(s):
+    return "".join(c for c in s if c not in string.punctuation)
+
