@@ -1,0 +1,4 @@
+pyvis
+networkx
+ailog
+nose
