@@ -29,6 +29,18 @@ class Path(Loggable):
 
 
 def random_strategy(node: str, graph: nx.Graph, path: Path) -> str:
+    """
+    Random Strategy. Chooses a random adjacent node that is not in path.
+
+    Works for sentences.
+    
+    Args:
+        graph: Content graph.
+        path: path so far.
+    
+    Returns:
+        : Next node from the graph.
+    """
     return random.choice([n for n in graph.neighbors(node) if n not in path.steps])
 
 

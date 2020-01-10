@@ -23,7 +23,7 @@ class Stringifier(Loggable, ABC):
 
 
 def consolidate(path: List[str]) -> Tuple[List[str], Dict[str, int]]:
-    new_path = []
+    new_path: List[str] = []
     index_map = dict()
     for node in path:
         if node.startswith("."):
@@ -71,13 +71,13 @@ class TemplateStringifier(Stringifier):
 
     def to_string(self, path: List[str]):
         path, index_map = consolidate(path)
-        variables_table = dict()
+        variables_table: Dict[str, str] = dict()
         realised_path = [self.choice("path", c) for c in path]
         resolved_path = []
         for s in realised_path:
             if '#' in s:
                 s, variables_table = self.resolve_variable(s, variables_table)
-            resolved_path.append(s)
+            resolved_path.append(s.strip())
 
         return (" ".join(resolved_path),
                 {alphnum(n): resolved_path[v] for n, v in index_map.items()})
