@@ -1,9 +1,8 @@
 import os
-import random
 import shutil
 import string
 import tempfile
-from typing import List, Tuple, Set, Mapping
+from typing import List, Set
 
 import networkx as nx
 from ailog import Loggable
@@ -11,8 +10,7 @@ from pyvis.network import Network
 
 
 def load_graph(path) -> nx.Graph:
-    with open(path, 'r') as f:
-        g = nx.read_graphml(path)
+    g = nx.read_graphml(path)
     return expand(convert(g))
 
 
@@ -111,10 +109,35 @@ class PyVisPrinter(Loggable):
         vis.show(name)
 
 
-def random_sample_keys(cfg: Mapping):
-    return random.sample(list(cfg.keys()))
+# def random_sample_keys(cfg: Mapping):
+#    return random.sample(list(cfg.keys()))
 
 
 def alphnum(s):
     return "".join(c for c in s if c not in string.punctuation)
 
+
+def in_sentence(path):
+    try:
+        sos_index = path.rindex("sos")
+    except ValueError:
+        return False
+    try:
+        eos_index = path.rindex("eos")
+    except ValueError:
+        return True
+    return sos_index > eos_index
+
+
+def get_sentence_of_word(word: int, path: 'Path') -> slice:
+    sos_index = word
+    while path[sos_index] != 'sos':
+        sos_index -= 1
+    eos_index = word
+    while path[eos_index] != 'eos':
+        eos_index += 1
+    return slice(sos_index, eos_index)
+
+
+def in_same_sentence(one: int, other: int, path: 'Path'):
+    return get_sentence_of_word(one, path) == get_sentence_of_word(other, path)

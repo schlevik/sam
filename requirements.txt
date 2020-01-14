@@ -1,3 +1,5 @@
+names
+aiconf
 pyvis
 networkx
 ailog
