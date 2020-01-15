@@ -64,7 +64,6 @@ def expand(graph: nx.Graph) -> nx.Graph:
 
     tree_roots: List[str] = [n for n in graph.nodes() if is_root(n)]
     tree_leaves: List[Set[str]] = [get_leaves(n) for n in tree_roots]
-    print(tree_leaves)
     for root, leaves in zip(tree_roots, tree_leaves):
         real_neighbors = set(
             n for n in graph.neighbors(root) if not n.startswith("."))

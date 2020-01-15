@@ -17,8 +17,6 @@ def at_least_one_sent(path: Path,
 
     """
     if path.last == 'idle' and 'sos' not in path:
-        logger = logging.getLogger(__name__)
-        logger.info("Firing!")
         return Choices(['sos'])
     return possible_choices
 
@@ -46,8 +44,6 @@ def unique_elaborations(path: Path,
             possible_choices.remove(['elaboration'])
 
         if path.last == 'elaboration':
-            logger = logging.getLogger(__name__)
-            logger.info("Firing!")
             to_remove = [c for c in possible_choices if c in current_sentence]
             possible_choices.remove(to_remove)
     return possible_choices
@@ -69,9 +65,7 @@ def no_foul_team(path: Path, possible_choices: Choices):
 
         # don't foul team
         if "._team" in current_sentence.steps:
-            logger = logging.getLogger(__name__)
-            logger.info("Firing!")
-        possible_choices.remove(".foul")
+            possible_choices.remove(".foul")
     return possible_choices
 
 

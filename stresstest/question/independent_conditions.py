@@ -20,9 +20,7 @@ def is_not_modified(target: str, action: str, path: Path, candidates):
     alphnum = list(path.alph_num())
     result = []
     for i in candidates:
-        print(i)
         sentence = alphnum[get_sentence_of_word(i, alphnum)]
-        print(sentence)
         if "altering" not in sentence:
             result.append(i)
 

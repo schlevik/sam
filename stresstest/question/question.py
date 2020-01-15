@@ -46,7 +46,5 @@ def generate_question(path: Path,
     possible_choices = Choices(q for q in questions if q)
     if not possible_choices:
         return None
-    print(possible_choices.choices)
     question = possible_choices.random()
-    print(question)
     return question

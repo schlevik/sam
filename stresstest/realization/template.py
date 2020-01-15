@@ -1,22 +1,21 @@
 import random
 import re
-from typing import List, Dict, Tuple
+from typing import List, Dict
 
 import names
 
 from stresstest.classes import Stringifier, Templates, Path
 from stresstest.question.question import Question
-from stresstest.util import alphnum
 
 
 class TemplateStringifier(Stringifier):
     def to_string_question(self):
         target = self.templates \
-            .random_with_conditions(self.path,
+            .random_with_conditions(path=self.path,
                                     keys=["question.target",
                                           self.question.target])
         action = self.templates \
-            .random_with_conditions(self.path,
+            .random_with_conditions(path=self.path,
                                     keys=["question.action",
                                           self.question.action])
         return " ".join((target, action))
@@ -47,9 +46,9 @@ class TemplateStringifier(Stringifier):
                 elif 'team' in var_name:
                     var_value = " ".join([
                         self.templates.random_with_conditions(
-                            self.path, keys=['team-name', 'first']),
+                            path=self.path, keys=['team-name', 'first']),
                         self.templates.random_with_conditions(
-                            self.path, keys=['team-name', 'last'])
+                            path=self.path, keys=['team-name', 'last'])
                     ])
                 elif 'min' == var_name:
                     # TODO: will need conditions here as well
@@ -81,12 +80,11 @@ class TemplateStringifier(Stringifier):
         # TODO: Implement conditions here as well
         self.consolidated_path = self.consolidate(self.path)
         self.realised_path = []
-        self.logger.info(self.path)
-        self.logger.info(self.consolidated_path)
 
         self.realised_path.extend(self.templates.random_with_conditions(
-            self.consolidated_path,
-            keys=['path', c]) for c in self.consolidated_path)
+            path=self.consolidated_path,
+            keys=['path', c], position=i) for i, c in
+                                  enumerate(self.consolidated_path))
 
         self.resolved_path = []
         self.logger.info("Realised path:")
@@ -100,11 +98,13 @@ class TemplateStringifier(Stringifier):
                         start = s.index(var_name) - 1
                         end = start + len(var_name) + 1
                         resolved = self.templates. \
-                            random_with_conditions(self.realised_path,
-                                                   keys=['path', var_name])
-                        self.logger.info(resolved)
+                            random_with_conditions(
+                            path=self.consolidated_path,
+                            realised_path=self.realised_path,
+                            keys=['path', var_name],
+                            position=i
+                        ) or ""
                         self.realised_path[i] = s[:start] + resolved + s[end:]
-            self.logger.info(self.realised_path)
         for i, s in enumerate(self.realised_path):
             # if '#' in s:
             #    s = self.resolve_variable(s)

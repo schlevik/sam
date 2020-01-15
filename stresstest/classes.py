@@ -1,6 +1,7 @@
 import random
 from abc import ABC, abstractmethod
-from typing import Sequence, List, Iterable, TypeVar, Mapping, Dict, Any
+from typing import Sequence, List, Iterable, TypeVar, Mapping, Dict, Any, \
+    Optional
 
 from aiconf import ConfigReader
 from ailog import Loggable
@@ -50,13 +51,19 @@ class Path(Loggable, Sequence):
         return p
 
     def __getitem__(self, i):
+        if isinstance(i, slice):
+            p = Path()
+            p.steps = self.steps[i]
+            return p
         return self.steps[i]
 
     def __len__(self):
         return len(self.steps)
 
     def alph_num(self):
-        return (alphnum(e) for e in self)
+        p = Path()
+        p.steps = [alphnum(e) for e in self]
+        return p
 
     @property
     def last(self):
@@ -84,16 +91,20 @@ class Choices(Sequence[T]):
             self.choices.remove(i)
 
     def __repr__(self):
-        return repr(self.choices)
+        return f"Choices({repr(self.choices)})"
 
-    def random(self) -> T:
-        return random.choice(self)
+    def random(self) -> Optional[T]:
+        try:
+            return random.choice(self)
+        except IndexError:
+            return None
 
-    def random_with_conditions(self, path, conditions, *args, **kwargs):
-        choices = self.choices
+    def random_with_conditions(self, conditions, **kwargs):
+        choices = self
         for condition in conditions:
-            choices = condition(path, choices, *args, **kwargs)
-        return random.choice(choices)
+            choices = condition(possible_choices=choices,
+                                **kwargs)
+        return choices.random()
 
 
 class Templates(Loggable, Mapping):
@@ -106,13 +117,11 @@ class Templates(Loggable, Mapping):
     def as_choices(self, *keys: str):
         return Choices(self.templates(*keys))
 
-    def random_with_conditions(self, path, keys, *args, **kwargs):
-        self.logger.info("BLABLA")
-        print("")
-        self.logger.info(self.templates(*keys))
+    def random_with_conditions(self, keys, **kwargs):
+        kwargs['keys'] = keys
         return self \
             .as_choices(*keys) \
-            .random_with_conditions(path, self.conditions, *args, **kwargs)
+            .random_with_conditions(conditions=self.conditions, **kwargs)
 
     def __len__(self) -> int:
         return len(self.cfg)
