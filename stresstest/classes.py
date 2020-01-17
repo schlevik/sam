@@ -1,7 +1,7 @@
 import random
 from abc import ABC, abstractmethod
-from typing import Sequence, List, Iterable, TypeVar, Mapping, Dict, Any, \
-    Optional
+from typing import Sequence, Iterable, TypeVar, Mapping, Dict, Any, Optional, \
+    Union
 
 from aiconf import ConfigReader
 from ailog import Loggable
@@ -83,7 +83,15 @@ class Choices(Sequence[T]):
     def __len__(self):
         return len(self.choices)
 
-    def remove(self, i):
+    def remove(self, i: Union[Iterable, str]) -> None:
+        """
+        Removes a choice if present.
+        Does nothing otherwise.
+
+        Args:
+            i: Element to remove. If argument is an Iterable of
+               elements removes  all elements.
+        """
         if isinstance(i, Iterable) and not isinstance(i, str):
             for e in i:
                 self.remove(e)
@@ -94,12 +102,28 @@ class Choices(Sequence[T]):
         return f"Choices({repr(self.choices)})"
 
     def random(self) -> Optional[T]:
+        """
+        Returns a random value if present, returns None otherwise.
+
+
+        Returns:
+            Random value if present None otherwise.
+        """
         try:
             return random.choice(self)
         except IndexError:
             return None
 
-    def random_with_conditions(self, conditions, **kwargs):
+    def random_with_conditions(self, *, conditions, **kwargs):
+        """
+
+        Args:
+            conditions:
+            **kwargs: Kwargs that should match the conditions
+
+        Returns:
+
+        """
         choices = self
         for condition in conditions:
             choices = condition(possible_choices=choices,
@@ -112,12 +136,61 @@ class Templates(Loggable, Mapping):
         return self.cfg[k]
 
     def templates(self, *keys: str):
+        """
+        Gives the templates for a sequence of given keys.
+
+        Keys are joined with the point operator. i.e. if you want to
+        access "a.b.c" you can call::
+
+            random_with_conditions(keys=['a','b','c'])
+        Args:
+            *keys: Keys to choose the template from. Joins the keys with
+            the point (".") operator.
+
+        Returns:
+
+        """
         return self.cfg['.'.join(keys)]
 
     def as_choices(self, *keys: str):
+        """
+        Generates choices from a template for a sequence of given keys.
+
+        Keys are joined with the point operator. i.e. if you want to
+        access "a.b.c" you can call::
+
+            random_with_conditions(keys=['a','b','c'])
+
+        Args:
+            *keys: Keys to choose the template from. Joins the keys with
+            the point (".") operator.
+
+        Returns: ``Choices``
+
+        """
         return Choices(self.templates(*keys))
 
     def random_with_conditions(self, keys, **kwargs):
+        """
+        Chooses a random template from the given keys satisfying the
+        conditions.
+
+        Keys are joined with the point operator. i.e. if you want to
+        access "a.b.c" you can call::
+
+            random_with_conditions(keys=['a','b','c'])
+
+        Args:
+            keys: Keys to chose the template from. Joins the keys with
+            the point (".") operator.
+            **kwargs: Keyword arguments passed to the conditions.
+            Depend on the type of condition you're using.
+
+        Returns: A randomly chosen template that satisfies all
+        conditions.
+
+        """
+        # add keys to kwargs in key we want to pass on the keys
         kwargs['keys'] = keys
         return self \
             .as_choices(*keys) \

@@ -5,8 +5,8 @@ from stresstest.passage.strategies import ReasonableStrategy
 from stresstest.question.independent_conditions import bare_minimum, \
     is_not_modified
 from stresstest.question.question import generate_question
-from stresstest.realization.conditions import SingularPluralCondition, \
-    ModifierCondition
+from stresstest.realization.conditions import SingularPlural, \
+    Modifier
 from stresstest.realization.template import TemplateStringifier
 from stresstest.util import load_graph
 
@@ -24,7 +24,7 @@ def generate_passage_question_and_answer_reasonable(graph_path, clauses_path,
     if not p:
         p = generate_path(g, 'start', 'end', strategy)
     templates = Templates(clauses_path,
-                          [SingularPluralCondition(), ModifierCondition()])
+                          [SingularPlural(), Modifier()])
     q = generate_question(p,
                           templates['question.target'].keys(),
                           templates['question.action'].keys(),
