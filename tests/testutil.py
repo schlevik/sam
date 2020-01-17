@@ -1,8 +1,7 @@
 from stresstest.state import StartClause, GoalClause, TeamClause, \
     EndClause
-from stresstest.graph import Path
+from stresstest.classes import Path
 
-import markovify
 test_path = Path(
     StartClause(),
     GoalClause(),
