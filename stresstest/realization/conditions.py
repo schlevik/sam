@@ -35,11 +35,16 @@ class BaseRealisationCondition(Loggable, ABC):
         implementing condition's key.
 
         Args:
-            possible_choices: Choices to choose from so far.
-            keys: Key to compare the condition key to.
-            path: (non-realised) path.
-            realised_path: (partly) realised path.
-            position: Position in path.
+            possible_choices:
+                Choices to choose from so far.
+            keys:
+                Key to compare the condition key to.
+            path:
+                (non-realised) path.
+            realised_path:
+                (partly) realised path.
+            position:
+                Position in path.
 
         Returns:
             Set of possible choices. Some choices were potentially

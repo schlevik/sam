@@ -3,18 +3,86 @@ import re
 from typing import List, Dict
 
 import names
+from ailog import Loggable
 
-from stresstest.classes import Stringifier, Templates, Path
+from stresstest.classes import Templates, Path
 from stresstest.question.question import Question
 
 
-class TemplateStringifier(Stringifier):
+class TemplateStringifier(Loggable):
+    """
+    Template based realisation algorithm implementation.
 
-    def to_string_question(self):
+    Transforms logical form based path and question into their final
+    string forms.
+
+    Realisation can happen subject to
+    :class:`stresstest.classes.Condition` s to maintain finer-grained
+    control over the random selection of templates.
+
+    Attributes:
+        variables_table (Dict[str, str]):
+            Map of variables from the path and their corresponding
+            values. Populated during path realisation.
+
+        templates (Templates):
+            Templates to use for realisation of logical forms.
+
+        path (Path):
+            The content of the passage represented as a path in the
+            content graph.
+
+        consolidated_path (Path):
+            Like ``path`` but with nodes starting with point (``.``)
+            (recursively) collapsed with their predecessors. I.e.::
+                path: ['sos' 'action', '.goal' '.spectacular', ...]
+                consolidated_path ['sos', 'action.goal.spectacular', ...]
+
+        realised_path (Path):
+            The corresponding realisations of``consolidated_path``
+            according to templates and conforming to conditions.
+            Populated during  the ``to_string_path`` method call.
+
+        resolved_path:
+            ``realised_path`` with variable names substituted for their
+            values.
+
+        question (Question):
+            Question corresponding to the passage.
+
+        index_map: (Dict[int,int]):
+            The map of indices from ``path`` to ``consolidated_path``.
+
+    """
+    _no_whitespace = ['eos']
+
+    def __init__(self, templates: Templates,
+                 path: Path, question: Question):
         """
-        Transfers the question into its string form.
 
-        Returns:
+
+        Args:
+            templates:
+            path:
+            question:
+
+        """
+        self.variables_table: Dict[str, str] = dict()
+        self.templates: Templates = templates
+        self.path: Path = path
+        self.realised_path = []
+        self.resolved_path = []
+        self.question = question
+        # initialise consolidated path and the index map
+        self.index_map: Dict[int, int] = dict()
+        self.consolidated_path = self._consolidate(self.path)
+
+    def to_string_question(self) -> str:
+        """
+        Transforms the question into its string form according to
+        existing question templates and conditions.
+
+        Returns: String version of the question.
 
         """
         target = self.templates \
@@ -27,41 +95,17 @@ class TemplateStringifier(Stringifier):
                                           self.question.action])
         return " ".join((target, action))
 
-    def to_string_answer(self):
-        return self.atomic_to_surface(self.question.answer_position)
-
-    def __init__(self, templates: Templates,
-                 path: Path, question: Question):
+    def to_string_answer(self) -> str:
         """
+        Returns the string form of the answer expected by the question.
 
-        Args:
-            templates:
-            path:
-            question:
+        Should be called after ``to_string_path``.
+        Returns:
 
         """
-        self.variables_table: Dict[str, str] = dict()
-        self.templates = templates
-        self._consolidated_path = None
-        self.path = path
-        self.realised_path = None
-        self.resolved_path = None
-        self.question = question
-        self.index_map: Dict[int, int] = dict()
+        return self.resolved_path[self.index_map[self.question.answer_position]]
 
-    def consolidated_to_surface(self, i) -> str:
-        return self.resolved_path[i]
-
-    def atomic_to_surface(self, i):
-        return self.resolved_path[self.index_map[i]]
-
-    @property
-    def consolidated_path(self):
-        if not self._consolidated_path:
-            self._consolidated_path = self.consolidate(self.path)
-        return self._consolidated_path
-
-    def resolve_variable(self, string, position):
+    def _resolve_hash_variable(self, string: str, position: int):
         var_names = re.findall(r"#(\w+)", string)
         for var_name in var_names:
             var_value = self.variables_table.get(var_name, None)
@@ -97,7 +141,7 @@ class TemplateStringifier(Stringifier):
             self.variables_table[var_name] = var_value
         return string
 
-    def consolidate(self, path: Path) -> Path:
+    def _consolidate(self, path: Path) -> Path:
         new_path: List[str] = []
         for i, node in enumerate(path):
             if node.startswith("."):
@@ -105,56 +149,74 @@ class TemplateStringifier(Stringifier):
             else:
                 new_path.append(node)
             self.index_map[i] = len(new_path) - 1
-        p = Path()
-        p.steps = new_path
-        self.logger.info(self.index_map)
+        p = Path(new_path)
         return p
 
-    def to_string_path(self):
+    def _resolve_dollar_template(self, template, position):
+        #
+        var_names = re.findall(r"\$(\S+)", template)
+
+        for var_name in var_names:
+            start = template.index(var_name) - 1
+            end = start + len(var_name) + 1
+            # Resolve if there is a a fitting template,
+            # otherwise just put an empty string
+            resolved = \
+                self.templates.random_with_conditions(
+                    path=self.consolidated_path,
+                    realised_path=self.realised_path,
+                    keys=['path', var_name],
+                    position=position
+                ) or ""
+            self.realised_path[position] = template[
+                                           :start] + resolved + template[end:]
+
+    def to_string_path(self) -> str:
+        """
+        Produces a string realisation (passage) of a given path in the
+        content graph.
+
+        Returns:
+            String rendition of the selected content (path).
+
+        """
+        if self.realised_path:
+            raise RuntimeError(f"realised_path not empty! "
+                               f"Don't run {self.__class__.__name__} twice!")
+
         self.logger.debug("Path:")
         self.logger.debug(self.path)
         self.logger.debug("Consolidated path:")
         self.logger.debug(self.consolidated_path)
 
-        self.realised_path = []
+        # Resolve using path -> string templates
         self.realised_path.extend(
             self.templates.random_with_conditions(
                 path=self.consolidated_path,
-                keys=['path', c], position=i)
+                keys=['path', c], position=i) or ""
             for i, c in enumerate(self.consolidated_path)
         )
 
-        self.resolved_path = []
         self.logger.debug("Realised path:")
         self.logger.debug(self.realised_path)
-        # recursive resolution of templates
+
+        # hierarchical resolution of $-templates
         while "$" in " ".join(self.realised_path):
             for i, s in enumerate(self.realised_path):
                 if "$" in s:
-                    var_names = re.findall(r"\$(\S+)", s)
-                    for var_name in var_names:
-                        start = s.index(var_name) - 1
-                        end = start + len(var_name) + 1
-                        # Resolve if there is a a fitting template,
-                        # otherwise just put an empty string
-                        resolved = \
-                            self.templates.random_with_conditions(
-                                path=self.consolidated_path,
-                                realised_path=self.realised_path,
-                                keys=['path', var_name],
-                                position=i
-                            ) or ""
-                        self.realised_path[i] = s[:start] + resolved + s[end:]
+                    self._resolve_dollar_template(s, i)
+
+        # Resolution of #-variables
         for i, s in enumerate(self.realised_path):
             if '#' in s:
-                s = self.resolve_variable(s, i)
+                s = self._resolve_hash_variable(s, i)
             self.logger.debug(f"Handling {self.consolidated_path[i]}:'{s}'")
-            all_of_them = [k for k, v in self.index_map.items() if v == i]
-            self.logger.debug(all_of_them)
             self.resolved_path.append(s.strip())
+
         self.logger.debug("Resolved Path")
         self.logger.debug(self.resolved_path)
         self.logger.debug('variable table:')
         self.logger.debug(self.variables_table)
         # TODO: normalise space
-        return " ".join(self.resolved_path)
+        result = " ".join(r for r in self.resolved_path if r)
+        return result.replace(" . ", ". ")
