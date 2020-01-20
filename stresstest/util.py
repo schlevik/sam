@@ -1,15 +1,17 @@
 import os
 import shutil
-import string
 import tempfile
+import stresstest
 from typing import List, Set
 
 import networkx as nx
 from ailog import Loggable
 from pyvis.network import Network
 
+from stresstest.classes import Path
 
-def load_graph(path) -> nx.Graph:
+
+def load_graph(path: os.PathLike) -> nx.Graph:
     g = nx.read_graphml(path)
     return expand(convert(g))
 
@@ -20,6 +22,7 @@ def convert(graph: nx.Graph) -> nx.Graph:
     where nodes are referred to as their labels.
 
     Also gets rid of unnecessary data.
+
     Args:
         graph: Graph to convert.
 
@@ -35,12 +38,21 @@ def convert(graph: nx.Graph) -> nx.Graph:
 
 def expand(graph: nx.Graph) -> nx.Graph:
     """
-    Expands the graph along the .attribute paths.
+    Expands the graph along the `.attribute` paths.
+
+    More concretely, for every path of nodes that start with a node
+    without leading point (head) followed by a arbitrary number of nodes
+    with a leading point (attributes), removes all outgoing neighbors
+    from the head and adds them as outgoing neighbors to the last
+    attribute.
+
+    Assumes that the given graph is well formed to do so.
 
     Args:
-        graph:
+        graph: Graph to expand.
 
     Returns:
+        Graph expanded towards nodes that start with ``.``.
 
     """
 
@@ -108,15 +120,18 @@ class PyVisPrinter(Loggable):
         vis.show(name)
 
 
-# def random_sample_keys(cfg: Mapping):
-#    return random.sample(list(cfg.keys()))
+def in_sentence(path: Path):
+    """
+    Returns whether the current snippet of the path is in an (open)
+    sentence.
+    Args:
+        path: Path to inspect.
 
+    Returns:
+        Whether the path is in the sentence, i.e. if there is an open
+        sentence tag (`sos`) but no closed one (`eos`).
 
-def alphnum(s):
-    return "".join(c for c in s if c not in string.punctuation)
-
-
-def in_sentence(path):
+    """
     try:
         sos_index = path.rindex("sos")
     except ValueError:
@@ -128,7 +143,19 @@ def in_sentence(path):
     return sos_index > eos_index
 
 
-def get_sentence_of_word(word: int, path: 'Path') -> slice:
+def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
+    """
+    Obtains the sentence of a given word.
+
+    Args:
+        word: Position of word in :class:`stresstest.classes.Path`.
+        path: Path to get the sentence from.
+
+    Returns:
+        The start and end indices of the sentence to be used as a
+        slice.
+
+    """
     sos_index = word
     while path[sos_index] != 'sos':
         sos_index -= 1
@@ -138,5 +165,16 @@ def get_sentence_of_word(word: int, path: 'Path') -> slice:
     return slice(sos_index, eos_index)
 
 
-def in_same_sentence(one: int, other: int, path: 'Path'):
+def in_same_sentence(one: int, other: int, path: 'stresstest.classes.Path'):
+    """
+    Determines whether two words are in the same sentence.
+
+    Args:
+        one: Position of one word in the path.
+        other: Position of the other word in the path.
+        path: Path to get the sentence from.
+
+    Returns: ``True`` if words are in same sentence, else ``False``.
+
+    """
     return get_sentence_of_word(one, path) == get_sentence_of_word(other, path)
