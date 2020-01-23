@@ -105,3 +105,52 @@ class TwoPlayersMention(PassageCondition):
         if path.last == 'attribution' and path.count('._player') < 2:
             return Choices(['._player'])
         return possible_choices
+
+
+class GoalWithDistractor(PassageCondition):
+    """
+    This will make the passage contain two goals, one with distractor
+    (almost) and one without.
+
+    """
+    predifined_first = ['attribution', '._player', 'modifier', '.altering',
+                        'action-description', '.goal', 'eos', 'sos']
+    predifined_second = ['attribution', '._player',
+                         'action-description', '.goal', 'eos']
+
+    def __init__(self):
+        self.sentence_position = 0
+        self.in_predefined_first = False
+
+        self.in_predefined_second = False
+        self._internal_counter = 0
+
+    def _run_predefined(self, which):
+        if self._internal_counter < len(which) - 2:
+            self._internal_counter += 1
+            return Choices([which[self._internal_counter]])
+        else:
+            self._internal_counter = 0
+            self.in_predefined_first = False
+            self.in_predefined_second = False
+            return Choices([which[-1]])
+
+    def evaluate_condition(self, *, path: Path,
+                           possible_choices: Choices) -> Choices:
+        if path.last == 'sos':
+            self.sentence_position += 1
+
+        print(self.sentence_position)
+        if self.sentence_position == 1 and path.last == 'attribution':
+            self.in_predefined_first = True
+
+        if self.in_predefined_first:
+            return self._run_predefined(self.predifined_first)
+
+        if self.sentence_position == 2 and path.last == 'attribution':
+            self.in_predefined_second = True
+
+        if self.in_predefined_second:
+            return self._run_predefined(self.predifined_second)
+
+        return possible_choices

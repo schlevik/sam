@@ -34,7 +34,7 @@ class Question(Loggable):
                 f"{self.path[self.answer_position], self.answer_position}")
 
 
-def create_question(target, action, path,
+def create_question(target: str, action: str, path: Path,
                     conditions: List[QuestionCondition]) -> Optional[Question]:
     """
     Creates a :class:`Question` for a path given a concrete target and
@@ -43,10 +43,11 @@ def create_question(target, action, path,
     The created question satisfies given conditions.
 
     Returns `None` if the question is ambiguous (more than 1 answer exists) or
-    unanswerable
+    unanswerable.
+
     Args:
         target:
-            Concrete question target (e.g. Player)
+            Concrete question target (e.g. player)
         action:
             Concrete question action (e.g. goal)
         path:
@@ -54,6 +55,7 @@ def create_question(target, action, path,
             the generated question should ask about.
         conditions:
              Conditions the generated question should conform to.
+
     Returns:
         A :class:`Question` if a question with given action and target
         is unambiguously answerable from the given path and suffices
