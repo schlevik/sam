@@ -4,7 +4,7 @@ import networkx as nx
 from ailog import Loggable
 
 from stresstest.classes import Path, Choices
-from stresstest.passage.conditions import PassageCondition
+from stresstest.passage.rules import PassageRule
 
 
 class ReasonableStrategy(Loggable):
@@ -17,14 +17,14 @@ class ReasonableStrategy(Loggable):
     selected as a next element in the path.
     """
 
-    def __init__(self, conditions: List[PassageCondition]):
+    def __init__(self, conditions: List[PassageRule]):
         """
         Instantiates the strategy.
 
         Args:
             conditions: Rules that guide the content generation.
         """
-        self.conditions: List[PassageCondition] = conditions
+        self.conditions: List[PassageRule] = conditions
 
     def __call__(self, graph: nx.Graph, path: Path) -> str:
         """

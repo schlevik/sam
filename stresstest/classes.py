@@ -196,7 +196,7 @@ class Choices(Sequence[T]):
         except IndexError:
             return None
 
-    def random_with_conditions(self, *, conditions: List['Condition'],
+    def random_with_conditions(self, *, conditions: List['Rule'],
                                **kwargs) -> Optional[T]:
         """
         Returns a random choice that conforms to all the given
@@ -219,7 +219,7 @@ class Choices(Sequence[T]):
         return choices.random()
 
 
-class Condition(Loggable, ABC):
+class Rule(Loggable, ABC):
     """
     Base condition class.
 

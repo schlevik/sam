@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from typing import List
 
-from stresstest.classes import Path, Condition, Choices
+from stresstest.classes import Path, Rule, Choices
 from stresstest.util import get_sentence_of_word
 
 
-class QuestionCondition(Condition):
+class QuestionRule(Rule):
     def __call__(self, *, path: Path, choices: Choices, **kwargs) -> Choices:
         target = kwargs.get('target', None)
         action = kwargs.get('action', None)
@@ -29,7 +29,7 @@ class QuestionCondition(Condition):
         ...
 
 
-class BareMinimum(QuestionCondition):
+class BareMinimum(QuestionRule):
     def evaluate_condition(self, target: str, action: str, path: Path,
                            choices: Choices) -> Choices:
         alphnum = path.alph_num()
@@ -43,7 +43,7 @@ class BareMinimum(QuestionCondition):
         return Choices(result)
 
 
-class IsNotModified(QuestionCondition):
+class IsNotModified(QuestionRule):
     def evaluate_condition(self, target: str, action: str, path: Path,
                            choices: Choices) -> Choices:
 

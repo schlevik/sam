@@ -7,7 +7,7 @@ from stresstest.classes import Choices, Path
 from stresstest.util import get_sentence_of_word
 
 
-class BaseRealisationCondition(Loggable, ABC):
+class BaseRealisationRule(Loggable, ABC):
     """
     This is the base class for the implementing realisation conditions.
 
@@ -83,7 +83,7 @@ class BaseRealisationCondition(Loggable, ABC):
         ...
 
 
-class SingularPlural(BaseRealisationCondition):
+class SingularPlural(BaseRealisationRule):
     """
     Sets the right numerus for verbs.
 
@@ -107,7 +107,7 @@ class SingularPlural(BaseRealisationCondition):
         return possible_choices
 
 
-class Modifier(BaseRealisationCondition):
+class Modifier(BaseRealisationRule):
     """
     Sets the right modifier realisation for templates that make use
     of a modifier.

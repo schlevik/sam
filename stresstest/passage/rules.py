@@ -1,11 +1,11 @@
 import logging
 from abc import abstractmethod
 
-from stresstest.classes import Path, Choices, Condition
+from stresstest.classes import Path, Choices, Rule
 from stresstest.util import in_sentence
 
 
-class PassageCondition(Condition):
+class PassageRule(Rule):
     """
     Base class for passage conditions.
     """
@@ -33,7 +33,7 @@ class PassageCondition(Condition):
         ...
 
 
-class AtLeastOneSentence(PassageCondition):
+class AtLeastOneSentence(PassageRule):
     """
     This condition ensures that there's at least one content sentence.
 
@@ -46,7 +46,7 @@ class AtLeastOneSentence(PassageCondition):
         return possible_choices
 
 
-class UniqueElaborations(PassageCondition):
+class UniqueElaborations(PassageRule):
     """
     This condition ensures the elaborations
     (e.g. ``elaboration.distance``) are unique. Also ensures there's
@@ -73,7 +73,7 @@ class UniqueElaborations(PassageCondition):
         return possible_choices
 
 
-class NoFoulTeam(PassageCondition):
+class NoFoulTeam(PassageRule):
     """
     Ensures that when attribution is team, action foul is not possible.
 
@@ -91,7 +91,7 @@ class NoFoulTeam(PassageCondition):
         return possible_choices
 
 
-class TwoPlayersMention(PassageCondition):
+class TwoPlayersMention(PassageRule):
     """
     Ensures that at least two players are mentioned.
 
@@ -107,7 +107,7 @@ class TwoPlayersMention(PassageCondition):
         return possible_choices
 
 
-class GoalWithDistractor(PassageCondition):
+class GoalWithDistractor(PassageRule):
     """
     This will make the passage contain two goals, one with distractor
     (almost) and one without.

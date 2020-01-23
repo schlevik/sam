@@ -2,7 +2,7 @@ import logging
 from ailog import Loggable
 from typing import List, Optional
 from stresstest.classes import Path, Choices
-from stresstest.question.independent_conditions import QuestionCondition
+from stresstest.question.independent_rules import QuestionRule
 
 
 class Question(Loggable):
@@ -35,7 +35,7 @@ class Question(Loggable):
 
 
 def create_question(target: str, action: str, path: Path,
-                    conditions: List[QuestionCondition]) -> Optional[Question]:
+                    conditions: List[QuestionRule]) -> Optional[Question]:
     """
     Creates a :class:`Question` for a path given a concrete target and
     action if possible.
@@ -81,7 +81,7 @@ def create_question(target: str, action: str, path: Path,
 def generate_question(path: Path,
                       targets: List[str],
                       actions: List[str],
-                      conditions: List[QuestionCondition],
+                      conditions: List[QuestionRule],
                       ) -> Optional[Question]:
     """
     Generates a random question that can be asked given the path and

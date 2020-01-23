@@ -1,12 +1,12 @@
 from stresstest.classes import Templates
-from stresstest.passage.conditions import AtLeastOneSentence, NoFoulTeam, \
+from stresstest.passage.rules import AtLeastOneSentence, NoFoulTeam, \
     TwoPlayersMention, UniqueElaborations, GoalWithDistractor
 from stresstest.passage.graph import generate_path
 from stresstest.passage.strategies import ReasonableStrategy
-from stresstest.question.independent_conditions import BareMinimum, \
+from stresstest.question.independent_rules import BareMinimum, \
     IsNotModified
 from stresstest.question.question import generate_question
-from stresstest.realization.conditions import SingularPlural, \
+from stresstest.realization.rules import SingularPlural, \
     Modifier
 from stresstest.realization.template import TemplateStringifier
 from stresstest.util import load_graph
