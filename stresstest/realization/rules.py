@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from ailog import Loggable
+from quicklog import Loggable
 
 from stresstest.classes import Choices, Path
 from stresstest.util import get_sentence_of_word

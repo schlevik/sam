@@ -2,10 +2,10 @@ import random
 import string
 from abc import ABC, abstractmethod
 from typing import Sequence, Iterable, TypeVar, Mapping, Dict, Any, Optional, \
-    Union, List
+    Union, List, Iterator
 
-from aiconf import ConfigReader
-from ailog import Loggable
+from quickconf import ConfigReader
+from quicklog import Loggable
 
 T = TypeVar("T")
 
@@ -17,6 +17,14 @@ class Path(Loggable, Sequence):
     A thin wrapper around a list representing the path of nodes chosen
     on the content graph.
     """
+
+    def __add__(self, other):
+        if isinstance(other, Path):
+            return Path(self.steps + other.steps)
+        elif isinstance(other, list):
+            return Path(self.steps + other)
+        else:
+            raise ValueError("Can only concatenate paths or lists!")
 
     def __init__(self, iterable: Iterable[str] = None):
         """
@@ -147,7 +155,7 @@ class Path(Loggable, Sequence):
         return sum(x == node for x in self)
 
 
-class Choices(Sequence[T]):
+class Choices(Iterable[T]):
     """
     Thin wrapper over a sequence.
 
@@ -155,14 +163,28 @@ class Choices(Sequence[T]):
     possibly subject to given :class:`Condition` s.
     """
 
-    def __init__(self, l: Iterable[T]):
-        self.choices = list(l)
+    def __iter__(self) -> Iterator[T]:
+        return iter(self.choices)
 
-    def __getitem__(self, i):
-        return self.choices[i]
+    def __init__(self, l: Iterable[T]):
+        self.choices = set(l)
+
+    def __hash__(self):
+        return hash(self.choices)
+
+    def __eq__(self, other):
+        return isinstance(other, Choices) and self.choices == other.choices
 
     def __len__(self):
         return len(self.choices)
+
+    def __sub__(self, other):
+        # if not isinstance(other, Choices) or not isinstance(other, list):
+        c = Choices(self.choices)
+        c.remove(other)
+        return c
+
+    # return
 
     def remove(self, i: Union[Iterable, str]) -> None:
         """
@@ -217,6 +239,9 @@ class Choices(Sequence[T]):
             choices = condition(possible_choices=choices,
                                 **kwargs)
         return choices.random()
+
+    def remove_all_but(self, *nodes: str):
+        self.remove([n for n in self if n not in nodes])
 
 
 class Rule(Loggable, ABC):

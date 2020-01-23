@@ -1,7 +1,7 @@
-from typing import List, Callable
+from typing import List
 
 import networkx as nx
-from ailog import Loggable
+from quicklog import Loggable
 
 from stresstest.classes import Path, Choices
 from stresstest.passage.rules import PassageRule

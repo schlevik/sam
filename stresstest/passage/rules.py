@@ -1,4 +1,3 @@
-import logging
 from abc import abstractmethod
 
 from stresstest.classes import Path, Choices, Rule
@@ -42,7 +41,7 @@ class AtLeastOneSentence(PassageRule):
     def evaluate_condition(self, *, path: Path,
                            possible_choices: Choices) -> Choices:
         if path.last == 'idle' and 'sos' not in path:
-            return Choices(['sos'])
+            possible_choices.remove_all_but('sos')
         return possible_choices
 
 
@@ -61,6 +60,7 @@ class UniqueElaborations(PassageRule):
                            possible_choices: Choices) -> Choices:
 
         if in_sentence(path):
+            self.logger.debug("In sentence!")
             current_sentence = path.from_index(path.rindex('sos'))
             if current_sentence.occurrences(
                     'elaboration') >= self.max_elaborations:
@@ -91,19 +91,28 @@ class NoFoulTeam(PassageRule):
         return possible_choices
 
 
-class TwoPlayersMention(PassageRule):
+class NPlayersMention(PassageRule):
     """
     Ensures that at least two players are mentioned.
 
+    Disables the transition into any state other than start of sentence
+    if there is less than `n` player mentions.
+
+    Enforces a player attribution as long as there are less than
+    `n` player mentions
+
     """
+
+    def __init__(self, n=2):
+        self.n = n
 
     def evaluate_condition(self, *, path: Path,
                            possible_choices: Choices) -> Choices:
 
-        if path.last == 'idle' and path.count('._player') < 2:
-            return Choices(['sos'])
-        if path.last == 'attribution' and path.count('._player') < 2:
-            return Choices(['._player'])
+        if path.last == 'idle' and path.count('._player') < self.n:
+            possible_choices.remove_all_but('sos')
+        if path.last == 'attribution' and path.count('._player') < self.n:
+            possible_choices.remove_all_but('._player')
         return possible_choices
 
 
@@ -111,6 +120,12 @@ class GoalWithDistractor(PassageRule):
     """
     This will make the passage contain two goals, one with distractor
     (almost) and one without.
+
+    Will run a pre-defined sequence of steps in the first sentence,
+    ensuring a modified goal action attributed to a player.
+
+    Will run a pre-defined sequence of steps in the second sentence,
+    ensuring a non-modified goal action attributed to a player.
 
     """
     predifined_first = ['attribution', '._player', 'modifier', '.altering',
@@ -140,7 +155,6 @@ class GoalWithDistractor(PassageRule):
         if path.last == 'sos':
             self.sentence_position += 1
 
-        print(self.sentence_position)
         if self.sentence_position == 1 and path.last == 'attribution':
             self.in_predefined_first = True
 

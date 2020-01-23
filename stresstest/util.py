@@ -5,13 +5,13 @@ import stresstest
 from typing import List, Set
 
 import networkx as nx
-from ailog import Loggable
+from quicklog import Loggable
 from pyvis.network import Network
 
-from stresstest.classes import Path
+from stresstest.classes import Path, Choices
 
 
-def load_graph(path: os.PathLike) -> nx.Graph:
+def load_graph(path: str) -> nx.Graph:
     g = nx.read_graphml(path)
     return expand(convert(g))
 
@@ -141,6 +141,10 @@ def in_sentence(path: Path):
     except ValueError:
         return True
     return sos_index > eos_index
+
+
+def choices_at(graph: nx.Graph, node: str) -> Choices:
+    return Choices(graph.neighbors(node))
 
 
 def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:

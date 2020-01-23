@@ -3,7 +3,7 @@ import re
 from typing import List, Dict
 
 import names
-from ailog import Loggable
+from quicklog import Loggable
 
 from stresstest.classes import Templates, Path
 from stresstest.question.question import Question

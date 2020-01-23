@@ -1,6 +1,6 @@
+quicklog
 names
-aiconf
+quickconf
 pyvis
 networkx
-ailog
 nose

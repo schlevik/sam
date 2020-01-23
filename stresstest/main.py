@@ -1,6 +1,6 @@
 from stresstest.classes import Templates
 from stresstest.passage.rules import AtLeastOneSentence, NoFoulTeam, \
-    TwoPlayersMention, UniqueElaborations, GoalWithDistractor
+    NPlayersMention, UniqueElaborations, GoalWithDistractor
 from stresstest.passage.graph import generate_path
 from stresstest.passage.strategies import ReasonableStrategy
 from stresstest.question.independent_rules import BareMinimum, \
@@ -21,7 +21,7 @@ def generate_passage_question_and_answer_reasonable(graph_path, clauses_path,
                                                     p=None, models=None):
     g = load_graph(graph_path)
     strategy = ReasonableStrategy(
-        [AtLeastOneSentence(), NoFoulTeam(), TwoPlayersMention(),
+        [AtLeastOneSentence(), NoFoulTeam(), NPlayersMention(),
          UniqueElaborations(3)])
     if not p:
         p = generate_path(g, 'start', 'end', strategy)

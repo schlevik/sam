@@ -1,5 +1,5 @@
 import logging
-from ailog import Loggable
+from quicklog import Loggable
 from typing import List, Optional
 from stresstest.classes import Path, Choices
 from stresstest.question.independent_rules import QuestionRule
