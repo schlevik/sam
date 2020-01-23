@@ -35,11 +35,12 @@ class TemplateStringifier(Loggable):
         consolidated_path (Path):
             Like ``path`` but with nodes starting with point (``.``)
             (recursively) collapsed with their predecessors. I.e.::
+
                 path: ['sos' 'action', '.goal' '.spectacular', ...]
-                consolidated_path ['sos', 'action.goal.spectacular', ...]
+                consolidated_path: ['sos', 'action.goal.spectacular', ...]
 
         realised_path (Path):
-            The corresponding realisations of``consolidated_path``
+            The corresponding realisations of ``consolidated_path``
             according to templates and conforming to conditions.
             Populated during  the ``to_string_path`` method call.
 
@@ -82,7 +83,8 @@ class TemplateStringifier(Loggable):
         Transforms the question into its string form according to
         existing question templates and conditions.
 
-        Returns: String version of the question.
+        Returns:
+            String version of the question.
 
         """
         target = self.templates \
@@ -101,6 +103,7 @@ class TemplateStringifier(Loggable):
 
         Should be called after ``to_string_path``.
         Returns:
+            String version of the answer.
 
         """
         return self.resolved_path[self.index_map[self.question.answer_position]]
