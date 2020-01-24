@@ -163,7 +163,7 @@ class Choices(Iterable[T]):
     Thin wrapper over a sequence.
 
     Allows to safely remove elements and chose random elements,
-    possibly subject to given :class:`Condition` s.
+    possibly subject to given :class:`rule` s.
     """
 
     def __iter__(self) -> Iterator[T]:
@@ -225,16 +225,16 @@ class Choices(Iterable[T]):
                           **kwargs) -> Optional[T]:
         """
         Returns a random choice that conforms to all the given
-        conditions.
+        rules.
 
         Does not change the instance.
 
         Args:
-            rules: List of conditions to apply.
-            **kwargs: Kwargs that should match the conditions
+            rules: List of rules to apply.
+            **kwargs: Kwargs that should match the rules
 
         Returns:
-            Random choice conforming to given conditions.
+            Random choice conforming to given rules.
 
         """
         choices = Choices(self)
@@ -249,26 +249,26 @@ class Choices(Iterable[T]):
 
 class Rule(Loggable, ABC):
     """
-    Base condition class.
+    Base rule class.
 
-    All conditions should implement this.
+    All rules should implement this.
     """
 
     @abstractmethod
     def __call__(self, *, path: Path, choices: Choices, **kwargs) -> Choices:
         """
-        Conditions should implement this method.
+        rules should implement this method.
 
         Args:
-            path: The path this condition is applied upon.
+            path: The path this rule is applied upon.
             choices:
                 :class:`Choices` prior to the application of the
-                implementing condition.
+                implementing rule.
             **kwargs:
 
         Returns:
             Valid :class:`Choices` after the application of the
-                implementing condition.
+                implementing rule.
         """
         ...
 
@@ -278,12 +278,12 @@ class Templates(Loggable, Mapping):
     Thin wrapper around the template config tree.
 
     Allows to represent chosen branches and leaves as
-    :class:`Choices` and select random ones with :class:`BaseCondition` s.
+    :class:`Choices` and select random ones with :class:`Baserule` s.
     """
 
-    def __init__(self, templates_path: str, conditions):
+    def __init__(self, templates_path: str, rules: List[Rule]):
         self.cfg: JsonDict = ConfigReader(templates_path).read_config()
-        self.conditions = conditions
+        self.rules = rules
 
     def __getitem__(self, k):
         return self.cfg[k]
@@ -295,7 +295,7 @@ class Templates(Loggable, Mapping):
         Keys are joined with the point operator. i.e. if you want to
         access "a.b.c" you can call::
 
-            random_with_conditions(keys=['a','b','c'])
+            random_with_rules(keys=['a','b','c'])
 
         Args:
             *keys: Keys to choose the template from. Joins the keys with
@@ -328,29 +328,30 @@ class Templates(Loggable, Mapping):
     def random_with_rules(self, keys: List[str], **kwargs):
         """
         Chooses a random template from the given keys satisfying the
-        conditions.
+        rules.
 
         Keys are joined with the point operator. i.e. if you want to
         access "a.b.c" you can call::
 
-            random_with_conditions(keys=['a','b','c'])
+            random_with_rules(keys=['a','b','c'])
 
         Args:
             keys: Keys to chose the template from. Joins the keys with
             the point (".") operator.
-            **kwargs: Keyword arguments passed to the conditions.
-            Depend on the type of condition you're using.
+            **kwargs: Keyword arguments passed to the rules.
+            Depend on the type of rule you're using.
 
         Returns:
             A randomly chosen template that satisfies all
-                conditions.
+                rules.
 
         """
+
         # add keys to kwargs in case we want to pass on the keys
         kwargs['keys'] = keys
         return self \
             .as_choices(*keys) \
-            .random_with_rules(rules=self.conditions, **kwargs)
+            .random_with_rules(rules=self.rules, **kwargs)
 
     def __len__(self) -> int:
         """

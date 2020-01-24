@@ -9,18 +9,18 @@ from stresstest.util import get_sentence_of_word
 
 class BaseRealisationRule(Loggable, ABC):
     """
-    This is the base class for the implementing realisation conditions.
+    This is the base class for the implementing realisation rules.
 
-    Conditions should inherit and implement `evaluate_condition`.
+    Rules should inherit and implement `evaluate_rule`.
     """
 
     def __init__(self, key: str):
         """
-        This condition will only trigger when the given key is being
+        This rule will only trigger when the given key is being
         realised.
 
         Args:
-            key: Key that triggers this condition
+            key: Key that triggers this rule
         """
         self.key = key
 
@@ -31,14 +31,14 @@ class BaseRealisationRule(Loggable, ABC):
                  realised_path: Path = None,
                  position: int = None):
         """
-        Evaluates the condition if the given key equals to the
-        implementing condition's key.
+        Evaluates the rule if the given key equals to the
+        implementing rule's key.
 
         Args:
             choices:
                 Choices to choose from so far.
             keys:
-                Key to compare the condition key to.
+                Key to compare the rule key to.
             path:
                 (non-realised) path.
             realised_path:
@@ -48,36 +48,36 @@ class BaseRealisationRule(Loggable, ABC):
 
         Returns:
             Set of possible choices. Some choices were potentially
-            removed by the condition.
+            removed by the rule.
 
         """
         key = ".".join(keys)
         if key == self.key:
-            return self.evaluate_condition(path=path,
-                                           realised_path=realised_path,
-                                           choices=choices,
-                                           position=position)
+            return self.evaluate_rule(path=path,
+                                      realised_path=realised_path,
+                                      choices=choices,
+                                      position=position)
         return choices
 
     @abstractmethod
-    def evaluate_condition(self, *,
-                           choices,
-                           path=None,
-                           realised_path=None,
-                           position=None):
+    def evaluate_rule(self, *,
+                      choices,
+                      path=None,
+                      realised_path=None,
+                      position=None):
         """
-        Should evaluate the condition to remove unwanted choices
-        according to the condition logic.
+        Should evaluate the rule to remove unwanted choices
+        according to the rule logic.
 
         Args:
-            choices: possible choices before applying condition
+            choices: possible choices before applying rule
             path: (non realised) path
             realised_path: (partly) realised path
             position: Position in path
 
         Returns:
-            Should return a set of conditions that are allowed from
-            the point of view of this condition.
+            Should return a set of rules that are allowed from
+            the point of view of this rule.
 
         """
         ...
@@ -92,9 +92,9 @@ class SingularPlural(BaseRealisationRule):
     def __init__(self):
         super().__init__("path.VBZ-VBP")
 
-    def evaluate_condition(self, *, choices, path=None,
-                           realised_path: Path = None,
-                           position=None):
+    def evaluate_rule(self, *, choices, path=None,
+                      realised_path: Path = None,
+                      position=None):
         if not (position and path):
             raise ValueError(
                 f"{self.__class__.__name__} requires the position and "
@@ -119,8 +119,8 @@ class Modifier(BaseRealisationRule):
     def __init__(self):
         super().__init__("path.MODIFIER")
 
-    def evaluate_condition(self, *, choices: Choices, path=None,
-                           realised_path=None, position=None):
+    def evaluate_rule(self, *, choices: Choices, path=None,
+                      realised_path=None, position=None):
         if not (position and path):
             raise ValueError(
                 f"{self.__class__.__name__} requires the position and "

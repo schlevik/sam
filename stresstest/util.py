@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 import stresstest
-from typing import List, Set
+from typing import List, Set, Dict
 
 import networkx as nx
 from quicklog import Loggable
@@ -23,13 +23,16 @@ def convert(graph: nx.Graph) -> nx.Graph:
 
     Also gets rid of unnecessary data.
 
+    Assumes that input graph has numeric node identifiers and a data
+    field ``label``.
+
     Args:
         graph: Graph to convert.
 
     Returns: (newly constructed) Converted Graph
 
     """
-    node_to_label = dict(graph.nodes('label'))
+    node_to_label: Dict[int, str] = dict(graph.nodes('label'))
     g = nx.DiGraph()
     for u, v in graph.edges():
         g.add_edge(node_to_label[u], node_to_label[v])
@@ -149,7 +152,10 @@ def choices_at(graph: nx.Graph, node: str) -> Choices:
 
 def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
     """
-    Obtains the sentence of a given word.
+    Obtains the sentence of a given word position.
+
+    More concretely, returns the positions of the closest "sos" node to
+    the left and the closes "eos" position to the right as a ``slice``.
 
     Args:
         word: Position of word in :class:`stresstest.classes.Path`.
@@ -160,12 +166,17 @@ def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
         slice.
 
     """
+
     sos_index = word
-    while path[sos_index] != 'sos':
+    while  sos_index >= 0 and path[sos_index] != 'sos':
         sos_index -= 1
     eos_index = word
-    while path[eos_index] != 'eos':
+
+    while eos_index < len(path) and path[eos_index] != 'eos':
         eos_index += 1
+
+    if sos_index < 0 or eos_index >= len(path):
+        raise ValueError(f"'{path[word]}' is not in sentence for '{path}'!")
     return slice(sos_index, eos_index)
 
 
@@ -173,12 +184,22 @@ def in_same_sentence(one: int, other: int, path: 'stresstest.classes.Path'):
     """
     Determines whether two words are in the same sentence.
 
+    More concretely checks whether the closest ``sos`` and ``eos`` nodes as
+    returned by :any:`get_sentence_of_word` are equal for both words.
+
+    Returns False if any or both words are not in a sentence.
+
     Args:
         one: Position of one word in the path.
         other: Position of the other word in the path.
         path: Path to get the sentence from.
 
-    Returns: ``True`` if words are in same sentence, else ``False``.
+    Returns:
+        ``True`` if words are in same sentence, else ``False``.
 
     """
-    return get_sentence_of_word(one, path) == get_sentence_of_word(other, path)
+    try:
+        return get_sentence_of_word(one, path) \
+               == get_sentence_of_word(other, path)
+    except ValueError:
+        return False

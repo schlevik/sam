@@ -23,8 +23,8 @@ class TestAtLeastOneSentence(unittest.TestCase):
     def test_fires_when_no_sentence(self):
         path = Path(['start', 'idle'])
         rule = AtLeastOneSentence()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=self.choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=self.choices) ==
                 self.expected)
 
     def test_doesnt_fire_when_one_sentence(self):
@@ -39,8 +39,8 @@ class TestAtLeastOneSentence(unittest.TestCase):
         path = full_one_sentence
         rule = AtLeastOneSentence()
         empty_choices = Choices([])
-        assert (rule.evaluate_condition(path=path,
-                                        choices=empty_choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=empty_choices) ==
                 empty_choices)
 
 
@@ -52,8 +52,8 @@ class TestUniqueElaborations(unittest.TestCase):
                                                'elaboration', '._position',
                                                'elaboration', '._type'])
         rule = UniqueElaborations()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == expected)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == expected)
 
     def test_removes_used_distance_elaboration(self):
         choices = Choices(['._distance',
@@ -62,8 +62,8 @@ class TestUniqueElaborations(unittest.TestCase):
         expected = choices - '._distance'
         path = full_one_sentence + ['elaboration', '._distance', 'elaboration']
         rule = UniqueElaborations()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == expected)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == expected)
 
     def test_removes_used_type_elaboration(self):
         choices = Choices(['._distance',
@@ -72,8 +72,8 @@ class TestUniqueElaborations(unittest.TestCase):
         expected = choices - '._type'
         path = full_one_sentence + ['elaboration', '._type', 'elaboration']
         rule = UniqueElaborations()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == expected)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == expected)
 
     def test_removes_used_position_elaboration(self):
         choices = Choices(['._distance',
@@ -82,8 +82,8 @@ class TestUniqueElaborations(unittest.TestCase):
         expected = choices - '._position'
         path = full_one_sentence + ['elaboration', '._position', 'elaboration']
         rule = UniqueElaborations()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == expected)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == expected)
 
     def test_does_not_affect_new_sentence(self):
         path = full_one_sentence + ['elaboration', '._position',
@@ -93,15 +93,15 @@ class TestUniqueElaborations(unittest.TestCase):
                            '._type', 'eos'])
         path = full_one_sentence + ['elaboration', '._position', 'elaboration']
         rule = UniqueElaborations()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == choices)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == choices)
 
     def test_doesnt_add_new_choices(self):
         path = full_one_sentence
         rule = AtLeastOneSentence()
         empty_choices = Choices([])
-        assert (rule.evaluate_condition(path=path,
-                                        choices=empty_choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=empty_choices) ==
                 empty_choices)
 
 
@@ -113,16 +113,16 @@ class TestNoFoulTeam(unittest.TestCase):
         choices = Choices(['.goal', '.foul', '.freekick'])
         expected = choices - '.foul'
         rule = NoFoulTeam()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == expected)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == expected)
 
     def test_does_not_affect_player(self):
         path = Path(['start', 'idle', 'sos', 'attribution', '._player',
                      'action-description'])
         choices = Choices(['.goal', '.foul', '.freekick'])
         rule = NoFoulTeam()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == choices)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == choices)
 
     def test_does_not_affect_new_sentence(self):
         path = Path(['start', 'idle', 'sos', 'attribution', '._team',
@@ -130,16 +130,16 @@ class TestNoFoulTeam(unittest.TestCase):
                      'attribution', '._player'])
         choices = Choices(['.goal', '.foul', '.freekick'])
         rule = NoFoulTeam()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) == choices)
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) == choices)
 
     def test_doesnt_add_new_choices(self):
         path = Path(['start', 'idle', 'sos', 'attribution', '._player',
                      'action-description'])
         rule = NoFoulTeam()
         empty_choices = Choices([])
-        assert (rule.evaluate_condition(path=path,
-                                        choices=empty_choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=empty_choices) ==
                 empty_choices)
 
 
@@ -149,8 +149,8 @@ class TestNPlayerMention(unittest.TestCase):
         choices = Choices(['end', 'sos'])
         expected = Choices(['sos'])
         rule = NPlayersMention()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) ==
                 expected)
 
     def test_enforces_player_mention_on_attribution(self):
@@ -159,8 +159,8 @@ class TestNPlayerMention(unittest.TestCase):
         expected = choices - '._team'
         rule = NPlayersMention()
 
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) ==
                 expected)
 
     def test_doesnt_alter_when_two_players_mentioned(self):
@@ -169,16 +169,16 @@ class TestNPlayerMention(unittest.TestCase):
         path = path + ['sos', 'attribution']
         choices = Choices(['._player', '._team'])
         rule = NPlayersMention()
-        assert (rule.evaluate_condition(path=path,
-                                        choices=choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=choices) ==
                 choices)
 
     def test_doesnt_add_new_choices(self):
         path = full_one_sentence + ['eos', 'idle']
         rule = NPlayersMention()
         empty_choices = Choices([])
-        assert (rule.evaluate_condition(path=path,
-                                        choices=empty_choices) ==
+        assert (rule.evaluate_rule(path=path,
+                                   choices=empty_choices) ==
                 empty_choices)
 
 
@@ -187,7 +187,7 @@ class TestGoalWithDistractor(unittest.TestCase):
         path = Path(['start', 'idle', 'sos'])
         choices = choices_at(graph, 'sos')
         rule = GoalWithDistractor()
-        rule.evaluate_condition(path=path, choices=choices)
+        rule.evaluate_rule(path=path, choices=choices)
         assert (rule.sentence_position == 1)
 
         old_next = 'attribution'
@@ -198,12 +198,12 @@ class TestGoalWithDistractor(unittest.TestCase):
             choices = choices_at(graph, old_next)
             new_next = n
             expected = Choices([new_next])
-            assert (rule.evaluate_condition(path=path,
-                                            choices=choices) == expected)
+            assert (rule.evaluate_rule(path=path,
+                                       choices=choices) == expected)
             old_next = new_next
         choices = choices_at(graph, 'sos')
         path += ['sos']
-        rule.evaluate_condition(path=path, choices=choices)
+        rule.evaluate_rule(path=path, choices=choices)
         assert rule.sentence_position == 2
 
         old_next = 'attribution'
@@ -213,6 +213,6 @@ class TestGoalWithDistractor(unittest.TestCase):
             choices = choices_at(graph, old_next)
             new_next = n
             expected = Choices([new_next])
-            assert (rule.evaluate_condition(path=path,
-                                            choices=choices) == expected)
+            assert (rule.evaluate_rule(path=path,
+                                       choices=choices) == expected)
             old_next = new_next

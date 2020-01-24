@@ -6,27 +6,27 @@ from stresstest.util import in_sentence
 
 class PassageRule(Rule):
     """
-    Base class for passage conditions.
+    Base class for passage rules.
     """
 
     def __call__(self, path: Path, choices: Choices, **kwargs):
-        return self.evaluate_condition(path=path, choices=choices)
+        return self.evaluate_rule(path=path, choices=choices)
 
     @abstractmethod
-    def evaluate_condition(self, *, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path,
+                      choices: Choices) -> Choices:
         """
-        Passage conditions should implement the logic in this method.
+        Passage rules should implement the logic in this method.
 
         Args:
             path: Content Path so far.
             choices: Possible neighbors in the content graph
                 as choices, minus all choices that did not meet
-                conditions applied prior to this one.
+                rules applied prior to this one.
 
         Returns:
             Choices from the given ones that also satisfy the
-            implementing condition.
+            implementing rule.
 
         """
         ...
@@ -34,12 +34,12 @@ class PassageRule(Rule):
 
 class AtLeastOneSentence(PassageRule):
     """
-    This condition ensures that there's at least one content sentence.
+    This rule ensures that there's at least one content sentence.
 
     """
 
-    def evaluate_condition(self, *, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path,
+                      choices: Choices) -> Choices:
         if path.last == 'idle' and 'sos' not in path:
             choices.remove_all_but('sos')
         return choices
@@ -47,7 +47,7 @@ class AtLeastOneSentence(PassageRule):
 
 class UniqueElaborations(PassageRule):
     """
-    This condition ensures the elaborations
+    This rule ensures the elaborations
     (e.g. ``elaboration.distance``) are unique. Also ensures there's
     no elaboration step after all possible elaborations are used up.
 
@@ -56,8 +56,8 @@ class UniqueElaborations(PassageRule):
     def __init__(self, max_elaborations=3):
         self.max_elaborations = max_elaborations
 
-    def evaluate_condition(self, *, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path,
+                      choices: Choices) -> Choices:
 
         if in_sentence(path):
             current_sentence = path.from_index(path.rindex('sos'))
@@ -78,8 +78,8 @@ class NoFoulTeam(PassageRule):
 
     """
 
-    def evaluate_condition(self, *, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path,
+                      choices: Choices) -> Choices:
 
         if in_sentence(path):
             current_sentence = path.from_index(path.rindex('sos'))
@@ -105,8 +105,8 @@ class NPlayersMention(PassageRule):
     def __init__(self, n=2):
         self.n = n
 
-    def evaluate_condition(self, *, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path,
+                      choices: Choices) -> Choices:
 
         if path.last == 'idle' and path.count('._player') < self.n:
             choices.remove_all_but('sos')
@@ -149,8 +149,8 @@ class GoalWithDistractor(PassageRule):
             self.in_predefined_second = False
             return Choices([which[-1]])
 
-    def evaluate_condition(self, *, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path,
+                      choices: Choices) -> Choices:
         if path.last == 'sos':
             self.sentence_position += 1
 

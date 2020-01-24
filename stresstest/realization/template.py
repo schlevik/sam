@@ -17,7 +17,7 @@ class TemplateStringifier(Loggable):
     string forms.
 
     Realisation can happen subject to
-    :class:`stresstest.classes.Condition` s to maintain finer-grained
+    :class:`stresstest.classes.rule` s to maintain finer-grained
     control over the random selection of templates.
 
     Attributes:
@@ -41,7 +41,7 @@ class TemplateStringifier(Loggable):
 
         realised_path (Path):
             The corresponding realisations of ``consolidated_path``
-            according to templates and conforming to conditions.
+            according to templates and conforming to rules.
             Populated during  the ``to_string_path`` method call.
 
         resolved_path:
@@ -81,7 +81,7 @@ class TemplateStringifier(Loggable):
     def to_string_question(self) -> str:
         """
         Transforms the question into its string form according to
-        existing question templates and conditions.
+        existing question templates and rules.
 
         Returns:
             String version of the question.
@@ -90,11 +90,11 @@ class TemplateStringifier(Loggable):
         target = self.templates \
             .random_with_rules(path=self.path,
                                keys=["question.target",
-                                          self.question.target])
+                                     self.question.target])
         action = self.templates \
             .random_with_rules(path=self.path,
                                keys=["question.action",
-                                          self.question.action])
+                                     self.question.action])
         return " ".join((target, action))
 
     def to_string_answer(self) -> str:
@@ -129,10 +129,10 @@ class TemplateStringifier(Loggable):
                             position=position)
                     ])
                 elif 'min' == var_name:
-                    # TODO: will need conditions here as well
+                    # TODO: will need rules here as well
                     var_value = str(random.choice(list(range(1, 45))))
                 elif "m" == var_name:
-                    # TODO: will need conditions here as well
+                    # TODO: will need rules here as well
                     var_value = str(random.choice(list(range(5, 30))))
                 else:
                     var_value = self.templates. \

@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import List
 
 from stresstest.classes import Path, Rule, Choices
 from stresstest.util import get_sentence_of_word
@@ -17,21 +16,21 @@ class QuestionRule(Rule):
         if not target and not action:
             missing = 'target and action'
         if missing:
-            raise ValueError("QuestionCondition signature is (path: Path, "
+            raise ValueError("QuestionRule signature is (path: Path, "
                              "choices: Choices, target:str, action:str) "
                              f"(keyword only). {missing} is missing.")
-        return self.evaluate_condition(path=path, choices=choices,
-                                       target=target, action=action)
+        return self.evaluate_rule(path=path, choices=choices,
+                                  target=target, action=action)
 
     @abstractmethod
-    def evaluate_condition(self, *, path: Path, target: str, action: str,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, *, path: Path, target: str, action: str,
+                      choices: Choices) -> Choices:
         ...
 
 
 class BareMinimum(QuestionRule):
-    def evaluate_condition(self, target: str, action: str, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, target: str, action: str, path: Path,
+                      choices: Choices) -> Choices:
         alphnum = path.alph_num()
         result = []
         for i in choices:
@@ -44,8 +43,8 @@ class BareMinimum(QuestionRule):
 
 
 class IsNotModified(QuestionRule):
-    def evaluate_condition(self, target: str, action: str, path: Path,
-                           choices: Choices) -> Choices:
+    def evaluate_rule(self, target: str, action: str, path: Path,
+                      choices: Choices) -> Choices:
 
         alphnum = path.alph_num()
 

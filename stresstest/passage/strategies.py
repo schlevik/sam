@@ -17,14 +17,14 @@ class ReasonableStrategy(Loggable):
     selected as a next element in the path.
     """
 
-    def __init__(self, conditions: List[PassageRule]):
+    def __init__(self, rules: List[PassageRule]):
         """
         Instantiates the strategy.
 
         Args:
-            conditions: Rules that guide the content generation.
+            rules: Rules that guide the content generation.
         """
-        self.conditions: List[PassageRule] = conditions
+        self.rules: List[PassageRule] = rules
 
     def __call__(self, graph: nx.Graph, path: Path) -> str:
         """
@@ -41,12 +41,12 @@ class ReasonableStrategy(Loggable):
 
         """
         possible_choices = Choices(graph.neighbors(path.last))
-        for condition in self.conditions:
-            possible_choices = condition(path, possible_choices)
+        for rule in self.rules:
+            possible_choices = rule(path, possible_choices)
         result = possible_choices.random()
         if not result:
-            names = [f.__name__ for f in self.conditions]
-            self.logger.error(f"The set of conditions {names} yielded no choice"
+            names = [f.__name__ for f in self.rules]
+            self.logger.error(f"The set of rules {names} yielded no choice"
                               f" for the node {path.last} in the path \n{path}")
             raise ValueError("Better check your config bro...")
         return result

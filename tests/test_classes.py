@@ -1,15 +1,19 @@
-import unittest
-from random import choice
-
 import pytest
 from flaky import flaky
 from quicklog import setup_logging
 
-from stresstest.classes import Choices, Path, Rule
-from stresstest.util import choices_at, load_graph
+from stresstest.classes import Choices, Path, Rule, Templates
 
 setup_logging('tests/resources/logging.conf')
-graph = load_graph('tests/resources/unnamed0.graphml')
+
+
+class TestRule(Rule):
+    def __call__(self, *, path: Path, choices: Choices,
+                 **kwargs) -> Choices:
+        assert 'x' in kwargs
+        assert kwargs['x'] == 3
+        choices.remove_all_but(1)
+        return choices
 
 
 class TestPath:
@@ -126,15 +130,30 @@ class TestChoices:
 
     @flaky(max_runs=10, min_passes=10)
     def test_random_with_conditions(self):
-        class TestRule(Rule):
-            def __call__(self, *, path: Path, choices: Choices,
-                         **kwargs) -> Choices:
-                assert 'x' in kwargs
-                assert kwargs['x'] == 3
-                choices.remove_all_but(1)
-                return choices
-
         assert Choices([1, 2, 3]) \
                    .random_with_rules(path=Path([]),
                                       rules=[TestRule()],
                                       x=3) == 1
+
+    def test_empty_choices_random_returns_none(self):
+        assert Choices([]).random() is None
+
+
+class TestTemplates:
+    def test_loading_works(self):
+        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        assert t['path.end'] == ['The end.']
+
+    def test_templates_work(self):
+        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+
+        assert t['path.end'] == t.templates('path', 'end')
+
+    def test_choices_work(self):
+        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        assert t.as_choices('path', 'end') == Choices(['The end.'])
+
+    def test_random_with_rules(self):
+        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        assert t.random_with_rules(path=Path(['end']), keys=['path', 'end'],
+                                   x=3) is None
