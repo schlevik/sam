@@ -12,7 +12,7 @@ T = TypeVar("T")
 JsonDict = Dict[str, Any]
 
 
-class Path(Loggable, Sequence):
+class Path(Loggable, Sequence[str]):
     """
     A thin wrapper around a list representing the path of nodes chosen
     on the content graph.
@@ -90,6 +90,9 @@ class Path(Loggable, Sequence):
             A copy of the path from a given index.
 
         """
+        if i >= len(self):
+            raise ValueError(f"Index i ({i}) to create Path from must be "
+                             f"smaller than this path's length ({len(self)})")
         return Path(self.steps[i:])
 
     def __getitem__(self, i):
@@ -186,7 +189,7 @@ class Choices(Iterable[T]):
 
     # return
 
-    def remove(self, i: Union[Iterable, str]) -> None:
+    def remove(self, i: Union[Iterable[T], T]) -> None:
         """
         Removes a choice if present.
 
@@ -214,12 +217,12 @@ class Choices(Iterable[T]):
             Random value if present None otherwise.
         """
         try:
-            return random.choice(self)
+            return random.choice(tuple(self))
         except IndexError:
             return None
 
-    def random_with_conditions(self, *, conditions: List['Rule'],
-                               **kwargs) -> Optional[T]:
+    def random_with_rules(self, *, rules: List['Rule'],
+                          **kwargs) -> Optional[T]:
         """
         Returns a random choice that conforms to all the given
         conditions.
@@ -227,7 +230,7 @@ class Choices(Iterable[T]):
         Does not change the instance.
 
         Args:
-            conditions: List of conditions to apply.
+            rules: List of conditions to apply.
             **kwargs: Kwargs that should match the conditions
 
         Returns:
@@ -235,12 +238,12 @@ class Choices(Iterable[T]):
 
         """
         choices = Choices(self)
-        for condition in conditions:
-            choices = condition(possible_choices=choices,
-                                **kwargs)
+        for rule in rules:
+            choices = rule(choices=choices,
+                           **kwargs)
         return choices.random()
 
-    def remove_all_but(self, *nodes: str):
+    def remove_all_but(self, *nodes: T):
         self.remove([n for n in self if n not in nodes])
 
 
@@ -322,7 +325,7 @@ class Templates(Loggable, Mapping):
         """
         return Choices(self.templates(*keys))
 
-    def random_with_conditions(self, keys: List[str], **kwargs):
+    def random_with_rules(self, keys: List[str], **kwargs):
         """
         Chooses a random template from the given keys satisfying the
         conditions.
@@ -347,7 +350,7 @@ class Templates(Loggable, Mapping):
         kwargs['keys'] = keys
         return self \
             .as_choices(*keys) \
-            .random_with_conditions(conditions=self.conditions, **kwargs)
+            .random_with_rules(rules=self.conditions, **kwargs)
 
     def __len__(self) -> int:
         """

@@ -10,17 +10,17 @@ class PassageRule(Rule):
     """
 
     def __call__(self, path: Path, choices: Choices, **kwargs):
-        return self.evaluate_condition(path=path, possible_choices=choices)
+        return self.evaluate_condition(path=path, choices=choices)
 
     @abstractmethod
     def evaluate_condition(self, *, path: Path,
-                           possible_choices: Choices) -> Choices:
+                           choices: Choices) -> Choices:
         """
         Passage conditions should implement the logic in this method.
 
         Args:
             path: Content Path so far.
-            possible_choices: Possible neighbors in the content graph
+            choices: Possible neighbors in the content graph
                 as choices, minus all choices that did not meet
                 conditions applied prior to this one.
 
@@ -39,10 +39,10 @@ class AtLeastOneSentence(PassageRule):
     """
 
     def evaluate_condition(self, *, path: Path,
-                           possible_choices: Choices) -> Choices:
+                           choices: Choices) -> Choices:
         if path.last == 'idle' and 'sos' not in path:
-            possible_choices.remove_all_but('sos')
-        return possible_choices
+            choices.remove_all_but('sos')
+        return choices
 
 
 class UniqueElaborations(PassageRule):
@@ -57,20 +57,19 @@ class UniqueElaborations(PassageRule):
         self.max_elaborations = max_elaborations
 
     def evaluate_condition(self, *, path: Path,
-                           possible_choices: Choices) -> Choices:
+                           choices: Choices) -> Choices:
 
         if in_sentence(path):
-            self.logger.debug("In sentence!")
             current_sentence = path.from_index(path.rindex('sos'))
             if current_sentence.occurrences(
                     'elaboration') >= self.max_elaborations:
-                possible_choices.remove(['elaboration'])
+                choices.remove(['elaboration'])
 
             if path.last == 'elaboration':
-                to_remove = [c for c in possible_choices if
+                to_remove = [c for c in choices if
                              c in current_sentence]
-                possible_choices.remove(to_remove)
-        return possible_choices
+                choices.remove(to_remove)
+        return choices
 
 
 class NoFoulTeam(PassageRule):
@@ -80,15 +79,15 @@ class NoFoulTeam(PassageRule):
     """
 
     def evaluate_condition(self, *, path: Path,
-                           possible_choices: Choices) -> Choices:
+                           choices: Choices) -> Choices:
 
         if in_sentence(path):
             current_sentence = path.from_index(path.rindex('sos'))
 
             # don't foul team
             if "._team" in current_sentence.steps:
-                possible_choices.remove(".foul")
-        return possible_choices
+                choices.remove(".foul")
+        return choices
 
 
 class NPlayersMention(PassageRule):
@@ -107,13 +106,13 @@ class NPlayersMention(PassageRule):
         self.n = n
 
     def evaluate_condition(self, *, path: Path,
-                           possible_choices: Choices) -> Choices:
+                           choices: Choices) -> Choices:
 
         if path.last == 'idle' and path.count('._player') < self.n:
-            possible_choices.remove_all_but('sos')
+            choices.remove_all_but('sos')
         if path.last == 'attribution' and path.count('._player') < self.n:
-            possible_choices.remove_all_but('._player')
-        return possible_choices
+            choices.remove_all_but('._player')
+        return choices
 
 
 class GoalWithDistractor(PassageRule):
@@ -151,7 +150,7 @@ class GoalWithDistractor(PassageRule):
             return Choices([which[-1]])
 
     def evaluate_condition(self, *, path: Path,
-                           possible_choices: Choices) -> Choices:
+                           choices: Choices) -> Choices:
         if path.last == 'sos':
             self.sentence_position += 1
 
@@ -167,4 +166,4 @@ class GoalWithDistractor(PassageRule):
         if self.in_predefined_second:
             return self._run_predefined(self.predifined_second)
 
-        return possible_choices
+        return choices

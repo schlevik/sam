@@ -88,12 +88,12 @@ class TemplateStringifier(Loggable):
 
         """
         target = self.templates \
-            .random_with_conditions(path=self.path,
-                                    keys=["question.target",
+            .random_with_rules(path=self.path,
+                               keys=["question.target",
                                           self.question.target])
         action = self.templates \
-            .random_with_conditions(path=self.path,
-                                    keys=["question.action",
+            .random_with_rules(path=self.path,
+                               keys=["question.action",
                                           self.question.action])
         return " ".join((target, action))
 
@@ -117,12 +117,12 @@ class TemplateStringifier(Loggable):
                     var_value = names.get_full_name(gender='female')
                 elif 'team' in var_name:
                     var_value = " ".join([
-                        self.templates.random_with_conditions(
+                        self.templates.random_with_rules(
                             path=self.consolidated_path,
                             realised_path=self.realised_path,
                             keys=['team-name', 'first'],
                             position=position),
-                        self.templates.random_with_conditions(
+                        self.templates.random_with_rules(
                             path=self.consolidated_path,
                             realised_path=self.realised_path,
                             keys=['team-name', 'last'],
@@ -136,10 +136,10 @@ class TemplateStringifier(Loggable):
                     var_value = str(random.choice(list(range(5, 30))))
                 else:
                     var_value = self.templates. \
-                        random_with_conditions(path=self.consolidated_path,
-                                               realised_path=self.realised_path,
-                                               keys=['variables', var_name],
-                                               position=position)
+                        random_with_rules(path=self.consolidated_path,
+                                          realised_path=self.realised_path,
+                                          keys=['variables', var_name],
+                                          position=position)
             string = re.sub(f"#{var_name}", var_value, string)
             self.variables_table[var_name] = var_value
         return string
@@ -165,7 +165,7 @@ class TemplateStringifier(Loggable):
             # Resolve if there is a a fitting template,
             # otherwise just put an empty string
             resolved = \
-                self.templates.random_with_conditions(
+                self.templates.random_with_rules(
                     path=self.consolidated_path,
                     realised_path=self.realised_path,
                     keys=['path', var_name],
@@ -194,7 +194,7 @@ class TemplateStringifier(Loggable):
 
         # Resolve using path -> string templates
         self.realised_path.extend(
-            self.templates.random_with_conditions(
+            self.templates.random_with_rules(
                 path=self.consolidated_path,
                 keys=['path', c], position=i) or ""
             for i, c in enumerate(self.consolidated_path)

@@ -1,3 +1,4 @@
+pytest
 quicklog
 names
 quickconf

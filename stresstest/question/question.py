@@ -35,12 +35,12 @@ class Question(Loggable):
 
 
 def create_question(target: str, action: str, path: Path,
-                    conditions: List[QuestionRule]) -> Optional[Question]:
+                    rules: List[QuestionRule]) -> Optional[Question]:
     """
     Creates a :class:`Question` for a path given a concrete target and
     action if possible.
 
-    The created question satisfies given conditions.
+    The created question satisfies given rules.
 
     Returns `None` if the question is ambiguous (more than 1 answer exists) or
     unanswerable.
@@ -53,16 +53,16 @@ def create_question(target: str, action: str, path: Path,
         path:
             Passage in logical form (a path in the content graph)
             the generated question should ask about.
-        conditions:
-             Conditions the generated question should conform to.
+        rules:
+             rules the generated question should conform to.
 
     Returns:
         A :class:`Question` if a question with given action and target
         is unambiguously answerable from the given path and suffices
-        given conditions.
+        given rules.
     """
     candidates = Choices([i for i, _ in enumerate(path)])
-    for c in conditions:
+    for c in rules:
         candidates = c(path=path, choices=candidates, target=target,
                        action=action)
     if not candidates:
@@ -70,22 +70,22 @@ def create_question(target: str, action: str, path: Path,
     if len(candidates) > 1:
         logging.getLogger(__name__).info(
             f"{target}, {action} is ambiguous under "
-            f"{[f.__class__.__name__ for f in conditions]}: "
+            f"{[f.__class__.__name__ for f in rules]}: "
             f"{[path[c] for c in candidates]}")
         return None
     else:
-        q = Question(target, action, candidates[0], path)
+        q = Question(target, action, next(iter(candidates)), path)
         return q
 
 
 def generate_question(path: Path,
                       targets: List[str],
                       actions: List[str],
-                      conditions: List[QuestionRule],
+                      rules: List[QuestionRule],
                       ) -> Optional[Question]:
     """
     Generates a random question that can be asked given the path and
-    conforms to the given conditions, if possible. If not, returns 0.
+    conforms to the given rules, if possible. If not, returns 0.
 
     Generated questions are per definition `unique` (i.e. there cannot
     be two correct answers) and answerable (i.e. there cannot be
@@ -99,17 +99,17 @@ def generate_question(path: Path,
             Possible question target types. (e.g. player, team, etc)
         actions:
             Possible question action types. (e.g. free kick, goal, etc)
-        conditions:
-            Conditions the generated question should conform to.
+        rules:
+            rules the generated question should conform to.
 
     Returns:
         A random question about the path that suffices all given
-        conditions. If no question can be asked, returns ``None``.
+        rules. If no question can be asked, returns ``None``.
 
     """
     logger = logging.getLogger("generate_question")
     logger.info(f"Generating question from: {path}")
-    questions = (create_question(t, a, path, conditions) for t in targets for a
+    questions = (create_question(t, a, path, rules) for t in targets for a
                  in actions)
     possible_choices = Choices(q for q in questions if q)
     if not possible_choices:

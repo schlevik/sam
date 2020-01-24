@@ -25,7 +25,7 @@ class BaseRealisationRule(Loggable, ABC):
         self.key = key
 
     def __call__(self, *,
-                 possible_choices: Choices,
+                 choices: Choices,
                  keys: Iterable[str],
                  path: Path = None,
                  realised_path: Path = None,
@@ -35,7 +35,7 @@ class BaseRealisationRule(Loggable, ABC):
         implementing condition's key.
 
         Args:
-            possible_choices:
+            choices:
                 Choices to choose from so far.
             keys:
                 Key to compare the condition key to.
@@ -55,13 +55,13 @@ class BaseRealisationRule(Loggable, ABC):
         if key == self.key:
             return self.evaluate_condition(path=path,
                                            realised_path=realised_path,
-                                           possible_choices=possible_choices,
+                                           choices=choices,
                                            position=position)
-        return possible_choices
+        return choices
 
     @abstractmethod
     def evaluate_condition(self, *,
-                           possible_choices,
+                           choices,
                            path=None,
                            realised_path=None,
                            position=None):
@@ -70,7 +70,7 @@ class BaseRealisationRule(Loggable, ABC):
         according to the condition logic.
 
         Args:
-            possible_choices: possible choices before applying condition
+            choices: possible choices before applying condition
             path: (non realised) path
             realised_path: (partly) realised path
             position: Position in path
@@ -92,7 +92,7 @@ class SingularPlural(BaseRealisationRule):
     def __init__(self):
         super().__init__("path.VBZ-VBP")
 
-    def evaluate_condition(self, *, possible_choices, path=None,
+    def evaluate_condition(self, *, choices, path=None,
                            realised_path: Path = None,
                            position=None):
         if not (position and path):
@@ -101,10 +101,10 @@ class SingularPlural(BaseRealisationRule):
                 f"realised_path kwargs!")
         sentence = path[get_sentence_of_word(position, path)]
         if any(a.endswith('team') for a in sentence):
-            possible_choices.remove('was')
+            choices.remove('was')
         elif any(a.endswith('player') for a in sentence):
-            possible_choices.remove('were')
-        return possible_choices
+            choices.remove('were')
+        return choices
 
 
 class Modifier(BaseRealisationRule):
@@ -119,7 +119,7 @@ class Modifier(BaseRealisationRule):
     def __init__(self):
         super().__init__("path.MODIFIER")
 
-    def evaluate_condition(self, *, possible_choices: Choices, path=None,
+    def evaluate_condition(self, *, choices: Choices, path=None,
                            realised_path=None, position=None):
         if not (position and path):
             raise ValueError(
@@ -127,7 +127,7 @@ class Modifier(BaseRealisationRule):
                 f"realised_path kwargs!")
         sentence = path[get_sentence_of_word(position, path)]
         if "modifier.altering" not in sentence:
-            possible_choices.remove('$ALTERING')
+            choices.remove('$ALTERING')
         if "modifier.non-altering" not in sentence:
-            possible_choices.remove('$NON-ALTERING')
-        return possible_choices
+            choices.remove('$NON-ALTERING')
+        return choices
