@@ -3,11 +3,11 @@ from typing import Iterable
 
 from quicklog import Loggable
 
-from stresstest.classes import Choices, Path
+from stresstest.classes import Choices, Path, Rule
 from stresstest.util import get_sentence_of_word
 
 
-class BaseRealisationRule(Loggable, ABC):
+class BaseRealisationRule(Rule):
     """
     This is the base class for the implementing realisation rules.
 

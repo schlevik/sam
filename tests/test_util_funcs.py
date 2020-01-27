@@ -2,9 +2,9 @@ import networkx as nx
 import pytest
 from quicklog import setup_logging
 
-from classes import Path
-from util import load_graph, convert, expand, in_sentence, get_sentence_of_word, \
-    in_same_sentence
+from stresstest.classes import Path
+from stresstest.util import load_graph, convert, expand, in_sentence, \
+    get_sentence_of_word, in_same_sentence
 
 setup_logging('tests/resources/logging.conf')
 graph = load_graph('tests/resources/unnamed0.graphml')

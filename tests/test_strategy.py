@@ -3,7 +3,7 @@ import unittest
 import pytest
 from quicklog import setup_logging
 
-from passage.strategies import ReasonableStrategy
+from stresstest.passage.strategies import ReasonableStrategy
 from stresstest.classes import Choices, Path
 from stresstest.passage.rules import AtLeastOneSentence, UniqueElaborations, \
     NoFoulTeam, NPlayersMention, GoalWithDistractor, PassageRule
@@ -44,4 +44,3 @@ class TestReasonableStrategy:
         path = Path(['start'])
         with pytest.raises(ValueError):
             s(graph, path)
-
