@@ -16,8 +16,8 @@ def naqanet() -> Tuple[str, Predictor]:
 
 class Albert:
     def __init__(self, path: str, gpu=False):
-        self.tokenizer = AlbertTokenizer(path)
-        self.model = AlbertForQuestionAnswering(path)
+        self.tokenizer = AlbertTokenizer.from_pretrained(path)
+        self.model = AlbertForQuestionAnswering.from_pretrained(path)
         self.gpu = gpu
 
     def predict(self, question, passage):
