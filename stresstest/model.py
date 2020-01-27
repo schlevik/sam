@@ -14,6 +14,10 @@ def naqanet() -> Tuple[str, Predictor]:
     return "NaQAnet", naqanet_dua_2019()
 
 
+def albert(path):
+    return "AlBERT", Albert(path)
+
+
 class Albert:
     def __init__(self, path: str, gpu=False):
         self.tokenizer = AlbertTokenizer.from_pretrained(path)
@@ -32,9 +36,11 @@ class Albert:
 
         s, e = self.model(token_type_ids=token_type_ids,
                           input_ids=input_ids)
-        return " ".join(
+        result = dict()
+        result['best_span_str'] = " ".join(
             [
                 self.tokenizer.decode(int(i))
                 for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
             ]
         )
+        return result
