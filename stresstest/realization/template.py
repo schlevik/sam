@@ -95,7 +95,7 @@ class TemplateStringifier(Loggable):
             .random_with_rules(path=self.path,
                                keys=["question.action",
                                      self.question.action])
-        return " ".join((target, action))
+        return " ".join((target, action)) + "?"
 
     def to_string_answer(self) -> str:
         """

@@ -14,8 +14,8 @@ def naqanet() -> Tuple[str, Predictor]:
     return "NaQAnet", naqanet_dua_2019()
 
 
-def albert(path):
-    return "AlBERT", Albert(path)
+def albert(path, gpu=False):
+    return "AlBERT", Albert(path, gpu)
 
 
 class Albert:
@@ -23,6 +23,8 @@ class Albert:
         self.tokenizer = AlbertTokenizer.from_pretrained(path)
         self.model = AlbertForQuestionAnswering.from_pretrained(path)
         self.gpu = gpu
+        if self.gpu:
+            self.model.cuda()
 
     def predict(self, question, passage):
         d = self.tokenizer.encode_plus(question.lower(), passage.lower(),
