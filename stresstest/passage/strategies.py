@@ -36,6 +36,7 @@ class ReasonableStrategy(Loggable):
             graph:
                 Content graph to select the next node from.
             path:
+                Path so far. Cannot be empty.
 
         Returns:
 
@@ -43,10 +44,11 @@ class ReasonableStrategy(Loggable):
         possible_choices = Choices(graph.neighbors(path.last))
         for rule in self.rules:
             possible_choices = rule(path, possible_choices)
+            self.logger.info(f"type: {type(possible_choices)}")
         result = possible_choices.random()
         if not result:
-            names = [f.__name__ for f in self.rules]
-            self.logger.error(f"The set of rules {names} yielded no choice"
-                              f" for the node {path.last} in the path \n{path}")
+            names = [f.__class__.__name__ for f in self.rules]
+            self.logger.error(f"The set of rules {names} yielded no choice for "
+                              f"the node '{path.last}' in the path \n{path}")
             raise ValueError("Better check your config bro...")
         return result

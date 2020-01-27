@@ -243,7 +243,7 @@ class Choices(Iterable[T]):
                            **kwargs)
         return choices.random()
 
-    def remove_all_but(self, *nodes: T):
+    def remove_all_but(self, *nodes: T) -> None:
         self.remove([n for n in self if n not in nodes])
 
 
@@ -278,7 +278,7 @@ class Templates(Loggable, Mapping):
     Thin wrapper around the template config tree.
 
     Allows to represent chosen branches and leaves as
-    :class:`Choices` and select random ones with :class:`Baserule` s.
+    :class:`Choices` and select random ones with :class:`Rule` s.
     """
 
     def __init__(self, templates_path: str, rules: List[Rule]):
