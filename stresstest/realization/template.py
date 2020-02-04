@@ -8,6 +8,11 @@ from quicklog import Loggable
 from stresstest.classes import Templates, Path
 from stresstest.question.question import Question
 
+tpl = """
+Passage: {}
+Question: {}
+Answer: {}"""
+
 
 class TemplateStringifier(Loggable):
     """
@@ -58,7 +63,7 @@ class TemplateStringifier(Loggable):
     _no_whitespace = ['eos']
 
     def __init__(self, templates: Templates,
-                 path: Path, question: Question):
+                 path: Path, question: Question, stringify=True):
         """
 
 
@@ -77,6 +82,22 @@ class TemplateStringifier(Loggable):
         # initialise consolidated path and the index map
         self.index_map: Dict[int, int] = dict()
         self.consolidated_path = self._consolidate(self.path)
+        self.question_string = ''
+        self.answer_string = ''
+        self.passage_string = ''
+
+        if stringify:
+            self.stringify()
+
+    def stringify(self):
+        self.passage_string = self.to_string_path()
+        self.question_string = self.to_string_question()
+        self.answer_string = self.to_string_answer()
+
+    def __str__(self):
+        return tpl.format(
+            self.passage_string, self.question_string, self.answer_string,
+        )
 
     def to_string_question(self) -> str:
         """

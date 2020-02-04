@@ -7,8 +7,6 @@ import numpy as np
 import editdistance
 from spacy.tokens import Doc
 
-nlp = spacy.load('en_core_web_sm', disable=['tagger', 'ner'])
-
 
 class Distance(Loggable, ABC):
 
@@ -32,17 +30,29 @@ class JaccardDistance(Distance):
 
 
 class EmbeddingDistance(Distance):
+    embeddings: Dict[str, np.ndarray]
+
     def __call__(self, text: Doc, other_text: Doc) -> float:
         pass
 
-    embeddings: Dict[str, np.ndarray]
-
     def __init__(self, embeddings: str):
-        self.embeddings = ...
+        # self.embeddings = ...
+        ...
+
+
+nlp = None
+
+
+def _get_spacy():
+    global nlp
+    if not nlp:
+        nlp = spacy.load('en_core_web_sm', disable=['tagger', 'ner'])
+    return nlp
 
 
 def pointwise_average_distance(corpus: List[str],
                                distance: Distance) -> List[float]:
+    nlp = _get_spacy()
     docs = list(nlp.pipe(corpus))
     return [distance(text, other_text) for i, text in enumerate(docs) for
             j, other_text in enumerate(docs) if i != j]
