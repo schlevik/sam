@@ -3,7 +3,7 @@ from quicklog import setup_logging
 
 from stresstest.passage.strategies import ReasonableStrategy
 from stresstest.classes import Choices, Path
-from stresstest.passage.rules import AtLeastOneSentence, UniqueElaborations, \
+from stresstest.passage.rules import AtLeastOneSentence, UniqueAttribute, \
     NoFoulTeam, NPlayersMention, GoalWithDistractor, PassageRule
 from stresstest.util import choices_at, load_graph
 

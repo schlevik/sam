@@ -2,9 +2,9 @@ from typing import List
 
 import networkx as nx
 
-from stresstest.classes import Templates
+from stresstest.classes import Config
 from stresstest.passage.rules import NoFoulTeam, \
-    NPlayersMention, UniqueElaborations, GoalWithDistractor, PassageRule
+    NPlayersMention, UniqueAttribute, GoalWithDistractor, PassageRule
 from stresstest.passage.graph import generate_path
 from stresstest.passage.strategies import ReasonableStrategy
 from stresstest.question.independent_rules import BareMinimum, \
@@ -16,10 +16,9 @@ from stresstest.realization.template import TemplateStringifier
 from stresstest.util import load_graph
 
 
-
 def generate_random(graph: nx.Graph, strategy_rules: List[PassageRule],
-                    templates: Templates, question_rules: List[QuestionRule],
-                    resolve=True):
+                    templates: Config, question_rules: List[QuestionRule],
+                    realise=True):
     strategy = ReasonableStrategy(strategy_rules)
     q = None
     p = None
@@ -30,26 +29,32 @@ def generate_random(graph: nx.Graph, strategy_rules: List[PassageRule],
                               templates['question.target'].keys(),
                               templates['question.action'].keys(),
                               question_rules)
-    return TemplateStringifier(templates, p, q, resolve)
+    return TemplateStringifier(templates, p, q, realise)
 
 
 def generate(graph_path='stresstest/resources/unnamed0.graphml',
              clauses_path='stresstest/resources/clauses.conf',
-             p=None,
              models=None,
-             strategy_rules=None):
+             strategy_rules=None,
+             realise=True):
     graph = load_graph(graph_path)
     strategy_rules = [NoFoulTeam(),
-                      UniqueElaborations(3)
+                      UniqueAttribute(3)
                       ] + strategy_rules if strategy_rules else []
-    templates = Templates(clauses_path, [SingularPlural(), Modifier()])
+    templates = Config(clauses_path, [SingularPlural(), Modifier()])
     question_rules = [BareMinimum(), IsNotModified()]
-    r = generate_random(graph, strategy_rules, templates, question_rules)
-    print(r)
-    if models:
-        for name, model in models:
-            print(
-                f"{name} prediction: {model.predict(r.question_string, r.passage_string)['best_span_str']}")
+    r = generate_random(graph, strategy_rules, templates, question_rules,
+                        realise)
+    p = r.path
+    if realise:
+        print(r)
+
+        if models:
+            for model in models:
+                print(
+                    f"{model.name} prediction: "
+                    f"{model.predict(r.question_string, r.passage_string)}"
+                )
     return p
 
 

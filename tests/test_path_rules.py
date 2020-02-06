@@ -3,7 +3,7 @@ import unittest
 from quicklog import setup_logging
 
 from stresstest.classes import Choices, Path
-from stresstest.passage.rules import AtLeastOneSentence, UniqueElaborations, \
+from stresstest.passage.rules import AtLeastOneSentence, UniqueAttribute, \
     NoFoulTeam, NPlayersMention, GoalWithDistractor
 from stresstest.util import choices_at, load_graph
 
@@ -51,7 +51,7 @@ class TestUniqueElaborations(unittest.TestCase):
         path = Path(full_one_sentence.steps + ['elaboration', '._distance',
                                                'elaboration', '._position',
                                                'elaboration', '._type'])
-        rule = UniqueElaborations()
+        rule = UniqueAttribute()
         assert (rule.evaluate_rule(path=path,
                                    choices=choices) == expected)
 
@@ -61,7 +61,7 @@ class TestUniqueElaborations(unittest.TestCase):
                            '._type', 'eos'])
         expected = choices - '._distance'
         path = full_one_sentence + ['elaboration', '._distance', 'elaboration']
-        rule = UniqueElaborations()
+        rule = UniqueAttribute()
         assert (rule.evaluate_rule(path=path,
                                    choices=choices) == expected)
 
@@ -71,7 +71,7 @@ class TestUniqueElaborations(unittest.TestCase):
                            '._type', 'eos'])
         expected = choices - '._type'
         path = full_one_sentence + ['elaboration', '._type', 'elaboration']
-        rule = UniqueElaborations()
+        rule = UniqueAttribute()
         assert (rule.evaluate_rule(path=path,
                                    choices=choices) == expected)
 
@@ -81,7 +81,7 @@ class TestUniqueElaborations(unittest.TestCase):
                            '._type', 'eos'])
         expected = choices - '._position'
         path = full_one_sentence + ['elaboration', '._position', 'elaboration']
-        rule = UniqueElaborations()
+        rule = UniqueAttribute()
         assert (rule.evaluate_rule(path=path,
                                    choices=choices) == expected)
 
@@ -92,7 +92,7 @@ class TestUniqueElaborations(unittest.TestCase):
                            '._position',
                            '._type', 'eos'])
         path = full_one_sentence + ['elaboration', '._position', 'elaboration']
-        rule = UniqueElaborations()
+        rule = UniqueAttribute()
         assert (rule.evaluate_rule(path=path,
                                    choices=choices) == choices)
 

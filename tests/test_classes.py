@@ -2,7 +2,7 @@ import pytest
 from flaky import flaky
 from quicklog import setup_logging
 
-from stresstest.classes import Choices, Path, Rule, Templates
+from stresstest.classes import Choices, Path, Rule, Config
 
 setup_logging('tests/resources/logging.conf')
 
@@ -141,19 +141,19 @@ class TestChoices:
 
 class TestTemplates:
     def test_loading_works(self):
-        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        t = Config('tests/resources/test-clauses.conf', [TestRule()])
         assert t['path.end'] == ['The end.']
 
     def test_templates_work(self):
-        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        t = Config('tests/resources/test-clauses.conf', [TestRule()])
 
         assert t['path.end'] == t.templates('path', 'end')
 
     def test_choices_work(self):
-        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        t = Config('tests/resources/test-clauses.conf', [TestRule()])
         assert t.as_choices('path', 'end') == Choices(['The end.'])
 
     def test_random_with_rules(self):
-        t = Templates('tests/resources/test-clauses.conf', [TestRule()])
+        t = Config('tests/resources/test-clauses.conf', [TestRule()])
         assert t.random_with_rules(path=Path(['end']), keys=['path', 'end'],
                                    x=3) is None

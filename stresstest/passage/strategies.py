@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Mapping
 
 import networkx as nx
+from overrides import overrides
 from quicklog import Loggable
 
 from stresstest.classes import Path, Choices
@@ -52,3 +53,17 @@ class ReasonableStrategy(Loggable):
                               f"the node '{path.last}' in the path \n{path}")
             raise ValueError("Better check your config bro...")
         return result
+
+
+class VariableResolvingStrategy(ReasonableStrategy):
+    def __init__(self, rules: List[PassageRule],
+                 underscores: Mapping[str, List[str]]):
+        super().__init__(rules)
+        self.underscores = underscores
+
+    @overrides
+    def __call__(self, graph: nx.Graph, path: Path):
+        result = super()(graph, path)
+        if result.startswith("_"):
+            return Choices(self.underscores[result]). \
+                random_with_rules(rules=self.rules, path=path)

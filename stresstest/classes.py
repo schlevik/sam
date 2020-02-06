@@ -1,3 +1,4 @@
+import json
 import random
 import string
 from abc import ABC, abstractmethod
@@ -40,9 +41,12 @@ class Path(Loggable, Sequence[str]):
 
     def sentences(self) -> List['Sentence']:
         sentences = []
-        for i, item in enumerate(self):
-            if item == 'eos' or i + 1 == len(self):
-                sentences.append(Sentence(self[sum(map(len, sentences)):i + 1]))
+        first_sos = self.index('sos')
+        # sentences.append(Sentence(self[:first_sos]))
+        for i, item in enumerate(self.steps[first_sos:]):
+            if item == 'eos' or i + 1 == len(self.steps):
+                sentences.append(
+                    Sentence(self.steps[sum(map(len, sentences)):i + 2]))
 
         return sentences
 
@@ -201,8 +205,6 @@ class Choices(Iterable[T]):
         c.remove(other)
         return c
 
-    # return
-
     def remove(self, i: Union[Iterable[T], T]) -> None:
         """
         Removes a choice if present.
@@ -260,6 +262,11 @@ class Choices(Iterable[T]):
     def remove_all_but(self, *nodes: T) -> None:
         self.remove([n for n in self if n not in nodes])
 
+    def all_but(self, *nodes: T) -> 'Choices':
+        c = Choices(self.choices)
+        c.remove_all_but(*nodes)
+        return c
+
 
 class Rule(Loggable, ABC):
     """
@@ -287,7 +294,7 @@ class Rule(Loggable, ABC):
         ...
 
 
-class Templates(Loggable, Mapping):
+class Config(Loggable, Mapping):
     """
     Thin wrapper around the template config tree.
 
@@ -339,6 +346,9 @@ class Templates(Loggable, Mapping):
         """
         return Choices(self.templates(*keys))
 
+    def random(self, *keys):
+        return self.as_choices(*keys).random()
+
     def random_with_rules(self, keys: List[str], **kwargs):
         """
         Chooses a random template from the given keys satisfying the
@@ -366,6 +376,9 @@ class Templates(Loggable, Mapping):
         return self \
             .as_choices(*keys) \
             .random_with_rules(rules=self.rules, **kwargs)
+
+    def pprint(self):
+        return json.dumps(self.cfg, indent=4)
 
     def __len__(self) -> int:
         """

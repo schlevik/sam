@@ -1,3 +1,6 @@
+transformers
+overrides
+allennlp
 flaky
 pytest
 quicklog

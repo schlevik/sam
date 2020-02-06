@@ -32,13 +32,14 @@ class PassageRule(Rule):
         ...
 
 
-class UniqueElaborations(PassageRule):
+class UniqueAttribute(PassageRule):
     """
     This rule ensures the elaborations
     (e.g. ``elaboration.distance``) are unique. Also ensures there's
     no elaboration step after all possible elaborations are used up.
 
     """
+    ATTRIBUTE = 'attribute'
 
     def __init__(self, max_elaborations=3):
         self.max_elaborations = max_elaborations
@@ -49,10 +50,10 @@ class UniqueElaborations(PassageRule):
         if in_sentence(path):
             current_sentence = path.from_index(path.rindex('sos'))
             if current_sentence.occurrences(
-                    'elaboration') >= self.max_elaborations:
-                choices.remove(['elaboration'])
+                    self.ATTRIBUTE) >= self.max_elaborations:
+                choices.remove([self.ATTRIBUTE])
 
-            if path.last == 'elaboration':
+            if path.last == self.ATTRIBUTE:
                 to_remove = [c for c in choices if
                              c in current_sentence]
                 choices.remove(to_remove)
