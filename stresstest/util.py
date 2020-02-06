@@ -168,7 +168,7 @@ def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
     """
 
     sos_index = word
-    while  sos_index >= 0 and path[sos_index] != 'sos':
+    while sos_index >= 0 and path[sos_index] != 'sos':
         sos_index -= 1
     eos_index = word
 

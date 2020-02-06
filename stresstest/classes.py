@@ -38,6 +38,14 @@ class Path(Loggable, Sequence[str]):
         """
         self.steps = [e for e in iterable] if iterable else []
 
+    def sentences(self) -> List['Sentence']:
+        sentences = []
+        for i, item in enumerate(self):
+            if item == 'eos' or i + 1 == len(self):
+                sentences.append(Sentence(self[sum(map(len, sentences)):i + 1]))
+
+        return sentences
+
     def push(self, node: str):
         """
         Adds a node at the end of the existing path.
@@ -156,6 +164,12 @@ class Path(Loggable, Sequence[str]):
             Number of occurrences of a node.
         """
         return sum(x == node for x in self)
+
+
+class Sentence(Path):
+    def __init__(self, iterable: Iterable[str] = None):
+        super().__init__(iterable)
+        self.modalities: JsonDict = dict()
 
 
 class Choices(Iterable[T]):

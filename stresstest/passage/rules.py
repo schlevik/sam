@@ -32,19 +32,6 @@ class PassageRule(Rule):
         ...
 
 
-class AtLeastOneSentence(PassageRule):
-    """
-    This rule ensures that there's at least one content sentence.
-
-    """
-
-    def evaluate_rule(self, *, path: Path,
-                      choices: Choices) -> Choices:
-        if path.last == 'idle' and 'sos' not in path:
-            choices.remove_all_but('sos')
-        return choices
-
-
 class UniqueElaborations(PassageRule):
     """
     This rule ensures the elaborations
@@ -108,7 +95,7 @@ class NPlayersMention(PassageRule):
     def evaluate_rule(self, *, path: Path,
                       choices: Choices) -> Choices:
 
-        if path.last == 'idle' and path.count('._player') < self.n:
+        if path.last == 'eos' and path.count('._player') < self.n:
             choices.remove_all_but('sos')
         if path.last == 'attribution' and path.count('._player') < self.n:
             choices.remove_all_but('._player')
