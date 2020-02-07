@@ -7,8 +7,9 @@ from quicklog import Loggable
 from stresstest.classes import Choices, Config
 
 
-class Sentence:
+class Sentence(dict):
     def __init__(self):
+        super().__init__()
         self.action: str = ""
         self.attributes: Dict[str, str] = dict()
         self.actor: Dict[str, str] = dict()
@@ -54,15 +55,15 @@ class StoryGenerator(Loggable):
             t1_second)).random()
 
         world['teams'] = [
-            {
+            dict({
                 "id": "team1",
                 "name": " ".join((t1_first, t1_second))
-            },
-            {
+            }),
+            dict({
                 "id": "team2",
                 "name": " ".join((t2_first, t2_second))
 
-            }]
+            })]
 
         world['num_players'] = num_players
         world['players'] = []
@@ -71,18 +72,18 @@ class StoryGenerator(Loggable):
         # TODO: actually non_unique would be funny too
         for i in range(1, num_players + 1):
             # TODO: Positions maybe
-            p1 = {
+            p1 = dict({
                 "id": f"player{i}",
                 "first": names.get_first_name(world['gender']),
                 "last": names.get_last_name(),
-                'team': f"team1"
-            }
-            p2 = {
+                'team': world['teams'][0]
+            })
+            p2 = dict({
                 "id": f"player{i + num_players}",
                 "first": names.get_first_name(world['gender']),
                 "last": names.get_last_name(),
-                'team': f"team2"
-            }
+                'team': world['teams'][1]
+            })
             world['players'].extend((p1, p2))
             world['players_by_id'][p1['id']] = p1
             world['players_by_id'][p2['id']] = p2
@@ -106,13 +107,17 @@ class StoryGenerator(Loggable):
             return random.choice(list(range(last_ts, 90)))
         if name == 'coactor':
             if self.sentence.action == 'foul':
-                return Choices(p['id'] for p in self.world['players'] if
-                               p['team'] != self.sentence.actor[
-                                   'team']).random()
-            elif self.sentence.actor == 'goal':
-                return Choices(p['id'] for p in self.world['players'] if
-                               p['team'] == self.sentence.actor[
-                                   'team']).random()
+                player = Choices(
+                    p['id'] for p in self.world['players'] if
+                    p['team'] != self.sentence.actor['team']).random()
+
+            elif self.sentence.action == 'goal':
+                player = Choices(p['id'] for p in self.world['players'] if
+                                 p['team'] == self.sentence.actor[
+                                     'team']).random()
+            else:
+                raise NotImplementedError()
+            return self.world['players_by_id'][player]
 
     def set_attributes(self):
 

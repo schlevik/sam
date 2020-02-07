@@ -9,8 +9,18 @@ from quickconf import ConfigReader
 from quicklog import Loggable
 
 T = TypeVar("T")
-
+V = TypeVar("V")
 JsonDict = Dict[str, Any]
+
+
+class dotdict(dict):
+    """dot.notation access to dictionary attributes"""
+
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+    def __getattr__(self, item):
+        return self[item]
 
 
 class Path(Loggable, Sequence[str]):
