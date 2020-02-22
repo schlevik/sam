@@ -170,3 +170,4 @@ fabric.properties
 
 docs/
 .vscode
+slack-bot.py
