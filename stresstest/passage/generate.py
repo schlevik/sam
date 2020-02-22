@@ -137,7 +137,8 @@ class StoryGenerator(Loggable):
     def set_anything_else(self):
         self.sentence.cause = self.CAUSES.random()
         # TODO: logics here
-        self.sentence.effect = self.EFFECTS.random()
+        if self.sentence.action != "goal":
+            self.sentence.effect = self.EFFECTS.random()
 
     def generate_sentence(self):
         self.sentence = Sentence()
