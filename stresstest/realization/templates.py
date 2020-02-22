@@ -17,7 +17,7 @@ class S(List[str]):
         return deepcopy(self[choice]), choice
 
 
-class YouDumbAssException(Exception):
+class YouIdiotException(Exception):
     ...
 
 
@@ -49,14 +49,17 @@ class Templates(Loggable):
                 "CC": S(["ended $PRP dry run after !RANDINT games",
                          "the stadium went wild over it"]),
                 # inserted as a gerrund
-                "VBG": S([",being $PRP !RANDINT th of the season,", "drawing attention from even $PRP biggest sceptics"])
+                "VBG": S([",being $PRP !RANDINT th of the season,",
+                          "drawing attention from even $PRP biggest sceptics"])
             },
             # NP description of assist
-            "ASSIST": S(["($JJ.positive) pass", "($JJ.accurate) cross", "($JJ.risky) through ball"]),
+            "ASSIST": S(["($JJ.positive) pass", "($JJ.accurate) cross",
+                         "($JJ.risky) through ball"]),
             # NP distance description
             "DISTANCE": S(["from #sent.attributes.distance meters (away)"]),
             # NP time description
-            "TIME": S(["in minute #sent.attributes.time", "on the #sent.attributes.time th minute"]),
+            "TIME": S(["in minute #sent.attributes.time",
+                       "on the #sent.attributes.time th minute"]),
             # ACTOR ACCESSOR
             "ACTOR": S(["#sent.actor.first #sent.actor.last"]),
             # COACTOR ACCESSOR
@@ -96,7 +99,8 @@ class Templates(Loggable):
             },
             # adjectives
             "JJ": {
-                "positive": S(["spectacular", "wonderful", "amazing", "stunning"]),
+                "positive": S(
+                    ["spectacular", "wonderful", "amazing", "stunning"]),
                 "accurate": S(["accurate", "pin-point", ]),
                 "risky": S(["bold", "daring", "risky"])
             },
@@ -162,9 +166,13 @@ class Templates(Loggable):
 
         self.bang = {
             "RANDINT": (lambda: random.randint(1, 15)),
-            "PRONOUN": (lambda: "her" if self.context['world']['gender'] == 'female' else "his"),
+            "PRONOUN": (lambda: "her" if self.context['world'][
+                                             'gender'] == 'female' else "his"),
             # difference in time from last event
-            "MINDIFF": (lambda: self.context['sent'].attributes['time'] - self.context['sentences'][self.context['sent_nr'] - 1].attributes['time'])
+            "MINDIFF": (lambda: self.context['sent'].attributes['time'] -
+                                self.context['sentences'][
+                                    self.context['sent_nr'] - 1].attributes[
+                                    'time'])
         }
 
     def _is_contrastive(self):
@@ -179,7 +187,7 @@ class Templates(Loggable):
     def _access_context(self, word: str) -> List[str]:
         n = self.context
         if word.startswith('sent'):
-            self.context['sent'].visited = word
+            self.context['visits'][self.context['sent_nr']].append(word)
         for k in word.split("."):
             try:
                 n = n[k]
@@ -223,9 +231,13 @@ class Templates(Loggable):
         return n
 
     def with_feedback(self, e: Exception):
-        if isinstance(e, AttributeError) and "object has no attribute 'random'" in str(e):
+        if isinstance(e,
+                      AttributeError) and "object has no attribute 'random'" in str(
+            e):
             msg = f"{self.context['word']} is not a leaf path!"
-        elif isinstance(e, TypeError) and "list indices must be integers or slices, not str" in str(e):
+        elif isinstance(e,
+                        TypeError) and "list indices must be integers or slices, not str" in str(
+            e):
             msg = ""
 
         else:
@@ -233,12 +245,13 @@ class Templates(Loggable):
         self.logger.debug(f"{self.context['sentence_template']}")
         self.logger.debug(f"{self.context['choices']}")
         self.logger.error(msg)
-        return YouDumbAssException(msg)
+        return YouIdiotException(msg)
 
     def realise_story(self, sentences: List[Sentence], world):
         self.context = dict()
         self.context['world'] = world
         self.context['sentences'] = sentences
+        self.context['visits'] = defaultdict(list)
         realised = []
         for self.context['sent_nr'], self.context['sent'] in enumerate(
                 sentences):
@@ -248,15 +261,15 @@ class Templates(Loggable):
             except Exception as e:
                 raise self.with_feedback(e)
             realised.append(sent)
-        return '\n'.join(realised)
+        return '\n'.join(realised) + ".", self.context['visits']
 
     def realise_sentence(self):
         ctx = self.context
         template, template_nr = self.sentences[ctx['sent'].action].random()
-        self.context['sentence_template'] = f"{ctx['sent'].action}.{template_nr}"
+        self.context[
+            'sentence_template'] = f"{ctx['sent'].action}.{template_nr}"
         self.context['realised'] = []
         self.context['choices'] = []
-        ctx['sent'].visited = set()
         self.context['stack'] = template
         self.context['stack'].reverse()
         while self.context['stack']:
@@ -311,4 +324,4 @@ class Templates(Loggable):
             else:
                 ctx['realised'].append(self.context['word'])
         self.logger.debug(ctx['realised'])
-        return " ".join(ctx['realised']) + "."
+        return " ".join(ctx['realised'])

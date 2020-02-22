@@ -8,8 +8,9 @@ from stresstest.classes import Choices, Config
 
 
 class Sentence(dict):
-    def __init__(self):
+    def __init__(self, i):
         super().__init__()
+        self.sentence_nr = i
         self.action: str = ""
         self.attributes: Dict[str, str] = dict()
         self.actor: Dict[str, str] = dict()
@@ -140,8 +141,8 @@ class StoryGenerator(Loggable):
         if self.sentence.action != "goal":
             self.sentence.effect = self.EFFECTS.random()
 
-    def generate_sentence(self):
-        self.sentence = Sentence()
+    def generate_sentence(self, sentence_nr):
+        self.sentence = Sentence(sentence_nr)
         self.set_action()
         self.set_actor()
         self.set_attributes()
@@ -152,6 +153,97 @@ class StoryGenerator(Loggable):
     def generate_story(self) -> List[Sentence]:
         self.set_world()
         self.sentences: List[Sentence] = []
-        for _ in range(self.world['num_sentences']):
-            self.generate_sentence()
+        for i in range(self.world['num_sentences']):
+            self.generate_sentence(i)
         return self.sentences
+
+    def generate_questions(self, story: List[Sentence],
+                           visits: Dict[int, List[str]]):
+        # extractive
+        single_span_questions = []
+        multi_span_questions = []
+        unanswerable_questions = []
+        abstractive_questions = []
+
+        # per-sentence action questions
+        for action in self.ACTIONS:
+            print(action)
+            for ith, sent in enumerate(s for s in story if s.action == action):
+                single_span_questions.append({
+                    "type": "direct",
+                    "target": "actor",
+                    "n": ith + 1,
+                    "action": action,
+                    "answer": sent.actor
+
+                })
+
+                # attribute questions
+                for attribute in self.ATTRIBUTES:
+                    q = {
+                        "type": "direct",
+                        "target": attribute,
+                        "n": ith + 1,
+                        "action": f"{action}"
+
+                    }
+                    print(any(f"sent.attributes.{attribute}" in v for v in
+                              visits[sent.sentence_nr]))
+                    print(visits[sent.sentence_nr])
+                    if any(f"sent.attributes.{attribute}" in v for v in
+                           visits[sent.sentence_nr]):
+                        q["answer"] = sent.attributes[attribute]
+                        single_span_questions.append(q)
+                    else:
+                        q['answer'] = None
+                        unanswerable_questions.append(q)
+
+            # overall questions
+
+            # target = actor
+            q = {
+                "type": "overall",
+                "target": "actor",
+                "action": action,
+            }
+            num_actions = sum(s.action == action for s in story)
+            if num_actions > 1:
+                q['answer'] = [s.actor for s in story if s.action == action]
+                multi_span_questions.append(q)
+            elif num_actions == 1:
+                q['answer'] = next(s.actor for s in story if s.action == action)
+                single_span_questions.append(q)
+            elif num_actions < 1:
+                q['answer'] = None
+                unanswerable_questions.append(q)
+
+            # target = attribute
+            for attribute in self.ATTRIBUTES:
+                q = {
+                    "type": "overall",
+                    "target": attribute,
+                    "action": action
+
+                }
+
+                def condition(s):
+                    return any(
+                        f"sent.attributes.{attribute}" in v for v in
+                        visits[s.sentence_nr]
+                    ) and s.action == action
+
+                num_actions = sum(1 for s in story if condition(s))
+                answers = [s.attributes[attribute] for s in story if
+                           condition(s)]
+                if num_actions > 1:
+                    q['answer'] = answers
+                    multi_span_questions.append(q)
+                elif num_actions == 1:
+                    q['answer'] = answers[0]
+                    single_span_questions.append(q)
+                elif num_actions < 1:
+                    q['answer'] = None
+                    unanswerable_questions.append(q)
+
+        return (single_span_questions, multi_span_questions,
+                unanswerable_questions, abstractive_questions)
