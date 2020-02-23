@@ -167,14 +167,14 @@ class StoryGenerator(Loggable):
 
         # per-sentence action questions
         for action in self.ACTIONS:
-            print(action)
             for ith, sent in enumerate(s for s in story if s.action == action):
                 single_span_questions.append({
                     "type": "direct",
                     "target": "actor",
                     "n": ith + 1,
                     "action": action,
-                    "answer": sent.actor
+                    # TODO: WHAT IF COREF ETC
+                    "answer": " ".join((sent.actor['first'], sent.actor['last']))
 
                 })
 
@@ -187,12 +187,13 @@ class StoryGenerator(Loggable):
                         "action": f"{action}"
 
                     }
-                    print(any(f"sent.attributes.{attribute}" in v for v in
-                              visits[sent.sentence_nr]))
-                    print(visits[sent.sentence_nr])
                     if any(f"sent.attributes.{attribute}" in v for v in
                            visits[sent.sentence_nr]):
-                        q["answer"] = sent.attributes[attribute]
+                        if attribute == 'coactor':
+                            q["answer"] = " ".join((sent.attributes['coactor']['first'], sent.attributes['coactor']['last']))
+                        else:
+
+                            q["answer"] = sent.attributes[attribute]
                         single_span_questions.append(q)
                     else:
                         q['answer'] = None
@@ -208,10 +209,10 @@ class StoryGenerator(Loggable):
             }
             num_actions = sum(s.action == action for s in story)
             if num_actions > 1:
-                q['answer'] = [s.actor for s in story if s.action == action]
+                q['answer'] = [" ".join((s.actor['first'], s.actor['last'])) for s in story if s.action == action]
                 multi_span_questions.append(q)
             elif num_actions == 1:
-                q['answer'] = next(s.actor for s in story if s.action == action)
+                q['answer'] = next(" ".join((s.actor['first'], s.actor['last'])) for s in story if s.action == action)
                 single_span_questions.append(q)
             elif num_actions < 1:
                 q['answer'] = None
@@ -235,6 +236,8 @@ class StoryGenerator(Loggable):
                 num_actions = sum(1 for s in story if condition(s))
                 answers = [s.attributes[attribute] for s in story if
                            condition(s)]
+                if attribute == 'coactor':
+                    answers = [" ".join((a['first'], a['last'])) for a in answers]
                 if num_actions > 1:
                     q['answer'] = answers
                     multi_span_questions.append(q)
