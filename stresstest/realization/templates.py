@@ -26,15 +26,17 @@ class Templates(Loggable):
         self.sentences = {
             "goal": S([
                 "%PREAMBLE-VBD.begin $ACTOR ($ACTORTEAM.name-pos-post) $VBD.goal a ($JJ.positive) goal",
-                "$ACTORTEAM.name-pos-pre player $ACTOR put an exclamation mark, $VBG.goal a ($JJ.positive) goal $DISTANCE",
-                "$ACTOR 's goal ($RANDOMSTUFF.VBG) arrived $TIME after $PRP teammates $COACTOR 's $ASSIST and $RANDOMSTUFF.CC",
-
+                "$ACTORTEAM.name-pos-pre player $ACTOR put an exclamation mark, $VBG.goal a ($JJ.positive) goal $DISTANCE.PP",
+                "$ACTOR 's goal ($RANDOMSTUFF.VBG) arrived $TIME after !PRP teammates $COACTOR 's $PASS-TYPE and $RANDOMSTUFF.CC",
+                "On $TIME a $PASS-TYPE fell to $COACTOR $POSITION.VERTICAL and $COREF-PLAYER swept (low) to the $POSITION.BOX for $ACTOR to poke past $GOALKEEPER",
+                "A $JJ.positive $DISTANCE.JJ strike from $ACTOR flying into the corner past a helpless $GOALKEEPER $RANDOMSTUFF.PP"
                 #            "If (only) #sent.actor $VBD.goal the penalty, "
                 #            "the score would be @CONDITION.then, otherwise it would "
                 #            "stay @CONDITION.else, @CONDITION.value"
             ]),
             "foul": S([
-                "$ACTOR was $VBD.foul ($ADVJ.neg) by $COACTOR",
+                "%PREAMBLE-VBD.begin $ACTOR had gone down with $INJURY",
+                "$ACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by $COACTOR",
                 "$COACTOR $VBD.foul ($ACTORTEAM.name-pos-pre) $ACTOR",
                 "$COACTOR $VBD.foul $ACTOR ($ACTORTEAM.name-pos-post)"
                 #            "If (only) #sent.actor $VBD.goal the penalty, "
@@ -43,20 +45,38 @@ class Templates(Loggable):
             ])
         }
         self.dollar = {
-            "PRP": S(["!PRONOUN"]),
             # just some random stuff that makes things look pretty
             "RANDOMSTUFF": {
-                "CC": S(["ended $PRP dry run after !RANDINT games",
+                "CC": S(["ended !PRPS dry run of !RANDINT games",
                          "the stadium went wild over it"]),
-                # inserted as a gerrund
-                "VBG": S([",being $PRP !RANDINT th of the season,",
-                          "drawing attention from even $PRP biggest sceptics"])
+                # inserted as a gerund
+                "VBG": S([", being !PRPS !RANDINT th of the season,",
+                          "a contender for the $RANDOMSTUFF.AWARD",
+                          "drawing attention from even !PRPS biggest sceptics"]),
+                "AWARD": S(["highlight of the day",
+                            "action of the match"]),
+                "PP": S(["for !PRPS !RANDOMINT th league goal of the season"])
             },
+            "GOALKEEPER": S(["the goalkeeper", "the woman between the posts", "the last line of defence"]),
+            "COREF-PLAYER": S(["!PRP", "the player"]),
+            "POSITION": {
+                "VERTICAL": S(["on the flank", "out wide", "in the center"]),
+                "BOX": S(["near post", "far post", "penalty spot", "6-yard-area"]),
+                "GOAL": S(["into the ($HIGHT) ($LR) corner", "(straight) into the middle of the goal"]),
+                "HEIGHT": S(["low", "high"]),
+                "LR": S(["left", "right"])
+            },
+            "INJURY": S(["a (potential) ($BODYPART) injury"]),
+            "BODYPART": S(["knee", "head", "shoulder", "arm", "hip", "leg", "ankle"]),
             # NP description of assist
-            "ASSIST": S(["($JJ.positive) pass", "($JJ.accurate) cross",
-                         "($JJ.risky) through ball"]),
+            "PASS-TYPE": S(["($JJ.positive) pass", "($JJ.accurate) cross",
+                            "($JJ.risky) through ball", "soft clearance", "stray ball"]),
             # NP distance description
-            "DISTANCE": S(["from #sent.attributes.distance meters (away)"]),
+            "DISTANCE": {
+                "PP": S(["from #sent.attributes.distance meters (away)"]),
+                "JJ": S(["#sent.attributes.distance meters"]),
+            },
+
             # NP time description
             "TIME": S(["in minute #sent.attributes.time",
                        "on the #sent.attributes.time th minute"]),
@@ -78,7 +98,8 @@ class Templates(Loggable):
                     "matchstart": S([
                         "The match started as",
                         "After the kickoff",
-                        "The first $JJ.attention thing after the kick-off was when"]),
+                        "The tone was set with the game just #sent.attributes.time minutes old, when",
+                        "The first $JJ.attention thing after the kick-off was, when"]),
                     "neutral": S([
                         "Then",
                         "After !MINDIFF minutes"
@@ -100,9 +121,10 @@ class Templates(Loggable):
             # adjectives
             "JJ": {
                 "positive": S(
-                    ["spectacular", "wonderful", "amazing", "stunning"]),
+                    ["spectacular", "wonderful", "amazing", "stunning", "searing"]),
                 "accurate": S(["accurate", "pin-point", ]),
-                "risky": S(["bold", "daring", "risky"])
+                "risky": S(["bold", "daring", "risky"]),
+                "attention": S(["remarkable", "interesting"])
             },
             # adverbials
             "ADVJ": {
@@ -111,8 +133,11 @@ class Templates(Loggable):
             },
             "VBD": {
                 "foul": S(["fouled", "felled"]),
-                "goal": S(["scored", "curled in"]),
+                "goal": S(["scored", "curled in", "put (in)"]),
                 "nogoal": S(["missed", "shot wide"])
+            },
+            "VBD-PASSIVE": {
+                "foul": S(["was $VBD.foul", "was sent to the ground"]),
             },
             "VBG": {
                 "goal": S(["scoring", "hammering in", "curling in"])
@@ -166,13 +191,17 @@ class Templates(Loggable):
 
         self.bang = {
             "RANDINT": (lambda: random.randint(1, 15)),
-            "PRONOUN": (lambda: "her" if self.context['world'][
+            "PRPS": (lambda: "her" if self.context['world'][
                                              'gender'] == 'female' else "his"),
+            "PRP": (lambda: "she" if self.context['world'][
+                                         'gender'] == 'female' else "he"),
             # difference in time from last event
             "MINDIFF": (lambda: self.context['sent'].attributes['time'] -
                                 self.context['sentences'][
                                     self.context['sent_nr'] - 1].attributes[
-                                    'time'])
+                                    'time']),
+            "NATIONALITY": (lambda: random.choice(["German", "Korean", "Japanese", "French", "Spaniard"])),
+
         }
 
     def _is_contrastive(self):
@@ -228,6 +257,9 @@ class Templates(Loggable):
                 n = getattr(n, k)
                 if not n:
                     raise NotImplementedError
+            except TypeError:
+                print(word)
+                raise YouIdiotException()
         return n
 
     def with_feedback(self, e: Exception):

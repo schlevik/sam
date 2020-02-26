@@ -34,6 +34,7 @@ class StoryGenerator(Loggable):
     EFFECTS = Choices(['penalty'])
     MODES = Choices([''])
     FEATURES = Choices(['modifier'])
+    POSITIONS = Choices(['forward', 'defender', 'midfielder'])
 
     def __init__(self, config: Config):
         self.logger.debug("cfg:")
@@ -70,20 +71,22 @@ class StoryGenerator(Loggable):
         world['players'] = []
         world['players_by_id'] = dict()
         # TODO: unique names
-        # TODO: actually non_unique would be funny too
+        # TODO: actually non unique would be funny too
         for i in range(1, num_players + 1):
             # TODO: Positions maybe
             p1 = dict({
                 "id": f"player{i}",
                 "first": names.get_first_name(world['gender']),
                 "last": names.get_last_name(),
-                'team': world['teams'][0]
+                'team': world['teams'][0],
+                "position": self.POSITIONS.random()
             })
             p2 = dict({
                 "id": f"player{i + num_players}",
                 "first": names.get_first_name(world['gender']),
                 "last": names.get_last_name(),
-                'team': world['teams'][1]
+                'team': world['teams'][1],
+                "position": self.POSITIONS.random()
             })
             world['players'].extend((p1, p2))
             world['players_by_id'][p1['id']] = p1
