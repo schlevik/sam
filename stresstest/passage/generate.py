@@ -1,7 +1,6 @@
 from typing import Dict, List, Tuple
 import random
 import names
-from quickconf import quickconf, format_config
 from quicklog import Loggable
 
 from stresstest.classes import Choices, Config
@@ -18,6 +17,9 @@ class Sentence(dict):
         self.effect: str = ""
         self.modes: List[Tuple[str, str]] = []
         self.features: List[str] = []
+
+    def __getitem__(self, item):
+        return self.__dict__[item]
 
     def __repr__(self):
         return (f"{self.action} by {self.actor['id']}: with {self.attributes}, "
@@ -171,7 +173,7 @@ class StoryGenerator(Loggable):
         # per-sentence action questions
         for action in self.ACTIONS:
             for ith, sent in enumerate(s for s in story if s.action == action):
-                single_span_questions.append({
+                q = {
                     "type": "direct",
                     "target": "actor",
                     "n": ith + 1,
@@ -179,7 +181,12 @@ class StoryGenerator(Loggable):
                     # TODO: WHAT IF COREF ETC
                     "answer": " ".join((sent.actor['first'], sent.actor['last']))
 
-                })
+                }
+                if any(f"sent.actor" in v for v in visits[sent.sentence_nr]):
+                    single_span_questions.append(q)
+                else:
+                    q['answer'] = None
+                unanswerable_questions.append(q)
 
                 # attribute questions
                 for attribute in self.ATTRIBUTES:
