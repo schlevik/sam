@@ -138,23 +138,6 @@ class QuestionTemplates(Loggable):
                     raise NotImplementedError
         return n
 
-    def with_feedback(self, e: Exception):
-        if isinstance(e,
-                      AttributeError) and "object has no attribute 'random'" in str(
-            e):
-            msg = f"{self.context['word']} is not a leaf path!"
-        elif isinstance(e,
-                        TypeError) and "list indices must be integers or slices, not str" in str(
-            e):
-            msg = ""
-
-        else:
-            msg = "And i don't even know what's wrong!"
-        self.logger.debug(f"{self.context['sentence_template']}")
-        self.logger.debug(f"{self.context['choices']}")
-        self.logger.error(msg)
-        return YouIdiotException(msg)
-
     def realise_question(self, q):
         self.logger.debug(q)
         template, template_nr = self.templates[q['type']][q['target']][q['action']].random()

@@ -19,7 +19,7 @@ def interactive_env(path='stresstest/resources/config.conf', g=None):
     realised_aqs = []
     print(story)
     print()
-    print("===QUESTIONS===:")
+    print("===QUESTIONS===: ")
     for q in single_span_questions:
         try:
             rq = qt.realise_question(q)

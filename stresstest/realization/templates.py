@@ -231,13 +231,9 @@ class Templates(Loggable):
         return n
 
     def with_feedback(self, e: Exception):
-        if isinstance(e,
-                      AttributeError) and "object has no attribute 'random'" in str(
-            e):
+        if isinstance(e, AttributeError) and "object has no attribute 'random'" in str(e):
             msg = f"{self.context['word']} is not a leaf path!"
-        elif isinstance(e,
-                        TypeError) and "list indices must be integers or slices, not str" in str(
-            e):
+        elif isinstance(e, TypeError) and "list indices must be integers or slices, not str" in str(e):
             msg = ""
 
         else:
@@ -253,8 +249,7 @@ class Templates(Loggable):
         self.context['sentences'] = sentences
         self.context['visits'] = defaultdict(list)
         realised = []
-        for self.context['sent_nr'], self.context['sent'] in enumerate(
-                sentences):
+        for self.context['sent_nr'], self.context['sent'] in enumerate(sentences):
             self.logger.debug(self.context['sent'])
             try:
                 sent = self.realise_sentence()
@@ -266,8 +261,7 @@ class Templates(Loggable):
     def realise_sentence(self):
         ctx = self.context
         template, template_nr = self.sentences[ctx['sent'].action].random()
-        self.context[
-            'sentence_template'] = f"{ctx['sent'].action}.{template_nr}"
+        self.context['sentence_template'] = f"{ctx['sent'].action}.{template_nr}"
         self.context['realised'] = []
         self.context['choices'] = []
         self.context['stack'] = template
