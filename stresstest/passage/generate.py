@@ -1,7 +1,6 @@
 from typing import Dict, List, Tuple
 import random
 import names
-from quickconf import quickconf, format_config
 from quicklog import Loggable
 
 from stresstest.classes import Choices, Config
@@ -19,6 +18,9 @@ class Sentence(dict):
         self.modes: List[Tuple[str, str]] = []
         self.features: List[str] = []
 
+    def __getitem__(self, item):
+        return self.__dict__[item]
+
     def __repr__(self):
         return (f"{self.action} by {self.actor['id']}: with {self.attributes}, "
                 f"caused by {self.cause} resulting in {self.effect}. "
@@ -34,6 +36,7 @@ class StoryGenerator(Loggable):
     EFFECTS = Choices(['penalty'])
     MODES = Choices([''])
     FEATURES = Choices(['modifier'])
+    POSITIONS = Choices(['forward', 'defender', 'midfielder'])
 
     def __init__(self, config: Config):
         self.logger.debug("cfg:")
@@ -70,20 +73,22 @@ class StoryGenerator(Loggable):
         world['players'] = []
         world['players_by_id'] = dict()
         # TODO: unique names
-        # TODO: actually non_unique would be funny too
+        # TODO: actually non unique would be funny too
         for i in range(1, num_players + 1):
             # TODO: Positions maybe
             p1 = dict({
                 "id": f"player{i}",
                 "first": names.get_first_name(world['gender']),
                 "last": names.get_last_name(),
-                'team': world['teams'][0]
+                'team': world['teams'][0],
+                "position": self.POSITIONS.random()
             })
             p2 = dict({
                 "id": f"player{i + num_players}",
                 "first": names.get_first_name(world['gender']),
                 "last": names.get_last_name(),
-                'team': world['teams'][1]
+                'team': world['teams'][1],
+                "position": self.POSITIONS.random()
             })
             world['players'].extend((p1, p2))
             world['players_by_id'][p1['id']] = p1
@@ -168,7 +173,7 @@ class StoryGenerator(Loggable):
         # per-sentence action questions
         for action in self.ACTIONS:
             for ith, sent in enumerate(s for s in story if s.action == action):
-                single_span_questions.append({
+                q = {
                     "type": "direct",
                     "target": "actor",
                     "n": ith + 1,
@@ -176,7 +181,12 @@ class StoryGenerator(Loggable):
                     # TODO: WHAT IF COREF ETC
                     "answer": " ".join((sent.actor['first'], sent.actor['last']))
 
-                })
+                }
+                if any(f"sent.actor" in v for v in visits[sent.sentence_nr]):
+                    single_span_questions.append(q)
+                else:
+                    q['answer'] = None
+                unanswerable_questions.append(q)
 
                 # attribute questions
                 for attribute in self.ATTRIBUTES:
