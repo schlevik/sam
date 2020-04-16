@@ -1,9 +1,14 @@
+import json
 import random
 import re
+import string
+from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Iterable, TypeVar, Dict, Any, Optional, Union, List, Iterator, Tuple
+from typing import Sequence, Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple
+from quickconf import ConfigReader
 
 T = TypeVar("T")
+V = TypeVar("V")
 JsonDict = Dict[str, Any]
 
 
@@ -68,6 +73,28 @@ class Choices(Iterable[T]):
         except IndexError:
             return None
 
+    def random_with_rules(self, *, rules: List['Rule'],
+                          **kwargs) -> Optional[T]:
+        """
+        Returns a random choice that conforms to all the given
+        rules.
+
+        Does not change the instance.
+
+        Args:
+            rules: List of rules to apply.
+            **kwargs: Kwargs that should match the rules
+
+        Returns:
+            Random choice conforming to given rules.
+
+        """
+        choices = Choices(self)
+        for rule in rules:
+            choices = rule(choices=choices,
+                           **kwargs)
+        return choices.random()
+
     def remove_all_but(self, *nodes: T) -> None:
         self.remove([n for n in self if n not in nodes])
 
@@ -75,6 +102,66 @@ class Choices(Iterable[T]):
         c = Choices(self.choices)
         c.remove_all_but(*nodes)
         return c
+
+
+class Config(Mapping):
+    """
+    Thin wrapper around the template config tree.
+
+    Allows to represent chosen branches and leaves as
+    :class:`Choices` and select random ones with :class:`Rule` s.
+    """
+
+    def __init__(self, templates_path: str):
+        self.cfg = ConfigReader(templates_path).read_config()
+
+    def __getitem__(self, k):
+        return self.cfg[k]
+
+    def as_choices(self, *keys: str) -> Choices:
+        """
+        Generates choices from a template for a sequence of given keys.
+
+        Keys are joined with the point operator. i.e. if you want to
+        access "a.b.c" you can call::
+
+            as_choices(keys=['a','b','c'])
+
+        Args:
+            *keys: Keys to choose the template from. Joins the keys with
+            the point (".") operator.
+
+        Returns:
+            ``Choices``
+
+        """
+        return Choices(self.cfg['.'.join(keys)])
+
+    def random(self, *keys):
+        return self.as_choices(*keys).random()
+
+    def pprint(self):
+        return json.dumps(self.cfg, indent=4)
+
+    def __len__(self) -> int:
+        """
+        Wraps the ConfigTree function.
+
+        Returns:
+            Number of top level keys in the config.
+
+        """
+        return len(self.cfg)
+
+    def __iter__(self):
+        """
+        Wraps the ConfigTree function.
+
+        Returns:
+            Iterator over the top level keys of the config.
+
+        """
+        return iter(self.cfg)
 
 
 pattern = re.compile(r"([^(\[\]]\S*|\(.+?\)|\[.+?\])\s*")

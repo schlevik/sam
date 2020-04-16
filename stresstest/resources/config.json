@@ -1,4 +1,22 @@
-team.name {
-  first: ["Arctic", "Gigantic", "Terrible", "Red-blue", "Dynamo", "Pale Lilac", "FC"]
-  second: ["Monkeys", "Lalaland", "Elephants", "Whalesharks", "Duckburg"]
+{
+  "team": {
+    "name": {
+      "first": [
+        "Arctic",
+        "Gigantic",
+        "Terrible",
+        "Red-blue",
+        "Dynamo",
+        "Pale Lilac",
+        "FC"
+      ],
+      "second": [
+        "Monkeys",
+        "Lalaland",
+        "Elephants",
+        "Whalesharks",
+        "Duckburg"
+      ]
+    }
+  }
 }

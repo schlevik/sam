@@ -181,7 +181,7 @@ def get_sentence_of_word(word: int, path) -> slice:
     return slice(sos_index, eos_index)
 
 
-def in_same_sentence(one: int, other: int, path: 'stresstest.classes.Path'):
+def in_same_sentence(one: int, other: int, path: 'import legacy.classes):
     """
     Determines whether two words are in the same sentence.
 

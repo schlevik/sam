@@ -1,10 +1,13 @@
+
+
+from stresstest.classes import Config
 from stresstest.generate import StoryGenerator
 from stresstest.realize import Realizer
 
 
-def interactive_env(path='stresstest/resources/config.conf', g_class=StoryGenerator):
-    from stresstest.classes import Config
-    c = Config(path, [])
+def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenerator):
+    c = Config(path)
+    c.pprint()
     g = g_class(c)
     t = Realizer()
     ss = g.generate_story()

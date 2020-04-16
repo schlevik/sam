@@ -3,7 +3,7 @@ import random
 import names
 from loguru import logger
 
-from stresstest.classes import Choices, Config
+from stresstest.classes import Choices
 
 
 class Sentence(dict):
@@ -38,8 +38,9 @@ class StoryGenerator:
     FEATURES = Choices(['modifier'])
     POSITIONS = Choices(['forward', 'defender', 'midfielder'])
 
-    def __init__(self, config: Config):
+    def __init__(self, config):
         logger.debug("cfg:")
+        # TODO: change to dynaconf maybe?
         self.cfg = config
         logger.debug(self.cfg.pprint())
 
