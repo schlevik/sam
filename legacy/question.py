@@ -1,8 +1,9 @@
 import logging
 from quicklog import Loggable
 from typing import List, Optional
-from stresstest.classes import Path, Choices
-from stresstest.question.independent_rules import QuestionRule
+from stresstest.classes import Choices
+from legacy.classes import Path
+from legacy.independent_rules import QuestionRule
 
 
 class Question(Loggable):

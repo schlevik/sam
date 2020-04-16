@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple
 import random
 import names
-from quicklog import Loggable
+from loguru import logger
 
 from stresstest.classes import Choices, Config
 
@@ -27,7 +27,7 @@ class Sentence(dict):
                 f"Modes: {self.modes}, Features: {self.features}")
 
 
-class StoryGenerator(Loggable):
+class StoryGenerator:
     ACTIONS = Choices(['goal', 'foul'])
     ATTRIBUTES = Choices(['time', 'distance', 'coactor'])
     # ACTORS = Choices(['player'])
@@ -39,9 +39,9 @@ class StoryGenerator(Loggable):
     POSITIONS = Choices(['forward', 'defender', 'midfielder'])
 
     def __init__(self, config: Config):
-        self.logger.debug("cfg:")
+        logger.debug("cfg:")
         self.cfg = config
-        self.logger.debug(self.cfg.pprint())
+        logger.debug(self.cfg.pprint())
 
     def set_world(self):
         world = dict()
@@ -94,8 +94,8 @@ class StoryGenerator(Loggable):
             world['players_by_id'][p1['id']] = p1
             world['players_by_id'][p2['id']] = p2
         self.world = world
-        self.logger.info("World:")
-        self.logger.info(self.world)
+        logger.info("World:")
+        logger.info(self.world)
 
     def set_action(self):
         self.sentence.action = self.ACTIONS.random()
@@ -200,7 +200,8 @@ class StoryGenerator(Loggable):
                     if any(f"sent.attributes.{attribute}" in v for v in
                            visits[sent.sentence_nr]):
                         if attribute == 'coactor':
-                            q["answer"] = " ".join((sent.attributes['coactor']['first'], sent.attributes['coactor']['last']))
+                            q["answer"] = " ".join(
+                                (sent.attributes['coactor']['first'], sent.attributes['coactor']['last']))
                         else:
 
                             q["answer"] = sent.attributes[attribute]

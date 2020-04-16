@@ -2,7 +2,8 @@ import pytest
 from flaky import flaky
 from quicklog import setup_logging
 
-from stresstest.classes import Choices, Path, Rule, Config
+from stresstest.classes import Choices, Rule, Config
+from legacy.classes import Path
 
 setup_logging('tests/resources/logging.conf')
 

@@ -2,10 +2,11 @@ import unittest
 
 from quicklog import setup_logging
 
-from stresstest.classes import Choices, Path
-from stresstest.passage.rules import AtLeastOneSentence, UniqueAttribute, \
+from stresstest.classes import Choices
+from legacy.classes import Path
+from legacy.rules import AtLeastOneSentence, UniqueAttribute, \
     NoFoulTeam, NPlayersMention, GoalWithDistractor
-from stresstest.util import choices_at, load_graph
+from legacy.util import choices_at, load_graph
 
 setup_logging('tests/resources/logging.conf')
 

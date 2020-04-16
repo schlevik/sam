@@ -4,8 +4,9 @@ import networkx as nx
 from overrides import overrides
 from quicklog import Loggable
 
-from stresstest.classes import Path, Choices
-from stresstest.passage.rules import PassageRule
+from stresstest.classes import Choices
+from legacy.classes import Path
+from legacy.rules import PassageRule
 
 
 class ReasonableStrategy(Loggable):

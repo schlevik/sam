@@ -3,17 +3,17 @@ from typing import List
 import networkx as nx
 
 from stresstest.classes import Config
-from stresstest.passage.rules import NoFoulTeam, \
-    NPlayersMention, UniqueAttribute, GoalWithDistractor, PassageRule
-from stresstest.passage.graph import generate_path
-from stresstest.passage.strategies import ReasonableStrategy
-from stresstest.question.independent_rules import BareMinimum, \
+from legacy.rules import NoFoulTeam, \
+    UniqueAttribute, GoalWithDistractor, PassageRule
+from legacy.graph import generate_path
+from legacy.strategies import ReasonableStrategy
+from legacy.independent_rules import BareMinimum, \
     IsNotModified, QuestionRule
-from stresstest.question.question import generate_question
-from stresstest.realization.rules import SingularPlural, \
+from legacy.question import generate_question
+from legacy.realization.rules import SingularPlural, \
     Modifier
-from stresstest.realization.template import TemplateStringifier
-from stresstest.util import load_graph
+from legacy.realization.template import TemplateStringifier
+from legacy.util import load_graph
 
 
 def generate_random(graph: nx.Graph, strategy_rules: List[PassageRule],

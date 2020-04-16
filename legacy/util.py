@@ -8,7 +8,8 @@ import networkx as nx
 from quicklog import Loggable
 from pyvis.network import Network
 
-from stresstest.classes import Path, Choices
+from stresstest.classes import Choices
+from legacy.classes import Path
 
 
 def load_graph(path: str) -> nx.Graph:
@@ -150,7 +151,7 @@ def choices_at(graph: nx.Graph, node: str) -> Choices:
     return Choices(graph.neighbors(node))
 
 
-def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
+def get_sentence_of_word(word: int, path) -> slice:
     """
     Obtains the sentence of a given word position.
 

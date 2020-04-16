@@ -5,8 +5,9 @@ from typing import List, Dict
 import names
 from quicklog import Loggable
 
-from stresstest.classes import Config, Path
-from stresstest.question.question import Question
+from stresstest.classes import Config
+from legacy.classes import Path
+from legacy.question import Question
 
 tpl = """
 Passage: {}

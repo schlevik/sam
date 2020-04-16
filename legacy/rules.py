@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
-from stresstest.classes import Path, Choices, Rule
-from stresstest.util import in_sentence
+from stresstest.classes import Choices, Rule
+from legacy.classes import Path
+from legacy.util import in_sentence
 
 
 class PassageRule(Rule):
