@@ -73,28 +73,6 @@ class Choices(Iterable[T]):
         except IndexError:
             return None
 
-    def random_with_rules(self, *, rules: List['Rule'],
-                          **kwargs) -> Optional[T]:
-        """
-        Returns a random choice that conforms to all the given
-        rules.
-
-        Does not change the instance.
-
-        Args:
-            rules: List of rules to apply.
-            **kwargs: Kwargs that should match the rules
-
-        Returns:
-            Random choice conforming to given rules.
-
-        """
-        choices = Choices(self)
-        for rule in rules:
-            choices = rule(choices=choices,
-                           **kwargs)
-        return choices.random()
-
     def remove_all_but(self, *nodes: T) -> None:
         self.remove([n for n in self if n not in nodes])
 
@@ -164,12 +142,13 @@ class Config(Mapping):
         return iter(self.cfg)
 
 
-pattern = re.compile(r"([^(\[\]]\S*|\(.+?\)|\[.+?\])\s*")
+alt_opt_pattern = re.compile(r"([^(\[\]]\S*|\(.+?\)|\[.+?\])\s*")
 
 
 class S(List[str]):
     def __init__(self, iterable: List[str]):
-        super().__init__([pattern.findall(template) for template in iterable])
+        # this will tokenise things separated by whitespace but keep expressions in []() brackets together
+        super().__init__([alt_opt_pattern.findall(template) for template in iterable])
 
     def random(self) -> Tuple[str, int]:
         choice = random.randint(0, len(self) - 1)
