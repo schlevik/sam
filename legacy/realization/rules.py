@@ -1,10 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Iterable
 
-from quicklog import Loggable
-
-from stresstest.classes import Choices, Path, Rule
-from stresstest.util import get_sentence_of_word
+from stresstest.classes import Choices, Rule
+from legacy.classes import Path
+from legacy.util import get_sentence_of_word
 
 
 class BaseRealisationRule(Rule):

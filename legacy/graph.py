@@ -3,7 +3,7 @@ from typing import Callable
 
 import networkx as nx
 
-from stresstest.classes import Path, Choices
+from legacy.classes import Path
 
 
 def random_strategy(graph: nx.Graph, path: Path) -> str:

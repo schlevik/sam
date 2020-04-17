@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
-from stresstest.classes import Path, Rule, Choices
-from stresstest.util import get_sentence_of_word
+from stresstest.classes import Rule, Choices
+from legacy.classes import Path
+from legacy.util import get_sentence_of_word
 
 
 class QuestionRule(Rule):

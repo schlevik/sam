@@ -8,7 +8,8 @@ import networkx as nx
 from quicklog import Loggable
 from pyvis.network import Network
 
-from stresstest.classes import Path, Choices
+from stresstest.classes import Choices
+from legacy.classes import Path
 
 
 def load_graph(path: str) -> nx.Graph:
@@ -150,7 +151,7 @@ def choices_at(graph: nx.Graph, node: str) -> Choices:
     return Choices(graph.neighbors(node))
 
 
-def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
+def get_sentence_of_word(word: int, path) -> slice:
     """
     Obtains the sentence of a given word position.
 
@@ -168,7 +169,7 @@ def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
     """
 
     sos_index = word
-    while  sos_index >= 0 and path[sos_index] != 'sos':
+    while sos_index >= 0 and path[sos_index] != 'sos':
         sos_index -= 1
     eos_index = word
 
@@ -180,7 +181,7 @@ def get_sentence_of_word(word: int, path: 'stresstest.classes.Path') -> slice:
     return slice(sos_index, eos_index)
 
 
-def in_same_sentence(one: int, other: int, path: 'stresstest.classes.Path'):
+def in_same_sentence(one: int, other: int, path: 'import legacy.classes):
     """
     Determines whether two words are in the same sentence.
 

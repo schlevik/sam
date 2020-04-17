@@ -5,8 +5,9 @@ from typing import List, Dict
 import names
 from quicklog import Loggable
 
-from stresstest.classes import Templates, Path
-from stresstest.question.question import Question
+from stresstest.classes import Config
+from legacy.classes import Path
+from legacy.question import Question
 
 tpl = """
 Passage: {}
@@ -30,7 +31,7 @@ class TemplateStringifier(Loggable):
             Map of variables from the path and their corresponding
             values. Populated during path realisation.
 
-        templates (Templates):
+        templates (Config):
             Templates to use for realisation of logical forms.
 
         path (Path):
@@ -62,7 +63,7 @@ class TemplateStringifier(Loggable):
     """
     _no_whitespace = ['eos']
 
-    def __init__(self, templates: Templates,
+    def __init__(self, templates: Config,
                  path: Path, question: Question, stringify=True):
         """
 
@@ -74,7 +75,7 @@ class TemplateStringifier(Loggable):
 
         """
         self.variables_table: Dict[str, str] = dict()
-        self.templates: Templates = templates
+        self.templates: Config = templates
         self.path: Path = path
         self.realised_path = []
         self.resolved_path = []

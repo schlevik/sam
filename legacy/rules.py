@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
-from stresstest.classes import Path, Choices, Rule
-from stresstest.util import in_sentence
+from stresstest.classes import Choices, Rule
+from legacy.classes import Path
+from legacy.util import in_sentence
 
 
 class PassageRule(Rule):
@@ -32,26 +33,14 @@ class PassageRule(Rule):
         ...
 
 
-class AtLeastOneSentence(PassageRule):
-    """
-    This rule ensures that there's at least one content sentence.
-
-    """
-
-    def evaluate_rule(self, *, path: Path,
-                      choices: Choices) -> Choices:
-        if path.last == 'idle' and 'sos' not in path:
-            choices.remove_all_but('sos')
-        return choices
-
-
-class UniqueElaborations(PassageRule):
+class UniqueAttribute(PassageRule):
     """
     This rule ensures the elaborations
     (e.g. ``elaboration.distance``) are unique. Also ensures there's
     no elaboration step after all possible elaborations are used up.
 
     """
+    ATTRIBUTE = 'attribute'
 
     def __init__(self, max_elaborations=3):
         self.max_elaborations = max_elaborations
@@ -62,10 +51,10 @@ class UniqueElaborations(PassageRule):
         if in_sentence(path):
             current_sentence = path.from_index(path.rindex('sos'))
             if current_sentence.occurrences(
-                    'elaboration') >= self.max_elaborations:
-                choices.remove(['elaboration'])
+                    self.ATTRIBUTE) >= self.max_elaborations:
+                choices.remove([self.ATTRIBUTE])
 
-            if path.last == 'elaboration':
+            if path.last == self.ATTRIBUTE:
                 to_remove = [c for c in choices if
                              c in current_sentence]
                 choices.remove(to_remove)
@@ -108,7 +97,7 @@ class NPlayersMention(PassageRule):
     def evaluate_rule(self, *, path: Path,
                       choices: Choices) -> Choices:
 
-        if path.last == 'idle' and path.count('._player') < self.n:
+        if path.last == 'eos' and path.count('._player') < self.n:
             choices.remove_all_but('sos')
         if path.last == 'attribution' and path.count('._player') < self.n:
             choices.remove_all_but('._player')

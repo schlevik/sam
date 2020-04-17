@@ -2,8 +2,8 @@ import networkx as nx
 import pytest
 from quicklog import setup_logging
 
-from stresstest.classes import Path
-from stresstest.util import load_graph, convert, expand, in_sentence, \
+from legacy.classes import Path
+from legacy.util import load_graph, convert, expand, in_sentence, \
     get_sentence_of_word, in_same_sentence
 
 setup_logging('tests/resources/logging.conf')
