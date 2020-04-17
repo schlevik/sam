@@ -2,13 +2,30 @@ import inspect
 import random
 import textwrap
 from collections import defaultdict
-from typing import List
+from typing import List, Callable, Optional
 
 from loguru import logger
 
 from stresstest.classes import S, YouIdiotException
 from stresstest.generate import Sentence
 from stresstest.resources.templates import percent, sentences, at, dollar, bang, templates as question_templates
+
+
+def process_templates(templates, allow_conditions=False) -> dict:
+    processed = {}
+    for k, v in templates.items():
+        if k == 'condition':
+            if not allow_conditions:
+                raise ValueError("Conditions not allowed!")
+            assert isinstance(v, Callable)
+        elif isinstance(v, dict):
+            v = process_templates(v, allow_conditions)
+        elif isinstance(v, list):
+            v = S(v)
+        else:
+            raise ValueError(f"Template values can only be lists or dicts! (was: {v}: {type(v)})")
+        processed[k] = v
+    return processed
 
 
 class Realizer:
@@ -24,11 +41,59 @@ class Realizer:
         self.context = None
         # TODO: move S([]) here
         self.bang = bang
-        self.dollar = dollar
-        self.sentences = sentences
+        self.dollar = process_templates(dollar)
+        self.sentences = process_templates(sentences)
         self.at = at
-        self.percent = percent
-        self.question_templates = question_templates
+        self.percent = process_templates(percent, True)
+        self.question_templates = process_templates(question_templates)
+        self.validate(self.dollar, 'dollar')
+        self.validate(self.sentences, 'sentences')
+        self.validate(self.percent, 'percent')
+        self.validate(self.question_templates, 'question_templates')
+
+    def get_first_invalid_key(self, sentence: S) -> Optional[str]:
+        words = sentence[:]
+        while words:
+            word = words.pop()
+            process_function = self.decide_process_function(word)
+            new_words = []
+            if process_function == self.process_option:
+                new_words = word[1:-1].split(" ")
+            elif process_function == self.process_alternative:
+                new_words = word[1:-1].split(" ")
+            elif process_function == self.process_condition:
+                try:
+                    self._access_percent(word[1:])
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            elif process_function == self.process_function:
+                try:
+                    self._access_bang(word[1:])
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            elif process_function == self.process_template:
+                try:
+                    self._access_dollar(word[1:])
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            words.extend(new_words)
+        return None
+
+    def validate(self, template: dict, path=''):
+        for k, v in template.items():
+            if isinstance(v, Callable):
+                pass  # you're off the hook
+            elif isinstance(v, list):
+                for i, t in enumerate(v):
+                    invalid = self.get_first_invalid_key(t)
+                    if invalid:
+                        raise ValueError(f"path '{path}.{k}', sentence '{i}' contains access "
+                                         f"key '{invalid}' which is invalid!")
+            elif isinstance(v, dict):
+                self.validate(v, path=f"{path}.{k}")
 
     def _access_context(self, word: str) -> List[str]:
         n = self.context
@@ -51,10 +116,10 @@ class Realizer:
             except KeyError:
                 n = getattr(n, k)
                 if not n:
-                    raise NotImplementedError
+                    raise NotImplementedError()
         return n
 
-    def _access_bang(self, word) -> List[str]:
+    def _access_bang(self, word) -> Callable:
         n = self.bang
         for k in word.split("."):
             try:
@@ -62,8 +127,8 @@ class Realizer:
             except KeyError:
                 n = getattr(n, k)
                 if not n:
-                    raise NotImplementedError
-        return str(n(self.context)).split()
+                    raise NotImplementedError()
+        return n
 
     def _access_dollar(self, word) -> S:
         n = self.dollar
@@ -73,10 +138,7 @@ class Realizer:
             except KeyError:
                 n = getattr(n, k)
                 if not n:
-                    raise NotImplementedError
-            except TypeError:
-                print(word)
-                raise YouIdiotException()
+                    raise NotImplementedError()
         return n
 
     def with_feedback(self, e: Exception):
@@ -108,6 +170,96 @@ class Realizer:
             realised.append(sent)
         return '\n'.join(realised) + ".", self.context['visits']
 
+    def decide_process_function(self, word) -> Optional[Callable[[str], List[str]]]:
+        if word.startswith("(") and word.endswith(")"):
+            r = self.process_option
+        elif word.startswith("[") and word.endswith("]"):
+            r = self.process_alternative
+        elif word.startswith("%"):
+            r = self.process_condition
+        elif word.startswith("#"):
+            r = self.process_context
+        elif word.startswith("$"):
+            r = self.process_template
+        elif word.startswith("!"):
+            r = self.process_function
+        else:
+            return None
+        logger.debug(f"Deciding to process with {r.__name__}")
+        return r
+
+    def process_option(self, word):
+        # word = self.context['word']
+        # stack = self.context['stack']
+        logger.debug("...Word is an option ()...")
+        # 50/50 whether to ignore it
+        if random.choice([True, False]):
+            new_words = word[1:-1].split()
+            logger.debug(f"... new words: {new_words}")
+            return new_words
+            # stack.extend(new_words)
+        else:
+            random.choice("Discarding!")
+            return []
+
+    def process_alternative(self, word):
+        # word = self.context['word']
+        # stack = self.context['stack']
+        logger.debug("...Word is an alternative []...")
+        alternatives = word[1:-1].split("|")
+        choice = random.choice(alternatives)
+        logger.debug(f"...Choosing {choice}")
+        # stack.extend(choice.split()[::-1])
+        return choice.split()
+
+    def process_condition(self, word):
+        # word = self.context['word']
+        # stack = self.context['stack']
+        logger.debug("...Word is a condition %...")
+        branch = self._access_percent(word[1:])
+        logger.debug(
+            f"...Evaluating: {branch['condition'].__name__}\n{textwrap.dedent(inspect.getsource(branch['condition']))}")
+        result = branch['condition'](self.context)
+        logger.debug(f"with result: {result}")
+        new_words, idx = branch[result].random()
+        self.context['choices'].append(f"{word}.{idx}")
+
+        logger.debug(f"... new words: {new_words}")
+        new_words = [str(w) for w in new_words]
+        # stack.extend(new_words)
+        return new_words
+
+    def process_context(self, word):
+        logger.debug("...Word is context #...")
+        new_words = self._access_context(word[1:])
+
+        logger.debug(f"... new words: {new_words}")
+        # self.context['stack'].extend(new_words[::-1])
+        return new_words
+
+    def process_template(self, word):
+        # word = self.context['word']
+        logger.debug("...Word is template $...")
+        try:
+            new_words, idx = self._access_dollar(word[1:]).random()
+        except (KeyError, AttributeError) as _:
+            new_words, idx = self._access_dollar(word[1:] + ".any").random()
+
+        new_words = new_words
+        self.context['choices'].append(f"{word}.{idx}")
+        logger.debug(f"... new words: {new_words}")
+        # self.context['stack'].extend(new_words)
+        return new_words
+
+    def process_function(self, word):
+        logger.debug("...Word is a function !...")
+        # get and execute
+        func = self._access_bang(word[1:])
+        new_words = str(func(self.context)).split()
+        logger.debug(f"... new words: {new_words}")
+        # self.context['stack'].extend(new_words[::-1])
+        return new_words
+
     def realise_sentence(self):
         ctx = self.context
 
@@ -130,74 +282,12 @@ class Realizer:
             logger.debug(f"Current word: {self.context['word']}")
 
             word = self.context['word']
-            stack = self.context['stack']
-
-            # optional as in ()
-            if word.startswith("(") and word.endswith(")"):
-                logger.debug("...Word is an option ()...")
-                # 50/50 whether to ignore it
-                if random.choice([True, False]):
-                    new_words = word[1:-1].split()[::-1]
-                    logger.debug(f"... new words: {new_words}")
-                    stack.extend(new_words)
-                else:
-                    random.choice("Discarding!")
-                # if c.word.startswith("@"):
-
-            # alternative as in []
-            elif word.startswith("[") and word.endswith("]"):
-                logger.debug("...Word is an alternative []...")
-                alternatives = word[1:-1].split("|")
-                choice = random.choice(alternatives)
-                logger.debug(f"...Choosing {choice}")
-                stack.extend(choice.split()[::-1])
-
-            # if/then/else
-            elif word.startswith("%"):
-                logger.debug("...Word is a condition %...")
-                branch = self._access_percent(word[1:])
-                logger.debug(
-                    f"...Evaluating: {branch['condition'].__name__}\n{textwrap.dedent(inspect.getsource(branch['condition']))}")
-                result = branch['condition'](ctx)
-                logger.debug(f"with result: {result}")
-                new_words, idx = branch[result].random()
-                self.context['choices'].append(f"{word}.{idx}")
-
-                logger.debug(f"... new words: {new_words}")
-                new_words = [str(w) for w in new_words[::-1]]
-                stack.extend(new_words)
-
-            # accessing context
-            elif word.startswith("#"):
-                logger.debug("...Word is context #...")
-                new_words = self._access_context(word[1:])
-
-                logger.debug(f"... new words: {new_words}")
-                stack.extend(new_words[::-1])
-
-            # recursive template evaluation
-            elif word.startswith("$"):
-                logger.debug("...Word is template $...")
-                try:
-                    new_words, idx = self._access_dollar(word[1:]).random()
-                except (KeyError, AttributeError) as _:
-                    new_words, idx = self._access_dollar(word[1:] + ".any").random()
-
-                new_words = new_words[::-1]
-                self.context['choices'].append(f"{word}.{idx}")
-                logger.debug(f"... new words: {new_words}")
-                stack.extend(new_words)
-
-            elif word.startswith("!"):
-
-                logger.debug("...Word is a function !...")
-                # get and execute
-                new_words = self._access_bang(word[1:])
-                logger.debug(f"... new words: {new_words}")
-                stack.extend(new_words[::-1])
-
+            process_function = self.decide_process_function(word)
+            if process_function:
+                new_words = process_function(word)
+                ctx['stack'].extend(new_words[::-1])
             else:
-                ctx['realised'].append(self.context['word'])
+                ctx['realised'].append(word)
             logger.debug("...done!")
 
         logger.debug(f"Final sentence is: {ctx['realised']}")
@@ -217,15 +307,8 @@ class Realizer:
 
             # alternative as in ()
             if word.startswith("(") and word.endswith(")"):
-                logger.debug("...Word is an option ()...")
-                # 50/50 whether to ignore it
-                if random.choice([True, False]):
-                    new_words = word[1:-1].split()[::-1]
-                    logger.debug(f"... new words: {new_words}")
-                    stack.extend(new_words)
-                else:
-                    random.choice("Discarding!")
-
+                new_words = self.process_option(word)
+                stack.extend(new_words[::-1])
             # context access
             elif word.startswith("#"):
                 try:
