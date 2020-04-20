@@ -37,7 +37,7 @@ class Realizer:
     # question_templates: dict  # well that's sort of obvious
 
     def __init__(self, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
-                 question_templates=question_templates):
+                 question_templates=question_templates, validate=True):
         self.context = None
         # TODO: move S([]) here
         self.bang = bang
@@ -46,10 +46,11 @@ class Realizer:
         self.at = at
         self.percent = process_templates(percent, True)
         self.question_templates = process_templates(question_templates)
-        self.validate(self.dollar, 'dollar')
-        self.validate(self.sentences, 'sentences')
-        self.validate(self.percent, 'percent')
-        self.validate(self.question_templates, 'question_templates')
+        if validate:
+            self.validate(self.dollar, 'dollar')
+            self.validate(self.sentences, 'sentences')
+            self.validate(self.percent, 'percent')
+            self.validate(self.question_templates, 'question_templates')
 
     def get_first_invalid_key(self, sentence: S) -> Optional[str]:
         words = sentence[:]
@@ -60,7 +61,10 @@ class Realizer:
             if process_function == self.process_option:
                 new_words = word[1:-1].split(" ")
             elif process_function == self.process_alternative:
-                new_words = word[1:-1].split(" ")
+                alternatives = word[1:-1].split("|")
+                logger.debug(alternatives)
+                new_words = [word for alternative in alternatives for word in alternative.split(" ")]
+                logger.debug(new_words)
             elif process_function == self.process_condition:
                 try:
                     self._access_percent(word[1:])
@@ -95,9 +99,9 @@ class Realizer:
             elif isinstance(v, dict):
                 self.validate(v, path=f"{path}.{k}")
 
-    def _access_context(self, word: str) -> List[str]:
+    def _access_context(self, word: str, record_visit=True) -> List[str]:
         n = self.context
-        if word.startswith('sent'):
+        if word.startswith('sent') and record_visit:
             self.context['visits'][self.context['sent_nr']].append(word)
         for k in word.split("."):
             try:
