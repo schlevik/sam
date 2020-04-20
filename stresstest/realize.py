@@ -2,7 +2,7 @@ import inspect
 import random
 import textwrap
 from collections import defaultdict
-from typing import List, Callable, Optional
+from typing import List, Callable, Optional, Dict, Tuple
 
 from loguru import logger
 
@@ -159,7 +159,7 @@ class Realizer:
         logger.error(msg)
         return YouIdiotException(msg)
 
-    def realise_story(self, sentences: List[Sentence], world):
+    def realise_story(self, sentences: List[Sentence], world) -> Tuple[List[str], Dict]:
         self.context = dict()
         self.context['world'] = world
         self.context['sentences'] = sentences
@@ -172,7 +172,7 @@ class Realizer:
             except Exception as e:
                 raise self.with_feedback(e)
             realised.append(sent)
-        return '\n'.join(realised) + ".", self.context['visits']
+        return realised, self.context['visits']
 
     def decide_process_function(self, word) -> Optional[Callable[[str], List[str]]]:
         if word.startswith("(") and word.endswith(")"):
