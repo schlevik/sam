@@ -3,13 +3,31 @@ import random
 sentences = {
     "goal": [
         "%PREAMBLE-VBD.begin $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal",
+
         "%PREAMBLE-VBD.begin $ACTOR $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name",
+
         "$ACTORTEAM.name-pos-pre player $ACTOR put an exclamation mark, $VBG.goal a ($JJ.positive) goal $DISTANCE.PP",
-        "$ACTOR 's goal ($RDM.VBG) arrived $TIME after !PRPS teammate $COACTOR 's $PASS-TYPE and [$RDM.CC-V.goal|$RDM.S.goal]",
-        "$TIME a $PASS-TYPE fell to ($ACTORTEAM.name-pos-pre) $COACTOR in $POSITION.VERTICAL and $COREF-PLAYER swept $POSITION.HEIGHT to the $POSITION.BOX for $ACTOR to poke past the $GOALKEEPER",
-        "A $JJ.positive $DISTANCE.JJ strike from $ACTOR [flying|homing] into $POSITION.GOAL past [the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %PREAMBLE-VP.end",
-        "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, scored $TIME [$REASON.PP.goal| and $RDM.S.goal].",
-        "$ACTOR scored $TIME when !PRPS $REASON.CC-V.goal (and $REASON.CC-V.goal) before slotting in at $POSITION.GOAL ."
+
+        "$ACTOR 's goal ( , [$RDM.VBG|RDM.NOVB] , ) arrived $TIME after !PRPS teammate $COACTOR 's $PASS-TYPE "
+        "and [$RDM.CC-V.goal|$RDM.S.goal]",
+
+        "$TIME a $PASS-TYPE fell to ($ACTORTEAM.name-pos-pre) $COACTOR in $POSITION.VERTICAL and $COREF-PLAYER "
+        "swept $POSITION.HEIGHT to the $POSITION.BOX for $ACTOR to poke past the $GOALKEEPER",
+
+        "A $JJ.positive $DISTANCE.JJ strike from $ACTOR [flying|homing] into $POSITION.GOAL past "
+        "[the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %PREAMBLE-VP.end",
+
+        "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, "
+        "scored $TIME [$REASON.PP.goal| and $RDM.S.goal].",
+
+        "$ACTOR scored $TIME when !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) "
+        "before $VBG.goal the ball $POSITION.PP.GOAL .",
+
+        "$ACTOR scored $TIME $VBG.goal the ball $POSITION.PP.GOAL "
+        "after !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) ",
+
+        "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG] , $ACTOR $VBDO.goal "
+        "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance)"
         # "%PREAMBLE-VBD.begin"
     ],
     "foul": [
@@ -34,11 +52,13 @@ dollar = {
             "goal": ["ended !PRPS dry run of !RANDINT games",
                      "made the fans chant !PRPS name"]
         },
+        # TODO: no verb, need to look up how we call it
+        "NOVB": ["a contender for the $RDM.AWARD",
+                 "a reward for !PRP hard work"],
         # inserted as a gerund
-        "VBG": [", being !PRPS !RANDINT th of the season ,",
-                ", a contender for the $RDM.AWARD ,",
-                ", a reward for !PRP hard work , "
-                ", drawing attention from even !PRPS biggest sceptics ,"],
+        "VBG": ["being !PRPS !RANDINT th of the season",
+                "drawing attention from even !PRPS biggest sceptics",
+                "following a $JJ.positive juggle"],
         "AWARD": ["highlight of the day",
                   "action of the match"],
         "PP": {
@@ -48,21 +68,29 @@ dollar = {
     },
     "REASON": {
         "PP": {
-            "goal": ["after a run on $POSITION.VERTICAL"]
+            "goal": ["after a run on $POSITION.VERTICAL"]  # TODO: on out wide / on the centre
         },
         "CC-V": {
+            "any": ["dribbled !RANDINT metres (on $POSITION.VERTICAL)"],  # TODO: on out wide / on the centre
             "goal": ["ran !RANDINT metres",
-                     "intercepted $NONACTORTEAM.name $GOALKEEPER goal kick"]
+                     "intercepted [$NONACTORTEAM.name-pos-pre goalkeeper's goal kick"
+                     "| the goal kick of $NONACTORTEAM.name-pos-pre goal keeper]"]
         }
     },
     "GOALKEEPER": ["goalkeeper", "woman between the posts", "last line of defence"],
     "COREF-PLAYER": ["!PRP", "the player"],
     "POSITION": {
-        "VERTICAL": ["the flank", "out wide", "the center"],
-        "BOX": ["near post", "far post", "penalty spot", "6-yard-area"],
-        "GOAL": ["the ($POSITION.HEIGHT) ($POSITION.LR) corner", "the middle of the goal"],
-        "HEIGHT": ["low", "high"],
-        "LR": ["left", "right"]
+        "VERTICAL": ["the flank", "out wide", "the centre"],
+        "BOX": ["near post", "far post", "penalty spot", "6-yard-area", "edge of the area"],
+        "GOAL": [
+            "the ($POSITION.HEIGHT) ($POSITION.LR) corner", "the middle of the goal", "the back of the net",
+            "between the posts"
+        ],
+        "HEIGHT": ["lower", "upper"],
+        "LR": ["left", "right"],
+        "PP": {
+            "GOAL": ["in $POSITION.GOAL", "under the bar", "off the [post|bar] and in $POSITION.GOAL"],
+        }
     },
     "INJURY": ["a (potential) ($BODYPART) injury"],
     "BODYPART": ["knee", "head", "shoulder", "arm", "hip", "leg", "ankle"],
@@ -157,7 +185,7 @@ dollar = {
     # adjectives
     "JJ": {
         "positive":
-            ["spectacular", "wonderful", "amazing", "stunning", "searing"],
+            ["spectacular", "wonderful", "amazing", "stunning", "searing", "mesmerising"],
         "accurate": ["accurate", "pin-point", ],
         "risky": ["bold", "daring", "risky"],
         "attention": ["remarkable", "interesting"],
@@ -172,14 +200,21 @@ dollar = {
     ### VERBS
     "VBD": {
         "foul": ["fouled", "felled"],
-        "goal": ["scored", "curled in", "put (in)"],
+        "goal": ["scored", "curled in", "put (in)", "hammered"],
+        "nogoal": ["missed", "shot wide"]
+    },
+    "VBDO": {
+        "goal": ["curled the ball", "put the ball", "hammered the ball"],
         "nogoal": ["missed", "shot wide"]
     },
     "VBD-PASSIVE": {
         "foul": ["was $VBD.foul", "was sent to the ground"],
     },
     "VBG": {
-        "goal": ["scoring", "hammering in", "curling in"]
+        "goal": ["scoring", "hammering in", "curling in", "slotting in"]
+    },
+    "VBGO": {
+        "goal": ["scoring", "hammering the ball in", "curling the ball in", "slotting the ball in"]
     },
     "CONJ": {
         "contrastive": ["but", "however"]
