@@ -92,7 +92,7 @@ class Realizer:
                     invalid = self.get_first_invalid_key(t)
                     if invalid:
                         raise ValueError(f"path '{path}.{k}', sentence '{i}' contains access "
-                                         f"key '{invalid}' which is invalid!")
+                                         f"key >>>{invalid}<<< which is invalid!")
             elif isinstance(v, dict):
                 self.validate(v, path=f"{path}.{k}")
 
