@@ -16,7 +16,7 @@ def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenera
     c = Config(path)
     c.pprint()
     g = g_class(c)
-    t = Realizer() or realizer
+    t = realizer or Realizer()
     ss = g.generate_story()
     story, visits = t.realise_story(ss, g.world)
     (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = g.generate_questions(

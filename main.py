@@ -26,9 +26,10 @@ def validate():
 
 
 @click.command()
-def generate():
-    from tests.testutil import interactive_env
-    interactive_env()
+@click.option("-k", type=int, default=1)
+def generate(k):
+    for _ in range(k):
+        interactive_env()
 
 
 @click.command()
@@ -43,15 +44,21 @@ def test(action, n, k):
     click.secho(f"{sentences[action][n]}", fg='red', bold=True)
 
     sentences[action] = [sentences[action][n]]
-    for _ in range(k):
-        r = Realizer(sentences=sentences)
-        _, _, _, story_sents, questions, logical_form = interactive_env(realizer=r, do_print=False)
-        for realised, logical in zip(story_sents, logical_form):
-            if logical['action'] == action:
-                styled = click.style(realised, fg='red', bold=True)
-            else:
-                styled = realised
-            click.echo(styled)
+    for i in range(k):
+        try:
+            r = Realizer(sentences=sentences, unique_sentences=False)
+            _, _, _, story_sents, questions, logical_form = interactive_env(realizer=r, do_print=False)
+            for realised, logical in zip(story_sents, logical_form):
+                if logical['action'] == action:
+                    styled = click.style(realised, fg='red', bold=True)
+                else:
+                    styled = realised
+                click.echo(styled)
+            click.secho(20*"=", bold=True)
+        except Exception as e:
+            click.secho(str(e), fg='red', bold=True)
+            click.secho(f'Error in i={i}')
+            return
 
 
 cli.add_command(validate)
