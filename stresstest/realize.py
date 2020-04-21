@@ -152,6 +152,8 @@ class Realizer:
             msg = ""
         elif isinstance(e, KeyError) and "dict object has no attribute" in str(e):
             msg = f"{self.context['word']} is not a valid template path!"
+        elif isinstance(e, YouIdiotException):
+            msg = str(e)
         else:
             msg = "And i don't even know what's wrong!"
         logger.debug(f"{self.context['sentence_template']}")
@@ -242,13 +244,18 @@ class Realizer:
         return new_words
 
     def process_template(self, word):
-        # word = self.context['word']
         logger.debug("...Word is template $...")
+        logger.debug(f"Choices so far: {self.context['choices']}")
+        exclude = [int(x.rsplit(".", 1)[-1]) for x in self.context['choices'] if x.startswith(word + '.')]
+        logger.debug(f"Excluding choices: {exclude}")
         try:
-            new_words, idx = self._access_dollar(word[1:]).random()
+            new_words, idx = self._access_dollar(word[1:]).random(exclude=exclude)
         except (KeyError, AttributeError) as _:
-            new_words, idx = self._access_dollar(word[1:] + ".any").random()
-
+            logger.debug("Trying any...")
+            new_words, idx = self._access_dollar(word[1:] + ".any").random(exclude=exclude)
+        except IndexError as _:
+            raise YouIdiotException(f"Template {self.context['sentence_template']} uses '{word}' "
+                                    f"more often than there are unique alternatives!")
         new_words = new_words
         self.context['choices'].append(f"{word}.{idx}")
         logger.debug(f"... new words: {new_words}")
@@ -265,6 +272,7 @@ class Realizer:
         return new_words
 
     def realise_sentence(self):
+        logger.debug("===PROCESSING NEW SENTENCE===")
         ctx = self.context
 
         # select template and the chosen number (for tracking purposes)

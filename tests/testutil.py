@@ -1,6 +1,15 @@
+from copy import deepcopy
+
 from stresstest.classes import Config
 from stresstest.generate import StoryGenerator
 from stresstest.realize import Realizer
+from tests.resources.templates import sentences, dollar, at, percent, bang, templates
+
+
+def only(sents, n, action='test'):
+    sents = deepcopy(sents)
+    sents[action] = [sents[action][n]]
+    return sents
 
 
 def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenerator, realizer=None, do_print=True):
@@ -53,3 +62,9 @@ def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenera
         for q, a in realised_ssqs + realised_msqs + realised_uaqs + realised_aqs:
             print(q, a if a else "Unanswerable")
     return g, c, t, story, qs, ss
+
+
+class TestRealizer(Realizer):
+    def __init__(self, sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang, templates=templates):
+        super().__init__(sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang,
+                         question_templates=templates)

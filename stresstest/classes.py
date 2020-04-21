@@ -1,10 +1,8 @@
 import json
 import random
 import re
-import string
-from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Sequence, Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple
+from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple
 from quickconf import ConfigReader
 
 T = TypeVar("T")
@@ -150,8 +148,15 @@ class S(List[str]):
         # this will tokenise things separated by whitespace but keep expressions in []() brackets together
         super().__init__([alt_opt_pattern.findall(template) for template in iterable])
 
-    def random(self) -> Tuple[str, int]:
-        choice = random.randint(0, len(self) - 1)
+    def random(self, exclude=None, mask=None) -> Tuple[str, int]:
+        if exclude and mask:
+            raise YouIdiotException("template.random with both 'exclude' and 'mask' keywords called!")
+        exclude = exclude or []
+        if exclude:
+            mask = [1] * len(self)
+            for i in exclude:
+                mask[i] = 0
+        choice = random.choices(range(len(self)), mask)[0]
         return deepcopy(self[choice]), choice
 
 
