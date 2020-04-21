@@ -7,7 +7,7 @@ from tests.testutil import interactive_env
 
 
 @click.group()
-@click.option('--debug', default=False)
+@click.option('--debug', default=False, is_flag=True)
 def cli(debug):
     if not debug:
         logger.remove(0)

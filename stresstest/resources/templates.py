@@ -27,15 +27,21 @@ sentences = {
         "after !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) ",
 
         "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG] , $ACTOR $VBDO.goal "
-        "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance)"
-        # "%PREAMBLE-VBD.begin"
+        "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance)",
+
     ],
     "foul": [
         "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY",
-        "%PREAMBLE-VBD.begin ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by [$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME)",
+
+        "%PREAMBLE-VBD.begin ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by "
+        "[$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME)",
+
         "%PREAMBLE-VBD.begin $ACTOR $VBD.foul ($COACTORTEAM.name-pos-pre) $COACTOR ($TIME)",
+
         "%PREAMBLE-VBD.begin $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post)",
-        "$RDM.S as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) challenge from $ACTOR"
+
+        "$RDM.S as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) "
+        "challenge from $ACTOR"
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
         # "stay @CONDITION.else, @CONDITION.value"
