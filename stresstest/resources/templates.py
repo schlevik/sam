@@ -29,6 +29,9 @@ sentences = {
         "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG] , $ACTOR $VBDO.goal "
         "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance)",
 
+        #TODO: extract "expression player's drive squirmed"
+        "$COACTOR was free on the $POSITION.BOX , with the defence slow to react, "
+        "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER ."
     ],
     "foul": [
         "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY",
