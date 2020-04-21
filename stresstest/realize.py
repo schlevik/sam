@@ -29,17 +29,12 @@ def process_templates(templates, allow_conditions=False) -> dict:
 
 
 class Realizer:
-    # bang: dict  # what is bang?
-    # dollar: dict  # what is dollar?
-    # sentences: dict  # what is sentences?
-    # at: dict  # what is at?
-    # percent: dict  # what is percent?
-    # question_templates: dict  # well that's sort of obvious
 
     def __init__(self, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
-                 question_templates=question_templates, validate=True):
+                 question_templates=question_templates, validate=True, unique_sentences=True):
+        self.unique_sentences = unique_sentences
+        logger.debug("Creating new Realizer...")
         self.context = None
-        # TODO: move S([]) here
         self.bang = bang
         self.dollar = process_templates(dollar)
         self.sentences = process_templates(sentences)
@@ -47,10 +42,12 @@ class Realizer:
         self.percent = process_templates(percent, True)
         self.question_templates = process_templates(question_templates)
         if validate:
+            logger.debug("Validating templates...")
             self.validate(self.dollar, 'dollar')
             self.validate(self.sentences, 'sentences')
             self.validate(self.percent, 'percent')
             self.validate(self.question_templates, 'question_templates')
+            logger.debug("Validation done, looks ok.")
 
     def get_first_invalid_key(self, sentence: S) -> Optional[str]:
         words = sentence[:]
@@ -156,25 +153,10 @@ class Realizer:
             msg = str(e)
         else:
             msg = "And i don't even know what's wrong!"
-        logger.debug(f"{self.context['sentence_template']}")
+        logger.debug(f"{self.context['chosen_templates'][-1]}")
         logger.debug(f"{self.context['choices']}")
         logger.error(msg)
         return YouIdiotException(msg)
-
-    def realise_story(self, sentences: List[Sentence], world) -> Tuple[List[str], Dict]:
-        self.context = dict()
-        self.context['world'] = world
-        self.context['sentences'] = sentences
-        self.context['visits'] = defaultdict(list)
-        realised = []
-        for self.context['sent_nr'], self.context['sent'] in enumerate(sentences):
-            logger.debug(self.context['sent'])
-            try:
-                sent = self.realise_sentence()
-            except Exception as e:
-                raise self.with_feedback(e)
-            realised.append(sent)
-        return realised, self.context['visits']
 
     def decide_process_function(self, word) -> Optional[Callable[[str], List[str]]]:
         if word.startswith("(") and word.endswith(")"):
@@ -254,7 +236,7 @@ class Realizer:
             logger.debug("Trying any...")
             new_words, idx = self._access_dollar(word[1:] + ".any").random(exclude=exclude)
         except IndexError as _:
-            raise YouIdiotException(f"Template {self.context['sentence_template']} uses '{word}' "
+            raise YouIdiotException(f"Template {self.context['chosen_templates'][-1]} uses '{word}' "
                                     f"more often than there are unique alternatives!")
         new_words = new_words
         self.context['choices'].append(f"{word}.{idx}")
@@ -271,17 +253,43 @@ class Realizer:
         # self.context['stack'].extend(new_words[::-1])
         return new_words
 
+    def realise_story(self, sentences: List[Sentence], world) -> Tuple[List[str], Dict]:
+        self.context = dict()
+        self.context['world'] = world
+        self.context['sentences'] = sentences
+        self.context['chosen_templates'] = list()
+        self.context['visits'] = defaultdict(list)
+        realised = []
+        for self.context['sent_nr'], self.context['sent'] in enumerate(sentences):
+            logger.debug(self.context['sent'])
+            # try:
+            # except Exception as e:
+            #    raise self.with_feedback(e)
+            sent = self.realise_sentence()
+            realised.append(sent)
+        return realised, self.context['visits']
+
     def realise_sentence(self):
-        logger.debug("===PROCESSING NEW SENTENCE===")
         ctx = self.context
+        logger.debug(f"===PROCESSING NEW SENTENCE: #{ctx['sent_nr']}, action = {ctx['sent'].action}===")
 
         # select template and the chosen number (for tracking purposes)
-        template, template_nr = self.sentences[ctx['sent'].action].random()
+        logger.debug(f"Use unique sentences?: {self.unique_sentences}")
+        if self.unique_sentences:
+            exclude = [int(x.rsplit(".", 1)[-1]) for x in self.context['chosen_templates'] if
+                       x.startswith(ctx['sent'].action + '.')]
+            logger.debug(f'Choices to exclude... {exclude}')
+            if len(exclude) == len(self.sentences[ctx['sent'].action]):
+                raise YouIdiotException(f"Your story has more '{ctx['sent'].action}' actions (> {len(exclude)}) "
+                                        f"than you have choices for ({len(self.sentences[ctx['sent'].action])})!")
+        else:
+            exclude = []
+        template, template_nr = self.sentences[ctx['sent'].action].random(exclude=exclude)
 
         # set chosen template
-        self.context['sentence_template'] = f"{ctx['sent'].action}.{template_nr}"
+        self.context['chosen_templates'].append(f"{ctx['sent'].action}.{template_nr}")
 
-        # initialise context context
+        # initialise context
         self.context['realised'] = []
         self.context['choices'] = []
         self.context['stack'] = template
@@ -289,15 +297,21 @@ class Realizer:
 
         # while there's something on the stack
         while self.context['stack']:
-            logger.debug(f"Stack content: {self.context['stack']}")
-            self.context['word'] = self.context['stack'].pop()
-            logger.debug(f"Current word: {self.context['word']}")
 
+            # take next word from stack
+            self.context['word'] = self.context['stack'].pop()
             word = self.context['word']
+
+            logger.debug(f"State: {' '.join(ctx['realised'])} ++ {word} ++ {' '.join(self.context['stack'][::-1])}")
+
+            # decide what to process with
             process_function = self.decide_process_function(word)
+
+            # apply if not a plain word
             if process_function:
                 new_words = process_function(word)
                 ctx['stack'].extend(new_words[::-1])
+            # if plain word, just append
             else:
                 ctx['realised'].append(word)
             logger.debug("...done!")

@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from flaky import flaky
 
 from stresstest.generate import Sentence
@@ -59,3 +57,17 @@ def test_different_dollar_templates_nested():
     assert '1' in realised_sents[0]
     assert '2' in realised_sents[0]
     assert '3' in realised_sents[0]
+
+
+@flaky(max_runs=5, min_passes=5)
+def test_different_sentences():
+    sents = sentences  # nested
+    r = TestRealizer(sentences=sents)
+    ii = [0, 1, 2, 3]
+    logic_sents = [Sentence(i) for i in ii]
+    for i in ii:
+        logic_sents[i].action = "unique_sentence_test"
+    world = {}
+    realised_sents, visits = r.realise_story(logic_sents, world)
+    for i in ii:
+        assert any(str(i) in sent for sent in realised_sents)
