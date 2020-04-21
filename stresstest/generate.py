@@ -22,7 +22,7 @@ class Sentence(dict):
         return self.__dict__[item]
 
     def __repr__(self):
-        return (f"{self.action} by {self.actor['id']}: with {self.attributes}, "
+        return (f"{self.action} by {self.actor.get('id', '')}: with {self.attributes}, "
                 f"caused by {self.cause} resulting in {self.effect}. "
                 f"Modes: {self.modes}, Features: {self.features}")
 
