@@ -76,7 +76,8 @@ class Realizer:
                     return word
             elif process_function == self.process_template:
                 try:
-                    self._access_dollar(word[1:])
+                    x = self._access_dollar(word[1:])
+                    assert isinstance(x, list) or "any" in x
                 except Exception as e:
                     logger.error(str(e))
                     return word
@@ -259,6 +260,7 @@ class Realizer:
         self.context['sentences'] = sentences
         self.context['chosen_templates'] = list()
         self.context['visits'] = defaultdict(list)
+        self.context['realizer'] = self
         realised = []
         for self.context['sent_nr'], self.context['sent'] in enumerate(sentences):
             logger.debug(self.context['sent'])

@@ -58,7 +58,7 @@ def test(action, n, k):
         except Exception as e:
             click.secho(str(e), fg='red', bold=True)
             click.secho(f'Error in i={i}')
-            return
+            raise e
 
 
 cli.add_command(validate)

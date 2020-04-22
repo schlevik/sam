@@ -1,5 +1,7 @@
 import random
 
+from loguru import logger
+
 sentences = {
     "goal": [
         "%PREAMBLE-VBD.begin $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal",
@@ -29,7 +31,7 @@ sentences = {
         "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG] , $ACTOR $VBDO.goal "
         "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance)",
 
-        #TODO: extract "expression player's drive squirmed"
+        # TODO: extract "expression player's drive squirmed"
         "$COACTOR was free on the $POSITION.BOX , with the defence slow to react, "
         "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER ."
     ],
@@ -44,7 +46,9 @@ sentences = {
         "%PREAMBLE-VBD.begin $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post)",
 
         "$RDM.S as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) "
-        "challenge from $ACTOR"
+        "challenge from $ACTOR",
+
+        "!PREAMBLE $ACTOR $VBG.foul $COACTOR $RDM.PP.foul"
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
         # "stay @CONDITION.else, @CONDITION.value"
@@ -71,6 +75,7 @@ dollar = {
         "AWARD": ["highlight of the day",
                   "action of the match"],
         "PP": {
+            "foul": ["for a $JJ.positive free-kick opportunity"],
             "goal": ["for !PRPS !RANDINT th league goal of the season"]
         },
         # "BEGINNING": ["$ACTORTEAM.name did well to withstand the barrage"]
@@ -83,7 +88,8 @@ dollar = {
             "any": ["dribbled !RANDINT metres (on $POSITION.VERTICAL)"],  # TODO: on out wide / on the centre
             "goal": ["ran !RANDINT metres",
                      "intercepted [$NONACTORTEAM.name-pos-pre goalkeeper's goal kick"
-                     "| the goal kick of $NONACTORTEAM.name-pos-pre goal keeper]"]
+                     "| the goal kick of $NONACTORTEAM.name-pos-pre goal keeper]",
+                     "$REASON.CC-V.any"]
         }
     },
     "GOALKEEPER": ["goalkeeper", "woman between the posts", "last line of defence"],
@@ -152,13 +158,21 @@ dollar = {
             ],
 
             "supportive": [
-                "To add insult to $NONACTORTEAM.name-pos-pre injury",
+                "[To add|adding] insult to $NONACTORTEAM.name-pos-pre injury",
                 "Further",
                 "The onslaught (by $ACTORTEAM.name) continued, as "
             ]
         },
         'VBG': {
-            "matchstart": ["The match started with"]}
+            "matchstart": ["The match started with"],
+            "supportive": [
+                "Further pressure (on the attack) [led to|resulted in]"
+            ],
+            "neutral": [
+                "Things proceeded with",
+            ],
+            'contrastive': ["Things changed ( , however , ) with"]
+        }
     },
     "END": {
         # VBD clause is following
@@ -208,7 +222,7 @@ dollar = {
 
     ### VERBS
     "VBD": {
-        "foul": ["fouled", "felled"],
+        "foul": ["fouled", "felled", "scythed down"],
         "goal": ["scored", "curled in", "put (in)", "hammered"],
         "nogoal": ["missed", "shot wide"]
     },
@@ -217,10 +231,11 @@ dollar = {
         "nogoal": ["missed", "shot wide"]
     },
     "VBD-PASSIVE": {
-        "foul": ["was $VBD.foul", "was sent to the ground"],
+        "foul": ["was $VBD.foul", "was sent to the ground", "was scythed down"],
     },
     "VBG": {
-        "goal": ["scoring", "hammering in", "curling in", "slotting in"]
+        "goal": ["scoring", "hammering in", "curling in", "slotting in"],
+        "foul": ["fouling", "felling", 'scything down', 'upending']
     },
     "VBGO": {
         "goal": ["scoring", "hammering the ball in", "curling the ball in", "slotting the ball in"]
@@ -311,7 +326,36 @@ percent = {
 
 }
 
+
+# assuming we only have one action
+def _vbx(template, action):
+    """
+    Gives the mode of the action verb (e.g. VBD, VBG, etc)
+    """
+    logger.debug(action)
+    logger.debug(template)
+    vbx = next(x for x in template if f".{action}" in x)
+    logger.debug(f"VBX:{vbx}")
+    vbx = vbx.split('.')[0][1:]
+    logger.debug(f"VBX:{vbx}")
+    assert vbx.startswith('VB')
+    return vbx
+
+
+def _preamble(ctx):
+    action, nr = ctx['chosen_templates'][-1].split('.')
+    assert action == ctx['sent'].action
+    current_template = ctx['realizer'].sentences[action][int(nr)]
+    vbx = _vbx(current_template, action)
+    # is matchbegin?
+    if ctx['sent_nr'] == 0:
+        return f'$BEGIN.{vbx}.matchstart'
+    contrastive = _is_contrastive(ctx)
+    return f'$BEGIN.{vbx}.{contrastive}'
+
+
 bang = {
+    "PREAMBLE": _preamble,
     "RANDINT": (lambda ctx: random.randint(1, 15)),
     "PRPS": (lambda ctx: "her" if ctx['world']['gender'] == 'female' else "his"),
     "PRP": (lambda ctx: "she" if ctx['world']['gender'] == 'female' else "he"),
