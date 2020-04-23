@@ -54,7 +54,7 @@ def test(action, n, k):
                 else:
                     styled = realised
                 click.echo(styled)
-            click.secho(20*"=", bold=True)
+            click.secho(20 * "=", bold=True)
         except Exception as e:
             click.secho(str(e), fg='red', bold=True)
             click.secho(f'Error in i={i}')
