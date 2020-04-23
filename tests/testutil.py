@@ -65,6 +65,7 @@ def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenera
 
 
 class TestRealizer(Realizer):
-    def __init__(self, sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang, templates=templates):
+    def __init__(self, sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang, templates=templates,
+                 *args, **kwargs):
         super().__init__(sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang,
-                         question_templates=templates)
+                         question_templates=templates, *args, **kwargs)

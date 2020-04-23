@@ -21,7 +21,7 @@ def test_different_dollar_templates_flat():
 @flaky(max_runs=5, min_passes=5)
 def test_different_dollar_templates_flat_with_multiple_sentences():
     sents = only(sentences, 0)  # flat
-    r = TestRealizer(sentences=sents)
+    r = TestRealizer(sentences=sents, unique_sentences=False)
     logic_sents = [Sentence(0), Sentence(1)]
     logic_sents[0].action = 'test'
     logic_sents[1].action = 'test'
@@ -35,7 +35,7 @@ def test_different_dollar_templates_flat_with_multiple_sentences():
 @flaky(max_runs=5, min_passes=5)
 def test_different_dollar_templates_flat_with_multiple_sentences_when_not_leaf():
     sents = only(sentences, 2)  # flat
-    r = TestRealizer(sentences=sents)
+    r = TestRealizer(sentences=sents, unique_sentences=False)
     logic_sents = [Sentence(0), Sentence(1)]
     logic_sents[0].action = 'test'
     logic_sents[1].action = 'test'

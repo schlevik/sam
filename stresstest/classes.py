@@ -1,8 +1,11 @@
 import json
 import random
 import re
+from abc import abstractmethod, ABC
 from copy import deepcopy
-from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple
+from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple, Callable
+
+from loguru import logger
 from quickconf import ConfigReader
 
 T = TypeVar("T")
@@ -141,6 +144,35 @@ class Config(Mapping):
 
 
 alt_opt_pattern = re.compile(r"([^(\[\]]\S*|\(.+?\)|\[.+?\])\s*")
+
+
+class F:
+    options: List[str] = None
+    number: int = None
+
+    @classmethod
+    def make(cls, callable: Callable[[Dict], str], options_or_number=None):
+        logger.debug(f"Making F with options_or_number={options_or_number}")
+        instance = cls()
+        if not options_or_number:
+            options_or_number = 1
+        if not isinstance(callable, Callable):
+            raise ValueError(f"Called F.make with first argument of type {callable} but only "
+                             f"Callable[(Context) -> str] is allowed!")
+        instance.__call__ = callable
+        if isinstance(options_or_number, int):
+            instance.number = options_or_number
+        elif isinstance(options_or_number, list):
+            instance.options = options_or_number
+        else:
+            raise ValueError(f"Called F.make with second argument: {options_or_number} "
+                             f"of type {type(options_or_number)}, but only int or List[str] is allowed!")
+
+        return instance
+
+    def __call__(self, ctx: dict) -> str:
+        # TODO: maybe better dict -> S?
+        raise NotImplementedError()
 
 
 class S(List[str]):
