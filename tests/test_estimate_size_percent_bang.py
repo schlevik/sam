@@ -4,13 +4,13 @@ from tests.testutil import TestRealizer, only
 sentences = {
     "test": [
         "%A",  # 12
-        "%B $a",  # 3*(3-1) = 6
-        "%B %B",
-        "!C",
-        "!D",
+        "%B $a",  # 3*3 = 9
+        "%B %B",  # 9
+        "!C",  # 2
+        "!D",  # 9
         "$a !E",  # 3*1 = 3
-        "$d !F $d",  # 3*2*2 = 12
-        "!G"
+        "$d !F $d",  # 3*2*3 = 18
+        "!G"  # 12
     ]
 
 }
@@ -18,7 +18,7 @@ dollar = {
     "a": "1 2 3".split(),  # 3
     "b": "4 5 6".split(),  # 3
     "c": "7 8 9".split(),  # 3
-    "d": "0 0 0".split()  # 3
+    "d": "0 x y".split()  # 3
 }
 
 percent = {
@@ -55,7 +55,7 @@ bang = {
     "D": TestD,
     "E": (lambda ctx: "4"),
     "F": (lambda ctx: ..., 2),
-    "G": (lambda ctx: ..., ['$b', '$a'])  # 12
+    "G": (lambda ctx: ..., ['$b', '$a'])  # 6
 }
 
 
@@ -63,18 +63,6 @@ def test_estimate_size_works_per_sentence():
     sents = only(sentences, 0)  # flat
     r = TestRealizer(sentences=sents, dollar=dollar, percent=percent)
     assert r.estimate_size(r.sentences['test']) == 12
-
-
-def test_estimate_size_works_with_replacement():
-    sents = only(sentences, 1)  # flat
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent)
-    assert r.estimate_size(r.sentences['test']) == 6
-
-
-def test_estimate_size_works_with_replacement_when_accessed_indirectly():
-    sents = only(sentences, 2)  # flat
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent)
-    assert r.estimate_size(r.sentences['test']) == 6
 
 
 def test_bang_works_with_explicitly_defined():
@@ -98,10 +86,15 @@ def test_bang_works_with_number_when_implicitly_defined_no_args():
 def test_bang_works_with_number_when_implicitly_defined_with_args():
     sents = only(sentences, 6)
     r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 12
+    assert r.estimate_size(r.sentences['test']) == 18
 
 
 def test_bang_works_with_options_when_implicitly_defined_with_args():
     sents = only(sentences, 7)
     r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
     assert r.estimate_size(r.sentences['test']) == 6
+
+
+def test_full_grammar():
+    r = TestRealizer(sentences=sentences, dollar=dollar, percent=percent, bang=bang)
+    assert r.estimate_size(r.sentences['test']) == 68
