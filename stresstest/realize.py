@@ -51,7 +51,6 @@ class Realizer:
         self.at = at
         self.percent = process_templates(percent, True)
         self.question_templates = process_templates(question_templates)
-        self.visited_keys_estimate = defaultdict(count)
         if validate:
             logger.debug("Validating templates...")
             self.validate(self.dollar, 'dollar')
@@ -95,39 +94,33 @@ class Realizer:
             words.extend(new_words)
         return None
 
-    def _estimate_words(self, sentence: S, replacement=False):
+    def _estimate_words(self, sentence: S):
         # todo: w/o replacement
         combinations = 1
-        logger.debug(f"Estimating size of '{sentence}' {'with replacement.' if replacement else '.'}")
+        logger.debug(f"Estimating size of '{sentence}'.")
         for w in sentence:
             logger.debug(f"w is {w}")
             process_function = self.decide_process_function(w)
             if process_function == self.process_template:
-                visits = next(self.visited_keys_estimate[w[1:]]) if replacement else 0
-                logger.debug(f"Number of visits for {w[1:]}: {visits}")
                 logger.debug(self.visited_keys_estimate)
-                size = self._estimate_sentences(self._access_dollar(w[1:]), replacement) - visits
-                assert size > 0
-                combinations *= size
+                combinations *= self._estimate_sentences(self._access_dollar(w[1:]))
 
             elif process_function == self.process_option:
-                combinations *= 1 + self._estimate_words(w[1:].split(" "), replacement)
+                combinations *= 1 + self._estimate_words(w[1:].split(" "))
 
             elif process_function == self.process_alternative:
-                combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")], replacement)
+                combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")])
 
             elif process_function == self.process_condition:
-                # optimistic
-                # combinations *=
                 combinations *= sum(
-                    self._estimate_sentences(v, replacement) for k, v in self._access_percent(w[1:]).items() if
+                    self._estimate_sentences(v) for k, v in self._access_percent(w[1:]).items() if
                     k != "condition"
                 )
             elif process_function == self.process_function:
                 f = self._access_bang(w[1:])
                 if f.options:
                     logger.debug(f"Calculating with options: {f.options}")
-                    combinations *= sum(self._estimate_words(o, replacement) for o in S(f.options))
+                    combinations *= sum(self._estimate_words(o) for o in S(f.options))
                 else:
                     logger.debug(f"Calculating with number: {f.number}")
                     assert f.number > 0
@@ -140,20 +133,18 @@ class Realizer:
         logger.debug(f"Size of '{sentence}' is {combinations}.")
         return combinations
 
-    def _estimate_sentences(self, sentences: List[S], replacement):
+    def _estimate_sentences(self, sentences: List[S]):
         combined = 0
         for sentence in sentences:
-            combined += self._estimate_words(sentence, replacement)
+            combined += self._estimate_words(sentence)
 
         return combined
 
-    def estimate_size(self, sentences: List[S], replacement=True) -> int:
-        # if replacement:
-        #    raise NotImplementedError()
+    def estimate_size(self, sentences: List[S]) -> int:
         combined = 0
         for sentence in sentences:
             self.visited_keys_estimate = defaultdict(count)
-            combined += self._estimate_words(sentence, replacement)
+            combined += self._estimate_words(sentence)
 
         return combined
 
