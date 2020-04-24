@@ -2,6 +2,8 @@ import random
 
 from loguru import logger
 
+from stresstest.classes import F
+
 sentences = {
     "goal": [
         "%PREAMBLE-VBD.begin $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal",
@@ -341,6 +343,25 @@ def _vbx(template, action):
     assert vbx.startswith('VB')
     return vbx
 
+_possible_verb_forms = ("VBG", "VBD")
+possible_contrastive = ["contrastive", 'supportive', 'neutral']
+
+class Preamble(F):
+
+    options = [f"$BEGIN.{x}.matchstart" for x in _possible_verb_forms] + \
+              [f'$BEGIN.{vbx}.{contrastive}' for vbx in _possible_verb_forms for contrastive in possible_contrastive]
+
+    def __call__(self, ctx: dict) -> str:
+        action, nr = ctx['chosen_templates'][-1].split('.')
+        assert action == ctx['sent'].action
+        current_template = ctx['realizer'].sentences[action][int(nr)]
+        vbx = _vbx(current_template, action)
+        # is matchbegin?
+        if ctx['sent_nr'] == 0:
+            return f'$BEGIN.{vbx}.matchstart'
+        contrastive = _is_contrastive(ctx)
+        return f'$BEGIN.{vbx}.{contrastive}'
+
 
 def _preamble(ctx):
     action, nr = ctx['chosen_templates'][-1].split('.')
@@ -355,7 +376,7 @@ def _preamble(ctx):
 
 
 bang = {
-    "PREAMBLE": _preamble,
+    "PREAMBLE": Preamble,
     "RANDINT": (lambda ctx: random.randint(1, 15)),
     "PRPS": (lambda ctx: "her" if ctx['world']['gender'] == 'female' else "his"),
     "PRP": (lambda ctx: "she" if ctx['world']['gender'] == 'female' else "he"),

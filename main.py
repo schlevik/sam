@@ -61,9 +61,25 @@ def test(action, n, k):
             raise e
 
 
+@click.command()
+@click.argument("action", type=str)
+@click.option("-n", type=int, default=-1)
+def count(action, n):
+    if n >= 0:
+        click.echo(f"Counting only for '{action}' sentence {click.style(text=n, fg='green', bold=True)}!")
+        sentences[action] = [sentences[action][n]]
+    else:
+        click.echo(f"Counting only for {click.style(text='all', fg='green', bold=True)} '{action}' sentences!")
+
+    r = Realizer(sentences=sentences)
+    size = r.estimate_size(r.sentences[action])
+    click.secho(f"Optimistically speaking, you can generate {size} distinct sentences!")
+
+
 cli.add_command(validate)
 cli.add_command(test)
 cli.add_command(generate)
+cli.add_command(count)
 
 if __name__ == '__main__':
     cli()

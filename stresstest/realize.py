@@ -106,7 +106,7 @@ class Realizer:
                 combinations *= self._estimate_sentences(self._access_dollar(w[1:]))
 
             elif process_function == self.process_option:
-                combinations *= 1 + self._estimate_words(w[1:].split(" "))
+                combinations *= 1 + self._estimate_words(w[1:-1].split(" "))
 
             elif process_function == self.process_alternative:
                 combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")])
@@ -126,9 +126,10 @@ class Realizer:
                     assert f.number > 0
                     combinations *= f.number
 
-            elif not process_function:
+            elif not process_function or process_function == self.process_context:
                 ...
             else:
+                logger.debug(f"Unknown process function: {process_function}")
                 raise NotImplementedError()
         logger.debug(f"Size of '{sentence}' is {combinations}.")
         return combinations
