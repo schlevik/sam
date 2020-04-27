@@ -2,7 +2,6 @@ import inspect
 import random
 import textwrap
 from collections import defaultdict
-from itertools import count
 from typing import List, Callable, Optional, Dict, Tuple, Union
 
 from loguru import logger
@@ -32,6 +31,7 @@ def process_templates(templates, allow_conditions=False) -> dict:
             v = F.make(v)
         elif isinstance(v, Tuple):
             v = F.make(*v)
+
         else:
             raise ValueError(f"Template values can only be lists or dicts! (was: {v}: {type(v)})")
         processed[k] = v

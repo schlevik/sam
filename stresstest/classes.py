@@ -149,6 +149,7 @@ alt_opt_pattern = re.compile(r"([^(\[\]]\S*|\(.+?\)|\[.+?\])\s*")
 class F:
     options: List[str] = None
     number: int = None
+    do_call = None
 
     @classmethod
     def make(cls, callable: Callable[[Dict], str], options_or_number=None):
@@ -159,7 +160,7 @@ class F:
         if not isinstance(callable, Callable):
             raise ValueError(f"Called F.make with first argument of type {callable} but only "
                              f"Callable[(Context) -> str] is allowed!")
-        instance.__call__ = callable
+        instance.do_call = callable
         if isinstance(options_or_number, int):
             instance.number = options_or_number
         elif isinstance(options_or_number, list):
@@ -171,8 +172,7 @@ class F:
         return instance
 
     def __call__(self, ctx: dict) -> str:
-        # TODO: maybe better dict -> S?
-        raise NotImplementedError()
+        return self.do_call(ctx)
 
 
 class S(List[str]):

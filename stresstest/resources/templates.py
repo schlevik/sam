@@ -343,11 +343,13 @@ def _vbx(template, action):
     assert vbx.startswith('VB')
     return vbx
 
+
 _possible_verb_forms = ("VBG", "VBD")
 possible_contrastive = ["contrastive", 'supportive', 'neutral']
 
-class Preamble(F):
 
+class Preamble(F):
+    wat = True
     options = [f"$BEGIN.{x}.matchstart" for x in _possible_verb_forms] + \
               [f'$BEGIN.{vbx}.{contrastive}' for vbx in _possible_verb_forms for contrastive in possible_contrastive]
 
