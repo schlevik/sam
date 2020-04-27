@@ -94,58 +94,63 @@ class Realizer:
             words.extend(new_words)
         return None
 
-    def _estimate_words(self, sentence: S):
+    def _estimate_words(self, sentence: S, pessimistic=False):
         # todo: w/o replacement
         combinations = 1
         logger.debug(f"Estimating size of '{sentence}'.")
+        aggr = min if pessimistic else sum
         for w in sentence:
             logger.debug(f"w is {w}")
             process_function = self.decide_process_function(w)
             if process_function == self.process_template:
-                logger.debug(self.visited_keys_estimate)
-                combinations *= self._estimate_sentences(self._access_dollar(w[1:]))
+                combinations *= self._estimate_sentences(self._access_dollar(w[1:]), pessimistic)
 
             elif process_function == self.process_option:
-                combinations *= 1 + self._estimate_words(w[1:-1].split(" "))
+                combinations *= 1 + self._estimate_words(w[1:-1].split(" "), pessimistic)
 
             elif process_function == self.process_alternative:
-                combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")])
+                combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")], pessimistic)
 
             elif process_function == self.process_condition:
-                combinations *= sum(
-                    self._estimate_sentences(v) for k, v in self._access_percent(w[1:]).items() if
+
+                combinations *= aggr(
+                    self._estimate_sentences(v, pessimistic) for k, v in self._access_percent(w[1:]).items() if
                     k != "condition"
                 )
             elif process_function == self.process_function:
                 f = self._access_bang(w[1:])
                 if f.options:
                     logger.debug(f"Calculating with options: {f.options}")
-                    combinations *= sum(self._estimate_words(o) for o in S(f.options))
+                    result = aggr(self._estimate_words(o, pessimistic) for o in S(f.options))
+                    logger.debug(f"Size of '{w}' is {result}.")
+                    combinations *= result
                 else:
-                    logger.debug(f"Calculating with number: {f.number}")
-                    assert f.number > 0
-                    combinations *= f.number
+                    if not pessimistic:
+                        assert f.number > 0
+                        logger.debug(f"Calculating with number: {f.number}")
+                        # if pessimistic, assume f.number = 1
+                        combinations *= f.number
 
             elif not process_function or process_function == self.process_context:
                 ...
             else:
                 logger.debug(f"Unknown process function: {process_function}")
                 raise NotImplementedError()
+
         logger.debug(f"Size of '{sentence}' is {combinations}.")
         return combinations
 
-    def _estimate_sentences(self, sentences: List[S]):
+    def _estimate_sentences(self, sentences: List[S], pessimistic=False):
         combined = 0
         for sentence in sentences:
-            combined += self._estimate_words(sentence)
+            combined += self._estimate_words(sentence, pessimistic)
 
         return combined
 
-    def estimate_size(self, sentences: List[S]) -> int:
+    def estimate_size(self, sentences: List[S], pessimistic=False) -> int:
         combined = 0
         for sentence in sentences:
-            self.visited_keys_estimate = defaultdict(count)
-            combined += self._estimate_words(sentence)
+            combined += self._estimate_words(sentence, pessimistic)
 
         return combined
 

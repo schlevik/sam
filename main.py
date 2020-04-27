@@ -73,7 +73,12 @@ def count(action, n):
 
     r = Realizer(sentences=sentences)
     size = r.estimate_size(r.sentences[action])
-    click.secho(f"Optimistically speaking, you can generate {size} distinct sentences!")
+    click.secho(
+        f"Optimistically speaking, you can generate {click.style(str(size), fg='green', bold=True)} distinct sentences!")
+    r = Realizer(sentences=sentences)
+    size = r.estimate_size(r.sentences[action], pessimistic=True)
+    click.secho(
+        f"Pessimistically speaking, you can generate {click.style(str(size), fg='red', bold=True)} distinct sentences!")
 
 
 cli.add_command(validate)
