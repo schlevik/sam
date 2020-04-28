@@ -194,3 +194,22 @@ class S(List[str]):
 
 class YouIdiotException(Exception):
     ...
+
+
+class Model:
+    """
+    Unifying interface to all those stupid things.
+    """
+
+    def __init__(self, name, something_with_predict, gpu=False):
+        self.name = name
+        self.predictor = something_with_predict
+        self.gpu = gpu
+
+    def predict(self, question, passage):
+        # TODO: something something GPU
+        return self.predictor.predict(question=question, passage=passage)['best_span_str']
+
+    @classmethod
+    def make(cls, path, gpu=False):
+        ...
