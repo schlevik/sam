@@ -3,6 +3,7 @@ import random
 import uuid
 
 import click
+from tqdm import trange
 
 from stresstest.classes import Config
 from stresstest.generate import StoryGenerator
@@ -42,10 +43,10 @@ def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
     if seed:
         random.seed(seed)
 
-    for _ in range(k):
+    for _ in trange(k, position=1):
 
         sample = []
-        for _ in range(n):
+        for _ in trange(n, position=0):
             # TODO: check if we can pull this out... not that it matters
             generator = StoryGenerator(c)
             realizer = Realizer()

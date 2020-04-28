@@ -1,26 +1,25 @@
 from abc import abstractmethod, ABC
-from typing import Dict, List
+from typing import Dict, List, Iterable
 
 import spacy
-from quicklog import Loggable
 import numpy as np
 import editdistance
 from spacy.tokens import Doc
 
 
-class Distance(Loggable, ABC):
+class Distance(ABC):
 
     @abstractmethod
     def __call__(self, text: Doc, other_text: Doc) -> float:
         ...
 
 
-class LevenshteinDistance(Distance):
+class Levenshtein(Distance):
     def __call__(self, text: Doc, other_text: Doc) -> float:
         return editdistance.distance(str(text), str(other_text))
 
 
-class JaccardDistance(Distance):
+class Jaccard(Distance):
 
     def __call__(self, text: Doc, other_text: Doc) -> float:
         tokens = set(str(t) for t in text)
@@ -29,7 +28,7 @@ class JaccardDistance(Distance):
                 len(tokens.union(other_tokens)))
 
 
-class EmbeddingDistance(Distance):
+class Embedding(Distance):
     embeddings: Dict[str, np.ndarray]
 
     def __call__(self, text: Doc, other_text: Doc) -> float:
@@ -50,7 +49,7 @@ def _get_spacy():
     return nlp
 
 
-def pointwise_average_distance(corpus: List[str],
+def pointwise_average_distance(corpus: Iterable[str],
                                distance: Distance) -> List[float]:
     nlp = _get_spacy()
     docs = list(nlp.pipe(corpus))
