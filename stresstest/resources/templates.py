@@ -6,51 +6,55 @@ from stresstest.classes import F
 
 sentences = {
     "goal": [
-        "%PREAMBLE-VBD.begin $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal",
+        "%PREAMBLE-VBD.begin $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal .",
 
-        "%PREAMBLE-VBD.begin $ACTOR $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name",
+        "%PREAMBLE-VBD.begin $ACTOR $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name .",
 
-        "$ACTORTEAM.name-pos-pre player $ACTOR put an exclamation mark, $VBG.goal a ($JJ.positive) goal $DISTANCE.PP",
+        "$ACTORTEAM.name-pos-pre player $ACTOR put an exclamation mark, $VBG.goal a ($JJ.positive) goal $DISTANCE.PP .",
 
-        "$ACTOR 's goal ( , [$RDM.VBG|RDM.NOVB] , ) arrived $TIME after !PRPS teammate $COACTOR 's $PASS-TYPE "
-        "and [$RDM.CC-V.goal|$RDM.S.goal]",
+        "$ACTOR 's goal ( , [$RDM.VBG.goal|RDM.NOVB] , ) arrived $TIME after !PRPS teammate $COACTOR 's $PASS-TYPE "
+        "and [$RDM.CC-V.goal|$RDM.S.goal] .",
 
         "$TIME a $PASS-TYPE fell to ($ACTORTEAM.name-pos-pre) $COACTOR in $POSITION.VERTICAL and $COREF-PLAYER "
-        "swept $POSITION.HEIGHT to the $POSITION.BOX for $ACTOR to poke past the $GOALKEEPER",
+        "swept $POSITION.HEIGHT to the $POSITION.BOX for $ACTOR to poke past the $GOALKEEPER .",
 
         "A $JJ.positive $DISTANCE.JJ strike from $ACTOR [flying|homing] into $POSITION.GOAL past "
-        "[the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %PREAMBLE-VP.end",
+        "[the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %PREAMBLE-VP.end .",
 
         "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, "
-        "scored $TIME [$REASON.PP.goal| and $RDM.S.goal].",
+        "scored $TIME [$REASON.PP.goal| and $RDM.S.goal] .",
 
         "$ACTOR scored $TIME when !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) "
         "before $VBG.goal the ball $POSITION.PP.GOAL .",
 
         "$ACTOR scored $TIME $VBG.goal the ball $POSITION.PP.GOAL "
-        "after !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) ",
+        "after !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) .",
 
-        "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG] , $ACTOR $VBDO.goal "
-        "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance)",
+        "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG.goal] , $ACTOR $VBDO.goal "
+        "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance) .",
 
         # TODO: extract "expression player's drive squirmed"
         "$COACTOR was free on the $POSITION.BOX , with the defence slow to react, "
         "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER ."
     ],
     "foul": [
-        "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY",
+        "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",
 
         "%PREAMBLE-VBD.begin ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by "
-        "[$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME)",
+        "[$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME) .",
 
-        "%PREAMBLE-VBD.begin $ACTOR $VBD.foul ($COACTORTEAM.name-pos-pre) $COACTOR ($TIME)",
+        "%PREAMBLE-VBD.begin $ACTOR $VBD.foul ($COACTORTEAM.name-pos-pre) $COACTOR ($TIME) .",
 
-        "%PREAMBLE-VBD.begin $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post)",
+        "%PREAMBLE-VBD.begin $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post) .",
 
         "$RDM.S as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) "
-        "challenge from $ACTOR",
+        "challenge from $ACTOR .",
 
-        "!PREAMBLE $ACTOR $VBG.foul $COACTOR $RDM.PP.foul"
+        "!PREAMBLE $ACTOR $VBG.foul $COACTOR $RDM.PP.foul .",
+
+        "!PREAMBLE $ACTOR $RDM.VBG.foul , "
+        "$VBG.foul $COACTOR near the $POSITION.BOX ."
+
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
         # "stay @CONDITION.else, @CONDITION.value"
@@ -71,9 +75,14 @@ dollar = {
         "NOVB": ["a contender for the $RDM.AWARD",
                  "a reward for !PRP hard work"],
         # inserted as a gerund
-        "VBG": ["being !PRPS !RANDINT th of the season",
+        "VBG": {
+            "foul": ["disappointing (the crowd) with an $JJ.negative action"],
+            "goal": [
+                "being !PRPS !RANDINT th of the season",
                 "drawing attention from even !PRPS biggest sceptics",
-                "following a $JJ.positive juggle"],
+                "following a $JJ.positive juggle"
+            ]
+        },
         "AWARD": ["highlight of the day",
                   "action of the match"],
         "PP": {
@@ -336,7 +345,7 @@ def _vbx(template, action):
     """
     logger.debug(action)
     logger.debug(template)
-    vbx = next(x for x in template if f".{action}" in x)
+    vbx = next(x for x in template if x.startswith("$V") and f".{action}" in x)
     logger.debug(f"VBX:{vbx}")
     vbx = vbx.split('.')[0][1:]
     logger.debug(f"VBX:{vbx}")
@@ -349,7 +358,6 @@ possible_contrastive = ["contrastive", 'supportive', 'neutral']
 
 
 class Preamble(F):
-    wat = True
     options = [f"$BEGIN.{x}.matchstart" for x in _possible_verb_forms] + \
               [f'$BEGIN.{vbx}.{contrastive}' for vbx in _possible_verb_forms for contrastive in possible_contrastive]
 
