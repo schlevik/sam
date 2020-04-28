@@ -15,7 +15,10 @@ from stresstest.realize import Realizer
 @click.option("-n", type=int, default=5)
 @click.option("-k", type=int, default=1)
 @click.option("--seed", type=int, default=False)
-def generate(config, output, n, k, seed):
+@click.option("--multispan", is_flag=True, default=False)
+@click.option("--unanswerable", is_flag=True, default=False)
+@click.option("--abstractive", is_flag=True, default=False)
+def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
     """
 
     Args:
@@ -54,11 +57,18 @@ def generate(config, output, n, k, seed):
             realised_msqs = [realizer.realise_question(q) for q in multi_span_questions]
             realised_uaqs = [realizer.realise_question(q) for q in unanswerable_questions]
             realised_aqs = [realizer.realise_question(q) for q in abstractive_questions]
-            qs = realised_ssqs + realised_msqs + realised_uaqs + realised_aqs
+            # qs = realised_ssqs + realised_msqs + realised_uaqs + realised_aqs
+            qs = realised_ssqs
+            if multispan:
+                qs += realised_msqs
+            if unanswerable:
+                qs += realised_uaqs
+            if abstractive:
+                qs += realised_aqs
             qs = [q for q in qs if q]
             sample.append(
                 {"id": uuid4(),
-                 "passage": story,
+                 "passage": ' '.join(story),
                  "qas": [
                      {"id": uuid4(), "question": q, "answer": a} for q, a in qs
                  ]}
