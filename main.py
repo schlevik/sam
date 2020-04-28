@@ -13,7 +13,8 @@ def cli(debug):
         logger.remove(0)
 
 
-# for folder in scripts: import everything, add to cli
+# for folder in scripts: import everything that is a command, add to main cli
+# python magic 🤪 (or more like undocumented interfaces)
 for file in glob.iglob('scripts/*.py'):
     m = importlib.import_module(file[:-3].replace('/', '.'))
     for name, obj in m.__dict__.items():
