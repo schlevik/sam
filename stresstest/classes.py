@@ -25,7 +25,7 @@ class Choices(Iterable[T]):
         return iter(self.choices)
 
     def __init__(self, l: Iterable[T]):
-        self.choices = set(l)
+        self.choices = list(l)
 
     def __hash__(self):
         return hash(self.choices)
