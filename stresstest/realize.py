@@ -394,7 +394,10 @@ class Realizer:
 
     def realise_question(self, q):
         logger.debug(f"Question: {q}")
-        template, template_nr = self.question_templates[q['type']][q['target']][q['action']].random()
+        try:
+            template, template_nr = self.question_templates[q['type']][q['target']][q['action']].random()
+        except KeyError:
+            return None
         question_words = []
         template.reverse()
         stack = template

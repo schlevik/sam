@@ -73,8 +73,8 @@ class StoryGenerator:
         world['num_players'] = num_players
         world['players'] = []
         world['players_by_id'] = dict()
-        # TODO: unique names
-        # TODO: actually non unique would be funny too
+        # TODO: unique names (actually non unique would be funny too)
+
         for i in range(1, num_players + 1):
             # TODO: Positions maybe
             p1 = dict({
@@ -95,6 +95,7 @@ class StoryGenerator:
             world['players_by_id'][p1['id']] = p1
             world['players_by_id'][p2['id']] = p2
         self.world = world
+
         logger.info("World:")
         logger.info(self.world)
 
@@ -102,8 +103,10 @@ class StoryGenerator:
         self.sentence.action = self.ACTIONS.random()
 
     def handle_attribute(self, name):
+
         if name == 'distance':
             return random.choice(list(range(18, 35)))
+
         if name == 'time':
             last_ts = 0
             for sentence in self.sentences[::-1]:
@@ -112,6 +115,7 @@ class StoryGenerator:
                     break
             # TODO: this needs to be more biased towards earlier times
             return random.choice(list(range(last_ts, 90)))
+
         if name == 'coactor':
             if self.sentence.action == 'foul':
                 player = Choices(
@@ -132,8 +136,7 @@ class StoryGenerator:
         if self.sentence.action == 'foul':
             choices = choices - ['distance']
         for attribute in choices:
-            self.sentence.attributes[attribute] = self.handle_attribute(
-                attribute)
+            self.sentence.attributes[attribute] = self.handle_attribute(attribute)
 
     def set_actor(self):
         self.sentence.actor = Choices.random(self.world['players'])

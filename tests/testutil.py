@@ -30,21 +30,24 @@ def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenera
     for q in single_span_questions:
         try:
             rq = t.realise_question(q)
-            realised_ssqs.append(rq)
+            if rq:
+                realised_ssqs.append(rq)
         except KeyError as e:
             pass
             # print(f"error with {q}")
     for q in multi_span_questions:
         try:
             rq = t.realise_question(q)
-            realised_msqs.append(rq)
+            if rq:
+                realised_msqs.append(rq)
         except KeyError as e:
             pass
             # print(f"error with {q}")
     for q in unanswerable_questions:
         try:
             rq = t.realise_question(q)
-            realised_msqs.append(rq)
+            if rq:
+                realised_msqs.append(rq)
         except KeyError as e:
             pass
             # print(f"error with {q}")
