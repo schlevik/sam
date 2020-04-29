@@ -1,0 +1,10 @@
+md5: 5f5fbf9e0716176c144eec4ea4c9cc00
+cmd: python main.py evaluate --predictions data/predictions-bidaf-3-1.json --gold
+  data/stresstest-ssq-3-1.json
+deps:
+- md5: 9013cf44f72cc02bd1e1b09ade064735
+  path: data/predictions-bidaf-3-1.json
+- md5: 4a435e5a5dc1af2eb6185d56849b900b
+  path: data/stresstest-ssq-3-1.json
+- md5: 4fd39221aa29d17440d8918cb606acc5
+  path: scripts/evaluate.py

@@ -1,0 +1,9 @@
+{
+    "num_samples": 1,
+    "Jaccard": {
+        "human_readable": "0.1642 \u00b1 nan",
+        "mean": 0.16421726523559513,
+        "variance": 0.0,
+        "\u00b1(95ci)": NaN
+    }
+}

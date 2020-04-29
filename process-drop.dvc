@@ -1,0 +1,13 @@
+md5: e5fc72982c3d5c2ba925b73e4e86bb9a
+cmd: python main.py process-drop
+deps:
+- md5: b51befb910069359687b5a7346d21f8a
+  path: data/drop_dataset_dev.json
+- md5: 1b90b76fca5951732bb0e928549bbc09
+  path: scripts/compare.py
+outs:
+- md5: 04d9683e1eb5e5b04977c6bdcc5a1290
+  path: data/drop_nfl.json
+  cache: true
+  metric: false
+  persist: false

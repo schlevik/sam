@@ -1,0 +1,11 @@
+md5: eb0d02a7c4aab502907fe11681026499
+locked: true
+deps:
+- etag: '"adea30ccbb0c2cf05a6a551de8537188"'
+  path: https://storage.googleapis.com/allennlp-public-models/bidaf-model-2020.03.19.tar.gz
+outs:
+- md5: adea30ccbb0c2cf05a6a551de8537188
+  path: bidaf-model-2020.03.19.tar.gz
+  cache: true
+  metric: false
+  persist: false

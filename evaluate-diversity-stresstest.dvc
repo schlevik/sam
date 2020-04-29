@@ -1,0 +1,13 @@
+md5: 735386cb42f445d3445c5eaa7c7a36f3
+cmd: python main.py compare --input data/stresstest-all-188-5.json --output metrics/stresstest-diversity-all-188-5.json
+deps:
+- md5: cad8fe46d538af2c6c2bdd2f90ecad40
+  path: data/stresstest-all-188-5.json
+- md5: c1c29b9ba30032636cbee551d8638349
+  path: scripts/compare.py
+outs:
+- md5: c87a1238bce2bfac48ee9f7c3d19608f
+  path: metrics/stresstest-diversity-all-188-5.json
+  cache: false
+  metric: true
+  persist: false

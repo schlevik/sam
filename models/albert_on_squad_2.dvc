@@ -1,0 +1,7 @@
+md5: 493ad8ce62902c8bd7ad4e07e6fe9ade
+outs:
+- md5: 8d09b19e15976988bb199e5928c67b3c.dir
+  path: albert_on_squad_2
+  cache: true
+  metric: false
+  persist: false
