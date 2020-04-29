@@ -1,4 +1,5 @@
 import random
+import re
 
 from loguru import logger
 
@@ -35,7 +36,9 @@ sentences = {
 
         # TODO: extract "expression player's drive squirmed"
         "$COACTOR was free on the $POSITION.BOX , with the defence slow to react, "
-        "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER ."
+        "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER .",
+
+        "!PREAMBLE $ACTOR , on the end of it , $VBDO.goal into the net $RDM.VBG.goal ."
     ],
     "foul": [
         "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",
@@ -53,8 +56,9 @@ sentences = {
         "!PREAMBLE $ACTOR $VBG.foul $COACTOR $RDM.PP.foul .",
 
         "!PREAMBLE $ACTOR $RDM.VBG.foul , "
-        "$VBG.foul $COACTOR near the $POSITION.BOX ."
+        "$VBG.foul $COACTOR near the $POSITION.BOX .",
 
+        "!PREAMBLE $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) ."
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
         # "stay @CONDITION.else, @CONDITION.value"
@@ -73,20 +77,30 @@ dollar = {
         },
         # TODO: no verb, need to look up how we call it
         "NOVB": ["a contender for the $RDM.AWARD",
-                 "a reward for !PRP hard work"],
+                 "a reward for !PRPS hard work",
+                 "!PRPS !RANDINT th goal [of the season|for the club]"],
         # inserted as a gerund
         "VBG": {
             "foul": ["disappointing (the crowd) with an $JJ.negative action"],
             "goal": [
-                "being !PRPS !RANDINT th of the season",
+                "being $RDM.NOVB",
                 "drawing attention from even !PRPS biggest sceptics",
                 "following a $JJ.positive juggle"
+            ]
+        },
+        "VBD": {
+            "foul": [
+                "(had only) just showed !PRPS reckless edge",
+                "disappointed"
             ]
         },
         "AWARD": ["highlight of the day",
                   "action of the match"],
         "PP": {
-            "foul": ["for a $JJ.positive free-kick opportunity"],
+            "foul": ["for a [$JJ.promising|$JJ.attention] free-kick $NN.opportunity "
+                     "[for $NONACTORTEAM.name|for !PRPS opponents|]",
+
+                     'for which !PRP was booked'],
             "goal": ["for !PRPS !RANDINT th league goal of the season"]
         },
         # "BEGINNING": ["$ACTORTEAM.name did well to withstand the barrage"]
@@ -103,6 +117,7 @@ dollar = {
                      "$REASON.CC-V.any"]
         }
     },
+
     "GOALKEEPER": ["goalkeeper", "woman between the posts", "last line of defence"],
     "COREF-PLAYER": ["!PRP", "the player"],
     "POSITION": {
@@ -164,6 +179,7 @@ dollar = {
             ],
             "contrastive": [
                 "However",
+                "$ACTORTEAM.name answered with a precise move , as",
                 "[But|The] $ACTORTEAM.name retaliated as",
                 "$ACTORTEAM.name , however, came back when",
             ],
@@ -220,11 +236,18 @@ dollar = {
     "JJ": {
         "positive":
             ["spectacular", "wonderful", "amazing", "stunning", "searing", "mesmerising"],
+        "promising": ["promising", "auspicious", "promisingly looking", "auspiciously looking"],
         "accurate": ["accurate", "pin-point", ],
         "risky": ["bold", "daring", "risky"],
         "attention": ["remarkable", "interesting"],
         "negative": ["bad", "harsh", "unnecessary"],
     },
+    # nouns/ noun phrases
+    "NN": {
+        "opportunity": ["opportunity", "chance"],
+        "foul": ['foul (play)']
+    },
+
     # adverbials
     "ADVJ": {
         # negative
@@ -345,9 +368,13 @@ def _vbx(template, action):
     """
     logger.debug(action)
     logger.debug(template)
-    vbx = next(x for x in template if x.startswith("$V") and f".{action}" in x)
+    # select action verb. if no action verb, then select any first appearing verb
+    vbx = next((x for x in template if x.startswith("$V") and f".{action}" in x), None)
+    if not vbx:
+        logger.debug("Template has no action verb!")
+        vbx = next(x for x in template if ("VB") in x and f".{action}" in x)
     logger.debug(f"VBX:{vbx}")
-    vbx = vbx.split('.')[0][1:]
+    vbx = re.findall(r'(VB.*)\.', "$RDM.VBD.foul")[0]
     logger.debug(f"VBX:{vbx}")
     assert vbx.startswith('VB')
     return vbx
