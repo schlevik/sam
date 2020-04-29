@@ -1,8 +1,8 @@
-md5: c9c75f7653de2fc20ae0cb3ded23bff6
+md5: c44881ac374fb16bd92559b12f6328f7
 cmd: python main.py compare --input data/drop_nfl.json --output metrics/drop-diversity.json
   --flat
 deps:
-- md5: 04d9683e1eb5e5b04977c6bdcc5a1290
+- md5: 4d895a9c6a0629c8f6453e88502abc2a
   path: data/drop_nfl.json
 - md5: c1c29b9ba30032636cbee551d8638349
   path: scripts/compare.py
