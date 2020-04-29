@@ -11,6 +11,9 @@ from loguru import logger
 def cli(debug):
     if not debug:
         logger.remove(0)
+    else:
+        logger.add("./logs/debug.log", level='DEBUG', rotation='50MB', compression="zip")
+        logger.debug('Set up logging.')
 
 
 # for folder in scripts: import everything that is a command, add to main cli
