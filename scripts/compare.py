@@ -9,6 +9,7 @@ import json
 
 from scipy.stats import t
 
+from scripts.utils import write_json
 from stresstest.textmetrics import pointwise_average_distance, Distance
 from stresstest.util import load_json
 
@@ -37,7 +38,7 @@ def compare(input, output, flat, attr, metric):
         distances.append(result.mean())
     distances = np.array(distances)
     t_975 = t.ppf(1 - .025, df=len(samples) - 1)
-    printable_result = f'{distances.mean():.4f} ± {t_975 * distances.std() / math.sqrt(len(distances)):.4f}'
+    printable_result = f'{distances.mean():.4f} +/- {t_975 * distances.std() / math.sqrt(len(distances)):.4f}'
     click.echo(f"Pointwise average distance under the {click.style(metric, fg='green')} metric: "
                f"{click.style(printable_result, fg='green', bold=True)}")
     result = {
@@ -46,11 +47,10 @@ def compare(input, output, flat, attr, metric):
             'human_readable': printable_result,
             'mean': distances.mean(),
             'variance': distances.var(),
-            '±(95ci)': t_975 * distances.std() / math.sqrt(len(distances))
+            '95ci': t_975 * distances.std() / math.sqrt(len(distances))
         }
     }
-    with open(output, "w+") as f:
-        json.dump(result, f, indent=4, separators=(',', ': '))
+    write_json(result, output)
 
 
 @click.command()

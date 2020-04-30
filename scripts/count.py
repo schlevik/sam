@@ -1,24 +1,31 @@
 import click
 
+from scripts.utils import write_json, get_templates
 from stresstest.realize import Realizer
-from stresstest.resources.templates import sentences
 
 
 @click.command()
-@click.argument("action", type=str)
-@click.option("-n", type=int, default=-1)
-def count(action, n):
-    if n >= 0:
-        click.echo(f"Counting only for '{action}' sentence {click.style(text=n, fg='green', bold=True)}!")
-        sentences[action] = [sentences[action][n]]
-    else:
-        click.echo(f"Counting only for {click.style(text='all', fg='green', bold=True)} '{action}' sentences!")
+@click.option("--action", type=str, default=None)
+@click.option("-n", type=int, default=None)
+@click.option('--output', type=str, default=None)
+def count(action, n, output):
+    result = {}
+    actions, sentences = get_templates(action, n, "Counting")
+    for action in actions:
+        r = Realizer(sentences=sentences)
+        upper_bound = r.estimate_size(r.sentences[action])
+        r = Realizer(sentences=sentences)
+        lower_bound = r.estimate_size(r.sentences[action], pessimistic=True)
+        click.secho(
+            f"Pessimistically speaking, you can generate {click.style(str(lower_bound), fg='red', bold=True)} "
+            f"distinct sentences!")
 
-    r = Realizer(sentences=sentences)
-    size = r.estimate_size(r.sentences[action])
-    click.secho(
-        f"Optimistically speaking, you can generate {click.style(str(size), fg='green', bold=True)} distinct sentences!")
-    r = Realizer(sentences=sentences)
-    size = r.estimate_size(r.sentences[action], pessimistic=True)
-    click.secho(
-        f"Pessimistically speaking, you can generate {click.style(str(size), fg='red', bold=True)} distinct sentences!")
+        click.secho(
+            f"Optimistically speaking, you can generate {click.style(str(upper_bound), fg='green', bold=True)} "
+            f"distinct sentences!")
+        result[action] = {
+            "lower": lower_bound,
+            "upper": upper_bound
+        }
+    if output:
+        write_json(result, output)

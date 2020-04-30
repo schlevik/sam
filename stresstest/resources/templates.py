@@ -3,7 +3,7 @@ import re
 
 from loguru import logger
 
-from stresstest.classes import F, YouIdiotException
+from stresstest.classes import F
 
 sentences = {
     "goal": [

@@ -20,15 +20,6 @@ from stresstest.realize import Realizer
 @click.option("--unanswerable", is_flag=True, default=False)
 @click.option("--abstractive", is_flag=True, default=False)
 def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
-    """
-
-    Args:
-        config: Config for the generator.
-        output: Where to save the output.
-        n: Number of passages per sample.
-        k: Number of samples.
-
-    """
     click.echo(
         f"Generating from '{click.style(config, fg='green')}': {click.style(str(k), fg='green', bold=True)} samples, "
         f"{click.style(str(n), fg='green', bold=True)} passages each.")
