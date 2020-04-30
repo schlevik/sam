@@ -3,7 +3,7 @@ import re
 
 from loguru import logger
 
-from stresstest.classes import F
+from stresstest.classes import F, YouIdiotException
 
 sentences = {
     "goal": [
@@ -38,7 +38,10 @@ sentences = {
         "$COACTOR was free on the $POSITION.BOX , with the defence slow to react, "
         "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER .",
 
-        "!PREAMBLE $ACTOR , on the end of it , $VBDO.goal into the net $RDM.VBG.goal ."
+        "!PREAMBLE $ACTOR , on the end of it , $VBDO.goal into the net $RDM.VBG.goal .",
+
+        "$ACTOR $VBD.goal [$ACTORTEAM.name-pos-pre !NEXT $NN.goal|the !NEXT $NN.goal for $ACTORTEAM.name] "
+        "after $REASON.S.goal"
     ],
     "foul": [
         "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",
@@ -58,7 +61,10 @@ sentences = {
         "!PREAMBLE $ACTOR $RDM.VBG.foul , "
         "$VBG.foul $COACTOR near the $POSITION.BOX .",
 
-        "!PREAMBLE $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) ."
+        "!PREAMBLE $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) .",
+
+        "!PREAMBLE $COACTOR winning the ball [in $POSITION.HORIZONTAL|on $POSITION.VERTICAL] (for $ACTORTEAM.name)"
+        "and drawing a $NN.foul from $ACTOR ."
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
         # "stay @CONDITION.else, @CONDITION.value"
@@ -106,8 +112,14 @@ dollar = {
         # "BEGINNING": ["$ACTORTEAM.name did well to withstand the barrage"]
     },
     "REASON": {
+        "S": {
+            "goal": ["$COACTOR (inadvertently) $VBD.pass the ball into !PRPS path (following $REASON.NP)"]
+        },
+
+        "NP": ["a run on $POSITION.VERTICAL", 'a (decisive) counter-attack'],
+
         "PP": {
-            "goal": ["after a run on $POSITION.VERTICAL"]  # TODO: on out wide / on the centre
+            "goal": ["after $REASON.NP"]  # TODO: on out wide / on the centre
         },
         "CC-V": {
             "any": ["dribbled !RANDINT metres (on $POSITION.VERTICAL)"],  # TODO: on out wide / on the centre
@@ -122,6 +134,7 @@ dollar = {
     "COREF-PLAYER": ["!PRP", "the player"],
     "POSITION": {
         "VERTICAL": ["the flank", "out wide", "the centre"],
+        "HORIZONTAL": ['the middle field', 'their own half', 'the attacking third'],
         "BOX": ["near post", "far post", "penalty spot", "6-yard-area", "edge of the area"],
         "GOAL": [
             "the ($POSITION.HEIGHT) ($POSITION.LR) corner", "the middle of the goal", "the back of the net",
@@ -245,7 +258,8 @@ dollar = {
     # nouns/ noun phrases
     "NN": {
         "opportunity": ["opportunity", "chance"],
-        "foul": ['foul (play)']
+        "foul": ['foul (play)'],
+        "goal": ["goal"]
     },
 
     # adverbials
@@ -257,8 +271,9 @@ dollar = {
     ### VERBS
     "VBD": {
         "foul": ["fouled", "felled", "scythed down"],
-        "goal": ["scored", "curled in", "put (in)", "hammered"],
-        "nogoal": ["missed", "shot wide"]
+        "goal": ["scored", "curled in", "put (in)", "hammered in", "drilled in", "slotted in"],
+        "nogoal": ["missed", "shot wide"],
+        "pass": ["played", "prodded", "passed"]
     },
     "VBDO": {
         "goal": ["curled the ball", "put the ball", "hammered the ball"],
@@ -268,7 +283,7 @@ dollar = {
         "foul": ["was $VBD.foul", "was sent to the ground", "was scythed down"],
     },
     "VBG": {
-        "goal": ["scoring", "hammering in", "curling in", "slotting in"],
+        "goal": ["scoring", "hammering in", "curling in", "slotting in", 'drilling in', 'putting in'],
         "foul": ["fouling", "felling", 'scything down', 'upending']
     },
     "VBGO": {
@@ -372,9 +387,20 @@ def _vbx(template, action):
     vbx = next((x for x in template if x.startswith("$V") and f".{action}" in x), None)
     if not vbx:
         logger.debug("Template has no action verb!")
-        vbx = next(x for x in template if ("VB") in x and f".{action}" in x)
+        try:
+            vbx = next(x for x in template if ("VB") in x and f".{action}" in x)
+        except StopIteration:
+            first_vbg = next((i for i, x in enumerate(template) if x.endswith('ing')), -1)
+            first_vbd = next((i for i, x in enumerate(template) if x.endswith('ed')), -1)
+            if first_vbg > 0 and first_vbg > first_vbd:
+                return "VBG"
+            elif first_vbd > 0 and first_vbd > first_vbg:
+                return "VBD"
+            else:
+                # TODO: hmmm
+                return "VBD"
     logger.debug(f"VBX:{vbx}")
-    vbx = re.findall(r'(VB.*)\.', "$RDM.VBD.foul")[0]
+    vbx = re.findall(r'(VB.).*\.', vbx)[0]
     logger.debug(f"VBX:{vbx}")
     assert vbx.startswith('VB')
     return vbx
@@ -400,19 +426,20 @@ class Preamble(F):
         return f'$BEGIN.{vbx}.{contrastive}'
 
 
-def _preamble(ctx):
-    action, nr = ctx['chosen_templates'][-1].split('.')
-    assert action == ctx['sent'].action
-    current_template = ctx['realizer'].sentences[action][int(nr)]
-    vbx = _vbx(current_template, action)
-    # is matchbegin?
-    if ctx['sent_nr'] == 0:
-        return f'$BEGIN.{vbx}.matchstart'
-    contrastive = _is_contrastive(ctx)
-    return f'$BEGIN.{vbx}.{contrastive}'
+def _is_first_action(ctx):
+    action = ctx['sent'].action
+    return next(sent.sentence_nr for sent in ctx['sentences'] if sent.action == action) == ctx['sent_nr']
+
+
+def _is_first_action_for_team(ctx):
+    action = ctx['sent'].action
+    team = ctx['sent']['actor']['team']
+    return next(sent.sentence_nr for sent in ctx['sentences']
+                if sent.action == action and sent.actor['team'] == team) == ctx['sent_nr']
 
 
 bang = {
+    "NEXT": (lambda ctx: "first" if _is_first_action_for_team(ctx) else "next", 2),
     "PREAMBLE": Preamble,
     "RANDINT": (lambda ctx: random.randint(1, 15)),
     "PRPS": (lambda ctx: "her" if ctx['world']['gender'] == 'female' else "his"),
