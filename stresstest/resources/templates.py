@@ -35,13 +35,13 @@ sentences = {
         "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance) .",
 
         # TODO: extract "expression player's drive squirmed"
-        "$COACTOR was free on the $POSITION.BOX , with the defence slow to react, "
+        "$ACTOR was free on the $POSITION.BOX , with the defence slow to react, "
         "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER .",
 
         "!PREAMBLE $ACTOR , on the end of it , $VBDO.goal into the net $RDM.VBG.goal .",
 
         "$ACTOR $VBD.goal [$ACTORTEAM.name-pos-pre !NEXT $NN.goal|the !NEXT $NN.goal for $ACTORTEAM.name] "
-        "after $REASON.S.goal"
+        "after $REASON.S.goal",
     ],
     "foul": [
         "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",

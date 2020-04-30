@@ -124,8 +124,7 @@ class StoryGenerator:
 
             elif self.sentence.action == 'goal':
                 player = Choices(p['id'] for p in self.world['players'] if
-                                 p['team'] == self.sentence.actor[
-                                     'team']).random()
+                                 p['team'] == self.sentence.actor['team'] and p != self.sentence.actor).random()
             else:
                 raise NotImplementedError()
             return self.world['players_by_id'][player]
