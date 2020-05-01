@@ -16,7 +16,7 @@ def test(action, n, k):
     actions, sentences = get_templates(action, n, "Testing")
     if n is not None:
         click.secho(f"Testing: {action}.{n}:", fg='green')
-        click.secho(f"{sentences[action][n]}", fg='green', bold=True)
+        click.secho(f"{sentences[action][0]}", fg='green', bold=True)
 
     colorise = action is not None
     for action in actions:
