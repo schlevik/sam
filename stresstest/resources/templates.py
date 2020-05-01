@@ -7,64 +7,65 @@ from stresstest.classes import F
 
 sentences = {
     "goal": [
-        "%PREAMBLE-VBD.begin $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal .",
+        "%CONNECTIVE.VBD> $ACTOR $ACTORTEAM.name-pos-post $VBD.goal a ($JJ.positive) goal .",
 
-        "%PREAMBLE-VBD.begin $ACTOR $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name .",
+        "%CONNECTIVE.VBD> $ACTOR $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name .",
 
-        "$ACTORTEAM.name-pos-pre player $ACTOR put an exclamation mark, $VBG.goal a ($JJ.positive) goal $DISTANCE.PP .",
+        "$ACTORTEAM.name-pos-pre player $ACTOR $VP.attention %CONNECTIVE.ADVP , "
+        "$VBG.goal a ($JJ.positive) goal $DISTANCE.PP .",
 
-        "$ACTOR 's goal ( , [$RDM.VBG.goal|RDM.NOVB] , ) arrived $TIME after !PRPS teammate $COACTOR 's $PASS-TYPE "
-        "and [$RDM.CC-V.goal|$RDM.S.goal] .",
+        "$ACTOR 's goal ( , [$RDM.VBG.goal|$RDM.NOVB] , ) arrived $TIME after !PRPS teammate "
+        "$COACTOR 's $PASS-TYPE and [$RDM.CC-V.goal|$RDM.S.goal] .",
 
-        "$TIME a $PASS-TYPE fell to ($ACTORTEAM.name-pos-pre) $COACTOR in $POSITION.VERTICAL and $COREF-PLAYER "
-        "swept $POSITION.HEIGHT to the $POSITION.BOX for $ACTOR to poke past the $GOALKEEPER .",
+        "$TIME a $PASS-TYPE [went to|arrived at] ($ACTORTEAM.name-pos-pre) $COACTOR in $POSITION.VERTICAL and "
+        "$COREF-PLAYER swept $POSITION.HEIGHT.NN to the $POSITION.BOX for $ACTOR to poke past the $GOALKEEPER .",
 
         "A $JJ.positive $DISTANCE.JJ strike from $ACTOR [flying|homing] into $POSITION.GOAL past "
-        "[the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %PREAMBLE-VP.end .",
+        "[the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %CONNECTIVE.VP .",
 
-        "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, "
-        "scored $TIME [$REASON.PP.goal| and $RDM.S.goal] .",
+        "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, %CONNECTIVE.VP"
+        " as !PRP scored $TIME [$REASON.PP.goal| and $RDM.S.goal] .",
 
-        "$ACTOR scored $TIME when !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) "
+        "$ACTOR scored $TIME to %CONNECTIVE.IVP when !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) "
         "before $VBG.goal the ball $POSITION.PP.GOAL .",
 
-        "$ACTOR scored $TIME $VBG.goal the ball $POSITION.PP.GOAL "
+        "%CONNECTIVE.VBD> $ACTOR scored $TIME $VBG.goal the ball $POSITION.PP.GOAL "
         "after !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) .",
 
-        "%PREAMBLE-VBD.begin the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG.goal] , $ACTOR $VBDO.goal "
+        "%CONNECTIVE.VBD> the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG.goal] , $ACTOR $VBDO.goal "
         "(just) $POSITION.PP.GOAL (to leave the $GOALKEEPER with no chance) .",
 
         # TODO: extract "expression player's drive squirmed"
-        "$ACTOR was free on the $POSITION.BOX , with the defence slow to react, "
+        "%CONNECTIVE.VBD> $ACTOR was free on the $POSITION.BOX , and with the defence slow to react, "
         "the $ACTORTEAM.name-pos-pre player 's drive squirmed beyond the $GOALKEEPER .",
 
-        "!PREAMBLE $ACTOR , on the end of it , $VBDO.goal into the net $RDM.VBG.goal .",
+        "%CONNECTIVE.VBD> $ACTOR , on the end of it , $VBDO.goal $POSITION.GOAL $RDM.VBG.goal .",
 
         "$ACTOR $VBD.goal [$ACTORTEAM.name-pos-pre !NEXT $NN.goal|the !NEXT $NN.goal for $ACTORTEAM.name] "
-        "after $REASON.S.goal",
+        "to %CONNECTIVE.IVP after $REASON.S.goal .",
     ],
     "foul": [
-        "%PREAMBLE-VBD.begin $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",
+        "%CONNECTIVE.VBD> $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",
 
-        "%PREAMBLE-VBD.begin ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by "
+        "%CONNECTIVE.VBD> ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by "
         "[$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME) .",
 
-        "%PREAMBLE-VBD.begin $ACTOR $VBD.foul ($COACTORTEAM.name-pos-pre) $COACTOR ($TIME) .",
+        "%CONNECTIVE.VBD> $ACTOR $VBD.foul ($COACTORTEAM.name-pos-pre) $COACTOR ($TIME) .",
 
-        "%PREAMBLE-VBD.begin $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post) .",
+        "%CONNECTIVE.VBD> $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post) [$RDM.PP.foul|and $RDM.S.any] .",
 
-        "$RDM.S as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) "
+        "$RDM.S.any as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) "
         "challenge from $ACTOR .",
 
-        "!PREAMBLE $ACTOR $VBG.foul $COACTOR $RDM.PP.foul .",
+        "%CONNECTIVE.VBG> $ACTOR $VBG.foul $COACTOR $RDM.PP.foul .",
 
-        "!PREAMBLE $ACTOR $RDM.VBG.foul , "
+        "%CONNECTIVE.VBD> $ACTOR $RDM.VBG.foul , "
         "$VBG.foul $COACTOR near the $POSITION.BOX .",
 
-        "!PREAMBLE $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) .",
+        "%CONNECTIVE.VBD> $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) .",
 
-        "!PREAMBLE $COACTOR winning the ball [in $POSITION.HORIZONTAL|on $POSITION.VERTICAL] (for $ACTORTEAM.name)"
-        "and drawing a $NN.foul from $ACTOR ."
+        "%CONNECTIVE.VBD> $COACTOR winning the ball [in $POSITION.HORIZONTAL|on $POSITION.VERTICAL] "
+        "(for $ACTORTEAM.name) and drawing a $NN.foul from $ACTOR ."
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
         # "stay @CONDITION.else, @CONDITION.value"
@@ -137,10 +138,13 @@ dollar = {
         "HORIZONTAL": ['the middle field', 'their own half', 'the attacking third'],
         "BOX": ["near post", "far post", "penalty spot", "6-yard-area", "edge of the area"],
         "GOAL": [
-            "the ($POSITION.HEIGHT) ($POSITION.LR) corner", "the middle of the goal", "the back of the net",
+            "the ($POSITION.HEIGHT.JJ) ($POSITION.LR) corner", "the middle of the goal", "the back of the net",
             "between the posts"
         ],
-        "HEIGHT": ["lower", "upper"],
+        "HEIGHT": {
+            "JJ": ["lower", "upper"],
+            "NN": ["low", "high"]
+        },
         "LR": ["left", "right"],
         "PP": {
             "GOAL": ["in $POSITION.GOAL", "under the bar", "off the [post|bar] and in $POSITION.GOAL"],
@@ -177,64 +181,10 @@ dollar = {
         "name-pos-post":
             ["of $NONACTORTEAM.name", ", a player of $NONACTORTEAM.name ,"]
     },
-    # stuff to put in the beginning of the sentence
-    "BEGIN": {
-        # VBD clause is following
-        'VBD': {
-            "matchstart": [
-                "The match started as",
-                "After the kickoff",
-                "The tone was set with the game just #sent.attributes.time minutes old, when",
-                "The first $JJ.attention thing after the kick-off was, when"],
-            "neutral": [
-                "Then",
-                "!MINDIFF minutes after that"
-            ],
-            "contrastive": [
-                "However",
-                "$ACTORTEAM.name answered with a precise move , as",
-                "[But|The] $ACTORTEAM.name retaliated as",
-                "$ACTORTEAM.name , however, came back when",
-            ],
-
-            "supportive": [
-                "[To add|adding] insult to $NONACTORTEAM.name-pos-pre injury",
-                "Further",
-                "The onslaught (by $ACTORTEAM.name) continued, as "
-            ]
-        },
-        'VBG': {
-            "matchstart": ["The match started with"],
-            "supportive": [
-                "Further pressure (on the attack) [led to|resulted in]"
-            ],
-            "neutral": [
-                "Things proceeded with",
-            ],
-            'contrastive': ["Things changed ( , however , ) with"]
-        }
+    "VP": {
+        "attention": ['put an exclamation mark', 'became the talking point of the day', 'attracted (lots of) attention']
     },
-    "END": {
-        # VBD clause is following
-        'VP': {
-            "matchstart": [
-                "kicked the match off",
-                "started the match",
-                "set the tone for the match",
-                "opened the action"],
-            "neutral": [
-                "advanced the action"
-            ],
-            "contrastive": [
-                "constituted a counter strike"
-            ],
 
-            "supportive": [
-                "added more insult to the injury",
-                "continued where $ACTORTEAM.name left off",
-            ]
-        }
-    },
     # variable resolution for the team of the action's coactor
     "COACTORTEAM": {
         # accessor of the team name
@@ -325,7 +275,9 @@ at = {
 }
 
 
-def _is_contrastive(ctx):
+def _is_contrastive_or_matchstart(ctx):
+    if ctx['sent_nr'] == 0:
+        return 'matchstart'
     # self last sentence in contrast to current sentence
     last_sentence = _last_sentence(ctx)
     current_sentence = _current_sentence(ctx)
@@ -340,40 +292,118 @@ def _is_contrastive(ctx):
 
 # percent looks like if/then/else thing
 percent = {
-    # preamble decider for a VBD-led VP
-    "PREAMBLE-VBD": {
-        # at the beginning of the sentence
-        "begin": {
-            "condition": lambda ctx: ctx['sent_nr'] == 0,
-            # put some starting comments
-            True: ["$BEGIN.VBD.matchstart"],
-            # whether to use a contrast or not
-            False: ["%CONTRAST-VBD"]
+    "CONNECTIVE": {
+        "VP": {
+            "condition": _is_contrastive_or_matchstart,
+            "matchstart": [
+                "kicked the match off",
+                "started the match",
+                "set the tone for the match",
+                "opened the action"
+            ],
+            "neutral": [
+                "advanced the action"
+            ],
+            "contrastive": [
+                "constituted a counter strike"
+            ],
+
+            "supportive": [
+                "added more insult to the injury",
+                "continued where $ACTORTEAM.name left off",
+            ]
+        },
+        "IVP": {
+            "condition": _is_contrastive_or_matchstart,
+            "matchstart": [
+                "kick the match off",
+                "start the match",
+                "set the tone for the match",
+                "open the action"
+            ],
+            "neutral": [
+                "advance the action"
+            ],
+            "contrastive": [
+                "constitute a counter strike"
+            ],
+
+            "supportive": [
+                "add more insult to the injury",
+                "continue where [$ACTORTEAM.name|they] left off",
+            ]
+        },
+        "ADVP": {
+            "condition": _is_contrastive_or_matchstart,
+            "matchstart": ['early in the game', 'as early as $TIME'],
+            "supportive": ['to add on'],
+            "neutral": ['later on', 'thereafter'],
+            "contrastive": ['[decisively quickly|quickly|promptly] answering', 'with a [decisive|quick|prompt] answer']
+        },
+        "VBD>": {
+            "condition": _is_contrastive_or_matchstart,
+            "matchstart": [
+                "The match started as",
+                "After the kickoff",
+                "The tone was set with the game just #sent.attributes.time minutes old, when",
+                "The first $JJ.attention thing after the kick-off was, when"],
+            "neutral": [
+                "Then",
+                "!MINDIFF minutes after that",
+                "$RDM.S.any as"
+            ],
+            "contrastive": [
+                "However",
+                "$ACTORTEAM.name answered with a precise move , as",
+                "[But|The|But the] $ACTORTEAM.name retaliated as",
+                "$ACTORTEAM.name , however, came back when",
+            ],
+
+            "supportive": [
+                "[To add|adding] insult to $NONACTORTEAM.name-pos-pre injury",
+                "Further",
+                "The onslaught (by $ACTORTEAM.name) continued, as "
+            ]
+        },
+        "VBG>": {
+            "condition": _is_contrastive_or_matchstart,
+            "matchstart": ["The match started with"],
+            "supportive": [
+                "Further pressure (on the attack) [led to|resulted in]"
+            ],
+            "neutral": [
+                "Things proceeded with",
+                "$RDM.S.any seeing"
+            ],
+            'contrastive': ["Things changed ( , however , ) with"]
         }
     },
-    "PREAMBLE-VP": {
-        "end": {
-            "condition": lambda ctx: ctx['sent_nr'] == 0,
-            True: ["$END.VP.matchstart"],
-            # whether to use a contrast or not
-            False: ["%CONTRAST-VP"]
-        }
-    },
-    "CONTRAST-VP": {
-        "condition": _is_contrastive,
-        "contrastive": ["$END.VP.contrastive"],
-        "supportive": ["$END.VP.supportive"],
-        "neutral": ["$END.VP.neutral"]
-    },
-
-    "CONTRAST-VBD": {
-        "condition": _is_contrastive,
-        "contrastive": ["$BEGIN.VBD.contrastive"],
-        "supportive": ["$BEGIN.VBD.supportive"],
-        "neutral": ["$BEGIN.VBD.neutral"]
-    }
-
 }
+
+
+# percent = {
+#     # preamble decider for a VBD-led VP
+#     "PREAMBLE-VBD": {
+#         # at the beginning of the sentence
+#         "begin": {
+#             "condition": lambda ctx: ctx['sent_nr'] == 0,
+#             # put some starting comments
+#             True: ["$BEGIN.VBD.matchstart"],
+#             # whether to use a contrast or not
+#             False: ["%CONTRAST-VBD"]
+#         }
+#     },
+#
+#     ,
+#
+#     "CONTRAST-VBD": {
+#         "condition": _is_contrastive,
+#         "contrastive": ["$BEGIN.VBD.contrastive"],
+#         "supportive": ["$BEGIN.VBD.supportive"],
+#         "neutral": ["$BEGIN.VBD.neutral"]
+#     }
+#
+# }
 
 
 # assuming we only have one action
@@ -410,20 +440,20 @@ _possible_verb_forms = ("VBG", "VBD")
 possible_contrastive = ["contrastive", 'supportive', 'neutral']
 
 
-class Preamble(F):
-    options = [f"$BEGIN.{x}.matchstart" for x in _possible_verb_forms] + \
-              [f'$BEGIN.{vbx}.{contrastive}' for vbx in _possible_verb_forms for contrastive in possible_contrastive]
-
-    def __call__(self, ctx: dict) -> str:
-        action, nr = ctx['chosen_templates'][-1].split('.')
-        assert action == ctx['sent'].action
-        current_template = ctx['realizer'].sentences[action][int(nr)]
-        vbx = _vbx(current_template, action)
-        # is matchbegin?
-        if ctx['sent_nr'] == 0:
-            return f'$BEGIN.{vbx}.matchstart'
-        contrastive = _is_contrastive(ctx)
-        return f'$BEGIN.{vbx}.{contrastive}'
+# class Preamble(F):
+#     options = [f"$BEGIN.{x}.matchstart" for x in _possible_verb_forms] + \
+#               [f'$BEGIN.{vbx}.{contrastive}' for vbx in _possible_verb_forms for contrastive in possible_contrastive]
+#
+#     def __call__(self, ctx: dict) -> str:
+#         action, nr = ctx['chosen_templates'][-1].split('.')
+#         assert action == ctx['sent'].action
+#         current_template = ctx['realizer'].sentences[action][int(nr)]
+#         vbx = _vbx(current_template, action)
+#         # is matchbegin?
+#         if ctx['sent_nr'] == 0:
+#             return f'$BEGIN.{vbx}.matchstart'
+#         contrastive = _is_contrastive(ctx)
+#         return f'$BEGIN.{vbx}.{contrastive}'
 
 
 def _is_first_action(ctx):
@@ -440,13 +470,13 @@ def _is_first_action_for_team(ctx):
 
 bang = {
     "NEXT": (lambda ctx: "first" if _is_first_action_for_team(ctx) else "next", 2),
-    "PREAMBLE": Preamble,
+    # "PREAMBLE": Preamble,
     "RANDINT": (lambda ctx: random.randint(1, 15)),
     "PRPS": (lambda ctx: "her" if ctx['world']['gender'] == 'female' else "his"),
     "PRP": (lambda ctx: "she" if ctx['world']['gender'] == 'female' else "he"),
     # difference in time from last event
     # TODO: it's a tiny bit buggy because it doesn't register itself in ctx['visited'], ok for span-based though
-    "MINDIFF": (lambda ctx: ctx['sent'].attributes['time'] - ctx['sent'].attributes['time']),
+    "MINDIFF": (lambda ctx: ctx['sent'].attributes['time'] - ctx['sentences'][ctx['sent_nr'] - 1].attributes['time']),
     "OTHERTEAM": (
         lambda ctx: next(t['name'] for t in ctx['world']['teams'] if t['id'] != ctx['sent'].actor['team']['id']))
 
