@@ -172,3 +172,4 @@ docs/
 .vscode
 slack-bot.py
 .in
+daily.sh

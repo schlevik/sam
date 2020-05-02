@@ -1,5 +1,3 @@
-# from allennlp.pretrained import bidirectional_attention_flow_seo_2017
-# from allennlp.pretrained import naqanet_dua_2019
 from allennlp.predictors import Predictor
 from overrides import overrides
 from transformers import AlbertForQuestionAnswering, AlbertTokenizer
@@ -27,22 +25,17 @@ class NaQANet(Model):
     def make(cls, path, gpu=False):
         # TODO: here, we'll probably need
         from allennlp_models.rc.qanet.naqanet_model import NumericallyAugmentedQaNet
-        model = Predictor.from_path(path, 'reading-comprehension')
-        return NaQANet("NaQAnet", model)
+        cuda_device = 0 if gpu else -1
+        predictor = Predictor.from_path(path, 'reading-comprehension', cuda_device=cuda_device)
+        return NaQANet("NaQAnet", predictor, gpu=gpu)
 
 
 class BiDAF(Model):
     @classmethod
     def make(cls, path, gpu=False):
         from allennlp_models.rc.bidaf.bidaf_model import BidirectionalAttentionFlow
-        return cls("BiDAF", Predictor.from_path(path, 'reading-comprehension'))
-
-
-#
-# def bidaf() -> Model:
-#     return Model("BiDAF", bidirectional_attention_flow_seo_2017())
-#
-#
+        cuda_device = 0 if gpu else -1
+        return cls("BiDAF", Predictor.from_path(path, 'reading-comprehension', cuda_device=cuda_device), gpu=gpu)
 
 
 class Albert(Model):
