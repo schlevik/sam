@@ -1,9 +1,9 @@
-md5: 8e60f5b9b07a3de913485f8b180b9ca1
+md5: 6a3b338391948fd5c3a5f358b9fa656f
 cmd: python main.py count --output metrics/count.json
 deps:
 - md5: eefbfa21038823631ee02899f6e5c20a
   path: scripts/count.py
-- md5: 10d0df18d51457b0ceaeb9d25dd37e50.dir
+- md5: 377cb52a06e4b4d9a2d13eaf85f1e922.dir
   path: stresstest/resources
 - md5: 648cbcd7cdaa71d04bf187921808ea99
   path: stresstest/generate.py
