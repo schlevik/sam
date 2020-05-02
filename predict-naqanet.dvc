@@ -1,11 +1,11 @@
-md5: f0bc175fb5f68e737f5f096f49440e8b
+md5: 9b2eb33c71ae785c346097d94d245f7c
 cmd: python main.py predict --cls NaQANet --model models/naqanet-2020.02.19.tar.gz
   --input data/stresstest-ssq-50-5.json --output data/predictions-naqanet-50-5.json
 deps:
-- md5: 146dcd3f451ee0a151daf18f6d89020f
+- md5: d8b13e6d9d5a8082fb4cf32ec741e227
   path: data/stresstest-ssq-50-5.json
 outs:
-- md5: 0d698ec289fdb3cfd020a68e471a0653
+- md5: 66c03be2ed3f2856c9b53d484390243d
   path: data/predictions-naqanet-50-5.json
   cache: true
   metric: false
