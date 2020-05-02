@@ -14,9 +14,9 @@ from stresstest.util import load_json, sample_iter
 @click.option("--output", type=str, default="data/predictions.json")
 @click.option("--model", type=str, default='models/model.tar.gz')
 @click.option("--cls", type=str, default=None)
-@click.option("--gpu", default='auto', type=bool)
+@click.option("--gpu", default=None, type=bool)
 def predict(input, output, model, cls, gpu):
-    if gpu == 'auto':
+    if gpu is None:
         try:
             from torch.cuda import is_available
             gpu = is_available()
