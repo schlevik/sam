@@ -7,6 +7,10 @@ def load_json(path: str):
         return json.load(f)
 
 
+def num_questions(sample: List[Dict[str, Any]]):
+    return sum(len(datum['qas']) for datum in sample)
+
+
 def sample_iter(sample: List[Dict[str, Any]]):
     for datum in sample:
         passage = datum['passage']

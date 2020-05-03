@@ -1,16 +1,17 @@
-md5: fb853a8e67df88e2c9c12076b565650b
+md5: 7551480c367af7fc0ef308ae61862b39
+wdir: ..
 cmd: python main.py generate --seed 56 -n 3 -k 1 --output data/stresstest-ssq-3-1.json
 deps:
 - md5: 83069819dfb1bb5053a8d53371bdebdd
   path: scripts/generate.py
-- md5: 74b696847b0e3112b34551698c29a6ed
+- md5: e547421a97e59473b54aee99eb233d6b
   path: stresstest/realize.py
-- md5: 515fc3f287a9bdb458b02f4dec4bd466
+- md5: d92d6388ff3e93fe2f9b5ec4ab1eb931
   path: stresstest/resources/templates.py
-- md5: 648cbcd7cdaa71d04bf187921808ea99
+- md5: 11b2a86ee12a6d552c91fdc8f0846d55
   path: stresstest/generate.py
 outs:
-- md5: 1ef3274f4d88b3f80e02c4a34af9083b
+- md5: d589d8fd251b8f1533c452614bf95a05
   path: data/stresstest-ssq-3-1.json
   cache: true
   metric: false

@@ -1,4 +1,5 @@
 md5: 9b2eb33c71ae785c346097d94d245f7c
+wdir: ../
 cmd: python main.py predict --cls NaQANet --model models/naqanet-2020.02.19.tar.gz
   --input data/stresstest-ssq-50-5.json --output data/predictions-naqanet-50-5.json
 deps:

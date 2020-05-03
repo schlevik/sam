@@ -1,16 +1,17 @@
-md5: 6a3b338391948fd5c3a5f358b9fa656f
+md5: 857888bc93fa9d15b92544449642cbc1
+wdir: ..
 cmd: python main.py count --output metrics/count.json
 deps:
 - md5: eefbfa21038823631ee02899f6e5c20a
   path: scripts/count.py
-- md5: 377cb52a06e4b4d9a2d13eaf85f1e922.dir
+- md5: d308c87c0034ae771dc64c63a2879890.dir
   path: stresstest/resources
-- md5: 648cbcd7cdaa71d04bf187921808ea99
+- md5: 11b2a86ee12a6d552c91fdc8f0846d55
   path: stresstest/generate.py
-- md5: 74b696847b0e3112b34551698c29a6ed
+- md5: e547421a97e59473b54aee99eb233d6b
   path: stresstest/realize.py
 outs:
-- md5: c6da659022fb3c9aeb3188b897ff002b
+- md5: 4f7847f5408faa27e162891de1240edb
   path: metrics/count.json
   cache: false
   metric: true

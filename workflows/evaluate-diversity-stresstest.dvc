@@ -1,4 +1,5 @@
 md5: 5d0003b89fce49bafe7f2dcd43d17aa0
+wdir: ../
 cmd: python main.py compare --input data/stresstest-all-188-5.json --output metrics/stresstest-diversity-all-188-5.json
 deps:
 - md5: ce6d012c97d8ecb16962d1e862a31cc2
