@@ -171,7 +171,7 @@ class F:
 
         return instance
 
-    def __call__(self, ctx: dict) -> str:
+    def __call__(self, ctx: 'Context') -> str:
         return self.do_call(ctx)
 
 
@@ -194,6 +194,82 @@ class S(List[str]):
 
 class YouIdiotException(Exception):
     ...
+
+
+class DataObjectMixin:
+    def __init__(self, *args, **kwargs):
+        for a, k in zip(args, self.__annotations__.keys()):
+            setattr(self, k, a)
+        for k, v in kwargs.items():
+            if k not in self.__annotations__:
+                raise YouIdiotException(f"You tried to create {self.__class__} with constructor {k}, but it's not in"
+                                        f"it's annotations! ({list(self.__annotations__.keys())})")
+            setattr(self, k, v)
+
+    def __getitem__(self, item):
+        return self.__dict__[item]
+
+    def __repr__(self):
+        attrs = ", ".join(f"{k}={self[k]}" for k in self.__annotations__)
+        return f"{self.__class__.__name__}({attrs})"
+
+
+class Team(DataObjectMixin):
+    id: str
+    name: str
+
+
+class Player(DataObjectMixin):
+    id: str
+    first: str
+    last: str
+    team: Team
+    position: str
+
+
+class Sentence(DataObjectMixin):
+    sentence_nr: int
+    action: str
+    attributes: Dict[str, Union[str, Player]]
+    actor: Dict[str, str]
+    cause: str
+    effect: str
+    modes: List[Tuple[str, str]]
+    features: List[str]
+
+    def __getitem__(self, item):
+        return self.__dict__[item]
+
+    def __repr__(self):
+        return (f"{self.action} by {self.actor.get('id', '')}: with {self.attributes}, "
+                f"caused by {self.cause} resulting in {self.effect}. "
+                f"Modes: {self.modes}, Features: {self.features}")
+
+
+class World(DataObjectMixin):
+    MALE = 'male'
+    FEMALE = 'female'
+    gender: str
+    num_sentences: int
+    teams: Tuple[Team, Team]
+    num_players: int
+    players: List[Player]
+    players_by_id: Dict[str, Player]
+
+
+class Context(DataObjectMixin):
+    world: World
+    sentences: List[Sentence]
+    chosen_templates: List[str]
+    visits: Dict[int, List[str]]
+    sent: Sentence
+    realized: List[str]
+    choices: List[str]
+    stack: List[str]
+    word: str
+    other: Dict[str, Any]
+    realizer: Any
+    sent_nr: int
 
 
 class Model:

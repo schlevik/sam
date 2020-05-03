@@ -3,7 +3,7 @@ import re
 
 from loguru import logger
 
-from stresstest.classes import F
+from stresstest.classes import Context
 
 sentences = {
     "goal": [
@@ -64,7 +64,7 @@ sentences = {
 
         "%CONNECTIVE.VBD> $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) .",
 
-        "%CONNECTIVE.VBD> $COACTOR winning the ball [in $POSITION.HORIZONTAL|on $POSITION.VERTICAL] "
+        "%CONNECTIVE.VBG> $COACTOR winning the ball [in $POSITION.HORIZONTAL|on $POSITION.VERTICAL] "
         "(for $ACTORTEAM.name) and drawing a $NN.foul from $ACTOR ."
         # "If (only) #sent.actor $VBD.goal the penalty, "
         # "the score would be @CONDITION.then, otherwise it would "
@@ -461,24 +461,24 @@ def _is_first_action(ctx):
     return next(sent.sentence_nr for sent in ctx['sentences'] if sent.action == action) == ctx['sent_nr']
 
 
-def _is_first_action_for_team(ctx):
-    action = ctx['sent'].action
-    team = ctx['sent']['actor']['team']
-    return next(sent.sentence_nr for sent in ctx['sentences']
-                if sent.action == action and sent.actor['team'] == team) == ctx['sent_nr']
+def _is_first_action_for_team(ctx: Context):
+    action = ctx.sent.action
+    team = ctx.sent['actor']['team']
+    return next(sent.sentence_nr for sent in ctx.sentences
+                if sent.action == action and sent.actor['team'] == team) == ctx.sent_nr
 
 
 bang = {
     "NEXT": (lambda ctx: "first" if _is_first_action_for_team(ctx) else "next", 2),
     # "PREAMBLE": Preamble,
     "RANDINT": (lambda ctx: random.randint(1, 15)),
-    "PRPS": (lambda ctx: "her" if ctx['world']['gender'] == 'female' else "his"),
-    "PRP": (lambda ctx: "she" if ctx['world']['gender'] == 'female' else "he"),
+    "PRPS": (lambda ctx: "her" if ctx.world.gender == 'female' else "his"),
+    "PRP": (lambda ctx: "she" if ctx.world.gender == 'female' else "he"),
     # difference in time from last event
     # TODO: it's a tiny bit buggy because it doesn't register itself in ctx['visited'], ok for span-based though
-    "MINDIFF": (lambda ctx: ctx['sent'].attributes['time'] - ctx['sentences'][ctx['sent_nr'] - 1].attributes['time']),
+    "MINDIFF": (lambda ctx: ctx.sent.attributes['time'] - ctx.sentences[ctx.sent_nr - 1].attributes['time']),
     "OTHERTEAM": (
-        lambda ctx: next(t['name'] for t in ctx['world']['teams'] if t['id'] != ctx['sent'].actor['team']['id']))
+        lambda ctx: next(t.name for t in ctx.world.teams if t.id != ctx.sent.actor.team.id))
 
 }
 templates = {

@@ -1,6 +1,6 @@
 from flaky import flaky
 
-from stresstest.generate import Sentence
+from stresstest.classes import Sentence
 from tests.resources.templates import sentences
 from tests.testutil import TestRealizer, only
 

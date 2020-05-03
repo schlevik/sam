@@ -1,30 +1,9 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import random
 import names
 from loguru import logger
 
-from stresstest.classes import Choices
-
-
-class Sentence(dict):
-    def __init__(self, i):
-        super().__init__()
-        self.sentence_nr = i
-        self.action: str = ""
-        self.attributes: Dict[str, str] = dict()
-        self.actor: Dict[str, str] = dict()
-        self.cause: str = ""
-        self.effect: str = ""
-        self.modes: List[Tuple[str, str]] = []
-        self.features: List[str] = []
-
-    def __getitem__(self, item):
-        return self.__dict__[item]
-
-    def __repr__(self):
-        return (f"{self.action} by {self.actor.get('id', '')}: with {self.attributes}, "
-                f"caused by {self.cause} resulting in {self.effect}. "
-                f"Modes: {self.modes}, Features: {self.features}")
+from stresstest.classes import Choices, Sentence, World, Team, Player
 
 
 class StoryGenerator:
@@ -45,11 +24,11 @@ class StoryGenerator:
         logger.debug(self.cfg.pprint())
 
     def set_world(self):
-        world = dict()
+        world = World()
         num_players = self.cfg.get("world.num_players", 5)
         gender = self.cfg.get("world.gender", True)
-        world['gender'] = "female" if gender else "male"
-        world['num_sentences'] = self.cfg.get("world.num_sentences", 5)
+        world.gender = World.FEMALE if gender else World.MALE
+        world.num_sentences = self.cfg.get("world.num_sentences", 5)
 
         t1_first = self.cfg.as_choices("team.name.first").random()
         t1_second = self.cfg.as_choices("team.name.second").random()
@@ -59,41 +38,41 @@ class StoryGenerator:
         t2_second = (self.cfg.as_choices("team.name.second") - (
             t1_second)).random()
 
-        world['teams'] = [
-            dict({
+        world.teams = (
+            Team(**{
                 "id": "team1",
                 "name": " ".join((t1_first, t1_second))
             }),
-            dict({
+            Team(**{
                 "id": "team2",
                 "name": " ".join((t2_first, t2_second))
 
-            })]
+            })
+        )
 
-        world['num_players'] = num_players
-        world['players'] = []
-        world['players_by_id'] = dict()
+        world.num_players = num_players
+        world.players = []
+        world.players_by_id = dict()
         # TODO: unique names (actually non unique would be funny too)
 
         for i in range(1, num_players + 1):
-            # TODO: Positions maybe
-            p1 = dict({
+            p1 = Player(**{
                 "id": f"player{i}",
-                "first": names.get_first_name(world['gender']),
+                "first": names.get_first_name(world.gender),
                 "last": names.get_last_name(),
                 'team': world['teams'][0],
                 "position": self.POSITIONS.random()
             })
-            p2 = dict({
+            p2 = Player(**{
                 "id": f"player{i + num_players}",
-                "first": names.get_first_name(world['gender']),
+                "first": names.get_first_name(world.gender),
                 "last": names.get_last_name(),
                 'team': world['teams'][1],
                 "position": self.POSITIONS.random()
             })
-            world['players'].extend((p1, p2))
-            world['players_by_id'][p1['id']] = p1
-            world['players_by_id'][p2['id']] = p2
+            world.players.extend((p1, p2))
+            world.players_by_id[p1['id']] = p1
+            world.players_by_id[p2['id']] = p2
         self.world = world
 
         logger.info("World:")
@@ -130,7 +109,7 @@ class StoryGenerator:
             return self.world['players_by_id'][player]
 
     def set_attributes(self):
-
+        self.sentence.attributes = dict()
         choices = self.ATTRIBUTES
         if self.sentence.action == 'foul':
             choices = choices - ['distance']
@@ -204,7 +183,7 @@ class StoryGenerator:
                            visits[sent.sentence_nr]):
                         if attribute == 'coactor':
                             q["answer"] = " ".join(
-                                (sent.attributes['coactor']['first'], sent.attributes['coactor']['last']))
+                                (sent.attributes['coactor'].first, sent.attributes['coactor'].last))
                         else:
 
                             q["answer"] = sent.attributes[attribute]
