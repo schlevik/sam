@@ -1,4 +1,4 @@
-md5: 46bc406894d5e9584230ed3b6ce9f409
+md5: e1924515614189fa5db387da4442d0c4
 cmd: python main.py evaluate --predictions data/predictions-albert-50-5.json --gold
   data/stresstest-ssq-50-5.json
 wdir: ..
@@ -7,5 +7,5 @@ deps:
   path: data/predictions-albert-50-5.json
 - md5: 87d3f827d1b49ee3e8234ff4382123d6
   path: data/stresstest-ssq-50-5.json
-- md5: 850dd6b036f5496decbd6cd31ef06c7b
+- md5: bb47ed9640bae7d8c06e2c878948752b
   path: scripts/evaluate.py
