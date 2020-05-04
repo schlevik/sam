@@ -1,0 +1,11 @@
+md5: c28709a98f09bee96f139598a26b447f
+cmd: python main.py evaluate --predictions data/predictions-naqanet-50-5.json --gold
+  data/stresstest-ssq-50-5.json
+wdir: ..
+deps:
+- md5: bf1df518d294f447dd08019878c0e716
+  path: data/predictions-naqanet-50-5.json
+- md5: 87d3f827d1b49ee3e8234ff4382123d6
+  path: data/stresstest-ssq-50-5.json
+- md5: 850dd6b036f5496decbd6cd31ef06c7b
+  path: scripts/evaluate.py
