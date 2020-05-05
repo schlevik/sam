@@ -1,3 +1,5 @@
+import string
+
 from allennlp.predictors import Predictor
 from overrides import overrides
 from transformers import AlbertForQuestionAnswering, AlbertTokenizer
@@ -46,6 +48,28 @@ class Albert(Model):
         if self.gpu:
             self.predictor.cuda()
 
+    def _match(self, passage, result):
+        if not result:
+            return 0, 0
+        result = [c for c in result.lower() if c not in string.whitespace]
+        print("".join(result))
+        print(passage)
+        j = 0
+        start = 0
+        in_string = False
+        for i, c in enumerate(passage.lower()):
+            if c not in string.whitespace:
+                if c == result[j]:
+                    j += 1
+                    if not in_string:
+                        in_string = True
+                        start = i
+                else:
+                    in_string = False
+                    j = 0
+                if j >= len(result):
+                    return start, start + i + 1
+
     @classmethod
     def make(cls, path, gpu=False) -> Model:
         return cls("AlBERT", path, gpu)
@@ -63,9 +87,10 @@ class Albert(Model):
 
         s, e = self.predictor(token_type_ids=token_type_ids,
                               input_ids=input_ids)
-        return " ".join(
-            [
-                self.tokenizer.decode(int(i))
-                for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
-            ]
-        )
+        tokens = [
+            self.tokenizer.decode(int(i))
+            for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
+        ]
+        result = " ".join(t for t in tokens if not (t == "[CLS]" or t == "[SEP]"))
+        print(result)
+        return f'{question} {passage}'[slice(*self._match(f'{question} {passage}', result))]
