@@ -1,3 +1,4 @@
+import json
 from math import ceil
 
 import click
@@ -12,7 +13,8 @@ from tests.testutil import interactive_env
 @click.option("--action", type=str, default=None)
 @click.option("-n", type=int, default=None)
 @click.option("-k", type=int, default=1)
-def test(action, n, k):
+@click.option("--with-questions", is_flag=True, default=False)
+def test(action, n, k, with_questions):
     actions, sentences = get_templates(action, n, "Testing")
     if n is not None:
         click.secho(f"Testing: {action}.{n}:", fg='green')
@@ -30,6 +32,14 @@ def test(action, n, k):
                     else:
                         styled = realised
                     click.echo(styled)
+                if with_questions:
+                    labels = ["SSQs", "MSQs", "UAQs", "AQs"]
+                    for label, (logical_qs, realized_qs) in zip(labels, questions):
+                        click.echo(f"{label}:")
+                        for logical, realised in zip(logical_qs, realized_qs):
+                            click.echo(json.dumps(logical))
+                            click.echo(realised)
+
                 click.secho(20 * "=", bold=True)
             except Exception as e:
                 click.secho(str(e), fg='red', bold=True)
