@@ -3,11 +3,11 @@ import random
 import names
 from loguru import logger
 
-from stresstest.classes import Choices, Sentence, World, Team, Player
+from stresstest.classes import Choices, Event, World, Team, Player, Question, QuestionTypes, ReasoningTypes
 
 
 class StoryGenerator:
-    ACTIONS = Choices(['goal', 'foul'])
+    EVENT_TYPES = Choices(['goal', 'foul'])
     ATTRIBUTES = Choices(['time', 'distance', 'coactor'])
     # ACTORS = Choices(['player'])
     # ASSIST = Choices(['player'])
@@ -79,7 +79,7 @@ class StoryGenerator:
         logger.info(self.world)
 
     def set_action(self):
-        self.sentence.action = self.ACTIONS.random()
+        self.sentence.event_type = self.EVENT_TYPES.random()
 
     def handle_attribute(self, name):
 
@@ -96,12 +96,12 @@ class StoryGenerator:
             return random.choice(list(range(last_ts, 90)))
 
         if name == 'coactor':
-            if self.sentence.action == 'foul':
+            if self.sentence.event_type == 'foul':
                 player = Choices(
                     p['id'] for p in self.world['players'] if
                     p['team'] != self.sentence.actor['team']).random()
 
-            elif self.sentence.action == 'goal':
+            elif self.sentence.event_type == 'goal':
                 player = Choices(p['id'] for p in self.world['players'] if
                                  p['team'] == self.sentence.actor['team'] and p != self.sentence.actor).random()
             else:
@@ -111,7 +111,7 @@ class StoryGenerator:
     def set_attributes(self):
         self.sentence.attributes = dict()
         choices = self.ATTRIBUTES
-        if self.sentence.action == 'foul':
+        if self.sentence.event_type == 'foul':
             choices = choices - ['distance']
         for attribute in choices:
             self.sentence.attributes[attribute] = self.handle_attribute(attribute)
@@ -125,11 +125,11 @@ class StoryGenerator:
     def set_anything_else(self):
         self.sentence.cause = self.CAUSES.random()
         # TODO: logics here
-        if self.sentence.action != "goal":
+        if self.sentence.event_type != "goal":
             self.sentence.effect = self.EFFECTS.random()
 
     def generate_sentence(self, sentence_nr):
-        self.sentence = Sentence(sentence_nr)
+        self.sentence = Event(sentence_nr)
         self.set_action()
         self.set_actor()
         self.set_attributes()
@@ -137,14 +137,14 @@ class StoryGenerator:
         self.set_modes()
         self.sentences.append(self.sentence)
 
-    def generate_story(self) -> List[Sentence]:
+    def generate_story(self) -> List[Event]:
         self.set_world()
-        self.sentences: List[Sentence] = []
+        self.sentences: List[Event] = []
         for i in range(self.world['num_sentences']):
             self.generate_sentence(i)
         return self.sentences
 
-    def generate_questions(self, story: List[Sentence],
+    def generate_questions(self, story: List[Event],
                            visits: Dict[int, List[str]]):
         # extractive
         single_span_questions = []
@@ -153,92 +153,100 @@ class StoryGenerator:
         abstractive_questions = []
 
         # per-sentence action questions
-        for action in self.ACTIONS:
-            for ith, sent in enumerate(s for s in story if s.action == action):
-                q = {
-                    "type": "direct",
-                    "target": "actor",
-                    "n": ith + 1,
-                    "action": action,
+        for event_type in self.EVENT_TYPES:
+            for ith, event in enumerate(s for s in story if s.event_type == event_type):
+                q = Question(
+                    type=QuestionTypes.DIRECT,
+                    target="actor",
+                    evidence=[event.sentence_nr],
+                    event_type=event_type,
                     # TODO: WHAT IF COREF ETC
-                    "answer": " ".join((sent.actor['first'], sent.actor['last']))
-
-                }
-                if any(f"sent.actor" in v for v in visits[sent.sentence_nr]):
+                    answer=" ".join((event.actor['first'], event.actor['last'])),
+                    reasoning=ReasoningTypes.Retrieval if ith == 0 else ReasoningTypes.OrderingEasy,
+                    question_data={"n": ith + 1}
+                )
+                if any(f"sent.actor" in v for v in visits[event.sentence_nr]):
                     single_span_questions.append(q)
                 else:
-                    q['answer'] = None
-                unanswerable_questions.append(q)
+                    q.answer = None
+                    unanswerable_questions.append(q)
 
                 # attribute questions
                 for attribute in self.ATTRIBUTES:
-                    q = {
-                        "type": "direct",
-                        "target": attribute,
-                        "n": ith + 1,
-                        "action": f"{action}"
+                    q = Question(
+                        type=QuestionTypes.DIRECT,
+                        target=attribute,
+                        event_type=event_type,
+                        reasoning=ReasoningTypes.Retrieval if ith == 0 else ReasoningTypes.OrderingEasy,
+                        question_data={"n": ith + 1},
 
-                    }
-                    if any(f"sent.attributes.{attribute}" in v for v in
-                           visits[sent.sentence_nr]):
+                    )
+                    if any(f"sent.attributes.{attribute}" in v for v in visits[event.sentence_nr]):
                         if attribute == 'coactor':
-                            q["answer"] = " ".join(
-                                (sent.attributes['coactor'].first, sent.attributes['coactor'].last))
+                            q.answer = " ".join(
+                                (event.attributes['coactor'].first, event.attributes['coactor'].last))
                         else:
 
-                            q["answer"] = sent.attributes[attribute]
+                            q.answer = event.attributes[attribute]
+                        q.evidence = [event.sentence_nr]
                         single_span_questions.append(q)
                     else:
-                        q['answer'] = None
+                        q.answer = None
+                        q.evidence = []
                         unanswerable_questions.append(q)
 
             # overall questions
 
             # target = actor
-            q = {
-                "type": "overall",
-                "target": "actor",
-                "action": action,
-            }
-            num_actions = sum(s.action == action for s in story)
-            if num_actions > 1:
-                q['answer'] = [" ".join((s.actor['first'], s.actor['last'])) for s in story if s.action == action]
+            q = Question(
+                type=QuestionTypes.OVERALL,
+                target='actor',
+                event_type=event_type,
+
+            )
+            events = sum(s.event_type == event_type for s in story)
+            q.evidence = [s.sentence_nr for s in story if s.event_type == event_type]
+            if events > 1:
+                q.reasoning = ReasoningTypes.MultiRetrieval
+                q.answer = [" ".join((s.actor['first'], s.actor['last'])) for s in story if s.event_type == event_type]
                 multi_span_questions.append(q)
-            elif num_actions == 1:
-                q['answer'] = next(" ".join((s.actor['first'], s.actor['last'])) for s in story if s.action == action)
+            elif events == 1:
+                q.reasoning = ReasoningTypes.Retrieval
+                q.answer = next(
+                    " ".join((s.actor['first'], s.actor['last'])) for s in story if s.event_type == event_type)
                 single_span_questions.append(q)
-            elif num_actions < 1:
-                q['answer'] = None
+            elif events < 1:
+                q.answer = None
                 unanswerable_questions.append(q)
 
             # target = attribute
             for attribute in self.ATTRIBUTES:
-                q = {
-                    "type": "overall",
-                    "target": attribute,
-                    "action": action
+                q = Question(
+                    type=QuestionTypes.OVERALL,
+                    target=attribute,
+                    event_type=event_type
 
-                }
+                )
 
                 def condition(s):
-                    return any(
-                        f"sent.attributes.{attribute}" in v for v in
-                        visits[s.sentence_nr]
-                    ) and s.action == action
+                    return any(f"sent.attributes.{attribute}" in v for v in visits[s.sentence_nr]) and \
+                           s.event_type == event_type
 
-                num_actions = sum(1 for s in story if condition(s))
-                answers = [s.attributes[attribute] for s in story if
-                           condition(s)]
+                events = sum(1 for s in story if condition(s))
+                q.evidence = [s.sentence_nr for s in story if condition(s)]
+                answers = [s.attributes[attribute] for s in story if condition(s)]
                 if attribute == 'coactor':
                     answers = [" ".join((a['first'], a['last'])) for a in answers]
-                if num_actions > 1:
-                    q['answer'] = answers
+                if events > 1:
+                    q.reasoning = ReasoningTypes.MultiRetrieval
+                    q.answer = answers
                     multi_span_questions.append(q)
-                elif num_actions == 1:
-                    q['answer'] = answers[0]
+                elif events == 1:
+                    q.reasoning = ReasoningTypes.Retrieval
+                    q.answer = answers[0]
                     single_span_questions.append(q)
-                elif num_actions < 1:
-                    q['answer'] = None
+                elif events < 1:
+                    q.answer = None
                     unanswerable_questions.append(q)
 
         return (single_span_questions, multi_span_questions,

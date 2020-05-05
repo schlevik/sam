@@ -37,9 +37,9 @@ def test(action, n, k, with_questions):
                     for label, (logical_qs, realized_qs) in zip(labels, questions):
                         click.echo(f"{label}:")
                         for logical, realised in zip(logical_qs, realized_qs):
-                            click.echo(json.dumps(logical))
+                            click.echo(logical)
                             click.echo(realised)
-
+                            click.echo()
                 click.secho(20 * "=", bold=True)
             except Exception as e:
                 click.secho(str(e), fg='red', bold=True)
