@@ -45,10 +45,10 @@ def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
             story, visits = realizer.realise_story(ss, generator.world)
             (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = \
                 generator.generate_questions(ss, visits)
-            realised_ssqs = [realizer.realise_question(q) for q in single_span_questions]
-            realised_msqs = [realizer.realise_question(q) for q in multi_span_questions]
-            realised_uaqs = [realizer.realise_question(q) for q in unanswerable_questions]
-            realised_aqs = [realizer.realise_question(q) for q in abstractive_questions]
+            realised_ssqs = [(q, realizer.realise_question(q)) for q in single_span_questions]
+            realised_msqs = [(q, realizer.realise_question(q)) for q in multi_span_questions]
+            realised_uaqs = [(q, realizer.realise_question(q)) for q in unanswerable_questions]
+            realised_aqs = [(q, realizer.realise_question(q)) for q in abstractive_questions]
             # qs = realised_ssqs + realised_msqs + realised_uaqs + realised_aqs
             qs = realised_ssqs
             if multispan:
@@ -57,13 +57,23 @@ def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
                 qs += realised_uaqs
             if abstractive:
                 qs += realised_aqs
-            qs = [q for q in qs if q]
+            qs = [(l, r) for l, r in qs if r]
             sample.append(
-                {"id": uuid4(),
-                 "passage": ' '.join(story),
-                 "qas": [
-                     {"id": uuid4(), "question": q, "answer": a} for q, a in qs
-                 ]}
+                {
+                    "id": uuid4(),
+                    "passage": ' '.join(story),
+                    "qas": [
+                        {
+                            "id": uuid4(),
+                            "question": q,
+                            "answer": a,
+                            "reasoning": l.reasoning,
+                            'type': l.type,
+                            'target': l.target,
+                            'evidence': l.evidence,
+                            'event_type': l.event_type,
+                        } for l, (q, a) in qs
+                    ]}
             )
         results.append(sample)
     with open(output, "w+") as f:

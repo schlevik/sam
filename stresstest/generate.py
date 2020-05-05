@@ -158,7 +158,7 @@ class StoryGenerator:
                 q = Question(
                     type=QuestionTypes.DIRECT,
                     target="actor",
-                    evidence=event.sentence_nr,
+                    evidence=[event.sentence_nr],
                     event_type=event_type,
                     # TODO: WHAT IF COREF ETC
                     answer=" ".join((event.actor['first'], event.actor['last'])),
@@ -177,7 +177,6 @@ class StoryGenerator:
                         type=QuestionTypes.DIRECT,
                         target=attribute,
                         event_type=event_type,
-                        evidence=event.sentence_nr,
                         reasoning=ReasoningTypes.Retrieval if ith == 0 else ReasoningTypes.OrderingEasy,
                         question_data={"n": ith + 1},
 
@@ -189,9 +188,11 @@ class StoryGenerator:
                         else:
 
                             q.answer = event.attributes[attribute]
+                        q.evidence = [event.sentence_nr]
                         single_span_questions.append(q)
                     else:
                         q.answer = None
+                        q.evidence = []
                         unanswerable_questions.append(q)
 
             # overall questions
@@ -228,10 +229,8 @@ class StoryGenerator:
                 )
 
                 def condition(s):
-                    return any(
-                        f"sent.attributes.{attribute}" in v for v in
-                        visits[s.sentence_nr]
-                    ) and s.event_type == event_type
+                    return any(f"sent.attributes.{attribute}" in v for v in visits[s.sentence_nr]) and \
+                           s.event_type == event_type
 
                 events = sum(1 for s in story if condition(s))
                 q.evidence = [s.sentence_nr for s in story if condition(s)]
