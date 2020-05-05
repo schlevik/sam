@@ -1,12 +1,12 @@
-md5: 3d7d1046b29e9994d02bcb6a66c9662a
+md5: c53e9fd8e6f141ada2be821585b49ce6
 wdir: ..
 cmd: python main.py predict --cls Albert --model models/albert_on_squad_2 --input
   data/stresstest-ssq-50-5.json --output data/predictions-albert-50-5.json
 deps:
-- md5: 87d3f827d1b49ee3e8234ff4382123d6
+- md5: 321dd644f3a1ffcc388f260c6f25c5c9
   path: data/stresstest-ssq-50-5.json
 outs:
-- md5: 8aa9d6713f12ac0d325edd581dd985ee
+- md5: 64aafcea67b63ad4491270e53b4193e7
   path: data/predictions-albert-50-5.json
   cache: true
   metric: false
