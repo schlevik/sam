@@ -21,7 +21,6 @@ def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenera
     story, visits = t.realise_story(ss, g.world)
     (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = g.generate_questions(
         ss, visits)
-    print(len(unanswerable_questions))
     realised_ssqs = []
     realised_msqs = []
     realised_uaqs = []

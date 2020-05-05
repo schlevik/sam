@@ -6,7 +6,7 @@ from typing import List, Callable, Optional, Dict, Tuple, Union
 
 from loguru import logger
 
-from stresstest.classes import S, YouIdiotException, F, Sentence, Context
+from stresstest.classes import S, YouIdiotException, F, Event, Context, Question
 from stresstest.resources.templates import percent, sentences, at, dollar, bang, templates as question_templates
 
 
@@ -324,7 +324,7 @@ class Realizer:
         # self.context['stack'].extend(new_words[::-1])
         return new_words
 
-    def realise_story(self, sentences: List[Sentence], world) -> Tuple[List[str], Dict]:
+    def realise_story(self, sentences: List[Event], world) -> Tuple[List[str], Dict]:
         self.context = Context()
         self.context.world = world
         self.context.sentences = sentences
@@ -343,23 +343,23 @@ class Realizer:
 
     def realise_sentence(self):
         ctx: Context = self.context
-        logger.debug(f"===PROCESSING NEW SENTENCE: #{ctx.sent_nr}, action = {ctx.sent.action}===")
+        logger.debug(f"===PROCESSING NEW SENTENCE: #{ctx.sent_nr}, event = {ctx.sent.event_type}===")
 
         # select template and the chosen number (for tracking purposes)
         logger.debug(f"Use unique sentences?: {self.unique_sentences}")
         if self.unique_sentences:
             exclude = [int(x.rsplit(".", 1)[-1]) for x in self.context.chosen_templates if
-                       x.startswith(ctx.sent.action + '.')]
+                       x.startswith(ctx.sent.event_type + '.')]
             logger.debug(f'Choices to exclude... {exclude}')
-            if len(exclude) == len(self.sentences[ctx.sent.action]):
-                raise YouIdiotException(f"Your story has more '{ctx.sent.action}' actions (> {len(exclude)}) "
-                                        f"than you have choices for ({len(self.sentences[ctx.sent.action])})!")
+            if len(exclude) == len(self.sentences[ctx.sent.event_type]):
+                raise YouIdiotException(f"Your story has more '{ctx.sent.event_type}' events (> {len(exclude)}) "
+                                        f"than you have choices for ({len(self.sentences[ctx.sent.event_type])})!")
         else:
             exclude = []
-        template, template_nr = self.sentences[ctx.sent.action].random(exclude=exclude)
+        template, template_nr = self.sentences[ctx.sent.event_type].random(exclude=exclude)
 
         # set chosen template
-        self.context.chosen_templates.append(f"{ctx.sent.action}.{template_nr}")
+        self.context.chosen_templates.append(f"{ctx.sent.event_type}.{template_nr}")
 
         # initialise context
         self.context.realized = []
@@ -392,10 +392,10 @@ class Realizer:
 
         return " ".join(ctx.realized)
 
-    def realise_question(self, q):
+    def realise_question(self, q: Question):
         logger.debug(f"Question: {q}")
         try:
-            template, template_nr = self.question_templates[q['type']][q['target']][q['action']].random()
+            template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()
         except KeyError:
             return None
         question_words = []
@@ -413,9 +413,9 @@ class Realizer:
             # context access
             elif word.startswith("#"):
                 try:
-                    new_word = q[word[1:]]
+                    new_word = q.question_data[word[1:]]
                 except KeyError:
-                    raise NotImplementedError(f"{word} is not in question!")
+                    raise NotImplementedError(f"{word} is not in question data!")
                 stack.append(str(new_word))
 
             else:

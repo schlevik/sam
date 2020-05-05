@@ -1,7 +1,6 @@
 import json
 import random
 import re
-from abc import abstractmethod, ABC
 from copy import deepcopy
 from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple, Callable
 
@@ -196,7 +195,13 @@ class YouIdiotException(Exception):
     ...
 
 
-class DataObjectMixin:
+class DataObjectMixin(Mapping):
+    def __iter__(self) -> Iterator:
+        return iter(self.__dict__)
+
+    def __len__(self) -> int:
+        return len(self.__dict__)
+
     def __init__(self, *args, **kwargs):
         for a, k in zip(args, self.__annotations__.keys()):
             setattr(self, k, a)
@@ -207,7 +212,10 @@ class DataObjectMixin:
             setattr(self, k, v)
 
     def __getitem__(self, item):
-        return self.__dict__[item]
+        try:
+            return self.__dict__[item]
+        except KeyError:
+            raise YouIdiotException(f"{self.__class__.__name__} doesn't have attribute {item}!")
 
     def __repr__(self):
         attrs = ", ".join(f"{k}={self[k]}" for k in self.__annotations__)
@@ -227,21 +235,21 @@ class Player(DataObjectMixin):
     position: str
 
 
-class Sentence(DataObjectMixin):
+class Event(DataObjectMixin):
     sentence_nr: int
-    action: str
+    event_type: str
     attributes: Dict[str, Union[str, Player]]
     actor: Dict[str, str]
-    cause: str
-    effect: str
-    modes: List[Tuple[str, str]]
-    features: List[str]
+    cause: str = ""
+    effect: str = ""
+    modes: List[Tuple[str, str]] = []
+    features: List[str] = []
 
     def __getitem__(self, item):
         return self.__dict__[item]
 
     def __repr__(self):
-        return (f"{self.action} by {self.actor.get('id', '')}: with {self.attributes}, "
+        return (f"{self.event_type} by {self.actor.get('id', '')}: with {self.attributes}, "
                 f"caused by {self.cause} resulting in {self.effect}. "
                 f"Modes: {self.modes}, Features: {self.features}")
 
@@ -259,10 +267,10 @@ class World(DataObjectMixin):
 
 class Context(DataObjectMixin):
     world: World
-    sentences: List[Sentence]
+    sentences: List[Event]
     chosen_templates: List[str]
     visits: Dict[int, List[str]]
-    sent: Sentence
+    sent: Event
     realized: List[str]
     choices: List[str]
     stack: List[str]
@@ -270,6 +278,33 @@ class Context(DataObjectMixin):
     other: Dict[str, Any]
     realizer: Any
     sent_nr: int
+
+
+class QuestionTypes:
+    DIRECT = "direct"
+    OVERALL = 'overall'
+
+
+class ReasoningTypes:
+    Retrieval = "retrieval"  # just retrieve as it is
+    MultiRetrieval = 'multi-retrieval'  # retrieve multiple passages as it is
+    OrderingEasy = 'ordering-easy'  # order of appearance == actual order (temporal, math, etc)
+    OrderingHard = 'ordering-hard'  # order of appearance != actual order (e.g. x, but before that y => y < x)
+
+
+class Question(DataObjectMixin):
+    type: str
+    target: str
+    evidence: List[int]
+    event_type: str
+    reasoning: str  # something like retrieval, counting, etc
+    question_data: Dict[str, Any]
+    answer: str
+
+    def __init__(self, *args, **kwargs):
+        self.question_data = {}
+        self.reasoning = None
+        super().__init__(*args, **kwargs)
 
 
 class Model:

@@ -281,7 +281,7 @@ def _is_contrastive_or_matchstart(ctx):
     # self last sentence in contrast to current sentence
     last_sentence = _last_sentence(ctx)
     current_sentence = _current_sentence(ctx)
-    if last_sentence.action == current_sentence.action:
+    if last_sentence.event_type == current_sentence.event_type:
         if last_sentence.actor['team'] == current_sentence.actor['team']:
             return 'supportive'
         else:
@@ -407,18 +407,18 @@ percent = {
 
 
 # assuming we only have one action
-def _vbx(template, action):
+def _vbx(template, event_type):
     """
     Gives the mode of the action verb (e.g. VBD, VBG, etc)
     """
-    logger.debug(action)
+    logger.debug(event_type)
     logger.debug(template)
     # select action verb. if no action verb, then select any first appearing verb
-    vbx = next((x for x in template if x.startswith("$V") and f".{action}" in x), None)
+    vbx = next((x for x in template if x.startswith("$V") and f".{event_type}" in x), None)
     if not vbx:
         logger.debug("Template has no action verb!")
         try:
-            vbx = next(x for x in template if ("VB") in x and f".{action}" in x)
+            vbx = next(x for x in template if ("VB") in x and f".{event_type}" in x)
         except StopIteration:
             first_vbg = next((i for i, x in enumerate(template) if x.endswith('ing')), -1)
             first_vbd = next((i for i, x in enumerate(template) if x.endswith('ed')), -1)
@@ -440,36 +440,22 @@ _possible_verb_forms = ("VBG", "VBD")
 possible_contrastive = ["contrastive", 'supportive', 'neutral']
 
 
-# class Preamble(F):
-#     options = [f"$BEGIN.{x}.matchstart" for x in _possible_verb_forms] + \
-#               [f'$BEGIN.{vbx}.{contrastive}' for vbx in _possible_verb_forms for contrastive in possible_contrastive]
-#
-#     def __call__(self, ctx: dict) -> str:
-#         action, nr = ctx['chosen_templates'][-1].split('.')
-#         assert action == ctx['sent'].action
-#         current_template = ctx['realizer'].sentences[action][int(nr)]
-#         vbx = _vbx(current_template, action)
-#         # is matchbegin?
-#         if ctx['sent_nr'] == 0:
-#             return f'$BEGIN.{vbx}.matchstart'
-#         contrastive = _is_contrastive(ctx)
-#         return f'$BEGIN.{vbx}.{contrastive}'
 
 
-def _is_first_action(ctx):
-    action = ctx['sent'].action
-    return next(sent.sentence_nr for sent in ctx['sentences'] if sent.action == action) == ctx['sent_nr']
+def _is_first_event_of_its_type(ctx):
+    event_type = ctx['sent'].event_type
+    return next(sent.sentence_nr for sent in ctx['sentences'] if sent.event_type == event_type) == ctx['sent_nr']
 
 
-def _is_first_action_for_team(ctx: Context):
-    action = ctx.sent.action
+def _is_first_event_of_its_type_for_team(ctx: Context):
+    event_type = ctx.sent.event_type
     team = ctx.sent['actor']['team']
     return next(sent.sentence_nr for sent in ctx.sentences
-                if sent.action == action and sent.actor['team'] == team) == ctx.sent_nr
+                if sent.event_type == event_type and sent.actor['team'] == team) == ctx.sent_nr
 
 
 bang = {
-    "NEXT": (lambda ctx: "first" if _is_first_action_for_team(ctx) else "next", 2),
+    "NEXT": (lambda ctx: "first" if _is_first_event_of_its_type_for_team(ctx) else "next", 2),
     # "PREAMBLE": Preamble,
     "RANDINT": (lambda ctx: random.randint(1, 15)),
     "PRPS": (lambda ctx: "her" if ctx.world.gender == 'female' else "his"),
