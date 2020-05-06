@@ -52,8 +52,6 @@ class Albert(Model):
         if not result:
             return 0, 0
         result = [c for c in result.lower() if c not in string.whitespace]
-        print("".join(result))
-        print(passage)
         j = 0
         start = 0
         in_string = False
@@ -92,5 +90,7 @@ class Albert(Model):
             for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
         ]
         result = " ".join(t for t in tokens if not (t == "[CLS]" or t == "[SEP]"))
-        print(result)
-        return f'{question} {passage}'[slice(*self._match(f'{question} {passage}', result))]
+        try:
+            return f'{question} {passage}'[slice(*self._match(f'{question} {passage}', result))]
+        except:
+            raise ValueError(f"This should not happen! Question: {question} Passage: {passage} prediction: {result}")
