@@ -1,4 +1,4 @@
-md5: 622b7c7e4927c3c8082e25dbdc164182
+md5: ee61a8bba949322a0f5a46ae7a359e8b
 cmd: python main.py evaluate --predictions data/predictions-naqanet-50-5.json --gold
   data/stresstest-ssq-50-5.json --output metrics/score-naqanet-baseline.json
 wdir: ..
@@ -7,10 +7,10 @@ deps:
   path: data/predictions-naqanet-50-5.json
 - md5: 321dd644f3a1ffcc388f260c6f25c5c9
   path: data/stresstest-ssq-50-5.json
-- md5: bb47ed9640bae7d8c06e2c878948752b
+- md5: be415035a4dad796640bc6ab7167b43f
   path: scripts/evaluate.py
 outs:
-- md5: e2d6b658583be7ae5df57094a05999b8
+- md5: e42a6409f96a21a8e51f910a4e904829
   path: metrics/score-naqanet-baseline.json
   cache: false
   metric: true
