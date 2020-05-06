@@ -1,6 +1,7 @@
 import string
 
 from allennlp.predictors import Predictor
+from loguru import logger
 from overrides import overrides
 from transformers import AlbertForQuestionAnswering, AlbertTokenizer
 
@@ -66,7 +67,7 @@ class Albert(Model):
                         in_string = True
                         start = i
                 if j >= len(result):
-                    return start, start + i + 1
+                    return start, i + 1
 
     @classmethod
     def make(cls, path, gpu=False) -> Model:
@@ -90,7 +91,10 @@ class Albert(Model):
             for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
         ]
         result = " ".join(t for t in tokens if not (t == "[CLS]" or t == "[SEP]"))
+        logger.debug(f"Albert prediction: {result}")
         try:
-            return f'{question} {passage}'[slice(*self._match(f'{question} {passage}', result))]
+            result = f'{question} {passage}'[slice(*self._match(f'{question} {passage}', result))]
+            logger.debug(f"After matching: {result}")
         except:
             raise ValueError(f"This should not happen! Question: {question} Passage: {passage} prediction: {result}")
+        return result
