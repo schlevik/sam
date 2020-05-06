@@ -57,14 +57,14 @@ class Albert(Model):
         in_string = False
         for i, c in enumerate(passage.lower()):
             if c not in string.whitespace:
+                if c != result[j]:
+                    in_string = False
+                    j = 0
                 if c == result[j]:
                     j += 1
                     if not in_string:
                         in_string = True
                         start = i
-                else:
-                    in_string = False
-                    j = 0
                 if j >= len(result):
                     return start, start + i + 1
 
