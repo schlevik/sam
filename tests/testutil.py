@@ -28,22 +28,22 @@ def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenera
     if do_print:
         print("===STORY===:")
     for q in single_span_questions:
-        rq = t.realise_question(q)
+        rq = t.realise_question(q, story)
         if rq:
             realised_ssqs.append(rq)
     for q in multi_span_questions:
-        rq = t.realise_question(q)
+        rq = t.realise_question(q, story)
         if rq:
             realised_msqs.append(rq)
     for q in unanswerable_questions:
-        rq = t.realise_question(q)
+        rq = t.realise_question(q, story)
         if rq:
             realised_uaqs.append(rq)
     qs = [
-        (single_span_questions, realised_ssqs),
-        (multi_span_questions, realised_msqs),
-        (unanswerable_questions, realised_uaqs),
-        (abstractive_questions, realised_aqs)
+        single_span_questions,
+        multi_span_questions,
+        unanswerable_questions,
+        abstractive_questions
     ]
     if do_print:
         print('\n'.join(story))
