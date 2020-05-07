@@ -59,7 +59,7 @@ sentences = {
 
         "%CONNECTIVE.VBG> $ACTOR $VBG.foul $COACTOR $RDM.PP.foul .",
 
-        "%CONNECTIVE.VBD> $ACTOR $RDM.VBG.foul , "
+        "%CONNECTIVE.VBG> $ACTOR $RDM.VBG.foul , "
         "$VBG.foul $COACTOR near the $POSITION.BOX .",
 
         "%CONNECTIVE.VBD> $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) .",
