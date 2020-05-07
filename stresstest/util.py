@@ -11,8 +11,11 @@ def num_questions(sample: List[Dict[str, Any]]):
     return sum(len(datum['qas']) for datum in sample)
 
 
-def sample_iter(sample: List[Dict[str, Any]]):
+def sample_iter(sample: List[Dict[str, Any]], full=False):
     for datum in sample:
         passage = datum['passage']
         for qa in datum['qas']:
-            yield datum['id'], passage, qa['id'], qa['question'], qa['answer']
+            if full:
+                yield datum['id'], passage, qa['id'], qa['question'], qa['answer'], qa
+            else:
+                yield datum['id'], passage, qa['id'], qa['question'], qa['answer']

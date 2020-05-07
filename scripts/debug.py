@@ -34,12 +34,14 @@ def test(action, n, k, with_questions):
                     click.echo(styled)
                 if with_questions:
                     labels = ["SSQs", "MSQs", "UAQs", "AQs"]
-                    for label, (logical_qs, realized_qs) in zip(labels, questions):
+                    for label, logical_qs in zip(labels, questions):
                         click.echo(f"{label}:")
-                        for logical, realised in zip(logical_qs, realized_qs):
-                            click.echo(logical)
-                            click.echo(realised)
-                            click.echo()
+                        for logical in logical_qs:
+                            if logical.realized:
+                                click.echo(logical)
+                                click.echo(logical.realized)
+                                # click.echo(realised)
+                                click.echo()
                 click.secho(20 * "=", bold=True)
             except Exception as e:
                 click.secho(str(e), fg='red', bold=True)

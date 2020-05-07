@@ -297,13 +297,15 @@ class Question(DataObjectMixin):
     target: str
     evidence: List[int]
     event_type: str
-    reasoning: str  # something like retrieval, counting, etc
+    reasoning: Optional[str]  # something like retrieval, counting, etc
     question_data: Dict[str, Any]
     answer: str
+    realized: Optional[str]
 
     def __init__(self, *args, **kwargs):
         self.question_data = {}
         self.reasoning = None
+        self.realized = None
         super().__init__(*args, **kwargs)
 
 

@@ -392,7 +392,45 @@ class Realizer:
 
         return " ".join(ctx.realized)
 
-    def realise_question(self, q: Question):
+    def _fix_units(self, question: Question, passage: List[str]):
+        if question.target == 'distance' and question.answer:
+            unit = 'metre'
+        elif question.target == 'time' and question.answer:
+            unit = 'minute'
+        else:
+            return question.answer
+        logger.debug(f"Target: {question.target}")
+        logger.debug(f"Target: {passage}")
+        new_answers = []
+        for answer in question.answer if isinstance(question.answer, list) else [question.answer]:
+            logger.debug(f"Answer: {answer}, Evidence: {question.evidence}")
+            candidate_sentences = [passage[i] for i in question.evidence]
+            candidate_spans = []
+            for candidate_sentence in candidate_sentences:
+                tokens = candidate_sentence.split()
+                logger.debug(f"Evidence tokens: {tokens}")
+                answer_position = next((i for i, token in enumerate(tokens) if str(token) == str(answer)), None)
+                logger.debug(f"Answer found in evidence: {answer_position}")
+                if answer_position:
+                    unit_found = False
+                    i = 0
+                    while not unit_found:
+                        try:
+                            if tokens[answer_position + i].startswith(unit):
+                                candidate_spans.append(tokens[answer_position:answer_position + i + 1])
+                                unit_found = True
+                            if tokens[answer_position - i].startswith(unit):
+                                candidate_spans.append(tokens[answer_position - i:answer_position + 1])
+                                unit_found = True
+                            i += 1
+                        except IndexError:
+                            break
+            shortest_answer = sorted(candidate_spans, key=len)[0]
+            new_answers.append(shortest_answer)
+        new_answers = [' '.join(answer) for answer in new_answers]
+        return new_answers if isinstance(question.answer, list) else new_answers[0]
+
+    def realise_question(self, q: Question, passage: List[str]):
         logger.debug(f"Question: {q}")
         try:
             template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()
@@ -421,4 +459,7 @@ class Realizer:
             else:
                 question_words.append(word)
         logger.debug(question_words)
-        return " ".join(question_words) + "?", q['answer']
+        q.realized = " ".join(question_words) + "?"
+        answer = self._fix_units(q, passage)
+        q.answer = answer
+        return " ".join(question_words) + "?", q.answer

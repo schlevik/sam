@@ -45,10 +45,10 @@ def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
             story, visits = realizer.realise_story(ss, generator.world)
             (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = \
                 generator.generate_questions(ss, visits)
-            realised_ssqs = [(q, realizer.realise_question(q)) for q in single_span_questions]
-            realised_msqs = [(q, realizer.realise_question(q)) for q in multi_span_questions]
-            realised_uaqs = [(q, realizer.realise_question(q)) for q in unanswerable_questions]
-            realised_aqs = [(q, realizer.realise_question(q)) for q in abstractive_questions]
+            realised_ssqs = [(q, realizer.realise_question(q, story)) for q in single_span_questions]
+            realised_msqs = [(q, realizer.realise_question(q, story)) for q in multi_span_questions]
+            realised_uaqs = [(q, realizer.realise_question(q, story)) for q in unanswerable_questions]
+            realised_aqs = [(q, realizer.realise_question(q, story)) for q in abstractive_questions]
             # qs = realised_ssqs + realised_msqs + realised_uaqs + realised_aqs
             qs = realised_ssqs
             if multispan:

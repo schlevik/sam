@@ -157,8 +157,8 @@ dollar = {
                   "($JJ.risky) through ball", "soft clearance", "stray ball"],
     # NP distance description
     "DISTANCE": {
-        "PP": ["from #sent.attributes.distance meters (away)"],
-        "JJ": ["#sent.attributes.distance meters"],
+        "PP": ["from #sent.attributes.distance metres (away)"],
+        "JJ": ["#sent.attributes.distance metres"],
     },
 
     # NP time description
@@ -533,7 +533,7 @@ templates = {
             "goal": [
                 "From how far away were goals scored",
                 "From how far away were goals shot",
-                "The goals was show from how far (away)",
+                "The goals were shot from how far (away)",
                 "They scored the goals from how far (away)"
             ],
         }
