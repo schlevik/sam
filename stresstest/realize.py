@@ -10,235 +10,49 @@ from stresstest.classes import S, YouIdiotException, F, Event, Context, Question
 from stresstest.resources.templates import percent, sentences, at, dollar, bang, templates as question_templates
 
 
-def process_templates(templates, allow_conditions=False) -> dict:
-    processed = {}
-    for k, v in templates.items():
-        if k == 'condition':
-            if not allow_conditions:
-                raise ValueError("Conditions not allowed!")
-            assert isinstance(v, Callable)
-        elif isinstance(v, dict):
-            v = process_templates(v, allow_conditions)
-        elif isinstance(v, list):
-            v = S(v)
-        elif isinstance(v, type) and issubclass(v, F):
-            logger.debug(f"templates[{k}] = {v} is instance of F")
-            v = v()
-            logger.debug(v.options)
-            logger.debug(v.number)
-        elif isinstance(v, Callable):
-            v = F.make(v)
-        elif isinstance(v, Tuple):
-            v = F.make(*v)
+class Accessor:
+    def __init__(self, context: Context, sentences, percent, at, dollar, bang, question_templates):
+        self.context = context
+        self.bang = prepare_templates(bang)
+        self.dollar = prepare_templates(dollar)
+        self.sentences = prepare_templates(sentences)
+        self.at = prepare_templates(at)
+        self.percent = prepare_templates(percent, True)
+        self.question_templates = prepare_templates(question_templates)
 
-        else:
-            raise ValueError(f"Template values can only be lists or dicts! (was: {v}: {type(v)})")
-        processed[k] = v
-    return processed
+    def _access(self, word: str, target):
+        n = target
+        for k in word.split("."):
+            try:
+                n = n[k]
+            except KeyError:
+                n = getattr(n, k)
+                if not n:
+                    raise NotImplementedError()
+        return n
 
-
-class Realizer:
-    context: Context
-
-    def __init__(self, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
-                 question_templates=question_templates, validate=True, unique_sentences=True):
-        self.unique_sentences = unique_sentences
-        logger.debug("Creating new Realizer...")
-        self.context = None
-        self.bang = process_templates(bang)
-        self.dollar = process_templates(dollar)
-        self.sentences = process_templates(sentences)
-        self.at = process_templates(at)
-        self.percent = process_templates(percent, True)
-        self.question_templates = process_templates(question_templates)
-        if validate:
-            logger.debug("Validating templates...")
-            self.validate(self.dollar, 'dollar')
-            self.validate(self.sentences, 'sentences')
-            self.validate(self.percent, 'percent')
-            self.validate(self.question_templates, 'question_templates')
-            logger.debug("Validation done, looks ok.")
-
-    def get_first_invalid_key(self, sentence: S) -> Optional[str]:
-        words = sentence[:]
-        while words:
-            word = words.pop()
-            process_function = self.decide_process_function(word)
-            new_words = []
-            if process_function == self.process_option:
-                new_words = word[1:-1].split(" ")
-            elif process_function == self.process_alternative:
-                alternatives = word[1:-1].split("|")
-                logger.debug(alternatives)
-                new_words = [word for alternative in alternatives for word in alternative.split(" ")]
-                logger.debug(new_words)
-            elif process_function == self.process_condition:
-                try:
-                    self._access_percent(word[1:])
-                except Exception as e:
-                    logger.error(str(e))
-                    return word
-            elif process_function == self.process_function:
-                try:
-                    self._access_bang(word[1:])
-                except Exception as e:
-                    logger.error(str(e))
-                    return word
-            elif process_function == self.process_template:
-                try:
-                    x = self._access_dollar(word[1:])
-                    assert isinstance(x, list) or "any" in x
-                except Exception as e:
-                    logger.error(str(e))
-                    return word
-            words.extend(new_words)
-        return None
-
-    def _estimate_words(self, sentence: S, pessimistic=False):
-        # todo: w/o replacement
-        combinations = 1
-        logger.debug(f"Estimating size of '{sentence}'.")
-        aggr = min if pessimistic else sum
-        for w in sentence:
-            logger.debug(f"w is {w}")
-            process_function = self.decide_process_function(w)
-            if process_function == self.process_template:
-                combinations *= self._estimate_sentences(self._access_dollar(w[1:]), pessimistic)
-
-            elif process_function == self.process_option:
-                combinations *= 1 + self._estimate_words(w[1:-1].split(" "), pessimistic)
-
-            elif process_function == self.process_alternative:
-                combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")], pessimistic)
-
-            elif process_function == self.process_condition:
-
-                combinations *= aggr(
-                    self._estimate_sentences(v, pessimistic) for k, v in self._access_percent(w[1:]).items() if
-                    k != "condition"
-                )
-            elif process_function == self.process_function:
-                f = self._access_bang(w[1:])
-                if f.options:
-                    logger.debug(f"Calculating with options: {f.options}")
-                    result = aggr(self._estimate_words(o, pessimistic) for o in S(f.options))
-                    logger.debug(f"Size of '{w}' is {result}.")
-                    combinations *= result
-                else:
-                    if not pessimistic:
-                        assert f.number > 0
-                        logger.debug(f"Calculating with number: {f.number}")
-                        # if pessimistic, assume f.number = 1
-                        combinations *= f.number
-
-            elif not process_function or process_function == self.process_context:
-                ...
-            else:
-                logger.debug(f"Unknown process function: {process_function}")
-                raise NotImplementedError()
-
-        logger.debug(f"Size of '{sentence}' is {combinations}.")
-        return combinations
-
-    def _estimate_sentences(self, sentences: List[S], pessimistic=False):
-        combined = 0
-        for sentence in sentences:
-            combined += self._estimate_words(sentence, pessimistic)
-
-        return combined
-
-    def estimate_size(self, sentences: List[S], pessimistic=False) -> int:
-        combined = 0
-        for sentence in sentences:
-            combined += self._estimate_words(sentence, pessimistic)
-
-        return combined
-
-    def validate(self, template: dict, path=''):
-        for k, v in template.items():
-            if isinstance(v, Callable):
-                pass  # you're off the hook
-            elif isinstance(v, list):
-                for i, t in enumerate(v):
-                    invalid = self.get_first_invalid_key(t)
-                    if invalid:
-                        raise ValueError(f"path '{path}.{k}', sentence '{i}' contains access "
-                                         f"key >>>{invalid}<<< which is invalid!")
-            elif isinstance(v, dict):
-                self.validate(v, path=f"{path}.{k}")
-
-    def _access_context(self, word: str, record_visit=True) -> List[str]:
-        n = self.context
+    def access_context(self, word: str, record_visit=True) -> List[str]:
         if word.startswith('sent') and record_visit:
-            self.context['visits'][self.context['sent_nr']].append(word)
-        for k in word.split("."):
-            try:
-                n = n[k]
-            except KeyError:
-                n = getattr(n, k)
-                if not n:
-                    raise NotImplementedError()
-        return str(n).split()
+            self.context.visits[self.context.sent_nr].append(word)
+        return str(self._access(word, self.context)).split()
 
-    def _access_percent(self, word) -> Dict[str, Union[Callable, S]]:
-        n = self.percent
-        for k in word.split("."):
-            try:
-                n = n[k]
-            except KeyError:
-                n = getattr(n, k)
-                if not n:
-                    raise NotImplementedError()
-        return n
+    def access_percent(self, word) -> Dict[str, Union[Callable, S]]:
+        return self._access(word, self.percent)
 
-    def _access_bang(self, word) -> F:
-        n = self.bang
-        for k in word.split("."):
-            try:
-                n = n[k]
-            except KeyError:
-                n = getattr(n, k)
-                if not n:
-                    raise NotImplementedError()
-        return n
+    def access_bang(self, word) -> F:
+        return self._access(word, self.bang)
 
-    def _access_dollar(self, word) -> S:
-        n = self.dollar
-        for k in word.split("."):
-            try:
-                n = n[k]
-            except KeyError:
-                n = getattr(n, k)
-                if not n:
-                    raise NotImplementedError()
-        return n
+    def access_dollar(self, word) -> S:
+        return self._access(word, self.dollar)
 
-    def _access_at(self, word) -> S:
-        n = self.at
-        for k in word.split("."):
-            try:
-                n = n[k]
-            except KeyError:
-                n = getattr(n, k)
-                if not n:
-                    raise NotImplementedError()
-        return n
+    def access_at(self, word) -> S:
+        return self._access(word, self.at)
 
-    def with_feedback(self, e: Exception):
-        if isinstance(e, AttributeError) and "object has no attribute 'random'" in str(e):
-            msg = f"{self.context.word} is not a leaf path and template doesn't provide .any"
-        elif isinstance(e, TypeError) and "list indices must be integers or slices, not str" in str(e):
-            msg = ""
-        elif isinstance(e, KeyError) and "dict object has no attribute" in str(e):
-            msg = f"{self.context.word} is not a valid template path!"
-        elif isinstance(e, YouIdiotException):
-            msg = str(e)
-        else:
-            msg = "And i don't even know what's wrong!"
-        logger.debug(f"{self.context.chosen_templates[-1]}")
-        logger.debug(f"{self.context.choices}")
-        logger.error(msg)
-        return YouIdiotException(msg)
+
+class Processor:
+    def __init__(self, accessor: Accessor):
+        self.accessor = accessor
+        self.context = self.accessor.context
 
     def decide_process_function(self, word) -> Optional[Callable[[str], List[str]]]:
         if word.startswith("(") and word.endswith(")"):
@@ -264,7 +78,7 @@ class Realizer:
         logger.debug("...Word is a feature @...")
         if word[1:].startswith("MODIFIER"):
             if "modifier" in self.context.sent.features:
-                new_words, idx = self._access_at(word[1:]).random()
+                new_words, idx = self.accessor.access_at(word[1:]).random()
             else:
                 new_words = []
             return new_words
@@ -299,7 +113,7 @@ class Realizer:
         # word = self.context['word']
         # stack = self.context['stack']
         logger.debug("...Word is a condition %...")
-        branch = self._access_percent(word[1:])
+        branch = self.accessor.access_percent(word[1:])
         logger.debug(
             f"...Evaluating: {branch['condition'].__name__}\n{textwrap.dedent(inspect.getsource(branch['condition']))}")
         result = branch['condition'](self.context)
@@ -314,7 +128,7 @@ class Realizer:
 
     def process_context(self, word):
         logger.debug("...Word is context #...")
-        new_words = self._access_context(word[1:])
+        new_words = self.accessor.access_context(word[1:])
 
         logger.debug(f"... new words: {new_words}")
         # self.context['stack'].extend(new_words[::-1])
@@ -326,10 +140,10 @@ class Realizer:
         exclude = [int(x.rsplit(".", 1)[-1]) for x in self.context.choices if x.startswith(word + '.')]
         logger.debug(f"Excluding choices: {exclude}")
         try:
-            new_words, idx = self._access_dollar(word[1:]).random(exclude=exclude)
+            new_words, idx = self.accessor.access_dollar(word[1:]).random(exclude=exclude)
         except (KeyError, AttributeError) as _:
             logger.debug("Trying any...")
-            new_words, idx = self._access_dollar(word[1:] + ".any").random(exclude=exclude)
+            new_words, idx = self.accessor.access_dollar(word[1:] + ".any").random(exclude=exclude)
         except IndexError as _:
             raise YouIdiotException(f"Template {self.context.chosen_templates[-1]} uses '{word}' "
                                     f"more often than there are unique alternatives!")
@@ -342,14 +156,206 @@ class Realizer:
     def process_function(self, word):
         logger.debug("...Word is a function !...")
         # get and execute
-        func = self._access_bang(word[1:])
+        func = self.accessor.access_bang(word[1:])
         new_words = str(func(self.context)).split()
         logger.debug(f"... new words: {new_words}")
         # self.context['stack'].extend(new_words[::-1])
         return new_words
 
+
+class Validator:
+    def __init__(self, processor: Processor):
+        self.processor = processor
+        self.accessor = self.processor.accessor
+
+    def validate(self, template: dict, path=''):
+        for k, v in template.items():
+            if isinstance(v, Callable):
+                pass  # you're off the hook
+            elif isinstance(v, list):
+                for i, t in enumerate(v):
+                    invalid = self.get_first_invalid_key(t)
+                    if invalid:
+                        raise ValueError(f"path '{path}.{k}', sentence '{i}' contains access "
+                                         f"key >>>{invalid}<<< which is invalid!")
+            elif isinstance(v, dict):
+                self.validate(v, path=f"{path}.{k}")
+
+    def get_first_invalid_key(self, sentence: S) -> Optional[str]:
+        words = sentence[:]
+        while words:
+            word = words.pop()
+            process_function = self.processor.decide_process_function(word)
+            new_words = []
+            if process_function == self.processor.process_option:
+                new_words = word[1:-1].split(" ")
+            elif process_function == self.processor.process_alternative:
+                alternatives = word[1:-1].split("|")
+                logger.debug(alternatives)
+                new_words = [word for alternative in alternatives for word in alternative.split(" ")]
+                logger.debug(new_words)
+            elif process_function == self.processor.process_condition:
+                try:
+                    self.accessor.access_percent(word[1:])
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            elif process_function == self.processor.process_function:
+                try:
+                    self.accessor.access_bang(word[1:])
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            elif process_function == self.processor.process_template:
+                try:
+                    x = self.accessor.access_dollar(word[1:])
+                    assert isinstance(x, list) or "any" in x
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            words.extend(new_words)
+        return None
+
+
+class SizeEstimator:
+    def __init__(self, processor: Processor):
+        self.processor = processor
+        self.accessor = self.processor.accessor
+
+    def _estimate_words(self, sentence: S, pessimistic=False):
+        # todo: w/o replacement
+        combinations = 1
+        logger.debug(f"Estimating size of '{sentence}'.")
+        aggr = min if pessimistic else sum
+        for w in sentence:
+            logger.debug(f"w is {w}")
+            process_function = self.processor.decide_process_function(w)
+            if process_function == self.processor.process_template:
+                combinations *= self._estimate_sentences(self.accessor.access_dollar(w[1:]), pessimistic)
+
+            elif process_function == self.processor.process_option:
+                combinations *= 1 + self._estimate_words(w[1:-1].split(" "), pessimistic)
+
+            elif process_function == self.processor.process_alternative:
+                combinations *= self._estimate_sentences([sent.split(" ") for sent in w[1:-1].split("|")], pessimistic)
+
+            elif process_function == self.processor.process_condition:
+
+                combinations *= aggr(
+                    self._estimate_sentences(v, pessimistic) for k, v in self.accessor.access_percent(w[1:]).items() if
+                    k != "condition"
+                )
+            elif process_function == self.processor.process_function:
+                f = self.accessor.access_bang(w[1:])
+                if f.options:
+                    logger.debug(f"Calculating with options: {f.options}")
+                    result = aggr(self._estimate_words(o, pessimistic) for o in S(f.options))
+                    logger.debug(f"Size of '{w}' is {result}.")
+                    combinations *= result
+                else:
+                    if not pessimistic:
+                        assert f.number > 0
+                        logger.debug(f"Calculating with number: {f.number}")
+                        # if pessimistic, assume f.number = 1
+                        combinations *= f.number
+
+            elif not process_function or process_function == self.processor.process_context:
+                ...
+            else:
+                logger.debug(f"Unknown process function: {process_function}")
+                raise NotImplementedError()
+
+        logger.debug(f"Size of '{sentence}' is {combinations}.")
+        return combinations
+
+    def _estimate_sentences(self, sentences: List[S], pessimistic=False):
+        combined = 0
+        for sentence in sentences:
+            combined += self._estimate_words(sentence, pessimistic)
+
+        return combined
+
+    def estimate_size(self, sentences: List[S], pessimistic=False) -> int:
+        combined = 0
+        for sentence in sentences:
+            combined += self._estimate_words(sentence, pessimistic)
+
+        return combined
+
+
+def prepare_templates(templates, allow_conditions=False) -> dict:
+    processed = {}
+    for k, v in templates.items():
+        if k == 'condition':
+            if not allow_conditions:
+                raise ValueError("Conditions not allowed!")
+            assert isinstance(v, Callable)
+        elif isinstance(v, dict):
+            v = prepare_templates(v, allow_conditions)
+        elif isinstance(v, list):
+            v = S(v)
+        elif isinstance(v, type) and issubclass(v, F):
+            logger.debug(f"templates[{k}] = {v} is instance of F")
+            v = v()
+            logger.debug(v.options)
+            logger.debug(v.number)
+        elif isinstance(v, Callable):
+            v = F.make(v)
+        elif isinstance(v, Tuple):
+            v = F.make(*v)
+
+        else:
+            raise ValueError(f"Template values can only be lists or dicts! (was: {v}: {type(v)})")
+        processed[k] = v
+    return processed
+
+
+class Realizer:
+    context: Context
+
+    def __init__(self, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
+                 question_templates=question_templates, validate=True, unique_sentences=True):
+        self.unique_sentences = unique_sentences
+        logger.debug("Creating new Realizer...")
+        self.context = None
+        self.bang = prepare_templates(bang)
+        self.dollar = prepare_templates(dollar)
+        self.sentences = prepare_templates(sentences)
+        self.at = prepare_templates(at)
+        self.percent = prepare_templates(percent, True)
+        self.question_templates = prepare_templates(question_templates)
+        self.accessor = Accessor(self.context, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
+                                 question_templates=question_templates)
+        self.processor = Processor(self.accessor)
+        if validate:
+            validator = Validator(self.processor)
+            logger.debug("Validating templates...")
+            validator.validate(self.dollar, 'dollar')
+            validator.validate(self.sentences, 'sentences')
+            validator.validate(self.percent, 'percent')
+            validator.validate(self.question_templates, 'question_templates')
+            logger.debug("Validation done, looks ok.")
+
+    def with_feedback(self, e: Exception):
+        if isinstance(e, AttributeError) and "object has no attribute 'random'" in str(e):
+            msg = f"{self.context.word} is not a leaf path and template doesn't provide .any"
+        elif isinstance(e, TypeError) and "list indices must be integers or slices, not str" in str(e):
+            msg = ""
+        elif isinstance(e, KeyError) and "dict object has no attribute" in str(e):
+            msg = f"{self.context.word} is not a valid template path!"
+        elif isinstance(e, YouIdiotException):
+            msg = str(e)
+        else:
+            msg = "And i don't even know what's wrong!"
+        logger.debug(f"{self.context.chosen_templates[-1]}")
+        logger.debug(f"{self.context.choices}")
+        logger.error(msg)
+        return YouIdiotException(msg)
+
     def realise_story(self, sentences: List[Event], world) -> Tuple[List[str], Dict]:
         self.context = Context()
+        self.processor.context = self.context
+        self.accessor.context = self.context
         self.context.world = world
         self.context.sentences = sentences
         self.context.chosen_templates = list()
@@ -401,7 +407,7 @@ class Realizer:
             logger.debug(f"State: {' '.join(ctx.realized)} ++ {word} ++ {' '.join(self.context.stack[::-1])}")
 
             # decide what to process with
-            process_function = self.decide_process_function(word)
+            process_function = self.processor.decide_process_function(word)
 
             # apply if not a plain word
             if process_function:
@@ -470,7 +476,7 @@ class Realizer:
 
             # alternative as in ()
             if word.startswith("(") and word.endswith(")"):
-                new_words = self.process_option(word)
+                new_words = self.processor.process_option(word)
                 stack.extend(new_words[::-1])
             # context access
             elif word.startswith("#"):
