@@ -14,7 +14,7 @@ class StoryGenerator:
     CAUSES = Choices(['error', 'run', 'freekick'])
     EFFECTS = Choices(['penalty'])
     MODES = Choices([''])
-    FEATURES = Choices(['modifier'])
+    # FEATURES = Choices(['modifier'])
     POSITIONS = Choices(['forward', 'defender', 'midfielder'])
 
     def __init__(self, config):
