@@ -25,8 +25,8 @@ def test(action, n, k, with_questions):
         for i in range(ceil(k / len(actions))):
             try:
                 r = Realizer(sentences=sentences, unique_sentences=False)
-                _, _, _, story_sents, questions, logical_form = interactive_env(realizer=r, do_print=False)
-                for realised, logical in zip(story_sents, logical_form):
+                generator, cfg, events, realizer, story, all_questions = interactive_env(realizer=r, do_print=False)
+                for realised, logical in zip(story, events):
                     if colorise and logical['action'] == action:
                         styled = click.style(realised, fg='red', bold=True)
                     else:
@@ -34,7 +34,7 @@ def test(action, n, k, with_questions):
                     click.echo(styled)
                 if with_questions:
                     labels = ["SSQs", "MSQs", "UAQs", "AQs"]
-                    for label, logical_qs in zip(labels, questions):
+                    for label, logical_qs in zip(labels, all_questions):
                         click.echo(f"{label}:")
                         for logical in logical_qs:
                             if logical.realized:
