@@ -240,10 +240,17 @@ class Event(DataObjectMixin):
     event_type: str
     attributes: Dict[str, Union[str, Player]]
     actor: Dict[str, str]
-    cause: str = ""
-    effect: str = ""
-    modes: List[Tuple[str, str]] = []
-    features: List[str] = []
+    cause: Optional[str]
+    effect: Optional[str]
+    modes: List[Tuple[str, str]]
+    features: List[str]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cause = None
+        self.effect = None
+        self.modes = []
+        self.features = []
 
     def __getitem__(self, item):
         return self.__dict__[item]

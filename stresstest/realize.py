@@ -48,7 +48,7 @@ class Realizer:
         self.bang = process_templates(bang)
         self.dollar = process_templates(dollar)
         self.sentences = process_templates(sentences)
-        self.at = at
+        self.at = process_templates(at)
         self.percent = process_templates(percent, True)
         self.question_templates = process_templates(question_templates)
         if validate:
@@ -213,6 +213,17 @@ class Realizer:
                     raise NotImplementedError()
         return n
 
+    def _access_at(self, word) -> S:
+        n = self.at
+        for k in word.split("."):
+            try:
+                n = n[k]
+            except KeyError:
+                n = getattr(n, k)
+                if not n:
+                    raise NotImplementedError()
+        return n
+
     def with_feedback(self, e: Exception):
         if isinstance(e, AttributeError) and "object has no attribute 'random'" in str(e):
             msg = f"{self.context.word} is not a leaf path and template doesn't provide .any"
@@ -242,10 +253,23 @@ class Realizer:
             r = self.process_template
         elif word.startswith("!"):
             r = self.process_function
+        elif word.startswith("@"):
+            r = self.process_feature
         else:
             return None
         logger.debug(f"Deciding to process with {r.__name__}")
         return r
+
+    def process_feature(self, word):
+        logger.debug("...Word is a feature @...")
+        if word[1:].startswith("MODIFIER"):
+            if "modifier" in self.context.sent.features:
+                new_words, idx = self._access_at(word[1:]).random()
+            else:
+                new_words = []
+            return new_words
+        else:
+            raise NotImplementedError(f"Don't know how to process {word.split('.', 1)[0]} type of feature!")
 
     def process_option(self, word):
         # word = self.context['word']
