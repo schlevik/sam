@@ -45,7 +45,8 @@ sentences = {
         "to %CONNECTIVE.IVP after $REASON.S.goal .",
     ],
     "foul": [
-        "%CONNECTIVE.VBD> $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY .",
+        "%CONNECTIVE.VBD> $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY "
+        "after a ($JJ.negative) foul by ($ACTORTEAM.name-pos-pre) $ACTOR .",
 
         "%CONNECTIVE.VBD> ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by "
         "[$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME) .",
