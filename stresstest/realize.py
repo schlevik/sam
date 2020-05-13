@@ -11,7 +11,8 @@ from stresstest.resources.templates import percent, sentences, at, dollar, bang,
 
 
 class Accessor:
-    def __init__(self, context: Context, sentences, percent, at, dollar, bang, question_templates):
+    def __init__(self, context: Context, sentences=sentences, percent=percent, at=at, dollar=dollar, bang=bang,
+                 question_templates=question_templates):
         self.context = context
         self.bang = prepare_templates(bang)
         self.dollar = prepare_templates(dollar)

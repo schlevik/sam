@@ -6,7 +6,7 @@ import click
 from scripts.utils import get_templates
 from stresstest.realize import Realizer
 from stresstest.resources.templates import sentences
-from tests.testutil import interactive_env
+from tests.util import interactive_env
 
 
 @click.command()
