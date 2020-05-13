@@ -469,7 +469,7 @@ bang = {
         lambda ctx: next(t.name for t in ctx.world.teams if t.id != ctx.sent.actor.team.id))
 
 }
-templates = {
+question_templates = {
     'direct': {
         "actor": {
             "goal": [

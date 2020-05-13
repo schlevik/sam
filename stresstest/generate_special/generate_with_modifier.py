@@ -4,7 +4,7 @@ from typing import List, Dict
 from loguru import logger
 
 from stresstest.generate import StoryGenerator
-from stresstest.classes import Config, Event, QuestionTypes, ReasoningTypes, Question
+from stresstest.classes import Event, QuestionTypes, ReasoningTypes, Question
 
 
 class ModifierGenerator(StoryGenerator):
@@ -28,7 +28,7 @@ class ModifierGenerator(StoryGenerator):
         multi_span_questions = []
         unanswerable_questions = []
         abstractive_questions = []
-
+        # TODO: refactor with conditions
         # per-sentence action questions
         for event_type in self.EVENT_TYPES:
             events = (event for event in story if
@@ -88,12 +88,14 @@ class ModifierGenerator(StoryGenerator):
                           s.event_type == event_type and self.MODIFIER not in s.features]
             if events > 1:
                 q.reasoning = ReasoningTypes.MultiRetrieval
-                q.answer = [" ".join((s.actor['first'], s.actor['last'])) for s in story if s.event_type == event_type]
+                q.answer = [" ".join((s.actor['first'], s.actor['last'])) for s in story if
+                            s.event_type == event_type and self.MODIFIER not in s.features]
                 multi_span_questions.append(q)
             elif events == 1:
                 q.reasoning = ReasoningTypes.Retrieval
                 q.answer = next(
-                    " ".join((s.actor['first'], s.actor['last'])) for s in story if s.event_type == event_type)
+                    " ".join((s.actor['first'], s.actor['last'])) for s in story if
+                    s.event_type == event_type and self.MODIFIER not in s.features)
                 single_span_questions.append(q)
             elif events < 1:
                 q.answer = None
@@ -110,7 +112,7 @@ class ModifierGenerator(StoryGenerator):
 
                 def condition(s):
                     return any(f"sent.attributes.{attribute}" in v for v in visits[s.sentence_nr]) and \
-                           s.event_type == event_type
+                           s.event_type == event_type and self.MODIFIER not in s.features
 
                 events = sum(1 for s in story if condition(s))
                 q.evidence = [s.sentence_nr for s in story if condition(s)]

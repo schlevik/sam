@@ -1,0 +1,9 @@
+{
+  "generator": {
+    "class": "stresstest.generate_special.generate_with_modifier.ModifierGenerator"
+  },
+  "templates": "stresstest.resources.templates_modifier",
+  "reasoning": [
+    "retrieval"
+  ]
+}

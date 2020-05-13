@@ -1,0 +1,8 @@
+{
+  "generator": {
+    "class": "stresstest.generate.StoryGenerator"
+  },
+  "reasoning": [
+    "retrieval"
+  ]
+}

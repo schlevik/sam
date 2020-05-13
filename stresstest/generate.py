@@ -3,7 +3,7 @@ import random
 import names
 from loguru import logger
 
-from stresstest.classes import Choices, Event, World, Team, Player, Question, QuestionTypes, ReasoningTypes
+from stresstest.classes import Choices, Event, World, Team, Player, Question, QuestionTypes, ReasoningTypes, Config
 
 
 class StoryGenerator:
@@ -17,10 +17,10 @@ class StoryGenerator:
     # FEATURES = Choices(['modifier'])
     POSITIONS = Choices(['forward', 'defender', 'midfielder'])
 
-    def __init__(self, config):
-        logger.debug("cfg:")
-        # TODO: change to dynaconf maybe?
+    def __init__(self, config, team_names: str = "stresstest/resources/team-names.json"):
         self.cfg = config
+        self.team_names = Config(team_names)
+        logger.debug("cfg:")
         logger.debug(self.cfg.pprint())
 
     def set_world(self):
@@ -30,13 +30,11 @@ class StoryGenerator:
         world.gender = World.FEMALE if gender else World.MALE
         world.num_sentences = self.cfg.get("world.num_sentences", 5)
 
-        t1_first = self.cfg.as_choices("team.name.first").random()
-        t1_second = self.cfg.as_choices("team.name.second").random()
+        t1_first = self.team_names.as_choices("first").random()
+        t1_second = self.team_names.as_choices("second").random()
 
-        t2_first = (self.cfg.as_choices("team.name.first") - (
-            t1_first)).random()
-        t2_second = (self.cfg.as_choices("team.name.second") - (
-            t1_second)).random()
+        t2_first = (self.team_names.as_choices("first") - t1_first).random()
+        t2_second = (self.team_names.as_choices("second") - t1_second).random()
 
         world.teams = (
             Team(**{

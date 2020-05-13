@@ -296,7 +296,7 @@ class ReasoningTypes:
     Retrieval = "retrieval"  # just retrieve as it is
     MultiRetrieval = 'multi-retrieval'  # retrieve multiple passages as it is
     OrderingEasy = 'ordering-easy'  # order of appearance == actual order (temporal, math, etc)
-    OrderingHard = 'ordering-hard'  # order of appearance != actual order (e.g. x, but before that y => y < x)
+    OrderingHard = 'ordering-hard'  # order of appearance != actual order (e.g. "x, but before that y" => y < x)
 
 
 class Question(DataObjectMixin):

@@ -7,7 +7,7 @@ from typing import List, Callable, Optional, Dict, Tuple, Union
 from loguru import logger
 
 from stresstest.classes import S, YouIdiotException, F, Event, Context, Question
-from stresstest.resources.templates import percent, sentences, at, dollar, bang, templates as question_templates
+from stresstest.resources.templates import percent, sentences, at, dollar, bang, question_templates as question_templates
 
 
 class Accessor:

@@ -36,16 +36,16 @@ def print_out(story, *questions):
             print(q.realized, q.answer if q.answer else "Unanswerable")
 
 
-def env_for_modifier(path='stresstest/resources/config.json', g_class=ModifierGenerator, do_print=True,
+def env_for_modifier(path='stresstest/resources/team-names.json', g_class=ModifierGenerator, do_print=True,
                      do_realise=True):
-    from stresstest.resources.templates_modifier import sentences, dollar, at, percent, bang, templates
+    from stresstest.resources.templates_modifier import sentences, dollar, at, percent, bang, question_templates
     realizer = Realizer(sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang,
-                        question_templates=templates, unique_sentences=False)
+                        question_templates=question_templates, unique_sentences=False)
 
     return interactive_env(path, g_class, realizer, do_print, do_realise)
 
 
-def interactive_env(path='stresstest/resources/config.json', g_class=StoryGenerator, realizer=None, do_print=True,
+def interactive_env(path='stresstest/resources/team-names.json', g_class=StoryGenerator, realizer=None, do_print=True,
                     do_realise=True):
     cfg = Config(path)
     cfg.pprint()
