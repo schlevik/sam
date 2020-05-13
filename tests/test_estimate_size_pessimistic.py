@@ -1,5 +1,6 @@
-from stresstest.classes import F
-from tests.testutil import TestRealizer, only
+from stresstest.classes import F, Context
+from stresstest.realize import Accessor, Processor, SizeEstimator
+from tests.util import  only
 
 sentences = {
     "test": [
@@ -50,29 +51,42 @@ bang = {
 
 def test_pessimistic_bang():
     sents = only(sentences, 1)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 2
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test'], pessimistic=True) == 1
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 2
+
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test'], pessimistic=True) == 1
 
     sents = only(sentences, 2)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 16
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test'], pessimistic=True) == 2
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 16
+
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test'], pessimistic=True) == 2
 
 
 def test_pessimistic_condition():
     sents = only(sentences, 0)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 20
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test'], pessimistic=True) == 4
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 20
+
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test'], pessimistic=True) == 4
 
 
 def test_combined():
-    r = TestRealizer(sentences=sentences, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 358
-    r = TestRealizer(sentences=sentences, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test'], pessimistic=True) == 23
+    a = Accessor(context=Context(), sentences=sentences, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
 
+    assert r.estimate_size(a.sentences['test']) == 358
+
+    a = Accessor(context=Context(), sentences=sentences, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+
+    assert r.estimate_size(a.sentences['test'], pessimistic=True) == 23

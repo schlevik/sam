@@ -1,4 +1,6 @@
-from tests.testutil import TestRealizer, only
+from stresstest.classes import Context
+from stresstest.realize import Accessor, SizeEstimator, Processor
+from tests.util import only
 
 sentences = {
     "test": [
@@ -27,26 +29,31 @@ dollar = {
 
 def test_estimate_size_works_per_sentence():
     sents = only(sentences, 0)  # flat
-    r = TestRealizer(sentences=sents, dollar=dollar)
-    assert r.estimate_size(r.sentences['test']) == 3
-    assert r._estimate_words(r.sentences['test'][0]) == 3
+
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 3
+    assert r._estimate_words(a.sentences['test'][0]) == 3
 
 
 def test_estimate_size_works_with_alternative():
     sents = only(sentences, 4)
-    r = TestRealizer(sentences=sents, dollar=dollar)
-    assert r.estimate_size(r.sentences['test']) == 5
-    assert r._estimate_words(r.sentences['test'][0]) == 5
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 5
+    assert r._estimate_words(a.sentences['test'][0]) == 5
 
 
 def test_estimate_size_works_with_option():
     sents = only(sentences, 5)
-    r = TestRealizer(sentences=sents, dollar=dollar)
-    assert r.estimate_size(r.sentences['test']) == 9
-    assert r._estimate_words(r.sentences['test'][0]) == 9
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 9
+    assert r._estimate_words(a.sentences['test'][0]) == 9
 
 
 def test_estimate_size_works():
     sents = sentences
-    r = TestRealizer(sentences=sents, dollar=dollar)
-    assert r.estimate_size(r.sentences['test']) == 61
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 61

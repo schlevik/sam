@@ -2,7 +2,7 @@ from flaky import flaky
 
 from stresstest.classes import Event
 from tests.resources.templates import sentences
-from tests.testutil import TestRealizer, only
+from tests.util import TestRealizer, only
 
 
 @flaky(max_runs=5, min_passes=5)

@@ -1,5 +1,6 @@
-from stresstest.classes import F
-from tests.testutil import TestRealizer, only
+from stresstest.classes import F, Context
+from stresstest.realize import SizeEstimator, Processor, Accessor
+from tests.util import only
 
 sentences = {
     "test": [
@@ -61,40 +62,48 @@ bang = {
 
 def test_estimate_size_works_per_sentence():
     sents = only(sentences, 0)  # flat
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent)
-    assert r.estimate_size(r.sentences['test']) == 12
+    # r = TestRealizer(sentences=sents, dollar=dollar, percent=percent)
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 12
 
 
 def test_bang_works_with_explicitly_defined():
     sents = only(sentences, 3)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 2
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 2
 
 
 def test_bang_works_with_options_when_explicitly_defined():
     sents = only(sentences, 4)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 9
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 9
 
 
 def test_bang_works_with_number_when_implicitly_defined_no_args():
     sents = only(sentences, 5)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 3
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 3
 
 
 def test_bang_works_with_number_when_implicitly_defined_with_args():
     sents = only(sentences, 6)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 18
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 18
 
 
 def test_bang_works_with_options_when_implicitly_defined_with_args():
     sents = only(sentences, 7)
-    r = TestRealizer(sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 6
+    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 6
 
 
 def test_full_grammar():
-    r = TestRealizer(sentences=sentences, dollar=dollar, percent=percent, bang=bang)
-    assert r.estimate_size(r.sentences['test']) == 68
+    a = Accessor(context=Context(), sentences=sentences, dollar=dollar, percent=percent, bang=bang)
+    r = SizeEstimator(Processor(a))
+    assert r.estimate_size(a.sentences['test']) == 68
