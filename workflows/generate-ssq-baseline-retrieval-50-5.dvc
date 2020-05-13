@@ -1,0 +1,21 @@
+md5: 608b80aa93c84a2131e6142350301694
+cmd: python main.py generate --seed 56 -n 50 -k 5 --output data/stresstest-ssq-baseline-retrieval-50-5.json
+  --config conf/baseline-retrieval.json
+wdir: ..
+deps:
+- md5: bf4b1302d383bf173927534c3fc60964
+  path: scripts/generate.py
+- md5: 4b2eb626f26998c3f839a21460411b20
+  path: stresstest/realize.py
+- md5: 6dc994c59fe0d9e62589e6e9695f705e
+  path: stresstest/resources/templates.py
+- md5: 0a471084fe05b4d2edce870b21919aae
+  path: stresstest/generate.py
+- md5: 2e6d4bee966b9c02bc54f5c2ad2174c8
+  path: conf/baseline-retrieval.json
+outs:
+- md5: 997f980aca532560c4f9ed8f2db43de6
+  path: data/stresstest-ssq-baseline-retrieval-50-5.json
+  cache: true
+  metric: false
+  persist: false

@@ -7,3 +7,5 @@
 /predictions-bidaf-50-5.json
 /predictions-albert-50-5.json
 /predictions-naqanet-50-5.json
+/stresstest-ssq-baseline-retrieval-50-5.json
+/stresstest-ssq-modifier-retrieval-50-5.json
