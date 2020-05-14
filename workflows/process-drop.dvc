@@ -1,10 +1,10 @@
-md5: e7f72a10aaf3d8ca98f78c5ad2dd3c35
+md5: 87c415ffe1a9153472b32b200cac1742
 wdir: ..
 cmd: python main.py process-drop
 deps:
 - md5: b51befb910069359687b5a7346d21f8a
   path: data/drop_dataset_dev.json
-- md5: 23e4d22ce56e8780267ad24c1653bf9f
+- md5: aefd6a30d0e1c267f8943b7d6569e6d3
   path: scripts/compare.py
 outs:
 - md5: 4d895a9c6a0629c8f6453e88502abc2a
