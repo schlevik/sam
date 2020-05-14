@@ -1,4 +1,5 @@
 md5: 61e1a8c5ca1f385e76dbad45eca6c96e
+wdir: ..
 cmd: python main.py predict --cls BiDAF --model models/bidaf-model-2020.03.19.tar.gz
   --input data/stresstest-ssq-baseline-retrieval-50-5.json --output data/predictions-bidaf-ssq-baseline-retrieval-50-5.json
 deps:

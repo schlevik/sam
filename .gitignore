@@ -173,3 +173,4 @@ docs/
 slack-bot.py
 .in
 daily.sh
+logs/
