@@ -1,4 +1,4 @@
-md5: db3620aab9bbfc19a4bfbaf835cd373a
+md5: 70517a0177ce0222a212dc2ba1ea7800
 wdir: ..
 cmd: python main.py predict --cls Albert --model models/albert_on_squad_2 --input
   data/stresstest-ssq-modifier-retrieval-50-5.json --output data/predictions-albert-ssq-modifier-retrieval-50-5.json
