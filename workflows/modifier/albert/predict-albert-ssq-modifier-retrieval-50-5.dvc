@@ -1,8 +1,7 @@
-md5: 70517a0177ce0222a212dc2ba1ea7800
-wdir: ../../../
-cmd: python main.py predict --cls Albert --model models/albert_on_squad_2
-  --input data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
-  --output data/modifier/albert/predictions-albert-ssq-modifier-retrieval-50-5.json
+md5: dd7ef2c258bc44f4cd41b9648c90ae80
+wdir: ../../..
+cmd: python main.py predict --cls Albert --model models/albert_on_squad_2 --input
+  data/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output data/modifier/albert/predictions-albert-ssq-modifier-retrieval-50-5.json
 deps:
 - md5: 201509f054f678be1a266a069aa76eff
   path: data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
