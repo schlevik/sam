@@ -7,13 +7,14 @@ from typing import List, Callable, Optional, Dict, Tuple, Union
 from loguru import logger
 
 from stresstest.classes import S, YouIdiotException, F, Event, Context, Question
-from stresstest.resources.templates import percent, sentences, at, dollar, bang, question_templates as question_templates
+from stresstest.resources.templates import percent, sentences, at, dollar, bang, \
+    question_templates as question_templates
 
 
 class Accessor:
-    def __init__(self, context: Context, sentences=sentences, percent=percent, at=at, dollar=dollar, bang=bang,
+    def __init__(self, context: Context = None, sentences=sentences, percent=percent, at=at, dollar=dollar, bang=bang,
                  question_templates=question_templates):
-        self.context = context
+        self.context = context or Context()
         self.bang = prepare_templates(bang)
         self.dollar = prepare_templates(dollar)
         self.sentences = prepare_templates(sentences)
