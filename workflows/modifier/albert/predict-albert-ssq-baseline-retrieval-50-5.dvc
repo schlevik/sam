@@ -1,0 +1,16 @@
+md5: 455efd206c9b6f94e444e8b0b82b1d05
+wdir: ../../../
+cmd: python main.py predict
+ --cls Albert
+ --model models/albert_on_squad_2
+ --input data/modifier/stresstest-ssq-baseline-retrieval-50-5.json
+ --output data/modifier/albert/predictions-albert-ssq-baseline-retrieval-50-5.json
+deps:
+- md5: 997f980aca532560c4f9ed8f2db43de6
+  path: data/modifier/stresstest-ssq-baseline-retrieval-50-5.json
+outs:
+- md5: a2a72ced6c732a5fbee72aac2efba59f
+  path: data/modifier/albert/predictions-albert-ssq-baseline-retrieval-50-5.json
+  cache: true
+  metric: false
+  persist: false

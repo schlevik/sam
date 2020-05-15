@@ -2,6 +2,7 @@
   "generator": {
     "class": "stresstest.generate.StoryGenerator"
   },
+  "templates": "stresstest.resources.templates_modifier",
   "reasoning": [
     "retrieval"
   ]

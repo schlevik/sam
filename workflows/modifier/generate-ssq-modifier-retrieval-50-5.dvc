@@ -1,11 +1,11 @@
-md5: 59734fe1d9ca1d0222646b20c9c8a8f1
-cmd: python main.py generate --seed 56 -n 50 -k 5 --output data/stresstest-ssq-modifier-retrieval-50-5.json
+md5: 8a2eab4fb4e59d367d659342558dffcc
+cmd: python main.py generate --seed 56 -n 50 -k 5 --output data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
   --config conf/modifier-retrieval.json
-wdir: ..
+wdir: ../..
 deps:
 - md5: bf4b1302d383bf173927534c3fc60964
   path: scripts/generate.py
-- md5: 4b2eb626f26998c3f839a21460411b20
+- md5: e0904b4ea36fa6f700c15bf0c62bddaa
   path: stresstest/realize.py
 - md5: b98772ddc6d8b39e5597999398a816dc
   path: stresstest/resources/templates_modifier.py
@@ -17,7 +17,7 @@ deps:
   path: conf/modifier-retrieval.json
 outs:
 - md5: 201509f054f678be1a266a069aa76eff
-  path: data/stresstest-ssq-modifier-retrieval-50-5.json
+  path: data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
   cache: true
   metric: false
   persist: false
