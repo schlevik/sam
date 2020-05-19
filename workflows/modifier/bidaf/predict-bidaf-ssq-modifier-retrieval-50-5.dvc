@@ -1,9 +1,9 @@
-md5: 6d7e46e4ae1aba3bb381088dc908c94f
+md5: cec8acb8810ff6e9be1e74a7dd56b58a
 wdir: ../../..
 cmd: python main.py predict --cls BiDAF --model models/bidaf-model-2020.03.19.tar.gz
   --input data/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output data/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
 deps:
-- md5: 201509f054f678be1a266a069aa76eff
+- md5: 5d50239c75ac0811ab8b2146537d6e79
   path: data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
 outs:
 - md5: c43117fb4829a64256774ca837462ae1

@@ -77,6 +77,7 @@ def generate(config, output, n, k, seed, multispan, unanswerable, abstractive):
                         'target': l.target,
                         'evidence': l.evidence,
                         'event_type': l.event_type,
+                        'question_data': l.question_data,
                     } for l, (q, a) in qs
                 ]
             })

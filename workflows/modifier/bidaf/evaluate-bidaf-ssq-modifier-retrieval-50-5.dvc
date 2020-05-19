@@ -1,16 +1,16 @@
-md5: 1b86f48d0d74d820f474ff0c1b906618
+md5: 16cad7901c85b1d2038dd14552420465
 cmd: python main.py evaluate --predictions data/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
   --gold data/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output metrics/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
 wdir: ../../..
 deps:
 - md5: c43117fb4829a64256774ca837462ae1
   path: data/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
-- md5: 201509f054f678be1a266a069aa76eff
+- md5: 5d50239c75ac0811ab8b2146537d6e79
   path: data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
 - md5: be415035a4dad796640bc6ab7167b43f
   path: scripts/evaluate.py
 outs:
-- md5: 07b8404a2c41220d41e34a109bd64e95
+- md5: bc8b32ff40df8e5cd2943cf19bc5e583
   path: metrics/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
   cache: false
   metric: true

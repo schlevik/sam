@@ -31,9 +31,11 @@ class ModifierGenerator(StoryGenerator):
         # TODO: refactor with conditions
         # per-sentence action questions
         for event_type in self.EVENT_TYPES:
+            base_events = [event for event in story if event.event_type == event_type]
             events = (event for event in story if
                       event.event_type == event_type and self.MODIFIER not in event.features)
             for ith, event in enumerate(events):
+                modified = base_events[ith].sentence_nr != event.sentence_nr
                 q = Question(
                     type=QuestionTypes.DIRECT,
                     target="actor",
@@ -42,8 +44,9 @@ class ModifierGenerator(StoryGenerator):
                     # TODO: WHAT IF COREF ETC
                     answer=" ".join((event.actor['first'], event.actor['last'])),
                     reasoning=ReasoningTypes.Retrieval if ith == 0 else ReasoningTypes.OrderingEasy,
-                    question_data={"n": ith + 1}
+                    question_data={"n": ith + 1, "modified": modified}
                 )
+                logger.debug(f"Question: {q}")
                 if any(f"sent.actor" in v for v in visits[event.sentence_nr]):
                     single_span_questions.append(q)
                 else:
@@ -57,7 +60,7 @@ class ModifierGenerator(StoryGenerator):
                         target=attribute,
                         event_type=event_type,
                         reasoning=ReasoningTypes.Retrieval if ith == 0 else ReasoningTypes.OrderingEasy,
-                        question_data={"n": ith + 1},
+                        question_data={"n": ith + 1, "modified": modified},
 
                     )
                     if any(f"sent.attributes.{attribute}" in v for v in visits[event.sentence_nr]):
@@ -83,7 +86,9 @@ class ModifierGenerator(StoryGenerator):
                 event_type=event_type,
 
             )
+            base_events = sum(s.event_type == event_type for s in story)
             events = sum(s.event_type == event_type and self.MODIFIER not in s.features for s in story)
+            q.question_data['modified'] = base_events != events
             q.evidence = [s.sentence_nr for s in story if
                           s.event_type == event_type and self.MODIFIER not in s.features]
             if events > 1:
@@ -114,7 +119,13 @@ class ModifierGenerator(StoryGenerator):
                     return any(f"sent.attributes.{attribute}" in v for v in visits[s.sentence_nr]) and \
                            s.event_type == event_type and self.MODIFIER not in s.features
 
+                def base_condition(s):
+                    return any(f"sent.attributes.{attribute}" in v for v in visits[s.sentence_nr]) and \
+                           s.event_type == event_type
+
+                base_events = sum(1 for s in story if base_condition(s))
                 events = sum(1 for s in story if condition(s))
+                q.question_data['modified'] = base_events != events
                 q.evidence = [s.sentence_nr for s in story if condition(s)]
                 answers = [s.attributes[attribute] for s in story if condition(s)]
                 if attribute == 'coactor':
@@ -126,6 +137,9 @@ class ModifierGenerator(StoryGenerator):
                 elif events == 1:
                     q.reasoning = ReasoningTypes.Retrieval
                     q.answer = answers[0]
+                    if next(e.sentence_nr for e in story if condition(e)) == next(
+                            e.sentence_nr for e in story if base_condition(e)):
+                        q.question_data['easier'] = True
                     single_span_questions.append(q)
                 elif events < 1:
                     q.answer = None

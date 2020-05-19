@@ -15,7 +15,10 @@ from stresstest.realize import Realizer
 @click.option("-k", type=int, default=1)
 @click.option("--with-questions", is_flag=True, default=False)
 @click.option("--config", default='conf/baseline.json')
-def test(action, n, k, with_questions, config):
+@click.option("--multispan", is_flag=True, default=False)
+@click.option("--unanswerable", is_flag=True, default=False)
+@click.option("--abstractive", is_flag=True, default=False)
+def test(action, n, k, with_questions, config, multispan, unanswerable, abstractive):
     actions, sentences = get_templates(action, n, "Testing")
     if n is not None:
         click.secho(f"Testing: {action}.{n}:", fg='green')
@@ -50,7 +53,13 @@ def test(action, n, k, with_questions, config):
                         styled = realised
                     click.echo(styled)
                 if with_questions:
-                    labels = ["SSQs", "MSQs", "UAQs", "AQs"]
+                    labels = ["SSQs"]
+                    if multispan:
+                        labels += ["MSQs"]
+                    if unanswerable:
+                        labels += ["UAQs"]
+                    if abstractive_questions:
+                        labels += ['AQs']
                     for label, logical_qs in zip(labels, all_questions):
                         click.echo(f"{label}:")
                         for logical in logical_qs:
