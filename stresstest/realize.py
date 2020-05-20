@@ -2,13 +2,53 @@ import inspect
 import random
 import textwrap
 from collections import defaultdict
-from typing import List, Callable, Optional, Dict, Tuple, Union
+from copy import deepcopy
+from typing import List, Callable, Optional, Dict, Tuple, Union, Any
 
 from loguru import logger
 
-from stresstest.classes import S, YouIdiotException, F, Event, Context, Question
+from stresstest.classes import S, YouIdiotException, F, Event, Context, Question, World
 from stresstest.resources.templates import percent, sentences, at, dollar, bang, \
     question_templates as question_templates
+
+
+class RandomChooser:
+    def choose(self, choices, exclude=None):
+        if isinstance(choices, S):
+            return choices.random(exclude=exclude)
+        elif isinstance(choices, Callable):
+            return str(choices()).split()
+        elif isinstance(choices, List):
+            choice = random.choice(range(len(choices)))
+            return choices[choice], choice
+
+
+class DeterminedChooser(RandomChooser):
+    def __init__(self, choices: Optional[List[List[Tuple[str, Any]]]], sentence_choices: List[Tuple[str, int]]):
+        self.choices = choices
+        self.sentence_choices = sentence_choices
+        self.iter = self._iter()
+
+    def _iter(self):
+        for choices_for_ith_sentence, ith_sentence_template in zip(self.choices, self.sentence_choices):
+            yield ith_sentence_template
+            for choice in choices_for_ith_sentence:
+                yield choice
+
+    def choose(self, choices, exclude=None):
+        # logger.debug(f"Choosing from {choices}...")
+        if isinstance(choices, S):
+            name, idx = next(self.iter)
+            logger.debug(f"Choosing {name}.{idx}")
+            return choices[idx], idx
+        elif isinstance(choices, Callable):
+            name, content = next(self.iter)
+            logger.debug(f"For {name} choosing {content}")
+            return content
+        elif isinstance(choices, List):
+            name, choice = next(self.iter)
+            logger.debug(f"Choosing {choices}:{choice} ({name})")
+            return choices[choice], choice
 
 
 class Accessor:
@@ -52,9 +92,10 @@ class Accessor:
 
 
 class Processor:
-    def __init__(self, accessor: Accessor):
+    def __init__(self, accessor: Accessor, chooser: RandomChooser):
         self.accessor = accessor
         self.context = self.accessor.context
+        self.chooser = chooser
 
     def decide_process_function(self, word) -> Optional[Callable[[str], List[str]]]:
         if word.startswith("(") and word.endswith(")"):
@@ -92,7 +133,9 @@ class Processor:
         # stack = self.context['stack']
         logger.debug("...Word is an option ()...")
         # 50/50 whether to ignore it
-        if random.choice([True, False]):
+        include, idx = self.chooser.choose([True, False])
+        self.context.current_choices.append((word, idx))
+        if include:
             new_words = word[1:-1].split()
             logger.debug(f"... new words: {new_words}")
             return new_words
@@ -102,13 +145,12 @@ class Processor:
             return []
 
     def process_alternative(self, word):
-        # word = self.context['word']
-        # stack = self.context['stack']
         logger.debug("...Word is an alternative []...")
         alternatives = word[1:-1].split("|")
-        choice = random.choice(alternatives)
+        # choice = random.choice(alternatives)
+        choice, idx = self.chooser.choose(alternatives)
         logger.debug(f"...Choosing {choice}")
-        # stack.extend(choice.split()[::-1])
+        self.context.current_choices.append((word, idx))
         return choice.split()
 
     def process_condition(self, word):
@@ -120,8 +162,9 @@ class Processor:
             f"...Evaluating: {branch['condition'].__name__}\n{textwrap.dedent(inspect.getsource(branch['condition']))}")
         result = branch['condition'](self.context)
         logger.debug(f"with result: {result}")
-        new_words, idx = branch[result].random()
-        self.context.choices.append(f"{word}.{idx}")
+        # new_words, idx = branch[result].random()
+        new_words, idx = self.chooser.choose(branch[result])
+        self.context.choices[self.context.sent_nr].append((word, idx))
 
         logger.debug(f"... new words: {new_words}")
         new_words = [str(w) for w in new_words]
@@ -138,19 +181,27 @@ class Processor:
 
     def process_template(self, word):
         logger.debug("...Word is template $...")
-        logger.debug(f"Choices so far: {self.context.choices}")
-        exclude = [int(x.rsplit(".", 1)[-1]) for x in self.context.choices if x.startswith(word + '.')]
+        logger.debug(f"Choices so far: {self.context.choices[self.context.sent_nr]}")
+
+        # to not use the same template twice
+        exclude = [
+            choice for name, choice in self.context.current_choices if name.startswith(word + '.')
+        ]
         logger.debug(f"Excluding choices: {exclude}")
         try:
-            new_words, idx = self.accessor.access_dollar(word[1:]).random(exclude=exclude)
+            choices = self.accessor.access_dollar(word[1:])
+            # new_words, idx = choices.random(exclude=exclude)
+            # new_words, idx = self.chooser.choose(choices, exclude)
         except (KeyError, AttributeError) as _:
             logger.debug("Trying any...")
-            new_words, idx = self.accessor.access_dollar(word[1:] + ".any").random(exclude=exclude)
+            choices = self.accessor.access_dollar(word[1:] + ".any")
+
+            # new_words, idx = choices.random(exclude=exclude)
         except IndexError as _:
             raise YouIdiotException(f"Template {self.context.chosen_templates[-1]} uses '{word}' "
                                     f"more often than there are unique alternatives!")
-        new_words = new_words
-        self.context.choices.append(f"{word}.{idx}")
+        new_words, idx = self.chooser.choose(choices, exclude)
+        self.context.current_choices.append((word, idx))
         logger.debug(f"... new words: {new_words}")
         # self.context['stack'].extend(new_words)
         return new_words
@@ -159,8 +210,10 @@ class Processor:
         logger.debug("...Word is a function !...")
         # get and execute
         func = self.accessor.access_bang(word[1:])
-        new_words = str(func(self.context)).split()
+        # new_words = str(func(self.context)).split()
+        new_words = self.chooser.choose(lambda: func(self.context))
         logger.debug(f"... new words: {new_words}")
+        self.context.current_choices.append((word, new_words))
         # self.context['stack'].extend(new_words[::-1])
         return new_words
 
@@ -328,7 +381,8 @@ class Realizer:
         self.question_templates = prepare_templates(question_templates)
         self.accessor = Accessor(self.context, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
                                  question_templates=question_templates)
-        self.processor = Processor(self.accessor)
+        self.chooser = RandomChooser()
+        self.processor = Processor(self.accessor, self.chooser)
         if validate:
             validator = Validator(self.processor)
             logger.debug("Validating templates...")
@@ -354,17 +408,19 @@ class Realizer:
         logger.error(msg)
         return YouIdiotException(msg)
 
-    def realise_story(self, sentences: List[Event], world) -> Tuple[List[str], Dict]:
+    def realise_story(self, events: List[Event], world) -> Tuple[List[str], Dict]:
         self.context = Context()
         self.processor.context = self.context
         self.accessor.context = self.context
         self.context.world = world
-        self.context.sentences = sentences
+        self.context.sentences = events
         self.context.chosen_templates = list()
+        self.context.choices = []
         self.context.visits = defaultdict(list)
         self.context.realizer = self
+
         realised = []
-        for self.context.sent_nr, self.context.sent in enumerate(sentences):
+        for self.context.sent_nr, self.context.sent in enumerate(events):
             logger.debug(self.context.sent)
             # try:
             # except Exception as e:
@@ -373,6 +429,12 @@ class Realizer:
             realised.append(sent)
         return realised, self.context.visits
 
+    def realise_with_choices(self, events: List[Event], world: World, choices: List[List[Tuple[Any, int]]],
+                             chosen_templates):
+        self.chooser = DeterminedChooser(choices, chosen_templates)
+        self.processor.chooser = self.chooser
+        return self.realise_story(events, world)
+
     def realise_sentence(self):
         ctx: Context = self.context
         logger.debug(f"===PROCESSING NEW SENTENCE: #{ctx.sent_nr}, event = {ctx.sent.event_type}===")
@@ -380,25 +442,24 @@ class Realizer:
         # select template and the chosen number (for tracking purposes)
         logger.debug(f"Use unique sentences?: {self.unique_sentences}")
         if self.unique_sentences:
-            exclude = [int(x.rsplit(".", 1)[-1]) for x in self.context.chosen_templates if
-                       x.startswith(ctx.sent.event_type + '.')]
+            exclude = [idx for event_type, idx in self.context.chosen_templates if
+                       event_type.startswith(ctx.sent.event_type + '.')]
             logger.debug(f'Choices to exclude... {exclude}')
-            if len(exclude) == len(self.sentences[ctx.sent.event_type]):
+            if len(exclude) >= len(self.sentences[ctx.sent.event_type]):
                 raise YouIdiotException(f"Your story has more '{ctx.sent.event_type}' events (> {len(exclude)}) "
                                         f"than you have choices for ({len(self.sentences[ctx.sent.event_type])})!")
         else:
             exclude = []
-        template, template_nr = self.sentences[ctx.sent.event_type].random(exclude=exclude)
-
+        # template, template_nr = self.sentences[ctx.sent.event_type].random(exclude=exclude)
+        template, template_nr = self.chooser.choose(self.sentences[ctx.sent.event_type], exclude=exclude)
         # set chosen template
-        self.context.chosen_templates.append(f"{ctx.sent.event_type}.{template_nr}")
-
+        self.context.chosen_templates.append((ctx.sent.event_type, template_nr))
         # initialise context
         self.context.realized = []
-        self.context.choices = []
-        self.context.stack = template
-        self.context.stack.reverse()
-
+        self.context.choices.append(list())
+        self.context.stack = template[::-1]
+        # self.context.stack.reverse()
+        logger.debug(f"Template: {template}")
         # while there's something on the stack
         while self.context.stack:
 
@@ -476,7 +537,7 @@ class Realizer:
             word = stack.pop()
             logger.debug(word)
 
-            # alternative as in ()
+            # option as in ()
             if word.startswith("(") and word.endswith(")"):
                 new_words = self.processor.process_option(word)
                 stack.extend(new_words[::-1])
