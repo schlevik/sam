@@ -275,16 +275,20 @@ class World(DataObjectMixin):
 class Context(DataObjectMixin):
     world: World
     sentences: List[Event]
-    chosen_templates: List[str]
+    chosen_templates: List[Tuple[str, int]]
     visits: Dict[int, List[str]]
     sent: Event
     realized: List[str]
-    choices: List[str]
+    choices: List[List[Tuple[str, Any]]]
     stack: List[str]
     word: str
     other: Dict[str, Any]
     realizer: Any
     sent_nr: int
+
+    @property
+    def current_choices(self) -> List[Tuple[str, Any]]:
+        return self.choices[self.sent_nr]
 
 
 class QuestionTypes:
