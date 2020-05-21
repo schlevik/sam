@@ -2,22 +2,111 @@ import random
 from typing import List, Dict
 
 from loguru import logger
+from overrides import overrides
 
 from stresstest.generate import StoryGenerator
-from stresstest.classes import Event, QuestionTypes, ReasoningTypes, Question
+from stresstest.classes import Event, QuestionTypes, ReasoningTypes, Question, Choices, YouIdiotException
+from stresstest.util import fmt_dict
 
 
 class ModifierGenerator(StoryGenerator):
+    def __init__(self, config, first_modification=0, fill_with_modification=None, modify_event_types=None,
+                 modification_distance=1, total_modifiable_actions=2):
+        """
+
+
+        Args:
+            config: The config.
+            first_modification: Which event to modify first.
+            modification_distance: How many events away the new first event is from the modified one.
+            fill_with_modification:
+                True: Fill with modified events; False: Don't fill with modified events: None: decide randomly
+            modify_event_types: Which event types to modify
+            total_modifiable_actions: How many actions to modify
+        """
+        super().__init__(config)
+        self.first_modification = first_modification
+        self.fill_with_modifications = fill_with_modification
+        self.modify_event_type = modify_event_types or ['goal']
+        self.modification_distance = modification_distance
+        self.total_modifiable_actions = 2
+        self.current_modifiable_actions = 0
+        if not total_modifiable_actions > modification_distance and fill_with_modification:
+            raise YouIdiotException("Can't have less modifiable actions than modification distance tho!")
+        self.in_modification_distance = False
+
     MODIFIER = "modifier"
 
+    def _determine_if_modify(self):
+        actual_event = self.current_event.sentence_nr == self.first_modification + self.modification_distance
+        first_modify = self.current_event.sentence_nr == self.first_modification
+        before_first_modify = self.current_event.sentence_nr < self.first_modification
+        in_modification_distance = self.in_modification_distance
+        after_modification_distance = self.current_event.sentence_nr > self.first_modification + self.modification_distance
+
+        logger.debug(fmt_dict(locals()))
+
+        if actual_event or before_first_modify or after_modification_distance:
+            return False
+        if first_modify or in_modification_distance:
+            return True
+        raise NotImplementedError()
+
+    @overrides
+    def set_actor(self):
+        actual_event = self.current_event.sentence_nr == self.first_modification + self.modification_distance
+        logger.debug(fmt_dict(locals()))
+
+        if actual_event:
+            modified_actors = [sent.actor for sent in self.sentences if
+                               sent.event_type in self.modify_event_type and self.MODIFIER in sent.features]
+            self.current_event.actor = Choices([p for p in self.world['players'] if p not in modified_actors]).random()
+        else:
+            super().set_actor()
+
+    @overrides
+    def set_action(self):
+        actual_event = self.current_event.sentence_nr == self.first_modification + self.modification_distance
+        first_modify = self.current_event.sentence_nr == self.first_modification
+        before_first_modify = self.current_event.sentence_nr < self.first_modification
+        fill_with_modification = random.choice((True, False)) \
+            if self.fill_with_modifications is None \
+            else self.fill_with_modifications
+        logger.debug(fmt_dict(locals()))
+        if actual_event or first_modify:
+            if first_modify:
+                self.in_modification_distance = True
+            elif actual_event:
+                self.in_modification_distance = False
+            self.current_event.event_type = self.EVENT_TYPES.keep_only(*self.modify_event_type).random()
+            self.current_modifiable_actions += 1
+
+        elif self.in_modification_distance or before_first_modify:
+            if self.in_modification_distance and fill_with_modification:
+                self.current_event.event_type = self.EVENT_TYPES.keep_only(*self.modify_event_type).random()
+                self.current_modifiable_actions += 1
+            else:
+                self.current_event.event_type = (self.EVENT_TYPES - self.modify_event_type).random()
+        else:
+            if self.current_modifiable_actions < self.total_modifiable_actions:
+                # if sentences left <= desired total modifiable actions - current modifiable actions
+                sentences_left = self.world.num_sentences - self.current_event.sentence_nr
+                if sentences_left <= self.total_modifiable_actions - self.current_modifiable_actions:
+                    self.EVENT_TYPES.keep_only(*self.modify_event_type).random()
+                else:
+                    super().set_action()
+                if self.current_event.event_type in self.modify_event_type:
+                    self.current_modifiable_actions += 1
+            else:
+                self.current_event.event_type = (self.EVENT_TYPES - self.modify_event_type).random()
+
+    @overrides
     def set_anything_else(self):
         # TODO: for now only for goal
-        if self.sentence.event_type == 'goal':
-            # TODO: maybe more control
-            logger.debug("Setting anything else...")
-            if random.choice([True, False]):
-                logger.debug("Modified!")
-                self.sentence.features.append(self.MODIFIER)
+        logger.debug(f"Modify event #{self.current_event.sentence_nr}?")
+        if self.current_event.event_type in self.modify_event_type and self._determine_if_modify():
+            logger.debug("Modified!")
+            self.current_event.features.append(self.MODIFIER)
         else:
             logger.debug("Not modified!")
 
@@ -29,11 +118,12 @@ class ModifierGenerator(StoryGenerator):
         unanswerable_questions = []
         abstractive_questions = []
         # TODO: refactor with conditions
-        # per-sentence action questions
         for event_type in self.EVENT_TYPES:
             base_events = [event for event in story if event.event_type == event_type]
             events = (event for event in story if
                       event.event_type == event_type and self.MODIFIER not in event.features)
+
+            # per-sentence action questions
             for ith, event in enumerate(events):
                 modified = base_events[ith].sentence_nr != event.sentence_nr
                 q = Question(
@@ -98,9 +188,8 @@ class ModifierGenerator(StoryGenerator):
                 multi_span_questions.append(q)
             elif events == 1:
                 q.reasoning = ReasoningTypes.Retrieval
-                q.answer = next(
-                    " ".join((s.actor['first'], s.actor['last'])) for s in story if
-                    s.event_type == event_type and self.MODIFIER not in s.features)
+                q.answer = next(" ".join((s.actor['first'], s.actor['last'])) for s in story if
+                                s.event_type == event_type and self.MODIFIER not in s.features)
                 single_span_questions.append(q)
             elif events < 1:
                 q.answer = None

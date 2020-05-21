@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple, Optional
 import random
 import names
 from loguru import logger
@@ -7,6 +7,7 @@ from stresstest.classes import Choices, Event, World, Team, Player, Question, Qu
 
 
 class StoryGenerator:
+    current_event: Optional[Event]
     EVENT_TYPES = Choices(['goal', 'foul'])
     ATTRIBUTES = Choices(['time', 'distance', 'coactor'])
     # ACTORS = Choices(['player'])
@@ -73,11 +74,11 @@ class StoryGenerator:
             world.players_by_id[p2['id']] = p2
         self.world = world
 
-        logger.info("World:")
-        logger.info(self.world)
+        logger.debug("World:")
+        logger.debug(self.world)
 
     def set_action(self):
-        self.sentence.event_type = self.EVENT_TYPES.random()
+        self.current_event.event_type = self.EVENT_TYPES.random()
 
     def handle_attribute(self, name):
 
@@ -94,46 +95,58 @@ class StoryGenerator:
             return random.choice(list(range(last_ts, 90)))
 
         if name == 'coactor':
-            if self.sentence.event_type == 'foul':
+            if self.current_event.event_type == 'foul':
                 player = Choices(
                     p['id'] for p in self.world['players'] if
-                    p['team'] != self.sentence.actor['team']).random()
+                    p['team'] != self.current_event.actor['team']).random()
 
-            elif self.sentence.event_type == 'goal':
+            elif self.current_event.event_type == 'goal':
                 player = Choices(p['id'] for p in self.world['players'] if
-                                 p['team'] == self.sentence.actor['team'] and p != self.sentence.actor).random()
+                                 p['team'] == self.current_event.actor[
+                                     'team'] and p != self.current_event.actor).random()
             else:
                 raise NotImplementedError()
             return self.world['players_by_id'][player]
 
     def set_attributes(self):
-        self.sentence.attributes = dict()
+        self.current_event.attributes = dict()
         choices = self.ATTRIBUTES
-        if self.sentence.event_type == 'foul':
+        if self.current_event.event_type == 'foul':
             choices = choices - ['distance']
         for attribute in choices:
-            self.sentence.attributes[attribute] = self.handle_attribute(attribute)
+            self.current_event.attributes[attribute] = self.handle_attribute(attribute)
 
     def set_actor(self):
-        self.sentence.actor = Choices.random(self.world['players'])
+        self.current_event.actor = Choices.random(self.world['players'])
 
     def set_modes(self):
         ...
 
     def set_anything_else(self):
-        self.sentence.cause = self.CAUSES.random()
+        self.current_event.cause = self.CAUSES.random()
         # TODO: logics here
-        if self.sentence.event_type != "goal":
-            self.sentence.effect = self.EFFECTS.random()
+        if self.current_event.event_type != "goal":
+            self.current_event.effect = self.EFFECTS.random()
 
     def generate_sentence(self, sentence_nr):
-        self.sentence = Event(sentence_nr)
+        logger.debug(f"Generating Sentence #{sentence_nr}")
+        self.current_event = Event(sentence_nr)
+        logger.debug("Setting Action...")
         self.set_action()
+        logger.debug(f"Action: {self.current_event.event_type}")
+        logger.debug("Setting Actor...")
         self.set_actor()
+        logger.debug(f"Actor: {self.current_event.actor.id}")
+        logger.debug("Setting Attributes...")
         self.set_attributes()
+        logger.debug(f"Attributes: {self.current_event.attributes}")
+        logger.debug("Setting Anything Else...")
         self.set_anything_else()
+        logger.debug(f"Event so far: {self.current_event}")
+        logger.debug("Setting Modes...")
         self.set_modes()
-        self.sentences.append(self.sentence)
+        logger.debug("Done!")
+        self.sentences.append(self.current_event)
 
     def generate_story(self) -> List[Event]:
         self.set_world()
@@ -143,7 +156,8 @@ class StoryGenerator:
         return self.sentences
 
     def generate_questions(self, story: List[Event],
-                           visits: Dict[int, List[str]]):
+                           visits: Dict[int, List[str]]) -> Tuple[
+        List[Question], List[Question], List[Question], List[Question]]:
         # extractive
         single_span_questions = []
         multi_span_questions = []

@@ -19,3 +19,7 @@ def sample_iter(sample: List[Dict[str, Any]], full=False):
                 yield datum['id'], passage, qa['id'], qa['question'], qa['answer'], qa
             else:
                 yield datum['id'], passage, qa['id'], qa['question'], qa['answer']
+
+
+def fmt_dict(dct: dict):
+    return "{{{}}}".format(', '.join(f"'{k}': {v}" for k, v in dct.items() if k != "self" and not k.startswith("_")))

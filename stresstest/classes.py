@@ -76,7 +76,7 @@ class Choices(Iterable[T]):
     def remove_all_but(self, *nodes: T) -> None:
         self.remove([n for n in self if n not in nodes])
 
-    def all_but(self, *nodes: T) -> 'Choices':
+    def keep_only(self, *nodes: T) -> 'Choices':
         c = Choices(self.choices)
         c.remove_all_but(*nodes)
         return c
@@ -239,7 +239,7 @@ class Event(DataObjectMixin):
     sentence_nr: int
     event_type: str
     attributes: Dict[str, Union[str, Player]]
-    actor: Dict[str, str]
+    actor: Player
     cause: Optional[str]
     effect: Optional[str]
     modes: List[Tuple[str, str]]
@@ -285,6 +285,7 @@ class Context(DataObjectMixin):
     other: Dict[str, Any]
     realizer: Any
     sent_nr: int
+
 
     @property
     def current_choices(self) -> List[Tuple[str, Any]]:

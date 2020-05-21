@@ -1,7 +1,7 @@
 import click
 
 from scripts.utils import write_json, get_templates
-from stresstest.realize import SizeEstimator, Processor, Accessor
+from stresstest.realize import SizeEstimator, Processor, Accessor, RandomChooser
 
 
 @click.command()
@@ -12,9 +12,9 @@ def count(action, n, output):
     result = {}
     actions, sentences = get_templates(action, n, "Counting")
     for action in actions:
-        r = SizeEstimator(processor=Processor(accessor=Accessor(sentences=sentences)))
+        r = SizeEstimator(processor=Processor(accessor=Accessor(sentences=sentences), chooser=RandomChooser()))
         upper_bound = r.estimate_size(r.processor.accessor.sentences[action])
-        r = SizeEstimator(processor=Processor(accessor=Accessor(sentences=sentences)))
+        r = SizeEstimator(processor=Processor(accessor=Accessor(sentences=sentences), chooser=RandomChooser()))
         lower_bound = r.estimate_size(r.processor.accessor.sentences[action], pessimistic=True)
         click.secho(
             f"Pessimistically speaking, you can generate {click.style(str(lower_bound), fg='red', bold=True)} "

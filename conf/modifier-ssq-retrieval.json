@@ -6,7 +6,11 @@
   "reasoning": [
     "retrieval"
   ],
-  "question_types": [
+  "answer_types": [
     "ssq"
-  ]
+  ],
+  "world": {
+    "num_sentences": 6
+  },
+  "modify_event_types": ['goal']
 }
