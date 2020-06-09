@@ -1,0 +1,28 @@
+md5: 40f8708342a69b8d16805af6266386c0
+cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval.json --seed
+  56 -n 50 -k 5 --out-path data/modifier/ --do-save
+wdir: ../..
+deps:
+- md5: ac83f272a7f5516458141205c0df1532
+  path: scripts/generate_modifier.py
+- md5: 6974788c2572151525893e323eaef9bf
+  path: stresstest/realize.py
+- md5: b98772ddc6d8b39e5597999398a816dc
+  path: stresstest/resources/templates_modifier.py
+- md5: 86aaadcf4b120ddec0915b8d035e0746
+  path: stresstest/generate.py
+- md5: 9a407e1cfa5ace90d5dd20bccd223e13
+  path: stresstest/generate_special/generate_with_modifier.py
+- md5: f238f99008c6f657188efcd358e8fb27
+  path: conf/modifier-ssq-retrieval.json
+outs:
+- md5: c821bbc174ae7c7f9141e67e0501ebf2
+  path: data/modifier/stresstest-ssq-baseline-retrieval-50-5.json
+  cache: true
+  metric: false
+  persist: false
+- md5: 57fca306ef946c3da055e507183425b8
+  path: data/modifier/stresstest-ssq-modifier-retrieval-50-5.json
+  cache: true
+  metric: false
+  persist: false

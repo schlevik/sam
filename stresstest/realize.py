@@ -524,6 +524,7 @@ class Realizer:
         return new_answers if isinstance(question.answer, list) else new_answers[0]
 
     def realise_question(self, q: Question, passage: List[str]):
+        self.processor.chooser = RandomChooser()
         logger.debug(f"Question: {q}")
         try:
             template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()

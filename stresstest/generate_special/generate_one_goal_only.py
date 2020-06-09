@@ -14,7 +14,7 @@ class OneGoalStoryGenerator(StoryGenerator):
         # if last sentence, must be goal
         if self.goal_scored():
             actions = actions - 'goal'
-        elif self.world['num_sentences'] - 1 == self.sentence.sentence_nr:
+        elif self.world['num_sentences'] - 1 == self.current_event.sentence_nr:
             actions = actions - 'foul'
 
-        self.sentence.event_type = actions.random()
+        self.current_event.event_type = actions.random()
