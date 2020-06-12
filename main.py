@@ -4,6 +4,7 @@ import importlib
 import click
 from click import Command
 from loguru import logger
+from tqdm import tqdm
 
 
 @click.group()
@@ -12,6 +13,8 @@ def cli(debug):
     if not debug:
         logger.remove(0)
     else:
+        logger.remove()
+        logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True)
         logger.add("./logs/debug.log", level='DEBUG', rotation='50MB', compression="zip")
         logger.debug('Set up logging.')
 
