@@ -1,7 +1,7 @@
-md5: 05b04d25d682042081483cdcbf154125
+md5: 17c546fafb37c6a0a144f6124829e620
 cmd: python main.py report --diversity metrics/modifier/diversity-modifier.json --baseline
   metrics/modifier/bidaf/bidaf-ssq-baseline-retrieval-50-5.json --intervention metrics/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
-  --count metrics/modifier/count-modifier.json
+  --count metrics/modifier/count-modifier.json --naturality metrics/modifier/naturality-modifier.json
 wdir: ../../..
 deps:
 - md5: a3105f6ab5a1a8427c1a834230bd476c
@@ -10,7 +10,9 @@ deps:
   path: metrics/modifier/bidaf/bidaf-ssq-baseline-retrieval-50-5.json
 - md5: 02700ca0e6994bb94998239cef12b37a
   path: metrics/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
-- md5: 88c31c850750840e91463d4353dcc099
+- md5: cf5233e21cda5a4f66dbe36f4e9f06bd
   path: scripts/final.py
 - md5: cea433e07dfcd331d5359fcff829f1aa
   path: metrics/modifier/count-modifier.json
+- md5: 3c5da98e97477d604726ddba87fd7372
+  path: metrics/modifier/naturality-modifier.json

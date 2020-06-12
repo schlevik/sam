@@ -1,7 +1,7 @@
 md5: 5f0191c616bbcc2972d778114bcb7172
 cmd: python main.py report --diversity metrics/modifier/diversity-modifier.json --baseline
   metrics/modifier/albert/albert-ssq-baseline-retrieval-50-5.json --intervention metrics/modifier/albert/albert-ssq-modifier-retrieval-50-5.json
-  --count metrics/modifier/count-modifier.json
+  --count metrics/modifier/count-modifier.json --naturality metrics/modifier/naturality-modifier.json
 wdir: ../../..
 deps:
 - md5: 15d4818d50393d2aff8914f552487e79
@@ -14,3 +14,5 @@ deps:
   path: scripts/final.py
 - md5: cea433e07dfcd331d5359fcff829f1aa
   path: metrics/modifier/count-modifier.json
+- md5: a3105f6ab5a1a8427c1a834230bd476c
+  path: metrics/modifier/naturality-modifier.json

@@ -4,6 +4,7 @@ from collections import defaultdict
 import click
 import quickconf
 from loguru import logger
+from tabulate import tabulate
 from tqdm import tqdm
 
 from stresstest.classes import Model
@@ -27,22 +28,43 @@ def report(diversity, count, baseline, intervention, naturality):
         naturality_diff = None
     # TODO
     click.secho("Diversity: ", fg='green')
+    table = []
     for metric, v in diversity_diff.items():
         if metric != 'num_samples':
-            click.echo(f'For "{metric}" metric:')
-            click.echo(f"Ours: {str(v['ours']['human_readable'])} Reference: {str(v['reference']['human_readable'])}")
-            click.echo(f"Difference: {v['difference']['difference']}")
-            click.echo(f"Within Confidence Interval? "
-                       f"{click.style('yes', fg='green') if v['difference']['within_ci'] else click.style('no', fg='red')}")
+            # click.echo(f'For "{metric}" metric:')
+            # click.echo(f"Ours: {str(v['ours']['human_readable'])} "
+            #           f"Reference: {str(v['reference']['human_readable'])}")
+            # click.echo(f"Difference: {v['difference']['difference']}")
+            table.append([
+                click.style(metric, fg='green'),
+                str(v['ours']['human_readable']),
+                str(v['reference']['human_readable']),
+                f"{v['difference']['difference']}"
+            ])
+            # click.echo(f"Within Confidence Interval? "
+            #           f"{click.style('yes', fg='green') if v['difference']['within_ci']
+            #           else click.style('no', fg='red')}")
+
+    click.echo(tabulate(table, headers=[click.style('Index', bold=True), click.style('Stress-test', bold=True),
+                                        click.style('Reference', bold=True), click.style('Difference', bold=True)]))
+    click.secho("Naturality: ", fg='green')
+    table = []
+    if naturality_diff:
+        for metric, v in naturality_diff.items():
+            if metric != 'num_samples':
+                table.append([
+                    click.style(metric, fg='green'),
+                    str(v['ours']['human_readable']),
+                    str(v['reference']['human_readable']),
+                    f"{v['difference']['difference']}"
+                ])
+    click.echo(tabulate(table, headers=[click.style('Metric', bold=True), click.style('Stress-test', bold=True),
+                                        click.style('Reference', bold=True), click.style('Difference', bold=True)]))
 
     click.secho("Configuration estimate: ", fg='green')
     for k, v in count.items():
         click.echo(f'For "{k}" event type:')
         click.echo(f"Upper bound: {v['upper']} Lower bound: {v['lower']}")
-
-    if naturality_diff:
-        click.secho("Naturality: ", fg='green')
-        click.echo(f"{naturality_diff}")
 
     click.secho("Baseline performance: ", fg='green')
     for metric, v in baseline_score['full'].items():
