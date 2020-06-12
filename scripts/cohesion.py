@@ -1,83 +1,118 @@
+import glob
 import math
+import os
+import subprocess
+import tempfile
+from collections import defaultdict
 from operator import itemgetter
 import numpy as np
 import click
-import quickconf
-from typing import Iterable
+
+from typing import Dict, List, Any, Callable
 from loguru import logger
 import json
-
+import pandas as pd
 from scipy.stats import t
+from tqdm import tqdm
 
 from scripts.utils import write_json
-from stresstest.textmetrics import pointwise_average_distance, Distance
 from stresstest.util import load_json
+
+DEFAULT_INDICES = [
+    # NEG: adjacent sentence verb lemma overlap
+    'adjacent_overlap_verb_sent', 'adjacent_overlap_verb_sent_div_seg', 'adjacent_overlap_binary_verb_sent',
+    'adjacent_overlap_2_verb_sent', 'adjacent_overlap_2_verb_sent_div_seg', 'adjacent_overlap_binary_2_verb_sent',
+    # POS: w2v semantic similarity sentence(s)
+    'word2vec_1_all_sent', 'word2vec_2_all_sent',
+    # NEG: Lemma TTR
+    'lemma_ttr', 'lemma_mattr',
+    # NEG: Pronoun to noun ratio
+    'pronoun_noun_ratio'
+]
+
+
+def apply_taaco(corpus: List[str], taaco_dir, indices) -> Dict[str, List[float]]:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # convert & write corpus into docs
+        data_path = f"{temp_dir}/data"
+        results_path = f"{temp_dir}/results.csv"
+        os.mkdir(os.path.join(temp_dir, 'data'))
+        logger.debug(f"{len(corpus)} documents to process with taaco.")
+        for i, doc in enumerate(corpus):
+            with open(os.path.join(data_path, f'{i:03}.txt'), "w+") as f:
+                f.write(doc)
+        logger.debug(f"{len(glob.glob(os.path.join(data_path, '*')))} files created.")
+        # run taaco
+        cmd = f'python cli_folders.py --indir {data_path} --outdir {results_path} ' \
+              f'--working-dir {temp_dir} --config taaco.ini'.split()
+        subprocess.call(cmd, shell=False, cwd=taaco_dir, stdout=subprocess.DEVNULL)
+        df = pd.read_csv(results_path, sep=',', header=0)
+        return {x: list(df[x]) for x in df.columns[1:] if x in indices}
 
 
 @click.command()
 @click.option("--input", type=str, default="data/stresstest.json")
 @click.option("--reference", type=str, default="data/drop_nfl.json")
-@click.option("--output", type=str, default="metrics/compare.json")
-# @click.option("--flat", default=False, is_flag=True)
+@click.option("--output", type=str, default="metrics/quality.json")
 @click.option("--attr", type=str, default='passage')
-@click.option("--metric", type=str, default='Jaccard')
-def diversity(input, reference, output, attr, metric):
-    # TODO: make metrics appendable
-    metric_class = quickconf.load_class(metric, restrict_to=Distance, relative_import='stresstest.textmetrics')
+@click.option("--taaco-dir", type=str, default='lib/taaco/')
+@click.option('--indices', type=str, default=None)
+def quality(input, reference, output, attr, taaco_dir, indices):
+    if not indices:
+        indices = DEFAULT_INDICES
+    else:
+        indices = indices.split(",")
+
     samples = load_json(input)
     reference = load_json(reference)
-    distances = []
-    getter = itemgetter(attr)
-    # if flat:
-    #    samples = [samples]
+    scores = defaultdict(list)
+    getter: Callable[[Any], str] = itemgetter(attr)
     logger.debug(f"Evaluating {len(samples)} sample(s).")
-    # samples
-    for i, sample in enumerate(samples):
+
+    for i, sample in enumerate(tqdm(samples)):
         logger.debug(f"Sample #{i} has {len(sample)} paragraphs.")
-        corpus: Iterable[str] = (getter(s) for s in sample)
-        result = pointwise_average_distance(corpus, metric_class())
-        result = np.array(result)
-        # printable_result = f'{result.mean()} ± {2 * result.std() / math.sqrt(len(result))}'
-        distances.append(result.mean())
+        corpus: List[str] = [getter(s) for s in sample]
+        result = apply_taaco(corpus, taaco_dir, indices)
+        for index, values in result.items():
+            scores[index].append(np.array(values, dtype=np.float).mean())
 
-    distances = np.array(distances)
-    t_975 = t.ppf(1 - .025, df=len(samples) - 1)
-    ci95 = t_975 * distances.std() / math.sqrt(len(distances))
-    printable_result = f'{distances.mean():.4f} +/- {ci95:.4f}'
-    click.echo(f"Pointwise average distance under the {click.style(metric, fg='green')} metric: "
-               f"{click.style(printable_result, fg='green', bold=True)}")
+    corpus_reference: List[str] = [getter(s) for s in reference]
+    scores_reference = apply_taaco(corpus_reference, taaco_dir, indices)
 
-    # reference
-    corpus_reference: Iterable[str] = (getter(s) for s in reference)
-    result_reference = np.array(pointwise_average_distance(corpus_reference, metric_class()))
-    printable_result_reference = f'{result_reference.mean():.4f}'
+    final_result = {
+        "num_samples": len(samples)
+    }
 
-    click.echo(f"Reference pointwise average distance under the {click.style(metric, fg='green')} metric: "
-               f"{click.style(printable_result_reference, fg='green', bold=True)}")
-    result_reference = result_reference.mean()
+    for index, values in scores.items():
+        values = np.array(values)
+        values_reference = np.array(scores_reference[index])
+        t_975 = t.ppf(1 - .025, df=len(samples) - 1)
+        ci95 = t_975 * values.std() / math.sqrt(len(values))
 
-    within_ci = abs(distances.mean() - result_reference) < t_975 * distances.std() / math.sqrt(len(distances))
-    result = {
-        "num_samples": len(samples),
-        metric: {
+        printable_result = f'{values.mean():.4f} +/- {ci95:.4f}'
+        printable_result_reference = f'{values_reference.mean():.4f}'
+
+        click.echo(f"Average over {len(samples)} runs for {click.style(index, fg='green')} index: "
+                   f"{click.style(printable_result, fg='green', bold=True)}")
+        click.echo(f"Reference average for {click.style(index, fg='green')} metric: "
+                   f"{click.style(printable_result_reference, fg='green', bold=True)}")
+        final_result[index] = {
             'ours': {
                 'human_readable': printable_result,
-                'mean': distances.mean(),
-                'variance': distances.var(),
+                'mean': values.mean(),
+                'variance': values.var(),
                 '95ci': ci95,
             },
             "reference": {
                 'human_readable': printable_result_reference,
-                'mean': result_reference,
+                'mean': values_reference.mean(),
             },
             "difference": {
-                "difference": distances.mean() - result_reference,
-                "within_ci": bool(within_ci)
+                "difference": values.mean() - values_reference.mean(),
+                # "within_ci": bool(within_ci)
             }
-        },
-
-    }
-    write_json(result, output)
+        }
+    write_json(final_result, output)
 
 
 @click.command()
