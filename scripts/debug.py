@@ -5,7 +5,7 @@ from quickconf import load_class
 
 from scripts.utils import get_templates
 from stresstest.classes import Config
-from stresstest.generate import StoryGenerator
+from stresstest.generator import StoryGenerator
 from stresstest.realize import Realizer
 
 

@@ -1,1 +1,1 @@
-from stresstest import classes
+implemented_domains = ['football']

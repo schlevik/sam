@@ -1,3 +1,4 @@
+import inspect
 import json
 import random
 import re
@@ -5,7 +6,8 @@ from copy import deepcopy
 from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple, Callable
 
 from loguru import logger
-from quickconf import ConfigReader
+from pyhocon import ConfigFactory
+
 
 T = TypeVar("T")
 V = TypeVar("V")
@@ -91,7 +93,7 @@ class Config(Mapping):
     """
 
     def __init__(self, templates_path: str):
-        self.cfg = ConfigReader(templates_path).read_config()
+        self.cfg = ConfigFactory().parse_file(templates_path)
 
     def __getitem__(self, k):
         return self.cfg[k]
@@ -202,14 +204,27 @@ class DataObjectMixin(Mapping):
     def __len__(self) -> int:
         return len(self.__dict__)
 
+    def _get_annotations(self):
+        annotations = dict(self.__annotations__)
+        classes = [c for c in inspect.getmro(self.__class__)]
+        classes = classes[:classes.index(DataObjectMixin)]
+        for base_class in classes:
+            annotations.update(base_class.__annotations__)
+        return annotations
+
     def __init__(self, *args, **kwargs):
-        for a, k in zip(args, self.__annotations__.keys()):
+        annotations = self._get_annotations()
+
+        for a, k in zip(args, annotations.keys()):
             setattr(self, k, a)
         for k, v in kwargs.items():
-            if k not in self.__annotations__:
+            if k not in annotations:
                 raise YouIdiotException(f"You tried to create {self.__class__} with constructor {k}, but it's not in"
-                                        f"it's annotations! ({list(self.__annotations__.keys())})")
+                                        f" it's annotations! ({list(self.__annotations__.keys())})")
             setattr(self, k, v)
+        for k in annotations.keys():
+            if k not in self.__dict__:
+                setattr(self, k, None)
 
     def __getitem__(self, item):
         try:
@@ -218,28 +233,35 @@ class DataObjectMixin(Mapping):
             raise YouIdiotException(f"{self.__class__.__name__} doesn't have attribute {item}!")
 
     def __repr__(self):
-        attrs = ", ".join(f"{k}={self[k]}" for k in self.__annotations__)
+        attrs = ", ".join(f"{k}={self[k]}" for k in self._get_annotations())
         return f"{self.__class__.__name__}({attrs})"
 
 
-class Team(DataObjectMixin):
-    id: str
-    name: str
+class World(DataObjectMixin):
+    num_sentences: int
+    # MALE = 'male'
+    # FEMALE = 'female'
+    # gender: str
+    # teams: Tuple[Team, Team]
+    # num_players: int
+    # players: List[Player]
+    # players_by_id: Dict[str, Player]
 
 
-class Player(DataObjectMixin):
-    id: str
-    first: str
-    last: str
-    team: Team
-    position: str
+class Bundle(DataObjectMixin):
+    # world, generator, templates
+    generator: Any
+    templates: Dict[str, Any]
+    generator_modifier: Dict[str, Any]
+    templates_modifier: Dict[str, Any]
+    world: World
 
 
 class Event(DataObjectMixin):
     sentence_nr: int
     event_type: str
-    attributes: Dict[str, Union[str, Player]]
-    actor: Player
+    attributes: Dict[str, Union[str, Any]]
+    actor: Any
     cause: Optional[str]
     effect: Optional[str]
     modes: List[Tuple[str, str]]
@@ -261,17 +283,6 @@ class Event(DataObjectMixin):
                 f"Modes: {self.modes}, Features: {self.features}")
 
 
-class World(DataObjectMixin):
-    MALE = 'male'
-    FEMALE = 'female'
-    gender: str
-    num_sentences: int
-    teams: Tuple[Team, Team]
-    num_players: int
-    players: List[Player]
-    players_by_id: Dict[str, Player]
-
-
 class Context(DataObjectMixin):
     world: World
     sentences: List[Event]
@@ -285,7 +296,6 @@ class Context(DataObjectMixin):
     other: Dict[str, Any]
     realizer: Any
     sent_nr: int
-
 
     @property
     def current_choices(self) -> List[Tuple[str, Any]]:

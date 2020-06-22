@@ -1,15 +1,15 @@
-from loguru import logger
-
 from scipy.stats import t
 import numpy as np
 import math
+
+from loguru import logger
 
 
 def em(gold, predictions):
     em = 0
     # num_questions = count()
     i = None
-    for i, (story_id, story, question_id, question, answer) in enumerate(gold):
+    for i, (story_id, story, question_id, question, answer) in enumerate(gold, 1):
         logger.debug(f"Passage: {story}")
         answer = answer or ''
         prediction = predictions[story_id][question_id]
@@ -30,7 +30,7 @@ def em(gold, predictions):
 def f1(gold, predictions):
     overall_f1 = 0
     i = 0
-    for i, (story_id, story, question_id, question, answer) in enumerate(gold):
+    for i, (story_id, story, question_id, question, answer) in enumerate(gold, 1):
         gold_tokens = set(str(answer).lower().split(" "))
         prediction_tokens = set(str(predictions[story_id][question_id]).lower().split(" "))
         logger.debug(f"Question: {question}")
