@@ -2,17 +2,16 @@ import json
 import os
 import random
 import uuid
-from itertools import count
 
 import click
-from quickconf import load_class
 
+from scripts.utils import Domain
 from stresstest.classes import Config
-from stresstest.generate_special.generate_with_modifier import ModifierGenerator
 from stresstest.realize import Realizer
 
 
-def _generate(config, question_types, answer_types, templates, first_modification, fill_with_modification,
+def _generate(generator_class, question_types, answer_types, templates, first_modification,
+              fill_with_modification,
               modify_event_types, modification_distance, total_modifiable_actions, uuid4):
     # generate modified
     story_id = uuid4()
@@ -21,8 +20,11 @@ def _generate(config, question_types, answer_types, templates, first_modificatio
         "qas": []
     }
     realizer = Realizer(**templates)
-    generator = ModifierGenerator(config, first_modification, fill_with_modification, modify_event_types,
-                                  modification_distance, total_modifiable_actions)
+    generator = generator_class({}, first_modification=first_modification,
+                                fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
+                                modification_distance=modification_distance,
+                                total_modifiable_actions=total_modifiable_actions)
+
     events = generator.generate_story()
     # raise NotImplementedError()
     story, visits = realizer.realise_story(events, generator.world)
@@ -82,8 +84,10 @@ def _generate(config, question_types, answer_types, templates, first_modificatio
     baseline["passage"] = ' '.join(story)
     baseline['passage_sents'] = story
 
-    generator = ModifierGenerator(config, first_modification, fill_with_modification, modify_event_types,
-                                  modification_distance, total_modifiable_actions)
+    generator = generator_class({}, first_modification=first_modification,
+                                fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
+                                modification_distance=modification_distance,
+                                total_modifiable_actions=total_modifiable_actions)
     (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = \
         generator.generate_questions(events, visits)
     for q in single_span_questions + multi_span_questions + unanswerable_questions + abstractive_questions:
@@ -126,7 +130,8 @@ def _generate(config, question_types, answer_types, templates, first_modificatio
 @click.option("-k", type=int, default=1)
 @click.option("--do-print", is_flag=True, default=False)
 @click.option("--do-save", is_flag=True, default=False)
-def generate_modifier(config, out_path, seed, n, k, do_print, do_save):
+@click.option("--domain", type=Domain(), default='football')
+def generate_modifier(config, out_path, seed, n, k, do_print, do_save, domain):
     if seed:
         random.seed(seed)
 
@@ -141,19 +146,18 @@ def generate_modifier(config, out_path, seed, n, k, do_print, do_save):
     click.echo(
         f"Generating from '{click.style(config, fg='green')}': {click.style(str(k), fg='green', bold=True)} samples, "
         f"{click.style(str(n), fg='green', bold=True)} passages each.")
-    click.echo(f"Saving baseline in {click.style(out_path + file_name.format('baseline'), fg='green', bold=True)}.")
-    click.echo(f"Saving modified in {click.style(out_path + file_name.format('modifier'), fg='green', bold=True)}.")
-
-    template_path = cfg.get("templates", "stresstest.resources.templates")
-    templates = {
-        name: load_class(f"{template_path}.{name}") for name in
-        ['dollar', 'sentences', 'at', 'percent', 'bang', 'question_templates']
-    }
+    click.echo(
+        f"Saving baseline in {click.style(os.path.join(out_path, file_name.format('baseline')), fg='green', bold=True)}.")
+    click.echo(
+        f"Saving modified in {click.style(os.path.join(out_path, file_name.format('modifier')), fg='green', bold=True)}.")
 
     samples_baseline = []
     samples_modified = []
 
     max_sents = cfg["world.num_sentences"]
+
+    templates = domain.templates_modifier
+
     first_modifications = range(max_sents - 1)
     fill_with_modifications = [True, False]
     modify_event_types = ['goal']
@@ -171,9 +175,9 @@ def generate_modifier(config, out_path, seed, n, k, do_print, do_save):
                         else:
                             totals = range(2, max_sents - (modification_distance + first_modification) + 1)
                         for total_modifiable_actions in totals:
-                            b, m = _generate(cfg, question_types, answer_types, templates, first_modification,
-                                             fill_with_modification, [modify_event_type], modification_distance,
-                                             total_modifiable_actions, uuid4)
+                            b, m = _generate(domain.generator_modifier, question_types, answer_types, templates,
+                                             first_modification, fill_with_modification, [modify_event_type],
+                                             modification_distance, total_modifiable_actions, uuid4)
                             baseline.append(b)
                             modified.append(m)
                             for qa in m['qas']:
@@ -185,40 +189,34 @@ def generate_modifier(config, out_path, seed, n, k, do_print, do_save):
                                     'total_modifiable_actions': total_modifiable_actions
                                 }
                                 qa['modification_data'] = modification_data
-        total_q_b = count()
-        total_q_m = count()
-        if not do_print:
-            click._echo = click.echo
-            click.echo = lambda *args, **kwargs: ...
-        for b, m in zip(baseline, modified):
-            click.echo("Baseline Story:")
-            for i, sent in zip(range(max_sents), b['passage_sents']):
-                click.echo(f'[{i}]: {sent}')
-            click.echo("Baseline Questions:")
+        total_q_b = sum(1 for b in baseline for _ in b['qas'])
+        total_q_m = sum(1 for m in modified for _ in m['qas'])
+        if do_print:
+            for b, m in zip(baseline, modified):
+                click.echo("Baseline Story:")
+                for i, sent in enumerate(b['passage_sents']):
+                    click.echo(f'[{i}]: {sent}')
 
-            for qa in b['qas']:
-                click.echo(f"{qa['question']}: {qa['answer']} ({qa['evidence']})")
-                next(total_q_b)
-            click.echo("Modified Story:")
-            for i, sent in zip(range(max_sents), m['passage_sents']):
-                click.echo(f'[{i}]: {sent}')
-            click.echo("Modified Questions:")
-            for qa in m['qas']:
-                click.echo(f"{qa['question']}: {qa['answer']} ({qa['evidence']})")
-                next(total_q_m)
-            if m['qas']:
-                click.echo(m['qas'][0]['modification_data'])
+                click.echo("Baseline Questions:")
+                for qa in b['qas']:
+                    click.echo(f"{qa['question']}: {qa['answer']} ({qa['evidence']})")
+                click.echo("Modified Story:")
+                for i, sent in zip(range(max_sents), m['passage_sents']):
+                    click.echo(f'[{i}]: {sent}')
+                click.echo("Modified Questions:")
+                for qa in m['qas']:
+                    click.echo(f"{qa['question']}: {qa['answer']} ({qa['evidence']})")
+                if m['qas']:
+                    click.echo(m['qas'][0]['modification_data'])
 
-            click.echo(20 * "===")
-        if not do_print:
-            click.echo = click._echo
+                click.echo(20 * "===")
+
         click.echo(f"Total Passages: {len(baseline)}")
-        click.echo(f"Total Questions over baseline passages: {next(total_q_b)}")
-        click.echo(f"Total Questions over modified passages: {next(total_q_m)}")
+        click.echo(f"Total Questions over baseline passages: {total_q_b}")
+        click.echo(f"Total Questions over modified passages: {total_q_m}")
         samples_baseline.append(baseline)
         samples_modified.append(modified)
-    print(len(samples_baseline))
-    print(len(samples_modified))
+
     if do_save:
         with open(os.path.join(out_path, file_name.format('baseline')), "w+") as f:
             json.dump(samples_baseline, f)

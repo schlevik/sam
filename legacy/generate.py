@@ -7,7 +7,6 @@ from quickconf import load_class
 from tqdm import trange
 
 from stresstest.classes import Config
-from stresstest.generate import StoryGenerator
 from stresstest.realize import Realizer
 
 

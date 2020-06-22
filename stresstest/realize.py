@@ -2,14 +2,11 @@ import inspect
 import random
 import textwrap
 from collections import defaultdict
-from copy import deepcopy
 from typing import List, Callable, Optional, Dict, Tuple, Union, Any
 
 from loguru import logger
 
 from stresstest.classes import S, YouIdiotException, F, Event, Context, Question, World
-from stresstest.resources.templates import percent, sentences, at, dollar, bang, \
-    question_templates as question_templates
 
 
 class RandomChooser:
@@ -52,8 +49,8 @@ class DeterminedChooser(RandomChooser):
 
 
 class Accessor:
-    def __init__(self, context: Context = None, sentences=sentences, percent=percent, at=at, dollar=dollar, bang=bang,
-                 question_templates=question_templates):
+    def __init__(self, sentences, percent, at, dollar, bang,
+                 question_templates, context: Context = None):
         self.context = context or Context()
         self.bang = prepare_templates(bang)
         self.dollar = prepare_templates(dollar)
@@ -313,6 +310,9 @@ class SizeEstimator:
                         logger.debug(f"Calculating with number: {f.number}")
                         # if pessimistic, assume f.number = 1
                         combinations *= f.number
+            elif process_function == self.processor.process_feature:
+                # pessimistic = True because usually the selection is not random
+                combinations *= self._estimate_sentences(self.accessor.access_at(w[1:]), pessimistic=True)
 
             elif not process_function or process_function == self.processor.process_context:
                 ...
@@ -368,8 +368,8 @@ def prepare_templates(templates, allow_conditions=False) -> dict:
 class Realizer:
     context: Context
 
-    def __init__(self, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
-                 question_templates=question_templates, validate=True, unique_sentences=True):
+    def __init__(self, sentences, bang, dollar, at, percent,
+                 question_templates, validate=True, unique_sentences=True):
         self.unique_sentences = unique_sentences
         logger.debug("Creating new Realizer...")
         self.context = None
@@ -379,7 +379,8 @@ class Realizer:
         self.at = prepare_templates(at)
         self.percent = prepare_templates(percent, True)
         self.question_templates = prepare_templates(question_templates)
-        self.accessor = Accessor(self.context, sentences=sentences, bang=bang, dollar=dollar, at=at, percent=percent,
+        self.accessor = Accessor(context=self.context, sentences=sentences, bang=bang, dollar=dollar, at=at,
+                                 percent=percent,
                                  question_templates=question_templates)
         self.chooser = RandomChooser()
         self.processor = Processor(self.accessor, self.chooser)

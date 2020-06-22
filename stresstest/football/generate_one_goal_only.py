@@ -1,8 +1,8 @@
-from stresstest.generate import StoryGenerator
 from stresstest.classes import Config
+from stresstest.football import FootballGenerator
 
 
-class OneGoalStoryGenerator(StoryGenerator):
+class OneGoalStoryGenerator(FootballGenerator):
     def __init__(self, config: Config):
 
         super().__init__(config)
