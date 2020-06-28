@@ -1,0 +1,18 @@
+md5: 5f0191c616bbcc2972d778114bcb7172
+cmd: python main.py report --diversity metrics/football/modifier/diversity-modifier.json --baseline
+  metrics/football/modifier/albert/albert-ssq-baseline-retrieval-50-5.json --intervention metrics/football/modifier/albert/albert-ssq-modifier-retrieval-50-5.json
+  --count metrics/football/modifier/count-modifier.json --naturality metrics/football/modifier/naturality-modifier.json
+wdir: ../../../..
+deps:
+- md5: 15d4818d50393d2aff8914f552487e79
+  path: metrics/football/modifier/diversity-modifier.json
+- md5: 31062d9a4c9b544491cc73e3d95af78a
+  path: metrics/football/modifier/albert/albert-ssq-baseline-retrieval-50-5.json
+- md5: 600e13a78206efa20dbc8a20f7dcd852
+  path: metrics/football/modifier/albert/albert-ssq-modifier-retrieval-50-5.json
+- md5: 88c31c850750840e91463d4353dcc099
+  path: scripts/final.py
+- md5: cea433e07dfcd331d5359fcff829f1aa
+  path: metrics/football/modifier/count-modifier.json
+- md5: a3105f6ab5a1a8427c1a834230bd476c
+  path: metrics/football/modifier/naturality-modifier.json

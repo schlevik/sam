@@ -1,5 +1,5 @@
 md5: 87c415ffe1a9153472b32b200cac1742
-wdir: ..
+wdir: ../..
 cmd: python main.py process-drop
 deps:
 - md5: b51befb910069359687b5a7346d21f8a

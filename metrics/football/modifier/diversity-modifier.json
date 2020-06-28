@@ -2,17 +2,17 @@
     "num_samples": 5,
     "Jaccard": {
         "ours": {
-            "human_readable": "0.2526 +/- 0.0025",
-            "mean": 0.25258355078856265,
-            "variance": 3.985200000217215e-06,
-            "95ci": 0.0024787295822067193
+            "human_readable": "0.2327 +/- 0.0032",
+            "mean": 0.2326652634772714,
+            "variance": 6.676902390535134e-06,
+            "95ci": 0.003208422864926781
         },
         "reference": {
             "human_readable": "0.1642",
             "mean": 0.16421726523559513
         },
         "difference": {
-            "difference": 0.08836628555296752,
+            "difference": 0.06844799824167627,
             "within_ci": false
         }
     }

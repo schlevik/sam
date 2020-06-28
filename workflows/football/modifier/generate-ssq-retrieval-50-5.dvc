@@ -1,0 +1,28 @@
+md5: 5344d60e0c718e1f5b7319feecc28dbf
+cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval.json --seed
+  56 -n 50 -k 5 --out-path data/football/modifier/ --do-save
+wdir: ../../..
+deps:
+- md5: d296c74184c2ae81355bb4471db510d2
+  path: scripts/generate_modifier.py
+- md5: a6fa9162e400399d2514413b0c76e457
+  path: stresstest/realize.py
+- md5: d8bf5414e6cbe3f6d55dc942a0fe3dff.dir
+  path: stresstest/football
+- md5: 922178e1e0b3b6933ca624f82adbba90
+  path: stresstest/generator.py
+- md5: 1d4f7a38b451b306fee9304aedb51d44
+  path: stresstest/generator_modifier.py
+- md5: d0f848ca756c4a4da58ead599bd38e2e
+  path: conf/modifier-ssq-retrieval.json
+outs:
+- md5: 9bd12d02a98effa8f656507fb573b71b
+  path: data/football/modifier/stresstest-ssq-baseline-retrieval-50-5.json
+  cache: true
+  metric: false
+  persist: false
+- md5: 9ba7b264b11fc53b7679c32aea6b8691
+  path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
+  cache: true
+  metric: false
+  persist: false
