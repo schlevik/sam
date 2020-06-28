@@ -33,16 +33,16 @@
     "adjacent_overlap_verb_sent": {
         "ours": {
             "human_readable": "0.0954 +/- 0.0071",
-            "mean": 0.09538009090582619,
-            "variance": 3.2742475137728965e-05,
-            "95ci": 0.007104930633949114
+            "mean": 0.0953800909058262,
+            "variance": 3.2742475137728925e-05,
+            "95ci": 0.00710493063394911
         },
         "reference": {
             "human_readable": "0.0913",
             "mean": 0.09125025870606386
         },
         "difference": {
-            "difference": 0.004129832199762332
+            "difference": 0.0041298321997623455
         }
     },
     "adjacent_overlap_verb_sent_div_seg": {
@@ -54,10 +54,10 @@
         },
         "reference": {
             "human_readable": "0.2423",
-            "mean": 0.24225572687048497
+            "mean": 0.242255726870485
         },
         "difference": {
-            "difference": 0.05649427312951505
+            "difference": 0.05649427312951502
         }
     },
     "adjacent_overlap_binary_verb_sent": {
@@ -79,8 +79,8 @@
         "ours": {
             "human_readable": "0.1567 +/- 0.0168",
             "mean": 0.15672890997890998,
-            "variance": 0.00018321499892911793,
-            "95ci": 0.016806783328162905
+            "variance": 0.0001832149989291179,
+            "95ci": 0.016806783328162902
         },
         "reference": {
             "human_readable": "0.1552",
@@ -99,18 +99,18 @@
         },
         "reference": {
             "human_readable": "0.4057",
-            "mean": 0.405713117298256
+            "mean": 0.40571311729825615
         },
         "difference": {
-            "difference": 0.07595354936841064
+            "difference": 0.07595354936841048
         }
     },
     "adjacent_overlap_binary_2_verb_sent": {
         "ours": {
             "human_readable": "0.3500 +/- 0.0340",
             "mean": 0.35,
-            "variance": 0.0007499999999999995,
-            "95ci": 0.03400436903291283
+            "variance": 0.0007499999999999989,
+            "95ci": 0.034004369032912825
         },
         "reference": {
             "human_readable": "0.3357",
@@ -123,16 +123,16 @@
     "word2vec_1_all_sent": {
         "ours": {
             "human_readable": "0.3592 +/- 0.0142",
-            "mean": 0.35918959869475575,
-            "variance": 0.00012997425174119266,
-            "95ci": 0.014155745693068277
+            "mean": 0.35918959869475564,
+            "variance": 0.00012997425174119198,
+            "95ci": 0.014155745693068239
         },
         "reference": {
             "human_readable": "0.5504",
-            "mean": 0.5504060494061012
+            "mean": 0.5504060494061013
         },
         "difference": {
-            "difference": -0.1912164507113454
+            "difference": -0.19121645071134563
         }
     },
     "word2vec_2_all_sent": {
@@ -144,18 +144,18 @@
         },
         "reference": {
             "human_readable": "0.7941",
-            "mean": 0.7940503849584174
+            "mean": 0.7940503849584175
         },
         "difference": {
-            "difference": -0.13994240867458674
+            "difference": -0.13994240867458685
         }
     },
     "pronoun_noun_ratio": {
         "ours": {
             "human_readable": "0.0753 +/- 0.0055",
             "mean": 0.07530692860704997,
-            "variance": 1.947761497404752e-05,
-            "95ci": 0.005479891722650073
+            "variance": 1.9477614974047533e-05,
+            "95ci": 0.005479891722650076
         },
         "reference": {
             "human_readable": "0.0522",

@@ -1,10 +1,11 @@
-md5: 87c415ffe1a9153472b32b200cac1742
+md5: e643ec525b003e72f3204c2910af7d4f
 wdir: ../..
-cmd: python main.py process-drop
+cmd: python main.py process-drop --input data/football/drop_dataset_dev.json --output
+  data/football/drop_nfl.json
 deps:
 - md5: b51befb910069359687b5a7346d21f8a
   path: data/football/drop_dataset_dev.json
-- md5: aefd6a30d0e1c267f8943b7d6569e6d3
+- md5: 0ca8feb66cf3975154bf06925e1c0c01
   path: scripts/compare.py
 outs:
 - md5: 4d895a9c6a0629c8f6453e88502abc2a

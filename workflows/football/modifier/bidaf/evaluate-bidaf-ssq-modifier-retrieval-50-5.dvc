@@ -1,16 +1,17 @@
-md5: e23c97716c5c8696558aa3f35925251b
+md5: c86c58c506aceacb16fea64caa72c032
 cmd: python main.py evaluate --predictions data/football/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
-  --gold data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output metrics/football/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
+  --gold data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output
+  metrics/football/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
 wdir: ../../../..
 deps:
-- md5: 1c5c3b9b9e5d9bfa8b4ffeaa60b532c2
+- md5: 36a566fc88dd37e9f5ce8768027e6c2f
   path: data/football/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
-- md5: 57fca306ef946c3da055e507183425b8
+- md5: 9ba7b264b11fc53b7679c32aea6b8691
   path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
 - md5: be415035a4dad796640bc6ab7167b43f
   path: scripts/evaluate.py
 outs:
-- md5: 02700ca0e6994bb94998239cef12b37a
+- md5: fe6bbab25fb692f1531673ecf4fc4f05
   path: metrics/football/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
   cache: false
   metric: true

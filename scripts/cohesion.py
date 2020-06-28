@@ -116,8 +116,8 @@ def quality(input, reference, output, attr, taaco_dir, indices):
 
 
 @click.command()
-@click.option("--input", type=str, default="data/drop_dataset_dev.json")
-@click.option("--output", type=str, default="data/drop_nfl.json")
+@click.option("--input", type=str, default="data/football/drop_dataset_dev.json")
+@click.option("--output", type=str, default="data/football/drop_nfl.json")
 def process_drop(input, output):
     with open(input) as f:
         data = json.load(f)

@@ -9,10 +9,10 @@
         },
         "reference": {
             "human_readable": "0.1642",
-            "mean": 0.16421726523559513
+            "mean": 0.16420688775112272
         },
         "difference": {
-            "difference": 0.06844799824167627,
+            "difference": 0.06845837572614868,
             "within_ci": false
         }
     }
