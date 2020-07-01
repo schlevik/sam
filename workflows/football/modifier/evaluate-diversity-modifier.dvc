@@ -1,16 +1,16 @@
-md5: 6aba8cd8d1998ba02dbd9dc500ac6b0a
+md5: 8597663d4b796b1824b203d861e2b4df
 cmd: python main.py diversity --input data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
   --output metrics/football/modifier/diversity-modifier.json --reference data/football/drop_nfl.json
 wdir: ../../..
 deps:
-- md5: 122447d63b8ee5127c8a87918f38c355
+- md5: 96a2035f70309efdfd59d9106f76c50c
   path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
 - md5: 4d895a9c6a0629c8f6453e88502abc2a
   path: data/football/drop_nfl.json
-- md5: d152c5d5ffc8118ab8b9c3a0649b6ef2
+- md5: 6b0aa8ecfa3ce9225be999cdb41fde89
   path: scripts/compare.py
 outs:
-- md5: 3342c6caccbebf05a902006ca8105fdb
+- md5: ea6bf10ede7504a811570a70e9116e9c
   path: metrics/football/modifier/diversity-modifier.json
   cache: false
   metric: true

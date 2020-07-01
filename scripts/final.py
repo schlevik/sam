@@ -23,13 +23,12 @@ def report(diversity, count, baseline, intervention, naturality):
     click.secho("Diversity: ", fg='green')
     table = []
     for metric, v in diversity_diff.items():
-        if metric != 'num_samples':
-            table.append([
-                click.style(metric, fg='green'),
-                str(v['ours']['human_readable']),
-                str(v['reference']['human_readable']),
-                f"{v['difference']['difference']}"
-            ])
+        table.append([
+            click.style(metric, fg='green'),
+            str(v['ours']['human_readable']),
+            str(v['reference']['human_readable']),
+            f"{v['difference']['difference']}"
+        ])
 
     click.echo(tabulate(table, headers=[click.style('Index', bold=True), click.style('Stress-test', bold=True),
                                         click.style('Reference', bold=True), click.style('Difference', bold=True)]))
