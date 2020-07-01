@@ -27,7 +27,7 @@ def report(diversity, count, baseline, intervention, naturality):
             click.style(metric, fg='green'),
             str(v['ours']['human_readable']),
             str(v['reference']['human_readable']),
-            f"{v['difference']['difference']}"
+            f"{v['difference']}"
         ])
 
     click.echo(tabulate(table, headers=[click.style('Index', bold=True), click.style('Stress-test', bold=True),

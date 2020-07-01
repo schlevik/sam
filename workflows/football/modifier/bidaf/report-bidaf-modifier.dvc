@@ -1,19 +1,19 @@
-md5: 0a12878e567a66ae7fdfc6cb28524a6a
+md5: 7beb2fb8d762d5e7c658a15bdba44adf
 cmd: python main.py report --diversity metrics/football/modifier/diversity-modifier.json
   --baseline metrics/football/modifier/bidaf/bidaf-ssq-baseline-retrieval-50-5.json
   --intervention metrics/football/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
   --count metrics/football/modifier/count-modifier.json --naturality metrics/football/modifier/naturality-modifier.json
 wdir: ../../../..
 deps:
-- md5: 3342c6caccbebf05a902006ca8105fdb
+- md5: ea6bf10ede7504a811570a70e9116e9c
   path: metrics/football/modifier/diversity-modifier.json
-- md5: 8405d7ab50b8befae58ea123459e3611
+- md5: 2b8cf2fbbae18d02f2dcf8e0ee258033
   path: metrics/football/modifier/bidaf/bidaf-ssq-baseline-retrieval-50-5.json
-- md5: 6fbf3f13bcf304dd1c24e33a2b6ff854
+- md5: bb234414dc5c2e6cd1f39957da09bbb6
   path: metrics/football/modifier/bidaf/bidaf-ssq-modifier-retrieval-50-5.json
-- md5: 3c1a29eb9ce7550f9bd2477131e36290
+- md5: 95e42af7ccf6de8ba74ad3a62925731b
   path: scripts/final.py
 - md5: cea433e07dfcd331d5359fcff829f1aa
   path: metrics/football/modifier/count-modifier.json
-- md5: 4cf994f5aa6d237ff094a9165f4988f8
+- md5: 247588a1086bdc500fdf202b188a919e
   path: metrics/football/modifier/naturality-modifier.json
