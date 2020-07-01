@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Dict, List, Tuple, Optional, Callable, Any
 from loguru import logger
 
-from stresstest.classes import Choices, Event, World, Question, QuestionTypes, ReasoningTypes, Config
+from stresstest.classes import Choices, Event, World, Question, QuestionTypes, ReasoningTypes, Config, YouIdiotException
 from stresstest.util import fmt_dict
 
 
@@ -27,6 +27,9 @@ class StoryGenerator(ABC):
         logger.debug(fmt_dict(locals()))
         self.cfg = config
         self.get_world = get_world
+        self.unique_actors = config.get('unique_actors', False)
+        self.chosen_actors = []
+
         logger.debug("cfg:")
         logger.debug(fmt_dict(self.cfg))
         logger.debug(f"{StoryGenerator.__name__} finish constructor")
@@ -34,6 +37,7 @@ class StoryGenerator(ABC):
     def set_world(self):
         self.world = self.get_world()
         self.world.num_sentences = self.cfg.get("world.num_sentences", 5)
+
         self.do_set_world()
 
     def set_action(self):
@@ -54,7 +58,14 @@ class StoryGenerator(ABC):
         ...
 
     def set_actor(self):
-        self.current_event.actor = self.get_actor_choices().random()
+        if self.unique_actors:
+            remaining_pool = self.get_actor_choices() - self.chosen_actors
+            logger.debug(f"Chosen Actors: {[a.id for a in self.chosen_actors]}")
+            logger.debug(f"Remaining pool: {[a.id for a in remaining_pool]}")
+            self.current_event.actor = remaining_pool.random()
+            self.chosen_actors.append(self.current_event.actor)
+        else:
+            self.current_event.actor = self.get_actor_choices().random()
 
     def set_everything_else(self):
         ...

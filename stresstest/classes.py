@@ -91,8 +91,11 @@ class Config(Mapping):
     :class:`Choices` and select random ones with :class:`Rule` s.
     """
 
-    def __init__(self, templates_path: str):
-        self.cfg = ConfigFactory().parse_file(templates_path)
+    def __init__(self, templates_path: Union[str, dict]):
+        if isinstance(templates_path, str):
+            self.cfg = ConfigFactory().parse_file(templates_path)
+        else:
+            self.cfg = ConfigFactory().from_dict(templates_path)
 
     def __getitem__(self, k):
         return self.cfg[k]
@@ -230,6 +233,9 @@ class DataObjectMixin(Mapping):
             return self.__dict__[item]
         except KeyError:
             raise YouIdiotException(f"{self.__class__.__name__} doesn't have attribute {item}!")
+
+    def __hash__(self):
+        return hash(tuple(self.__dict__.items()))
 
     def __repr__(self):
         attrs = ", ".join(f"{k}={self[k]}" for k in self._get_annotations())

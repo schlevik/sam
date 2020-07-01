@@ -11,14 +11,14 @@ from stresstest.classes import Config
 from stresstest.realize import Realizer
 
 
-def _generate(generator_class, question_types, answer_types, templates, first_modification,
+def _generate(generator_class, config, question_types, answer_types, templates, first_modification,
               fill_with_modification,
               modify_event_types, modification_distance, total_modifiable_actions, uuid4):
     # generate modified
     story_id = uuid4()
     modified = {"id": story_id, 'qas': []}
     realizer = Realizer(**templates)
-    generator = generator_class({}, first_modification=first_modification,
+    generator = generator_class(config, first_modification=first_modification,
                                 fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
                                 modification_distance=modification_distance,
                                 total_modifiable_actions=total_modifiable_actions)
@@ -178,7 +178,7 @@ def generate_modifier(config, out_path, seed, n, k, do_print, do_save, domain):
                         else:
                             totals = range(2, max_sents - (modification_distance + first_modification) + 1)
                         for total_modifiable_actions in totals:
-                            b, m = _generate(domain.generator_modifier, question_types, answer_types, templates,
+                            b, m = _generate(domain.generator_modifier, cfg, question_types, answer_types, templates,
                                              first_modification, fill_with_modification, [modify_event_type],
                                              modification_distance, total_modifiable_actions, uuid4)
                             baseline.append(b)

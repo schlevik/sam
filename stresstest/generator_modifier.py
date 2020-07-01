@@ -5,8 +5,7 @@ from typing import List, Dict
 from loguru import logger
 from overrides import overrides
 
-from stresstest.football import FootballGenerator
-from stresstest.classes import Event, QuestionTypes, ReasoningTypes, Question, Choices, YouIdiotException
+from stresstest.classes import Event, QuestionTypes, Question, Choices, YouIdiotException
 from stresstest.generator import StoryGenerator
 from stresstest.util import fmt_dict
 
@@ -69,7 +68,8 @@ class ModifierGenerator(StoryGenerator, ABC):
     @overrides
     def set_actor(self):
         # check whether the currently processed event is the actual first non-modified one
-        if self._is_current_event_first_nonmodified_event():
+        # if unique actors, the functionality is already implemented by base generation
+        if self._is_current_event_first_nonmodified_event() and not self.unique_actors:
             # if so, select an actor that did not appear in any modified event before the actual event
             modified_actors = [sent.actor for sent in self.sentences if
                                sent.event_type in self.modify_event_type and self.MODIFIER in sent.features]
