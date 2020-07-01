@@ -16,6 +16,7 @@ from scipy.stats import t
 from tqdm import tqdm
 
 from scripts.utils import write_json
+from stresstest.eval_utils import get_mean_var_ci
 from stresstest.util import load_json
 
 DEFAULT_INDICES = [
@@ -63,52 +64,58 @@ def quality(input, reference, output, attr, taaco_dir, indices):
     else:
         indices = indices.split(",")
 
-    samples = load_json(input)
+    sample = load_json(input)
     reference = load_json(reference)
-    scores = defaultdict(list)
+    # scores = Dict[str, np.ndarray]
     getter: Callable[[Any], str] = itemgetter(attr)
-    logger.debug(f"Evaluating {len(samples)} sample(s).")
 
-    for i, sample in enumerate(tqdm(samples)):
-        logger.debug(f"Sample #{i} has {len(sample)} paragraphs.")
-        corpus: List[str] = [getter(s) for s in sample]
-        result = apply_taaco(corpus, taaco_dir, indices)
-        for index, values in result.items():
-            scores[index].append(np.array(values, dtype=np.float).mean())
+    corpus: List[str] = [getter(s) for s in sample]
+    n = len(corpus)
+    logger.debug(f"Evaluating sample with n={n} paragraphs.")
+
+    result = apply_taaco(corpus, taaco_dir, indices)
+    # for index, values in result.items():
+    #    scores[index] = np.array(values, dtype=np.float)
 
     corpus_reference: List[str] = [getter(s) for s in reference]
+    n_reference = len(corpus_reference)
     scores_reference = apply_taaco(corpus_reference, taaco_dir, indices)
 
-    final_result = {
-        "num_samples": len(samples)
-    }
+    final_result = dict()
 
-    for index, values in scores.items():
+    for index, values in result.items():
+        # t_975 = t.ppf(1 - .025, df=n - 1)
+        # ci95 = t_975 * values.std() / math.sqrt(len(values))
         values = np.array(values)
+        mean, var, ci95 = get_mean_var_ci(values, alpha=0.025)
+        printable_result = f'{mean:.4f} +/- {ci95:.4f}'
+
         values_reference = np.array(scores_reference[index])
-        t_975 = t.ppf(1 - .025, df=len(samples) - 1)
-        ci95 = t_975 * values.std() / math.sqrt(len(values))
+        mean_ref, var_ref, ci95_ref = get_mean_var_ci(values_reference, alpha=0.025)
+        printable_result_reference = f'{mean_ref:.4f} +/- {ci95_ref:.4f}'
 
-        printable_result = f'{values.mean():.4f} +/- {ci95:.4f}'
-        printable_result_reference = f'{values_reference.mean():.4f}'
-
-        click.echo(f"Average over {len(samples)} runs for {click.style(index, fg='green')} index: "
+        # t_975_reference = t.ppf(1 - .025, df=n_reference - 1)
+        # ci95_reference = t_975_reference * values_reference.std()
+        click.echo(f"Mean for index {click.style(index, fg='green')} (n={n}): "
                    f"{click.style(printable_result, fg='green', bold=True)}")
-        click.echo(f"Reference average for {click.style(index, fg='green')} metric: "
+        click.echo(f"Reference mean for index {click.style(index, fg='green')} (n={n_reference}): "
                    f"{click.style(printable_result_reference, fg='green', bold=True)}")
         final_result[index] = {
             'ours': {
+                'n': len(sample),
                 'human_readable': printable_result,
-                'mean': values.mean(),
-                'variance': values.var(),
+                'mean': mean,
+                'variance': var,
                 '95ci': ci95,
             },
             "reference": {
                 'human_readable': printable_result_reference,
-                'mean': values_reference.mean(),
+                'mean': mean_ref,
+                'variance': var_ref,
+                '95ci': ci95_ref
             },
             "difference": {
-                "difference": values.mean() - values_reference.mean(),
+                "difference": mean - mean_ref,
                 # "within_ci": bool(within_ci)
             }
         }

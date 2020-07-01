@@ -75,8 +75,7 @@ class Albert(Model):
 
     @overrides
     def predict(self, question, passage):
-        d = self.tokenizer.encode_plus(question.lower(), passage.lower(),
-                                       return_tensors='pt')
+        d = self.tokenizer.encode_plus(question.lower(), passage.lower(), return_tensors='pt')
         if self.gpu:
             token_type_ids = d['token_type_ids'].cuda()
             input_ids = d['input_ids'].cuda()

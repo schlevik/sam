@@ -27,7 +27,7 @@ sentences = {
         "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, %CONNECTIVE.VP "
         "as !PRP @MODIFIER.RB.goal scored $TIME [$REASON.PP.goal| and $RDM.S.goal] .",
 
-        "$ACTOR scored $TIME to %CONNECTIVE.IVP when !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) "
+        "$ACTOR @MODIFIER.RB.goal scored $TIME to %CONNECTIVE.IVP when !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) "
         "before @MODIFIER.RB.goal $VBG.goal the ball $POSITION.PP.GOAL .",
 
         "%CONNECTIVE.VBD> $ACTOR @MODIFIER.RB.goal scored $TIME $VBG.goal the ball $POSITION.PP.GOAL "

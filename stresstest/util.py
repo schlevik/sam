@@ -1,5 +1,8 @@
+from collections import namedtuple
+
+import click
 import ujson as json
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Generator
 
 
 def load_json(path: str):
@@ -11,14 +14,14 @@ def num_questions(sample: List[Dict[str, Any]]):
     return sum(len(datum['qas']) for datum in sample)
 
 
-def sample_iter(sample: List[Dict[str, Any]], full=False):
+Entry = namedtuple("Entry", ["id", "passage", "qa_id", "question", "answer", "qa"])
+
+
+def sample_iter(sample: List[Dict[str, Any]]) -> Generator[Entry, None, None]:
     for datum in sample:
         passage = datum['passage']
         for qa in datum['qas']:
-            if full:
-                yield datum['id'], passage, qa['id'], qa['question'], qa['answer'], qa
-            else:
-                yield datum['id'], passage, qa['id'], qa['question'], qa['answer']
+            yield Entry(datum['id'], passage, qa['id'], qa['question'], qa['answer'], qa)
 
 
 def fmt_dict(dct: dict):
@@ -43,3 +46,13 @@ def do_import(class_string: str, relative_import: str = ""):
     cls = getattr(mod, cls_name)
 
     return cls
+
+
+def highlight(text, colors):
+    result = []
+    for t in text.split():
+        if t in colors.keys():
+            result.append(click.style(t, fg=colors[t]))
+        else:
+            result.append(t)
+    return " ".join(result)

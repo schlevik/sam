@@ -2,6 +2,7 @@ import json
 import os
 import random
 import uuid
+from typing import List, Dict
 
 import click
 
@@ -15,10 +16,7 @@ def _generate(generator_class, question_types, answer_types, templates, first_mo
               modify_event_types, modification_distance, total_modifiable_actions, uuid4):
     # generate modified
     story_id = uuid4()
-    modified = {
-        "id": story_id,
-        "qas": []
-    }
+    modified = {"id": story_id, 'qas': []}
     realizer = Realizer(**templates)
     generator = generator_class({}, first_modification=first_modification,
                                 fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
@@ -44,10 +42,12 @@ def _generate(generator_class, question_types, answer_types, templates, first_mo
         # click.echo(f"{label.upper()}s:")
         for logical in logical_qs:
             if logical.realized and (question_types and logical.reasoning in question_types or not question_types) \
-                    and logical.event_type == 'goal':
-                logical.id = uuid4()
+                    and logical.event_type in modify_event_types:
+                question_data_str = "/".join(
+                    f"{k}:{v}" for k, v in logical.question_data.items() if k not in ['modified', 'easier'])
                 modified['qas'].append({
-                    "id": logical.id,
+                    "id": f"{story_id}/{logical.reasoning}/{logical.type}/{logical.target}/{logical.event_type}/"
+                          f"{question_data_str}",
                     "question": logical.realized,
                     "answer": logical.answer,
                     "reasoning": logical.reasoning,
@@ -103,9 +103,11 @@ def _generate(generator_class, question_types, answer_types, templates, first_mo
         for logical in logical_qs:
             if logical.realized and (question_types and logical.reasoning in question_types or not question_types) \
                     and logical.event_type == 'goal':
-                logical.id = getattr(logical, 'id', uuid4())
+                question_data_str = "/".join(
+                    f"{k}:{v}" for k, v in logical.question_data.items() if k not in ['modified', 'easier'])
                 baseline['qas'].append({
-                    "id": logical.id,
+                    "id": f"{story_id}/{logical.reasoning}/{logical.type}/{logical.target}/{logical.event_type}/"
+                          f"{question_data_str}",
                     "question": logical.realized,
                     "answer": logical.answer,
                     "reasoning": logical.reasoning,
@@ -162,6 +164,7 @@ def generate_modifier(config, out_path, seed, n, k, do_print, do_save, domain):
     fill_with_modifications = [True, False]
     modify_event_types = ['goal']
 
+    # num of modifications: f(max_sent) = |modify_event_types| * 1/3 * max_sent * (max_sent - 1) * (max_sent - 2)
     for _ in range(k):
         baseline = []
         modified = []
@@ -214,8 +217,8 @@ def generate_modifier(config, out_path, seed, n, k, do_print, do_save, domain):
         click.echo(f"Total Passages: {len(baseline)}")
         click.echo(f"Total Questions over baseline passages: {total_q_b}")
         click.echo(f"Total Questions over modified passages: {total_q_m}")
-        samples_baseline.append(baseline)
-        samples_modified.append(modified)
+        samples_baseline.extend(baseline)
+        samples_modified.extend(modified)
 
     if do_save:
         with open(os.path.join(out_path, file_name.format('baseline')), "w+") as f:

@@ -8,7 +8,6 @@ from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List,
 from loguru import logger
 from pyhocon import ConfigFactory
 
-
 T = TypeVar("T")
 V = TypeVar("V")
 JsonDict = Dict[str, Any]
@@ -53,7 +52,7 @@ class Choices(Iterable[T]):
             i: Element to remove. If argument is an Iterable of
                elements removes  all elements.
         """
-        if isinstance(i, Iterable) and not isinstance(i, str):
+        if isinstance(i, Iterable) and not isinstance(i, str) and not isinstance(i, Mapping):
             for e in i:
                 self.remove(e)
         elif i in self.choices:
@@ -239,17 +238,9 @@ class DataObjectMixin(Mapping):
 
 class World(DataObjectMixin):
     num_sentences: int
-    # MALE = 'male'
-    # FEMALE = 'female'
-    # gender: str
-    # teams: Tuple[Team, Team]
-    # num_players: int
-    # players: List[Player]
-    # players_by_id: Dict[str, Player]
 
 
 class Bundle(DataObjectMixin):
-    # world, generator, templates
     generator: Any
     templates: Dict[str, Any]
     generator_modifier: Dict[str, Any]

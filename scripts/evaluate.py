@@ -1,25 +1,29 @@
 import random
+from typing import List, Type
 
 import click
+import numpy as np
 
-from scripts.utils import write_json
-from stresstest.eval_utils import em, get_mean_var_ci, f1
-from stresstest.util import load_json, sample_iter, num_questions
+from scripts.utils import write_json, EvalMetricParam
+from stresstest.eval_utils import get_mean_var_ci, get_mean_var_ci_bernoulli, EvalMetric
+
+from stresstest.util import load_json, sample_iter
 
 
-def _get_score(gold, predictions, metrics, subsample=None):
+def _get_score(gold, predictions, metrics: List[Type[EvalMetric]], subsample=None):
     result = dict()
-    for metric in metrics:
-        metric_name = metric.__name__
-        metric_results = []
-        for i, (gold_sample, predictions_sample) in enumerate(zip(gold, predictions)):
-            gold_sample = \
-                random.sample(list(sample_iter(gold_sample)), subsample) if subsample else sample_iter(gold_sample)
-            metric_results.append(metric(gold_sample, predictions_sample))
-        mean, var, ci = get_mean_var_ci(metric_results)
+    for metric_class in metrics:
+        metric_name = metric_class.__name__
+        metric = metric_class()
+        gold_iter = random.sample(list(sample_iter(gold)), subsample) if subsample else sample_iter(gold)
+        metric_results = np.array(metric(gold_iter, predictions))
+        if metric.binary:
+            mean, var, ci = get_mean_var_ci_bernoulli(metric_results)
+        else:
+            mean, var, ci = get_mean_var_ci(metric_results)
         printable_result = f'{mean:.4f} +/- {ci:.4f}'
 
-        click.echo(f"Average  under the {click.style(metric_name, fg='green')} metric on "
+        click.echo(f"Mean under the {click.style(metric_name, fg='green')} metric on "
                    f"{f'subsample of {subsample}' if subsample else 'full sample'}: "
                    f"{click.style(printable_result, fg='green', bold=True)}")
         click.echo()
@@ -36,24 +40,17 @@ def _get_score(gold, predictions, metrics, subsample=None):
 @click.option("--predictions", type=str, default='data/predictions.json')
 @click.option("--gold", type=str, default='data/stresstest.json')
 @click.option("--output", type=str, default="metrics/score.json")
-@click.option("--metric", type=str, default='em,f1')
+@click.option("--metric", type=EvalMetricParam(), default='EM,F1')
 def evaluate(predictions, gold, output, metric):
-    eval_metrics = []
-    if 'em' in metric:
-        eval_metrics.append(em)
-    if 'f1' in metric:
-        eval_metrics.append(f1)
-    if not eval_metrics:
-        raise ValueError("Need at list one metric to evaluate! Choose from: {em, f1}")
+    eval_metrics = metric
     gold = load_json(gold)
     predictions = load_json(predictions)
     click.echo(f"Evaluating {click.style(str(len(gold)), fg='green', bold=True)} sample(s).")
     result = {'num_samples': len(predictions), 'full': _get_score(gold, predictions, eval_metrics)}
-    # click.echo(f"Results EM: {' '.join(f'{s:.2f}' for s in em_metrics)}")
 
-    sample_sizes = [10, 25, 50, 100, 250]
+    sample_sizes = [10, 25, 50, 100, 250, 500]
     for k in sample_sizes:
-        too_small = any(num_questions(s) < k for s in gold)
+        too_small = len(gold) < k
         if too_small:
             click.echo(f"Omitting drawing {k} samples (and subsequent), not enough data to sample from!")
             break

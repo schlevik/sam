@@ -1,0 +1,24 @@
+md5: b98692557c0aecb0f38530d45c1d7030
+cmd: python main.py evaluate-intervention --predictions data/football/modifier/albert/predictions-albert-ssq-baseline-retrieval-50-5.json
+  --predictions-intervention data/football/modifier/albert/predictions-albert-ssq-modifier-retrieval-50-5.json
+  --gold data/football/modifier/stresstest-ssq-baseline-retrieval-50-5.json --gold-intervention
+  data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json --do-save --output
+  metrics/football/modifier/albert/intervention-albert-ssq-baseline-retrieval-50-5.json
+wdir: ../../../..
+deps:
+- md5: b2eb6fa702e7e097201a3574117c4dc3
+  path: data/football/modifier/albert/predictions-albert-ssq-baseline-retrieval-50-5.json
+- md5: 5801250fd05356ec3ddc96909877d7db
+  path: data/football/modifier/albert/predictions-albert-ssq-modifier-retrieval-50-5.json
+- md5: 2dd8428be40b243217ff79462eac611b
+  path: data/football/modifier/stresstest-ssq-baseline-retrieval-50-5.json
+- md5: 122447d63b8ee5127c8a87918f38c355
+  path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
+- md5: ec3cd8121121d2d019b34f567b82e579
+  path: scripts/evaluate_intervention.py
+outs:
+- md5: 6b9fbf517fc1d446e531327c32481d6f
+  path: metrics/football/modifier/albert/intervention-albert-ssq-baseline-retrieval-50-5.json
+  cache: false
+  metric: true
+  persist: false

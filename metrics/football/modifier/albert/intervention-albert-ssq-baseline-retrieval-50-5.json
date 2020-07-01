@@ -1,0 +1,15 @@
+{
+    "evaluation_on_intervention": {
+        "human_readable": "0.2360 +/- 0.0526",
+        "mean": 0.236,
+        "95ci": 0.05263574417471206
+    },
+    "n": 250,
+    "correct_baseline": 176,
+    "correct_intervention": 97,
+    "right->change->right": 59,
+    "right->keep->wrong": 67,
+    "right->change->wrong": 50,
+    "wrong->change->right": 9,
+    "wrong->keep->right": 29
+}

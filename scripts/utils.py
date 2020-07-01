@@ -1,6 +1,7 @@
 import json
 import click
 from stresstest import implemented_domains
+from stresstest.eval_utils import EvalMetric
 from stresstest.textmetrics import Distance
 from stresstest.util import do_import
 
@@ -26,10 +27,26 @@ def get_all_subclasses(cls):
 
 class MetricParam(click.ParamType):
     def convert(self, value, param, ctx):
-        try:
-            return do_import(value, relative_import='stresstest.textmetrics')
-        except ModuleNotFoundError:
-            self.fail(f"Metric '{value}' unknown, please choose from {get_all_subclasses(Distance)}")
+        vals = value.split(',')
+        metric_classes = []
+        for val in vals:
+            try:
+                metric_classes.append(do_import(val, relative_import='stresstest.textmetrics'))
+            except AttributeError:
+                self.fail(f"Metric '{value}' unknown, please choose from {get_all_subclasses(Distance)}")
+        return metric_classes
+
+
+class EvalMetricParam(click.ParamType):
+    def convert(self, value, param, ctx):
+        vals = value.split(',')
+        metric_classes = []
+        for val in vals:
+            try:
+                metric_classes.append(do_import(val, relative_import='stresstest.eval_utils'))
+            except AttributeError:
+                self.fail(f"Metric '{value}' unknown, please choose from {get_all_subclasses(EvalMetric)}")
+        return metric_classes
 
 
 def write_json(result, output):

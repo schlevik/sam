@@ -1,19 +1,19 @@
-md5: e8427d035b2460408d1c88964111e05c
+md5: bac2e2f869c3c11758722ab54c293bee
 cmd: python main.py quality --input data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
   --output metrics/football/modifier/naturality-modifier.json --reference data/football/drop_nfl.json
   --taaco-dir lib/taaco
 wdir: ../../..
 deps:
-- md5: 9ba7b264b11fc53b7679c32aea6b8691
+- md5: 122447d63b8ee5127c8a87918f38c355
   path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
 - md5: 4d895a9c6a0629c8f6453e88502abc2a
   path: data/football/drop_nfl.json
-- md5: 8559ba5a61e7fe69af9dc91db78fbc5b
+- md5: 7a3e9efcf56f0f936c937752e0ab1b28
   path: scripts/cohesion.py
 - md5: 0585989d5d1d363d232ec37c2063b008.dir
   path: lib/taaco
 outs:
-- md5: 94d45d95845148d39ad0acfc341cb9fb
+- md5: 4cf994f5aa6d237ff094a9165f4988f8
   path: metrics/football/modifier/naturality-modifier.json
   cache: false
   metric: true
