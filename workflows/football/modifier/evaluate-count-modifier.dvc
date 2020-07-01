@@ -1,10 +1,10 @@
-md5: ef41f44a15293a9596572f07cbbf3c60
+md5: e50fa8359af55ee1ea90b9d9bdfac93f
 wdir: ../../..
 cmd: python main.py count --output metrics/football/modifier/count-modifier.json
 deps:
 - md5: cc0bdb51c784ee6fb04b033d16c84fbd
   path: scripts/count.py
-- md5: f7eb7ad3a9a3f8704eaa0cf784f6a0e5.dir
+- md5: 939302a70962a13bfa35d74a3149213b.dir
   path: stresstest/football/resources
 - md5: 427afdf6a9a1b06eedddcfd329602aa4
   path: stresstest/generator.py
@@ -15,4 +15,3 @@ outs:
   path: metrics/football/modifier/count-modifier.json
   cache: false
   metric: true
-  persist: false

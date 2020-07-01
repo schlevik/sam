@@ -1,11 +1,8 @@
-md5: 9487ea3ef843caaeca0a32ea0a0a196b
-locked: true
+md5: 57f3b84a61aef67b5cbdf364c720a27d
 deps:
 - etag: '"f77ca9d217d9a9245f2dd3bc250b3b7e"'
   path: https://storage.googleapis.com/allennlp-public-models/naqanet-2020.02.19.tar.gz
 outs:
 - md5: f77ca9d217d9a9245f2dd3bc250b3b7e
   path: naqanet-2020.02.19.tar.gz
-  cache: true
-  metric: false
-  persist: false
+frozen: true

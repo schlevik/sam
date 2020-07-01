@@ -1,4 +1,4 @@
-md5: 2d5208c635b7d7d231c4d52d9f3af5b0
+md5: a563d75753c1ba638d0b90b563ca2de6
 wdir: ../../../..
 cmd: python main.py predict --cls Albert --model models/albert_on_squad_2 --input
   data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output data/football/modifier/albert/predictions-albert-ssq-modifier-retrieval-50-5.json
@@ -8,6 +8,3 @@ deps:
 outs:
 - md5: 260cd23de110d1157ed1d4b3165edf87
   path: data/football/modifier/albert/predictions-albert-ssq-modifier-retrieval-50-5.json
-  cache: true
-  metric: false
-  persist: false

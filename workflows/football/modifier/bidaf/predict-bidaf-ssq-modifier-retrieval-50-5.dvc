@@ -1,4 +1,4 @@
-md5: b41911dd0f03e851cab59aa419d703cc
+md5: 152b2a7a128f3ae35c73914be5d2dec0
 wdir: ../../../..
 cmd: python main.py predict --cls BiDAF --model models/bidaf-model-2020.03.19.tar.gz
   --input data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output
@@ -9,6 +9,3 @@ deps:
 outs:
 - md5: 1ebff9272e0f0925568bc08ea9043ae3
   path: data/football/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
-  cache: true
-  metric: false
-  persist: false

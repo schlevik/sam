@@ -1,4 +1,4 @@
-md5: 775f24fdd7fcfa178467e9595f914308
+md5: 9a034063469556ab4c5422facd88dc46
 wdir: ../..
 cmd: python main.py process-drop --input data/football/drop_dataset_dev.json --output
   data/football/drop_nfl.json
@@ -10,6 +10,3 @@ deps:
 outs:
 - md5: 4d895a9c6a0629c8f6453e88502abc2a
   path: data/football/drop_nfl.json
-  cache: true
-  metric: false
-  persist: false

@@ -1,7 +1,3 @@
-md5: 30d5fedda94728fd12e634fe7d98047c
 outs:
-- md5: 0585989d5d1d363d232ec37c2063b008.dir
+- md5: ed9742c93b8e665a16b9a875a63e668b.dir
   path: lib/taaco
-  cache: true
-  metric: false
-  persist: false

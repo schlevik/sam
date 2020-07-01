@@ -1,4 +1,4 @@
-md5: 9752ce909f06644e69f020b7a3fe0d3d
+md5: f2c81e51b5f9a70519283b575077a593
 cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
   --seed 56 -n 50 -k 5 --out-path data/football/modifier/ --do-save
 wdir: ../../..
@@ -7,7 +7,7 @@ deps:
   path: scripts/generate_modifier.py
 - md5: a6fa9162e400399d2514413b0c76e457
   path: stresstest/realize.py
-- md5: c1f254c992e103c0698025a0be8f8a8b.dir
+- md5: a4a1b241d39f2397d5e5b71bcd2726f7.dir
   path: stresstest/football
 - md5: 427afdf6a9a1b06eedddcfd329602aa4
   path: stresstest/generator.py
@@ -18,11 +18,5 @@ deps:
 outs:
 - md5: 0d0c9dee139e6fa91f08def3878d504c
   path: data/football/modifier/stresstest-ssq-baseline-retrieval-50-5.json
-  cache: true
-  metric: false
-  persist: false
 - md5: 96a2035f70309efdfd59d9106f76c50c
   path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
-  cache: true
-  metric: false
-  persist: false
