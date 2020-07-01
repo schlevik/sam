@@ -1,14 +1,7 @@
-import json
-from collections import defaultdict
-
 import click
-import quickconf
-from loguru import logger
 from tabulate import tabulate
-from tqdm import tqdm
 
-from stresstest.classes import Model
-from stresstest.util import load_json, sample_iter, num_questions
+from stresstest.util import load_json
 
 
 @click.command()
@@ -31,19 +24,12 @@ def report(diversity, count, baseline, intervention, naturality):
     table = []
     for metric, v in diversity_diff.items():
         if metric != 'num_samples':
-            # click.echo(f'For "{metric}" metric:')
-            # click.echo(f"Ours: {str(v['ours']['human_readable'])} "
-            #           f"Reference: {str(v['reference']['human_readable'])}")
-            # click.echo(f"Difference: {v['difference']['difference']}")
             table.append([
                 click.style(metric, fg='green'),
                 str(v['ours']['human_readable']),
                 str(v['reference']['human_readable']),
                 f"{v['difference']['difference']}"
             ])
-            # click.echo(f"Within Confidence Interval? "
-            #           f"{click.style('yes', fg='green') if v['difference']['within_ci']
-            #           else click.style('no', fg='red')}")
 
     click.echo(tabulate(table, headers=[click.style('Index', bold=True), click.style('Stress-test', bold=True),
                                         click.style('Reference', bold=True), click.style('Difference', bold=True)]))
@@ -76,8 +62,3 @@ def report(diversity, count, baseline, intervention, naturality):
     click.secho("Differences", fg='green')
     for (metric, baseline_v) in baseline_score['full'].items():
         click.secho(f"{metric}: {baseline_v['mean'] - phenomenon_score['full'][metric]['mean']:.4f} ")
-    # click.secho("Difference after intervention: ", fg='green')
-    # click.echo(f"{phenomenon_diff['difference']:.2f}")
-    # TODO well technically we should do a different computation here
-    # click.echo(f"Statistically significant? f"{click.style('yes', fg='green')
-    # if phenomenon_diff['within_ci'] else click.style('no', fg='red')}")

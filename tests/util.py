@@ -3,8 +3,8 @@ from typing import Tuple, List
 
 from stresstest.classes import Config, Question, Bundle
 from stresstest.football import bundle
-from stresstest.football.generate_with_modifier import FootballModifierGenerator
 from stresstest.realize import Realizer
+from stresstest.util import highlight
 
 
 def only(sents, n, action='test'):
@@ -24,9 +24,12 @@ def get_questions(generator, realizer, events, visits, story) \
     return single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions
 
 
-def print_out(story, *questions):
+def print_out(story, *questions, highlights=None):
     print("===STORY===:")
-    print('\n'.join(story))
+    color_map = {h: "red" for name in highlights for h in name.split(" ")}
+    print(color_map)
+    for s in story:
+        print(highlight(s, colors=color_map))
     print()
     print("===QUESTIONS===:")
     print(len(questions))
@@ -35,31 +38,24 @@ def print_out(story, *questions):
             print(q.realized, q.answer if q.answer else "Unanswerable")
 
 
-def env_for_modifier(path='stresstest/football/resources/team-names.json', g_class=FootballModifierGenerator,
-                     do_print=True,
-                     do_realise=True):
-    from stresstest.football.resources.templates_modifier import sentences, dollar, at, percent, bang, \
-        question_templates
-    realizer = Realizer(sentences=sentences, dollar=dollar, at=at, percent=percent, bang=bang,
-                        question_templates=question_templates, unique_sentences=False)
-
-    return interactive_env(path, g_class, realizer, do_print, do_realise)
-
-
-def interactive_env_football(do_print=True, do_realise=True):
+def interactive_env_football(do_print=True, do_realise=True, **kwargs):
+    generator_kwargs = dict(
+    )
+    generator_kwargs.update(kwargs)
     return interactive_env(bundle, modifier=False, do_print=do_print, do_realise=do_realise)
 
 
 def interactive_env_football_modifier(do_print=True, do_realise=True, first_modification=0, fill_with_modification=None,
                                       modify_event_types=None,
-                                      modification_distance=1, total_modifiable_actions=2):
+                                      modification_distance=1, total_modifiable_actions=2, **kwargs):
     generator_kwargs = dict(
         first_modification=first_modification,
         fill_with_modification=fill_with_modification,
         modify_event_types=modify_event_types,
         modification_distance=modification_distance,
-        total_modifiable_actions=total_modifiable_actions
+        total_modifiable_actions=total_modifiable_actions,
     )
+    generator_kwargs.update(kwargs)
     return interactive_env(bundle, modifier=True, do_print=do_print, do_realise=do_realise,
                            generator_kwargs=generator_kwargs)
 
@@ -86,5 +82,14 @@ def interactive_env(bundle: Bundle, path='stresstest/football/resources/team-nam
     ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
     all_questions = (ssq, maq, uaq, abq)
     if do_print:
-        print_out(story, ssq, maq, uaq, abq)
+        actors = [" ".join([e.actor.first, e.actor.last]) for e in events]
+        coactors = [" ".join([e.attributes['coactor'].first, e.attributes['coactor'].last]) for e in events]
+        assert not any(a in coactors for a in actors)
+        assert not any(c in actors for c in coactors)
+        assert len(set(actors)) == 5
+        assert len(set(coactors)) == 5
+
+        print('Actors', actors)
+        print('Coactors', coactors)
+        print_out(story, ssq, maq, uaq, abq, highlights=actors + coactors)
     return generator, cfg, events, realizer, story, all_questions

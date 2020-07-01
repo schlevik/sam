@@ -2,6 +2,7 @@ import random
 
 import names
 from loguru import logger
+from scipy.stats import expon
 
 from stresstest.classes import Choices, Config
 from stresstest.football.classes import Team, Player, FootballWorld
@@ -93,8 +94,15 @@ class FootballGenerator(StoryGenerator):
                 last_ts = sentence.attributes.get("time", 0)
                 if last_ts:
                     break
-            # TODO: this needs to be more biased towards earlier times
-            return random.choice(list(range(last_ts, 90)))
+
+            rv = expon(scale=20)
+            # TODO: if too slow, change to linear...
+            if last_ts + 1 >= 90:
+                return last_ts + 1
+            p = [rv.pdf(x) for x in range(last_ts + 1, 90)]
+            sum_p = sum(p)
+            p_norm = [x / sum_p for x in p]
+            return random.choices(list(range(last_ts + 1, 90)), weights=p_norm, k=1)[0]
 
         if name == 'coactor':
             if self.current_event.event_type == 'foul':
