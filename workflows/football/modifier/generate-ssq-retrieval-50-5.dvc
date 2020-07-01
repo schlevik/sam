@@ -1,4 +1,4 @@
-md5: f2c81e51b5f9a70519283b575077a593
+md5: 3bed319ecda36ed478887f8a9bab6bc0
 cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
   --seed 56 -n 50 -k 5 --out-path data/football/modifier/ --do-save
 wdir: ../../..
@@ -7,10 +7,16 @@ deps:
   path: scripts/generate_modifier.py
 - md5: a6fa9162e400399d2514413b0c76e457
   path: stresstest/realize.py
-- md5: a4a1b241d39f2397d5e5b71bcd2726f7.dir
-  path: stresstest/football
+- md5: 569914abf2f024262f95e715ec97d7f3
+  path: stresstest/football/football_generator.py
+- md5: 70c689f9a006158cc67faf2575307be0
+  path: stresstest/football/generate_with_modifier.py
 - md5: 427afdf6a9a1b06eedddcfd329602aa4
   path: stresstest/generator.py
+- md5: c4f0f0358818bad480e86efc2ce3e9ad
+  path: stresstest/football/resources/templates_modifier.py
+- md5: 3fd4f35f3dd738849f12ec721b7cdaf0
+  path: stresstest/football/resources/team-names.json
 - md5: 85262589763599cd7d3a87058e2f0af6
   path: stresstest/generator_modifier.py
 - md5: 0789d38c251038759696cb2422949c32
