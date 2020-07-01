@@ -1,13 +1,13 @@
-md5: 4ab7ec062acc0b0609e522d6fbc87d2c
+md5: b41911dd0f03e851cab59aa419d703cc
 wdir: ../../../..
 cmd: python main.py predict --cls BiDAF --model models/bidaf-model-2020.03.19.tar.gz
   --input data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json --output
   data/football/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
 deps:
-- md5: 122447d63b8ee5127c8a87918f38c355
+- md5: 96a2035f70309efdfd59d9106f76c50c
   path: data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json
 outs:
-- md5: 60f25ec886491ffe0656dcdb8e709be9
+- md5: 1ebff9272e0f0925568bc08ea9043ae3
   path: data/football/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
   cache: true
   metric: false

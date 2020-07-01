@@ -4,7 +4,7 @@ import names
 from loguru import logger
 from scipy.stats import expon
 
-from stresstest.classes import Choices, Config
+from stresstest.classes import Choices, Config, YouIdiotException
 from stresstest.football.classes import Team, Player, FootballWorld
 from stresstest.generator import StoryGenerator
 from stresstest.util import fmt_dict
@@ -21,16 +21,22 @@ class FootballGenerator(StoryGenerator):
     world: FootballWorld
 
     def __init__(self, config, get_world=FootballWorld,
-                 team_names: str = 'stresstest/football/resources/team-names.json', *args, **kwargs):
+                 team_names: str = 'stresstest/football/resources/team-names.json', *args,
+                 **kwargs):
         logger.debug(f"{FootballGenerator.__name__} entering constructor")
         logger.debug(fmt_dict(locals()))
         super().__init__(config, FootballWorld, *args, **kwargs)
         logger.debug(f"{team_names}")
         self.team_names = Config(team_names)
+        unique_coactors = config.get('unique_coactors', None)
+        if unique_coactors is None:
+            self.unique_coactors = self.unique_actors
+        else:
+            self.unique_coactors = unique_coactors
         logger.debug(f"{FootballGenerator.__name__} finish")
 
     def do_set_world(self):
-        num_players = self.cfg.get("world.num_players", 5)
+        num_players = self.cfg.get("world.num_players", 11)
         gender = self.cfg.get("world.gender", True)
         self.world.gender = self.world.FEMALE if gender else self.world.MALE
 
@@ -56,7 +62,14 @@ class FootballGenerator(StoryGenerator):
         self.world.players = []
         self.world.players_by_id = dict()
         # TODO: unique names (actually non unique would be funny too)
-
+        if self.unique_actors:
+            if self.world.num_players < self.world.num_sentences:
+                raise YouIdiotException(f"Can't have less players ({self.world.num_players}) "
+                                        f"than sentences ({self.world.num_sentences}) if choosing uniquely for actor!")
+            elif self.unique_coactors and self.world.num_players < 2 * self.world.num_sentences:
+                raise YouIdiotException(f"Can't have less than (4 * players) (you have {self.world.num_players}) "
+                                        f"than sentences ({self.world.num_sentences}) if choosing uniquely for "
+                                        "actor and coactor!")
         for i in range(1, num_players + 1):
             p1 = Player(**{
                 "id": f"player{i}",
@@ -105,18 +118,29 @@ class FootballGenerator(StoryGenerator):
             return random.choices(list(range(last_ts + 1, 90)), weights=p_norm, k=1)[0]
 
         if name == 'coactor':
+            logger.debug(f"Chosen Actors: {[a.id for a in self.chosen_actors]}")
+            own_team = Choices(p for p in self.world['players'] if p['team'] != self.current_event.actor['team'])
+            other_team = Choices(p for p in self.world['players'] if p['team'] == self.current_event.actor['team'])
             if self.current_event.event_type == 'foul':
-                player = Choices(
-                    p['id'] for p in self.world['players'] if
-                    p['team'] != self.current_event.actor['team']).random()
-
+                if self.unique_coactors:
+                    remaining_pool = other_team - self.chosen_actors
+                    logger.debug(f"Remaining pool: {[a.id for a in remaining_pool]}")
+                else:
+                    remaining_pool = other_team
+                player = remaining_pool.random()
             elif self.current_event.event_type == 'goal':
-                player = Choices(p['id'] for p in self.world['players'] if
-                                 p['team'] == self.current_event.actor[
-                                     'team'] and p != self.current_event.actor).random()
+                if self.unique_coactors:
+                    remaining_pool = other_team - self.chosen_actors
+                    logger.debug(f"Remaining pool: {[a.id for a in remaining_pool]}")
+                else:
+                    # can't assist yourself, innit?
+                    remaining_pool = own_team - self.current_event.actor['team']
+                player = remaining_pool.random()
             else:
                 raise NotImplementedError()
-            return self.world['players_by_id'][player]
+            if self.unique_coactors:
+                self.chosen_actors.append(player)
+            return player
 
     def post_process_attribute_answers(self, attribute_name, attribute_value):
         if attribute_name == 'coactor':

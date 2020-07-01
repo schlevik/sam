@@ -7,9 +7,10 @@
   ],
   "world": {
     "num_sentences": 6,
-    "num_players": 11
+    "num_players": 12
   },
   "modify_event_types": [
     "goal"
-  ]
+  ],
+  "unique_actors": true
 }

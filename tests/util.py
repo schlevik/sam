@@ -45,7 +45,8 @@ def interactive_env_football(do_print=True, do_realise=True, **kwargs):
     return interactive_env(bundle, modifier=False, do_print=do_print, do_realise=do_realise)
 
 
-def interactive_env_football_modifier(do_print=True, do_realise=True, first_modification=0, fill_with_modification=None,
+def interactive_env_football_modifier(cfg=None, do_print=True, do_realise=True, first_modification=0,
+                                      fill_with_modification=None,
                                       modify_event_types=None,
                                       modification_distance=1, total_modifiable_actions=2, **kwargs):
     generator_kwargs = dict(
@@ -56,13 +57,18 @@ def interactive_env_football_modifier(do_print=True, do_realise=True, first_modi
         total_modifiable_actions=total_modifiable_actions,
     )
     generator_kwargs.update(kwargs)
-    return interactive_env(bundle, modifier=True, do_print=do_print, do_realise=do_realise,
+    return interactive_env(bundle=bundle, cfg=cfg, modifier=True, do_print=do_print, do_realise=do_realise,
                            generator_kwargs=generator_kwargs)
 
 
-def interactive_env(bundle: Bundle, path='stresstest/football/resources/team-names.json', modifier=False, do_print=True,
+def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
                     do_realise=True, generator_kwargs=None):
-    cfg = Config(path)
+    if not cfg:
+        cfg = Config({})
+    elif isinstance(cfg, str):
+        cfg = Config(cfg)
+    elif isinstance(cfg, dict):
+        cfg = Config(cfg)
     cfg.pprint()
     if modifier:
         g_class = bundle.generator_modifier
@@ -73,7 +79,19 @@ def interactive_env(bundle: Bundle, path='stresstest/football/resources/team-nam
     generator_kwargs = generator_kwargs or {}
     generator = g_class(cfg, **generator_kwargs)
     events = generator.generate_story()
-
+    if generator.unique_actors:
+        print('unique actors?')
+        actors = [e.actor for e in events]
+        print(actors)
+        assert len(set(actors)) == generator.world.num_sentences
+        print('yes')
+        if getattr(generator, 'unique_coactors', False):
+            print('unique coactors?')
+            coactors = [e.attributes['coactor'] for e in events]
+            print(coactors)
+            assert len(set(coactors)) == generator.world.num_sentences
+            assert len(set(actors + coactors)) == 2 * generator.world.num_sentences
+            print('yes')
     if not do_realise:
         return generator, cfg, events, None, None, None
 
@@ -81,15 +99,13 @@ def interactive_env(bundle: Bundle, path='stresstest/football/resources/team-nam
     story, visits = realizer.realise_story(events, generator.world)
     ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
     all_questions = (ssq, maq, uaq, abq)
+
     if do_print:
         actors = [" ".join([e.actor.first, e.actor.last]) for e in events]
         coactors = [" ".join([e.attributes['coactor'].first, e.attributes['coactor'].last]) for e in events]
-        assert not any(a in coactors for a in actors)
-        assert not any(c in actors for c in coactors)
-        assert len(set(actors)) == 5
-        assert len(set(coactors)) == 5
-
         print('Actors', actors)
         print('Coactors', coactors)
+
         print_out(story, ssq, maq, uaq, abq, highlights=actors + coactors)
+
     return generator, cfg, events, realizer, story, all_questions

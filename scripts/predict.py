@@ -34,7 +34,7 @@ def predict(input, output, model, cls, gpu):
     model = model_cls.make(model, gpu=gpu)
 
     predictions = defaultdict(dict)
-    for passage_id, passage, question_id, question, _ in tqdm(sample_iter(sample), position=1, total=num_q):
+    for passage_id, passage, question_id, question, *_ in tqdm(sample_iter(sample), position=1, total=num_q):
         # TODO: maybe something something batch
         logger.debug(f"Passage:{passage}, Question: {question}")
         answer = model.predict(question=question, passage=passage)
