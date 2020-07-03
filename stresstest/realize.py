@@ -10,7 +10,7 @@ from stresstest.classes import S, YouIdiotException, F, Event, Context, Question
 
 
 class RandomChooser:
-    def choose(self, choices, exclude=None):
+    def choose(self, choices, exclude=None, *args, **kwargs):
         if isinstance(choices, S):
             return choices.random(exclude=exclude)
         elif isinstance(choices, Callable):
@@ -20,9 +20,14 @@ class RandomChooser:
             return choices[choice], choice
 
 
+class DeterminedSentenceTemplateChooser(RandomChooser):
+    def choose(self, choices, exclude=None, *args, is_sentence=True, **kwargs):
+        ...
+
+
 class DeterminedChooser(RandomChooser):
     def __init__(self, choices: Optional[List[List[Tuple[str, Any]]]], sentence_choices: List[Tuple[str, int]]):
-        self.choices = choices
+        self.choices = choices or [[]] * len(sentence_choices)
         self.sentence_choices = sentence_choices
         self.iter = self._iter()
 
@@ -32,20 +37,26 @@ class DeterminedChooser(RandomChooser):
             for choice in choices_for_ith_sentence:
                 yield choice
 
-    def choose(self, choices, exclude=None):
-        # logger.debug(f"Choosing from {choices}...")
+    def choose(self, choices, exclude=None, *args, **kwargs):
+
+        name, choice = next(self.iter)
         if isinstance(choices, S):
-            name, idx = next(self.iter)
-            logger.debug(f"Choosing {name}.{idx}")
-            return choices[idx], idx
+            # name, idx = next(self.iter)
+            logger.debug(f"Choosing {name}.{choice}")
+            if choice == '<any>':
+                return super().choose(choices, exclude, *args, **kwargs)
+            else:
+                return choices[choice], choice
         elif isinstance(choices, Callable):
-            name, content = next(self.iter)
-            logger.debug(f"For {name} choosing {content}")
-            return content
+            # name, content = next(self.iter)
+            logger.debug(f"For {name} choosing {choice}")
+            return choice
         elif isinstance(choices, List):
-            name, choice = next(self.iter)
             logger.debug(f"Choosing {choices}:{choice} ({name})")
-            return choices[choice], choice
+            if choice == '<any>':
+                super().choose(choices, exclude, *args, **kwargs)
+            else:
+                return choices[choice], choice
 
 
 class Accessor:
@@ -429,6 +440,11 @@ class Realizer:
             sent = self.realise_sentence()
             realised.append(sent)
         return realised, self.context.visits
+
+    def realise_with_sentence_choices(self, events: List[Event], world: World, chosen_templates):
+        self.chooser = DeterminedChooser(None, chosen_templates)
+        self.processor.chooser = RandomChooser()  # just to be sure
+        return self.realise_story(events, world)
 
     def realise_with_choices(self, events: List[Event], world: World, choices: List[List[Tuple[Any, int]]],
                              chosen_templates):
