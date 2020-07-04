@@ -10,7 +10,7 @@ from string import digits
 
 from statsmodels.stats.proportion import proportion_confint
 
-from stresstest.util import Entry
+from stresstest.classes import Entry
 
 
 class EvalMetric(ABC):

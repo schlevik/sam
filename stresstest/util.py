@@ -1,8 +1,9 @@
-from collections import namedtuple
-
+from itertools import chain, islice
 import click
 import ujson as json
-from typing import Dict, Any, List, Generator
+from typing import Dict, Any, List, Generator, Iterable, TypeVar
+
+from stresstest.classes import Entry
 
 
 def load_json(path: str):
@@ -14,7 +15,13 @@ def num_questions(sample: List[Dict[str, Any]]):
     return sum(len(datum['qas']) for datum in sample)
 
 
-Entry = namedtuple("Entry", ["id", "passage", "qa_id", "question", "answer", "qa"])
+T = TypeVar('T')
+
+
+def batch(iterable: Iterable[T], batch_size=10) -> List[Iterable[T]]:
+    iterator = iter(iterable)
+    for first in iterator:
+        yield list(chain([first], islice(iterator, batch_size - 1)))
 
 
 def sample_iter(sample: List[Dict[str, Any]]) -> Generator[Entry, None, None]:

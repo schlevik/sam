@@ -4,5 +4,5 @@ deps:
   path: https://storage.googleapis.com/allennlp-public-models/bidaf-model-2020.03.19.tar.gz
 outs:
 - md5: adea30ccbb0c2cf05a6a551de8537188
-  path: bidaf-model-2020.03.19.tar.gz
+  path: bidaf-squad.tar.gz
 frozen: true

@@ -1,7 +1,3 @@
 /drop_dataset_dev.json
 /drop_nfl.json
-/modifier/stresstest-ssq-baseline-retrieval-50-5.json
-/modifier/stresstest-ssq-modifier-retrieval-50-5.json
-/modifier/bidaf/predictions-bidaf-ssq-modifier-retrieval-50-5.json
-/modifier/bidaf/predictions-bidaf-ssq-baseline-retrieval-50-5.json
 /sanity-check.json

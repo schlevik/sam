@@ -9,7 +9,7 @@ from joblib import delayed, Parallel
 from loguru import logger
 from tqdm import tqdm
 
-from scripts.utils import Domain
+from scripts.utils import Domain, BASELINE, INTERVENTION
 from stresstest.classes import Config
 from stresstest.comb_utils import generate_all_possible_template_choices, split
 from stresstest.realize import Realizer
@@ -198,14 +198,14 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
 
         subsample_str = subsample if subsample else 'full'
         subsample_str = f"{subsample_str}-{i}" if split_templates else subsample_str
-        file_name = f"stresstest-{'-'.join(answer_types)}-{{}}-{'-'.join(question_types)}-{n}-{subsample_str}.json"
+        file_name = f"{{}}-{'-'.join(answer_types)}-{'-'.join(question_types)}-{n}-{subsample_str}.json"
         click.echo(
             f"Generating from '{click.style(config, fg='green')}': {click.style(str(n), fg='green', bold=True)} passages, "
             f"{click.style(str(subsample_str), fg='green', bold=True)} realisation per passage.")
         click.echo(f"Saving baseline in "
-                   f"{click.style(os.path.join(out_path, file_name.format('baseline')), fg='green', bold=True)}.")
+                   f"{click.style(os.path.join(out_path, file_name.format(BASELINE)), fg='green', bold=True)}.")
         click.echo(f"Saving modified in "
-                   f"{click.style(os.path.join(out_path, file_name.format('modifier')), fg='green', bold=True)}.")
+                   f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='green', bold=True)}.")
 
         baseline, modified = generate(cfg, domain, num_workers, subsample, templates, uuid4)
 
@@ -217,10 +217,10 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
         click.echo(f"Total Questions over modified passages: {sum(1 for m in modified for _ in m['qas'])}")
 
         if do_save:
-            with open(os.path.join(out_path, file_name.format('baseline')), "w+") as f:
+            with open(os.path.join(out_path, file_name.format(BASELINE)), "w+") as f:
                 json.dump(baseline, f)
 
-            with open(os.path.join(out_path, file_name.format('modifier')), "w+") as f:
+            with open(os.path.join(out_path, file_name.format(INTERVENTION)), "w+") as f:
                 json.dump(modified, f)
 
 

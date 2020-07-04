@@ -1,20 +1,24 @@
+import os
+
 import click
 from tabulate import tabulate
 
+from scripts.utils import BASELINE, INTERVENTION
 from stresstest.util import load_json
 
 
 @click.command()
 @click.option("--diversity", type=str, default='metrics/diversity.json')
 @click.option("--count", type=str, default='metrics/count.json')
-@click.option("--baseline", type=str, default='metrics/score-baseline.json')
-@click.option("--intervention", type=str, default='metrics/score-intervention.json')
+@click.option("--evaluation", type=str, default='metrics/result.json')
+@click.option('--evaluation-intervention', type=str, default='metrics/result-intervention.json')
 @click.option("--naturality", type=str, default='metrics/naturality.json')
-def report(diversity, count, baseline, intervention, naturality):
+def report(diversity, count, evaluation, evaluation_intervention, naturality):
     diversity_diff = load_json(diversity)
     count = load_json(count)
-    phenomenon_score = load_json(intervention)
-    baseline_score = load_json(baseline)
+
+    evaluation = load_json(evaluation)
+    evaluation_intervention = load_json(evaluation_intervention)
     try:
         naturality_diff = load_json(naturality)
     except:
@@ -51,13 +55,27 @@ def report(diversity, count, baseline, intervention, naturality):
         click.echo(f'For "{k}" event type:')
         click.echo(f"Upper bound: {v['upper']} Lower bound: {v['lower']}")
 
-    click.secho("Baseline performance: ", fg='green')
-    for metric, v in baseline_score['full'].items():
-        click.secho(f"{metric}: {v['human_readable']}")
+    baseline_score = next(v for k, v in evaluation.items() if BASELINE in os.path.basename(k))
+    intervention_score = next(v for k, v in evaluation.items() if INTERVENTION in os.path.basename(k))
 
-    click.secho("Performance after Intervention: ", fg='green')
-    for metric, v in phenomenon_score['full'].items():
-        click.secho(v['human_readable'])
-    click.secho("Differences", fg='green')
-    for (metric, baseline_v) in baseline_score['full'].items():
-        click.secho(f"{metric}: {baseline_v['mean'] - phenomenon_score['full'][metric]['mean']:.4f} ")
+    click.secho("Baseline/Intervention performance isolated: ", fg='green')
+    table = []
+    headers = []
+    for model_name, values in baseline_score.items():
+        intervention_values = intervention_score[model_name]
+        if model_name != 'n':
+
+            if not headers:
+                headers = [click.style(k, bold=True) for k in
+                           ['Model'] + list(values.keys()) + [f"Intervention {v}" for v in values.keys()]]
+            table.append([model_name] +
+                         [values[val]['human_readable'] for val in values] +
+                         [intervention_values[val]['human_readable'] for val in intervention_values]
+                         )
+    click.echo(tabulate(table, headers=headers))
+    click.secho("Evaluation by intervention: ", fg='green')
+    for model_name, values in evaluation_intervention.items():
+        click.echo(f"Model: {model_name}: {values['evaluation_on_intervention']['human_readable']}")
+
+        headers = [click.style(k, bold=True) for k in ['Model Behaviour', f'Occurrences (of {values["n"]})']]
+        click.echo(tabulate(list(values['behaviour'].items()), headers=headers))

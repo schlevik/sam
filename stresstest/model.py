@@ -1,11 +1,13 @@
+import itertools
 import string
+from typing import Iterable
 
 from allennlp.predictors import Predictor
 from loguru import logger
 from overrides import overrides
 from transformers import AlbertForQuestionAnswering, AlbertTokenizer
 
-from stresstest.classes import Model
+from stresstest.classes import Model, Entry
 
 
 class NaQANet(Model):
@@ -26,7 +28,6 @@ class NaQANet(Model):
 
     @classmethod
     def make(cls, path, gpu=False):
-        # TODO: here, we'll probably need
         from allennlp_models.rc.qanet.naqanet_model import NumericallyAugmentedQaNet
         cuda_device = 0 if gpu else -1
         predictor = Predictor.from_path(path, 'reading-comprehension', cuda_device=cuda_device)
@@ -39,6 +40,12 @@ class BiDAF(Model):
         from allennlp_models.rc.bidaf.bidaf_model import BidirectionalAttentionFlow
         cuda_device = 0 if gpu else -1
         return cls("BiDAF", Predictor.from_path(path, 'reading-comprehension', cuda_device=cuda_device), gpu=gpu)
+
+    def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        return [
+            p['best_span_str'] for p in
+            self.predictor.predict_batch_json({"question": e.question, "passage": e.passage} for e in batch)
+        ]
 
 
 class Albert(Model):
@@ -73,22 +80,7 @@ class Albert(Model):
     def make(cls, path, gpu=False) -> Model:
         return cls("AlBERT", path, gpu)
 
-    @overrides
-    def predict(self, question, passage):
-        d = self.tokenizer.encode_plus(question.lower(), passage.lower(), return_tensors='pt')
-        if self.gpu:
-            token_type_ids = d['token_type_ids'].cuda()
-            input_ids = d['input_ids'].cuda()
-        else:
-            input_ids = d['input_ids']
-            token_type_ids = d['token_type_ids']
-
-        s, e = self.predictor(token_type_ids=token_type_ids,
-                              input_ids=input_ids)
-        tokens = [
-            self.tokenizer.decode(int(i))
-            for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
-        ]
+    def post_process(self, question, passage, tokens):
         result = " ".join(t for t in tokens if not (t == "[CLS]" or t == "[SEP]"))
         logger.debug(f"Albert prediction: {result}")
         try:
@@ -97,3 +89,51 @@ class Albert(Model):
         except:
             raise ValueError(f"This should not happen! Question: {question} Passage: {passage} prediction: {result}")
         return result
+
+    def move_to_gpu(self, input_dict):
+        if self.gpu:
+            return {k: v.cuda() for k, v in input_dict}
+        else:
+            return input_dict
+
+    @overrides
+    def predict(self, question, passage):
+        d = self.tokenizer.encode_plus(question.lower(), passage.lower(), return_tensors='pt')
+
+        s, e = self.predictor(**self.move_to_gpu(d))
+
+        tokens = [
+            self.tokenizer.decode(int(i))
+            for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
+        ]
+        return self.post_process(question, passage, tokens)
+
+    @overrides
+    def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        batch = list(batch)
+        d = self.tokenizer.batch_encode_plus(((e.question.lower(), e.passage.lower()) for e in batch),
+                                             return_tensors='pt', pad_to_max_length=True)
+        if self.gpu:
+            token_type_ids = d['token_type_ids'].cuda()
+            input_ids = d['input_ids'].cuda()
+        else:
+            input_ids = d['input_ids']
+            token_type_ids = d['token_type_ids']
+
+        ss, es = self.predictor(token_type_ids=token_type_ids,
+                                input_ids=input_ids)
+        result = []
+        for j, (start, end, entry) in enumerate(zip(ss, es, batch)):
+            tokens = [
+                self.tokenizer.decode(int(i))
+                for i in d['input_ids'][j][start.argmax():end.argmax() + 1]
+            ]
+            result.append(self.post_process(entry.question, entry.passage, tokens))
+        return result
+
+        # try:
+        #     result = f'{question} {passage}'[slice(*self._match(f'{question} {passage}', result))]
+        #     logger.debug(f"After matching: {result}")
+        # except:
+        #     raise ValueError(f"This should not happen! Question: {question} Passage: {passage} prediction: {result}")
+        # return result
