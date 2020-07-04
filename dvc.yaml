@@ -40,21 +40,21 @@ stages:
       - data/football/modifier/baseline-ssq-retrieval-40-50.json
 
       - data/football/modifier/intervention-ssq-retrieval-40-50.json
-  evalate-diveristy-football-modifier:
-    cmd: python main.py diversity --input data/football/modifier/modifier-ssq-retrieval-40-50.json
+  evalate-diversity-football-modifier:
+    cmd: python main.py diversity --input data/football/modifier/intervention-ssq-retrieval-40-50.json
       --output metrics/football/modifier/diversity.json --reference data/football/drop_nfl.json
     deps:
-      - data/football/modifier/modifier-ssq-retrieval-40-50.json
+      - data/football/modifier/intervention-ssq-retrieval-40-50.json
       - data/football/drop_nfl.json
       - scripts/compare.py
     metrics:
     - metrics/football/modifier/diversity.json:
         cache: false
   evaluate-naturality-football-modifier:
-    cmd: python main.py diversity --input data/football/modifier/modifier-ssq-retrieval-40-50.json
+    cmd: python main.py quality --input data/football/modifier/intervention-ssq-retrieval-40-50.json
       --output metrics/football/modifier/naturality.json --reference data/football/drop_nfl.json
     deps:
-      - data/football/modifier/stresstest-ssq-intervention-retrieval-50-5.json
+      - data/football/modifier/intervention-ssq-retrieval-40-50.json
       - data/football/drop_nfl.json
       - scripts/cohesion.py
     metrics:
@@ -71,13 +71,13 @@ stages:
     outs:
       - data/football/drop_nfl.json
   predict-football-modifier:
-    cmd: MODELS=models/bidaf-squad.tar.gz:models/albert-squad;CLASSES='BiDAF,Albert' python main.py predict
+    cmd: MODELS=models/bidaf-squad.tar.gz:models/albert-squad CLASSES='BiDAF Albert' python main.py predict
       data/football/modifier/baseline-ssq-retrieval-40-50.json
-      data/football/modifier/modifier-ssq-retrieval-40-50.json
+      data/football/modifier/intervention-ssq-retrieval-40-50.json
       --output-folder data/football/modifier/predictions
     deps:
       - data/football/modifier/baseline-ssq-retrieval-40-50.json
-      - data/football/modifier/modifier-ssq-retrieval-40-50.json
+      - data/football/modifier/intervention-ssq-retrieval-40-50.json
       - models/albert-squad
       - models/bidaf-squad.tar.gz
     outs:

@@ -1,4 +1,4 @@
-md5: c7b444408f7b1702198bbc82a3a71c3f
+md5: 3535bf0356656fe457400975c0dff1be
 deps:
 - etag: '"adea30ccbb0c2cf05a6a551de8537188"'
   path: https://storage.googleapis.com/allennlp-public-models/bidaf-model-2020.03.19.tar.gz

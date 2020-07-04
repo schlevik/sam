@@ -1,0 +1,70 @@
+{
+    "data/football/modifier/baseline-ssq-retrieval-40-50.json": {
+        "n": 4479,
+        "albert-squad": {
+            "EM": {
+                "human_readable": "0.5443 +/- 0.0146",
+                "mean": 0.5443179281089529,
+                "variance": null,
+                "95ci": 0.014585282669023036
+            },
+            "F1": {
+                "human_readable": "0.5850 +/- 0.0139",
+                "mean": 0.5849773433891464,
+                "variance": 0.2255565397169655,
+                "95ci": 0.013912419770399835
+            }
+        },
+        "bidaf-squad": {
+            "EM": {
+                "human_readable": "0.2905 +/- 0.0133",
+                "mean": 0.2904666220138424,
+                "variance": null,
+                "95ci": 0.013295114811059883
+            },
+            "F1": {
+                "human_readable": "0.3847 +/- 0.0131",
+                "mean": 0.38473825184874844,
+                "variance": 0.2003662856417037,
+                "95ci": 0.013112553853404636
+            }
+        }
+    },
+    "data/football/modifier/intervention-ssq-retrieval-40-50.json": {
+        "n": 6041,
+        "albert-squad": {
+            "EM": {
+                "human_readable": "0.3375 +/- 0.0119",
+                "mean": 0.337526899519947,
+                "variance": null,
+                "95ci": 0.011924275252693461
+            },
+            "F1": {
+                "human_readable": "0.3598 +/- 0.0118",
+                "mean": 0.3597973356610729,
+                "variance": 0.2183634685536717,
+                "95ci": 0.01178611576767067
+            }
+        },
+        "bidaf-squad": {
+            "EM": {
+                "human_readable": "0.1920 +/- 0.0099",
+                "mean": 0.19202118854494288,
+                "variance": null,
+                "95ci": 0.009932720979726112
+            },
+            "F1": {
+                "human_readable": "0.2418 +/- 0.0101",
+                "mean": 0.24181183383174562,
+                "variance": 0.16069890353087782,
+                "95ci": 0.010110838355469167
+            }
+        }
+    },
+    "data/football/modifier/stresstest-ssq-baseline-retrieval-50-5.json": {
+        "n": 435
+    },
+    "data/football/modifier/stresstest-ssq-modifier-retrieval-50-5.json": {
+        "n": 619
+    }
+}
