@@ -1,3 +1,4 @@
+from copy import deepcopy
 from itertools import groupby, permutations, product
 from math import factorial
 from operator import attrgetter
@@ -11,20 +12,21 @@ from stresstest.classes import Event
 key = attrgetter('event_type')
 
 
-def split(templates: Dict[str, List[str]], event_types_to_split: List[str], split_ratio: float):
-    first_split = dict()
-    second_split = dict()
-    for et, sents in templates.items():
-        if et in event_types_to_split:
-            sents = sents[:]
+def split(templates: Dict[str, Dict[str, List[str]]], event_types_to_split: List[str], split_ratio: float):
+    first_split = deepcopy(templates)
+    second_split = deepcopy(templates)
+    for event_type, sents in templates['sentences'].items():
+        sents = deepcopy(sents)
+        if event_type in event_types_to_split:
             shuffle(sents)
             split_idx = round(split_ratio * len(sents))
-            first_split[et] = sents[split_idx:]
-            second_split[et] = sents[:split_idx]
-            assert len(first_split[et]) + len(second_split[et]) == len(sents)
+            first_split['sentences'][event_type] = sents[split_idx:]
+            second_split['sentences'][event_type] = sents[:split_idx]
+            assert len(first_split['sentences'][event_type]) + len(second_split['sentences'][event_type]) == len(
+                templates['sentences'][event_type])
         else:
-            second_split[et] = sents
-            first_split[et] = sents
+            second_split['sentences'][event_type] = sents
+            first_split['sentences'][event_type] = sents
     return first_split, second_split
 
 
