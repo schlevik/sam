@@ -80,6 +80,7 @@ stages:
       - data/football/modifier/intervention-ssq-retrieval-40-50.json
       - models/albert-squad
       - models/bidaf-squad.tar.gz
+      - scripts/predict.py
     outs:
       - data/football/modifier/predictions
   evaluate-football-modifier:
@@ -90,6 +91,7 @@ stages:
       - data/football/modifier/baseline-ssq-retrieval-40-50.json
       - data/football/modifier/intervention-ssq-retrieval-40-50.json
       - data/football/modifier/predictions
+      - scripts/evaluate.py
     metrics:
     - metrics/football/modifier/evaluation.json:
           cache: false
