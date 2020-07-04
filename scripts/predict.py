@@ -1,14 +1,13 @@
-import json
 import os
 import sys
 from collections import defaultdict
-from typing import Iterable, List
+from typing import List
 
 import click
-import quickconf
 from loguru import logger
 from tqdm import tqdm
 
+from scripts.utils import write_json
 from stresstest.classes import Model, Entry
 from stresstest.util import load_json, sample_iter, num_questions, fmt_dict, do_import, batch
 
@@ -68,5 +67,4 @@ def predict(in_files, output_folder, models, model_classes, gpu, batch_size):
                 os.mkdir(output_folder)
             output = os.path.join(output_folder, f"{output_base}-{weights_addon}.json")
             click.echo(f"Saving predictions to {click.style(output, fg='blue')}")
-            with open(output, "w+") as f:
-                json.dump(predictions, f)
+            write_json(predictions, output, pretty=False)

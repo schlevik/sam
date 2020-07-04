@@ -9,7 +9,7 @@ from joblib import delayed, Parallel
 from loguru import logger
 from tqdm import tqdm
 
-from scripts.utils import Domain, BASELINE, INTERVENTION
+from scripts.utils import Domain, BASELINE, INTERVENTION, write_json
 from stresstest.classes import Config
 from stresstest.comb_utils import generate_all_possible_template_choices, split
 from stresstest.realize import Realizer
@@ -217,11 +217,8 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
         click.echo(f"Total Questions over modified passages: {sum(1 for m in modified for _ in m['qas'])}")
 
         if do_save:
-            with open(os.path.join(out_path, file_name.format(BASELINE)), "w+") as f:
-                json.dump(baseline, f)
-
-            with open(os.path.join(out_path, file_name.format(INTERVENTION)), "w+") as f:
-                json.dump(modified, f)
+            write_json(baseline, os.path.join(out_path, file_name.format(BASELINE)), pretty=False)
+            write_json(modified, os.path.join(out_path, file_name.format(INTERVENTION)), pretty=False)
 
 
 def generate(cfg, domain, num_workers, subsample, templates, uuid4):

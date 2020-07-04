@@ -69,9 +69,13 @@ class EvalMetricParam(click.ParamType):
         return metric_classes
 
 
-def write_json(result, output):
-    with open(output, "w+") as f:
-        json.dump(result, f, indent=4, separators=(',', ': '))
+def write_json(result, path, pretty=True):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w+") as f:
+        if pretty:
+            json.dump(result, f, indent=4, separators=(',', ': '))
+        else:
+            json.dump(result, f)
 
 
 def get_templates(templates, action: str = None, n: int = None, command: str = "Executing command"):

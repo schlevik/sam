@@ -42,7 +42,7 @@ def export(in_path, out_path, ds_format, shuffle, split, seed):
     else:
         new_format = ds_format(dataset)
         click.echo(f'Writing out to: {click.style(out_path, fg="green")}')
-        write_json(new_format, out_path)
+        write_json(new_format, out_path, pretty=False)
 
 
 @click.command()
@@ -56,6 +56,6 @@ def combine(in_files, out_file):
             ds = load_json(in_file)
             combined_dataset.extend(ds)
         click.echo(f"Writing out: {click.style(out_file, fg='green')}")
-        write_json(combined_dataset, out_file)
+        write_json(combined_dataset, out_file, pretty=False)
     else:
         click.echo(f"Nothing to write...")
