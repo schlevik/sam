@@ -59,11 +59,11 @@ class Albert(Model):
     def _match(self, passage, result):
         result = result.replace("<pad>", "")
         result = result.replace("<unk>", "")
-        
-        if not result:
-            return 0, 0
 
         result = [c for c in result.lower() if c not in string.whitespace]
+
+        if not result:
+            return 0, 0
         j = 0
         start = 0
         in_string = False
