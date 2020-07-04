@@ -10,7 +10,7 @@ class Domain(click.ParamType):
     def convert(self, value, param, ctx):
         try:
             return do_import(f'{value}.bundle', relative_import='stresstest')
-        except ModuleNotFoundError:
+        except AttributeError:
             self.fail(f"Domain '{value}' unknown, please choose from {implemented_domains}")
 
 
@@ -23,6 +23,18 @@ def get_all_subclasses(cls):
     :return: all currently imported subclasses.
     """
     return set(cls.__subclasses__()).union(s for c in cls.__subclasses__() for s in get_all_subclasses(c))
+
+
+class FormatParam(click.ParamType):
+    def convert(self, value, param, ctx):
+        try:
+            return do_import(value, relative_import='stresstest.ds_utils')
+        except AttributeError:
+            import inspect
+            from stresstest import ds_utils
+            all_functions = inspect.getmembers(ds_utils, inspect.isfunction)
+            all_function_names = [name for name, func in all_functions]
+            self.fail(f"Format '{value}' unknown, please choose from {all_function_names}.")
 
 
 class MetricParam(click.ParamType):

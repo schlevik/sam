@@ -1,0 +1,103 @@
+workflows-pilot-combine:
+  cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
+    data/pilot/stresstest-ssq-modifier-retrieval-40-100.json data/pilot/stresstest-ssq-both-retrieval-40-100.json
+  deps:
+  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
+    md5: 8f5d1eaab1bed9726c7577a1cd418ea8
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-100.json
+    md5: b9cf805d3aedb215fbcb3c832b52e478
+  - path: scripts/dataops.py
+    md5: f8f4f5c651d7877a5145d86ed81fb2cf
+  outs:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-100.json
+    md5: 90fc1b679591f2142b9179f202c70ab7
+pilot-export-squad:
+  cmd: python main.py export --in-path data/pilot/stresstest-ssq-both-retrieval-40-100.json
+    --out-path data/pilot/stresstest-ssq-both-retrieval-40-100-squad --ds-format squad
+    --shuffle --split 80:20 --seed 56
+  deps:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-100.json
+    md5: 90fc1b679591f2142b9179f202c70ab7
+  outs:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-100-squad-20-split.json
+    md5: 116306979e9894b2eba13de0c6ac62ea
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-100-squad-80-split.json
+    md5: 9961dbab77639b58ab47b30fe4e68497
+pilot-combine:
+  cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
+    data/pilot/stresstest-ssq-modifier-retrieval-40-100.json data/pilot/stresstest-ssq-both-retrieval-40-100.json
+  deps:
+  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
+    md5: 8f5d1eaab1bed9726c7577a1cd418ea8
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-100.json
+    md5: b9cf805d3aedb215fbcb3c832b52e478
+  - path: scripts/dataops.py
+    md5: a5f3058c82bf83cbf678baffcee18d13
+  outs:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-100.json
+    md5: 90fc1b679591f2142b9179f202c70ab7
+pilot-generate-ssq-retrieval-40-100-split-templates:
+  cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
+    --seed 56 --out-path data/pilot --domain football --num-workers 8 --split-templates
+    0.5 --do-save
+  deps:
+  - path: conf/modifier-ssq-retrieval-unique-actors.json
+    md5: 28a244cf99f6915b8b4c74e914058ff4
+  - path: scripts/generate_modifier.py
+    md5: 507f750803f3e5d57848e2f76378ff98
+  - path: stresstest/football/football_generator.py
+    md5: 569914abf2f024262f95e715ec97d7f3
+  - path: stresstest/football/generate_with_modifier.py
+    md5: 70c689f9a006158cc67faf2575307be0
+  - path: stresstest/football/resources/team-names.json
+    md5: 3fd4f35f3dd738849f12ec721b7cdaf0
+  - path: stresstest/football/resources/templates_modifier.py
+    md5: c4f0f0358818bad480e86efc2ce3e9ad
+  - path: stresstest/generator.py
+    md5: 427afdf6a9a1b06eedddcfd329602aa4
+  - path: stresstest/generator_modifier.py
+    md5: 85262589763599cd7d3a87058e2f0af6
+  - path: stresstest/realize.py
+    md5: 4b30854b75f5301995bf1cad7d5e304d
+  outs:
+  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
+    md5: f74629dcefebaf48d75fcb5a841f7a4c
+  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-full-1.json
+    md5: 4a29890fd607f5faff850b443142ea94
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json
+    md5: 95131c3669eb9151402937052d861096
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
+    md5: e1783325dab478086dcebd5e10c06243
+pilot-combine-split:
+  cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
+    data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+  deps:
+  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
+    md5: f74629dcefebaf48d75fcb5a841f7a4c
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json
+    md5: 95131c3669eb9151402937052d861096
+  - path: scripts/dataops.py
+    md5: a5f3058c82bf83cbf678baffcee18d13
+  outs:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+    md5: eaa56b6a1a3686246e89402f2e346c3c
+pilot-export-squad-split-0:
+  cmd: python main.py export --in-path data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+    --out-path data/pilot/stresstest-ssq-both-retrieval-40-100-squad-0.json --ds-format
+    squad --shuffle --seed 56
+  deps:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+    md5: eaa56b6a1a3686246e89402f2e346c3c
+  outs:
+  - path: data/pilot/stresstest-ssq-both-retrieval-40-100-squad-0.json
+    md5: e734ff437a8dd2aed7c6f9e794cb58b1
+pilot-export-squad-split-1:
+  cmd: python main.py export --in-path data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
+    --out-path data/pilot/stresstest-ssq-modifier-retrieval-40-100-squad-1.json --ds-format
+    squad --shuffle --seed 56
+  deps:
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
+    md5: e1783325dab478086dcebd5e10c06243
+  outs:
+  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-100-squad-1.json
+    md5: d20efe69e470562f74b34b2e1820fe2f

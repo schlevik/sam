@@ -1,0 +1,62 @@
+stages:
+  pilot-combine:
+    cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
+      data/pilot/stresstest-ssq-modifier-retrieval-40-100.json data/pilot/stresstest-ssq-both-retrieval-40-100.json
+    deps:
+      - data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
+      - data/pilot/stresstest-ssq-modifier-retrieval-40-100.json
+      - scripts/dataops.py
+    outs:
+      - data/pilot/stresstest-ssq-both-retrieval-40-100.json
+  pilot-export-squad:
+    cmd: python main.py export --in-path data/pilot/stresstest-ssq-both-retrieval-40-100.json
+      --out-path data/pilot/stresstest-ssq-both-retrieval-40-100-squad --ds-format
+      squad --shuffle --split 80:20 --seed 56
+    deps:
+      - data/pilot/stresstest-ssq-both-retrieval-40-100.json
+    outs:
+      - data/pilot/stresstest-ssq-both-retrieval-40-100-squad-20-split.json
+      - data/pilot/stresstest-ssq-both-retrieval-40-100-squad-80-split.json
+  pilot-generate-ssq-retrieval-40-100-split-templates:
+    cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
+      --seed 56 --out-path data/pilot --domain football --num-workers 8 --split-templates 0.5 --do-save
+    deps:
+        - scripts/generate_modifier.py
+        - stresstest/realize.py
+        - stresstest/football/football_generator.py
+        - stresstest/football/generate_with_modifier.py
+        - stresstest/generator.py
+        - stresstest/football/resources/templates_modifier.py
+        - stresstest/football/resources/team-names.json
+        - stresstest/generator_modifier.py
+        - conf/modifier-ssq-retrieval-unique-actors.json
+    outs:
+        - data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
+        - data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json
+        - data/pilot/stresstest-ssq-baseline-retrieval-40-full-1.json
+        - data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
+  pilot-combine-split:
+    cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
+      data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+    deps:
+      - data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
+      - data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json
+      - scripts/dataops.py
+    outs:
+      - data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+  pilot-export-squad-split-0:
+    cmd: python main.py export --in-path data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+      --out-path data/pilot/stresstest-ssq-both-retrieval-40-100-squad-0.json --ds-format
+      squad --shuffle --seed 56
+    deps:
+      - data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+    outs:
+      - data/pilot/stresstest-ssq-both-retrieval-40-100-squad-0.json
+  pilot-export-squad-split-1:
+    cmd: python main.py export --in-path data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
+      --out-path data/pilot/stresstest-ssq-modifier-retrieval-40-100-squad-1.json --ds-format
+      squad --shuffle --seed 56
+    deps:
+      - data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
+    outs:
+      - data/pilot/stresstest-ssq-modifier-retrieval-40-100-squad-1.json
