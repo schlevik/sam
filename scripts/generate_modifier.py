@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import sys
 import uuid
 from copy import deepcopy
 
@@ -29,7 +30,9 @@ def _generate_events(generator_class, config, first_modification,
 
 def _realize_events(generator_class, target_event_types, events, world, arranged_sentences, question_types,
                     answer_types,
-                    templates, uuid4, modification_data=None):
+                    templates, uuid4, modification_data=None, seed=None):
+    if seed:
+        random.seed(seed)
     logger.remove()
     # realizer = Realizer(**templates)
     story_id = uuid4()
@@ -208,7 +211,8 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
                    f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='green', bold=True)}.")
 
         baseline, modified = generate(cfg, domain, num_workers, subsample, templates, uuid4)
-
+        baseline = sorted(baseline, key=lambda d: d['id'])
+        modified = sorted(modified, key=lambda d: d['id'])
         if do_print:
             _do_print(baseline, modified)
 
@@ -271,13 +275,16 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
                             )
 
                             progress_bar.update()
+
+    seeds = [random.randint(0, sys.maxsize) for _ in all_template_choices]
     all_realised = Parallel(n_jobs=num_workers)(
         delayed(_realize_events)(
             domain.generator_modifier, event_type_targets,
             events=events, world=world, arranged_sentences=choice,
             question_types=question_types, answer_types=answer_types,
-            templates=templates, uuid4=uuid4, modification_data=modification_data
-        ) for (events, world, event_type_targets, choice, modification_data) in tqdm(all_template_choices)
+            templates=templates, uuid4=uuid4, modification_data=modification_data, seed=seed
+        ) for ((events, world, event_type_targets, choice, modification_data), seed) in
+        zip(tqdm(all_template_choices), seeds)
     )
     # all_realised = [
     #     _realize_events(
