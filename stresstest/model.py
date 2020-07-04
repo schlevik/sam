@@ -57,10 +57,12 @@ class Albert(Model):
             self.predictor.cuda()
 
     def _match(self, passage, result):
-        if not result:
-            return 0, 0
         result = result.replace("<pad>", "")
         result = result.replace("<unk>", "")
+        
+        if not result:
+            return 0, 0
+
         result = [c for c in result.lower() if c not in string.whitespace]
         j = 0
         start = 0
