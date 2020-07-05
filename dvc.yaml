@@ -82,15 +82,20 @@ stages:
       - models/bidaf-squad.tar.gz
       - scripts/predict.py
     outs:
-      - data/football/modifier/predictions
+      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
   evaluate-football-modifier:
-    cmd: python main.py evaluate data/football/modifier/*.*
+    cmd: python main.py evaluate data/football/modifier/baseline-ssq-retrieval-40-50.json 
+      data/football/modifier/intervention-ssq-retrieval-40-50.json
       --prediction-folder data/football/modifier/predictions
       --output metrics/football/modifier/evaluation.json
     deps:
       - data/football/modifier/baseline-ssq-retrieval-40-50.json
       - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - data/football/modifier/predictions
+      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
       - scripts/evaluate.py
     metrics:
     - metrics/football/modifier/evaluation.json:
@@ -103,7 +108,10 @@ stages:
     deps:
       - data/football/modifier/baseline-ssq-retrieval-40-50.json
       - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - data/football/modifier/predictions
+      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
     metrics:
     - metrics/football/modifier/evaluation-by-intervention.json:
         cache: false
