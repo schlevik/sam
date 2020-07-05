@@ -70,7 +70,8 @@ class EvalMetricParam(click.ParamType):
 
 
 def write_json(result, path, pretty=True):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if os.path.dirname(path).replace(".", ""):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w+") as f:
         if pretty:
             json.dump(result, f, indent=4, separators=(',', ': '))
