@@ -98,7 +98,7 @@ stages:
   evaluate-intervention-football-modifier:
     cmd: python main.py evaluate-intervention
       --baseline-file data/football/modifier/baseline-ssq-retrieval-40-50.json
-      --predictions-folder data/football/predictions/
+      --predictions-folder data/football/modifier/predictions/
       --output metrics/football/modifier/evaluation-by-intervention.json --do-save
     deps:
       - data/football/modifier/baseline-ssq-retrieval-40-50.json

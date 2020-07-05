@@ -60,7 +60,7 @@ evaluate-football-modifier:
     md5: 725be405601548c93bf3ad2b3bfa2a9c
 evaluate-intervention-football-modifier:
   cmd: python main.py evaluate-intervention --baseline-file data/football/modifier/baseline-ssq-retrieval-40-50.json
-    --predictions-folder data/football/predictions/ --output metrics/football/modifier/evaluation-by-intervention.json
+    --predictions-folder data/football/modifier/predictions/ --output metrics/football/modifier/evaluation-by-intervention.json
     --do-save
   deps:
   - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
@@ -71,7 +71,7 @@ evaluate-intervention-football-modifier:
     md5: b8f550fcd12e1e37d094aeff077e6402.dir
   outs:
   - path: metrics/football/modifier/evaluation-by-intervention.json
-    md5: 99914b932bd37a50b983c5e7c90ae93b
+    md5: ccec9a0c42832f23b48a125de3215dbd
 process-drop:
   cmd: python main.py process-drop --input data/football/drop_dataset_dev.json --output
     data/football/drop_nfl.json
@@ -156,7 +156,7 @@ report-football-modifier:
   - path: metrics/football/modifier/diversity.json
     md5: 8d8521205e9c541d42ec12af061bee5e
   - path: metrics/football/modifier/evaluation-by-intervention.json
-    md5: 99914b932bd37a50b983c5e7c90ae93b
+    md5: ccec9a0c42832f23b48a125de3215dbd
   - path: metrics/football/modifier/evaluation.json
     md5: 725be405601548c93bf3ad2b3bfa2a9c
   - path: metrics/football/modifier/naturality.json

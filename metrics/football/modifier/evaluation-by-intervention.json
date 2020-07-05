@@ -1,1 +1,36 @@
-{}
+{
+    "albert-squad": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.0859 +/- 0.0110",
+            "mean": 0.08587479935794542,
+            "95ci": 0.011000433008960267
+        },
+        "n": 2492,
+        "behaviour": {
+            "correct_baseline": 1387,
+            "correct_intervention": 372,
+            "right->change->right": 214,
+            "right->keep->wrong": 361,
+            "right->change->wrong": 812,
+            "wrong->change->right": 112,
+            "wrong->keep->right": 46
+        }
+    },
+    "bidaf-squad": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.0762 +/- 0.0104",
+            "mean": 0.07624398073836276,
+            "95ci": 0.010419706695257505
+        },
+        "n": 2492,
+        "behaviour": {
+            "correct_baseline": 726,
+            "correct_intervention": 624,
+            "right->change->right": 190,
+            "right->keep->wrong": 120,
+            "right->change->wrong": 416,
+            "wrong->change->right": 318,
+            "wrong->keep->right": 116
+        }
+    }
+}
