@@ -51,7 +51,7 @@ def predict(in_files, output_folder, models, model_classes, gpu, batch_size):
             click.echo(
                 f"Evaluating on sample (n={num_q}, |{{C}}|={len(sample)}): {click.style(in_file, fg='blue')}")
 
-            predictions = defaultdict(dict)
+            predictions = dict()
             for sample_batch in batch(tqdm(sample_iter(sample), position=1, total=num_q), batch_size=batch_size):
                 sample_batch: List[Entry]
                 batch_predictions = model.predict_batch(sample_batch)
@@ -59,7 +59,7 @@ def predict(in_files, output_folder, models, model_classes, gpu, batch_size):
                     logger.debug(f"Passage: {entry.passage}")
                     logger.debug(f"Question: {entry.question}")
                     logger.debug(f"Prediction: {answer}")
-                    predictions[entry.id][entry.qa_id] = str(answer)
+                    predictions[entry.qa_id] = str(answer)
             output_base = os.path.splitext(os.path.basename(in_file))[0]
             weights_addon = os.path.basename(weights_path)
             weights_addon = weights_addon.replace(".tar", "").replace(".gz", "").replace(".zip", "").replace(".tgz", "")

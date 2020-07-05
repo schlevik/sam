@@ -1,5 +1,6 @@
 import os
 import string
+from typing import Dict
 
 import click
 
@@ -62,8 +63,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
 
     result = dict()
     for predictions_file, prediction_intervention_file in zip(prediction_files, prediction_intervention_files):
-        predictions = load_json(predictions_file)
-        predictions_intervention = load_json(prediction_intervention_file)
+        predictions: Dict[str, str] = load_json(predictions_file)
+        predictions_intervention: Dict[str, str] = load_json(prediction_intervention_file)
         model_name = extract_model_name(gold_descriptor, predictions_file)
         click.echo(f"Evaluating predictions of model {click.style(model_name, fg='green')}")
         click.echo(f"Evaluating {click.style(str(len(aligned)), fg='green', bold=True)} sample(s).")
@@ -73,9 +74,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
 
         # got it correct in first place
         correct_before_intervention = [
-            (d, aligned_intervention[i], predictions[d.id][d.qa_id], predictions_intervention[d.id][d.qa_id]) for i, d
-            in
-            enumerate(aligned_baseline) if results_baseline[i] == 1
+            (d, aligned_intervention[i], predictions[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+            in enumerate(aligned_baseline) if results_baseline[i] == 1
         ]
 
         results_intervention = em(aligned_intervention, predictions_intervention)
@@ -84,9 +84,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
         # changed prediction correctly in line with altered semantics
         # model right -model changes prediction- model right
         correct_change_correct = [
-            (d, aligned_intervention[i], predictions[d.id][d.qa_id], predictions_intervention[d.id][d.qa_id]) for i, d
-            in
-            enumerate(aligned_baseline) if results_baseline[i] == 1 and results_intervention[i] == 1
+            (d, aligned_intervention[i], predictions[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+            in enumerate(aligned_baseline) if results_baseline[i] == 1 and results_intervention[i] == 1
         ]
         click.echo(f"Out of {sum(results_baseline)} correct baseline results, got {len(correct_change_correct)} "
                    f"correct after intervention.")
@@ -94,11 +93,11 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
         # unimpressed: didn't change prediction although semantics dictated change
         # model right -model keeps prediction- model wrong
         correct_keep_wrong = [
-            (d, aligned_intervention[i], predictions[d.id][d.qa_id], predictions_intervention[d.id][d.qa_id]) for i, d
+            (d, aligned_intervention[i], predictions[d.qa_id], predictions_intervention[d.qa_id]) for i, d
             in
             enumerate(aligned_baseline) if
-            predictions[d.id][d.qa_id] ==
-            predictions_intervention[d.id][d.qa_id].replace("almost ", "").replace("nearly ", "")
+            predictions[d.qa_id] ==
+            predictions_intervention[d.qa_id].replace("almost ", "").replace("nearly ", "")
             and results_baseline[i]
         ]
         click.echo(f"Interventions that the model 'ignored': {len(correct_keep_wrong)}")
@@ -106,26 +105,26 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
         # confused: changed prediction when semantics dictated change but changed to wrong
         # model right -model changes prediction- model wrong
         correct_change_wrong = [
-            (d, aligned_intervention[i], predictions[d.id][d.qa_id], predictions_intervention[d.id][d.qa_id]) for i, d
+            (d, aligned_intervention[i], predictions[d.qa_id], predictions_intervention[d.qa_id]) for i, d
             in
             enumerate(aligned_baseline) if
-            predictions[d.id][d.qa_id] !=
-            predictions_intervention[d.id][d.qa_id].replace("almost ", "").replace("nearly ", "")
+            predictions[d.qa_id] !=
+            predictions_intervention[d.qa_id].replace("almost ", "").replace("nearly ", "")
             and results_baseline[i] and not results_intervention[i]
         ]
         click.echo(f"Interventions that left the model 'confused': {len(correct_change_wrong)}")
         # model wrong -model changes prediction- model right
         wrong_change_right = [
-            (d, aligned_intervention[i], predictions[d.id][d.qa_id], predictions_intervention[d.id][d.qa_id]) for i, d
+            (d, aligned_intervention[i], predictions[d.qa_id], predictions_intervention[d.qa_id]) for i, d
             in
             enumerate(aligned_baseline) if
-            predictions[d.id][d.qa_id] !=
-            predictions_intervention[d.id][d.qa_id].replace("almost ", "").replace("nearly ", "")
+            predictions[d.qa_id] !=
+            predictions_intervention[d.qa_id].replace("almost ", "").replace("nearly ", "")
             and not results_baseline[i] and results_intervention[i]
         ]
         # model wrong -model keeps prediction- model right
         wrong_keep_right = [
-            (d, aligned_intervention[i], predictions[d.id][d.qa_id], predictions_intervention[d.id][d.qa_id]) for i, d
+            (d, aligned_intervention[i], predictions[d.qa_id], predictions_intervention[d.qa_id]) for i, d
             in
             enumerate(aligned_baseline) if
             results_intervention[i]

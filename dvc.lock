@@ -26,8 +26,7 @@ generate-football-modifier-ssq-retrieval:
   - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
     md5: f36af512cc2a6e0ba6641edcd28a6214
 predict-football-modifier:
-  cmd: MODELS=models/bidaf-squad.tar.gz:models/albert-squad CLASSES='BiDAF Albert'
-    python main.py predict data/football/modifier/baseline-ssq-retrieval-40-50.json
+  cmd: MODELS=models/bidaf-squad.tar.gz CLASSES='BiDAF' python main.py predict data/football/modifier/baseline-ssq-retrieval-40-50.json
     data/football/modifier/intervention-ssq-retrieval-40-50.json --output-folder data/football/modifier/predictions
   deps:
   - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
@@ -39,10 +38,10 @@ predict-football-modifier:
   - path: models/bidaf-squad.tar.gz
     md5: adea30ccbb0c2cf05a6a551de8537188
   - path: scripts/predict.py
-    md5: b9e569fb49669d37b5923997c1aa72bb
+    md5: c3e988efcc066607bced2f9e93236ec3
   outs:
   - path: data/football/modifier/predictions
-    md5: b8f550fcd12e1e37d094aeff077e6402.dir
+    md5: 3d59d42f17e46e982f9dfeb8381ec8f0.dir
 evaluate-football-modifier:
   cmd: python main.py evaluate data/football/modifier/*.* --prediction-folder data/football/modifier/predictions
     --output metrics/football/modifier/evaluation.json
@@ -52,12 +51,12 @@ evaluate-football-modifier:
   - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
     md5: f36af512cc2a6e0ba6641edcd28a6214
   - path: data/football/modifier/predictions
-    md5: b8f550fcd12e1e37d094aeff077e6402.dir
+    md5: 3d59d42f17e46e982f9dfeb8381ec8f0.dir
   - path: scripts/evaluate.py
     md5: adeb051d1fa363b3c36766d5d143863f
   outs:
   - path: metrics/football/modifier/evaluation.json
-    md5: 725be405601548c93bf3ad2b3bfa2a9c
+    md5: 6eb449f86ffe718241ad7af4050fa6c0
 evaluate-intervention-football-modifier:
   cmd: python main.py evaluate-intervention --baseline-file data/football/modifier/baseline-ssq-retrieval-40-50.json
     --predictions-folder data/football/modifier/predictions/ --output metrics/football/modifier/evaluation-by-intervention.json
@@ -68,10 +67,10 @@ evaluate-intervention-football-modifier:
   - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
     md5: f36af512cc2a6e0ba6641edcd28a6214
   - path: data/football/modifier/predictions
-    md5: b8f550fcd12e1e37d094aeff077e6402.dir
+    md5: 3d59d42f17e46e982f9dfeb8381ec8f0.dir
   outs:
   - path: metrics/football/modifier/evaluation-by-intervention.json
-    md5: ccec9a0c42832f23b48a125de3215dbd
+    md5: 832ac6a2118e15a2cd12cdb3034fa3b0
 process-drop:
   cmd: python main.py process-drop --input data/football/drop_dataset_dev.json --output
     data/football/drop_nfl.json

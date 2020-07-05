@@ -71,7 +71,7 @@ stages:
     outs:
       - data/football/drop_nfl.json
   predict-football-modifier:
-    cmd: MODELS=models/bidaf-squad.tar.gz:models/albert-squad CLASSES='BiDAF Albert' python main.py predict
+    cmd: MODELS=models/bidaf-squad.tar.gz CLASSES='BiDAF' python main.py predict
       data/football/modifier/baseline-ssq-retrieval-40-50.json
       data/football/modifier/intervention-ssq-retrieval-40-50.json
       --output-folder data/football/modifier/predictions
