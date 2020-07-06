@@ -27,3 +27,14 @@ def squad(dataset):
         'data': data,
     }
     return result
+
+
+def from_squad(dataset):
+    result = []
+    for d in dataset['data']:
+        datum = d['paragraphs'][0]
+        datum['passage'] = datum['context']
+        for qa in datum['qas']:
+            qa['answer'] = qa['answers'][0]['text']
+        result.append(datum)
+    return result

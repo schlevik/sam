@@ -6,6 +6,7 @@ import numpy as np
 from loguru import logger
 
 from scripts.utils import write_json, EvalMetricParam, match_prediction_to_gold, extract_model_name
+from stresstest.ds_utils import from_squad
 from stresstest.eval_utils import get_mean_var_ci, get_mean_var_ci_bernoulli, EvalMetric
 
 from stresstest.util import load_json, sample_iter, num_questions
@@ -48,7 +49,8 @@ def evaluate(prediction_folder, gold_files, output, metric):
     for gold_file in gold_files:
         click.echo(f"Evaluating predictions on {click.style(gold_file, fg='blue')}")
         gold = load_json(gold_file)
-
+        if isinstance(gold, dict):  # squad format
+            gold = from_squad(gold)
         gold_descriptor, prediction_files = match_prediction_to_gold(gold_file, prediction_folder)
 
         result[gold_file] = {'n': num_questions(gold)}
