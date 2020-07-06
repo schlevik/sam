@@ -34,6 +34,7 @@ def from_squad(dataset):
     for d in dataset['data']:
         datum = d['paragraphs'][0]
         datum['passage'] = datum['context']
+        datum['id'] = d['title']
         for qa in datum['qas']:
             qa['answer'] = qa['answers'][0]['text']
         result.append(datum)
