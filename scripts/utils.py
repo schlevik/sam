@@ -97,7 +97,7 @@ def get_templates(templates, action: str = None, n: int = None, command: str = "
 
 def match_prediction_to_gold(gold_file, prediction_folder):
     gold_descriptor = os.path.splitext(os.path.basename(gold_file))[0]
-    logger.debug(f"Files in prediction folder: {glob.glob(os.path.join(prediction_folder, '*'))}")
+    logger.debug(f"Files in prediction folder: {glob.glob(os.path.join(prediction_folder, '*.json'))}")
 
     prediction_files = [p for p in glob.glob(os.path.join(prediction_folder, '*')) if
                         os.path.basename(p).startswith(gold_descriptor)]
