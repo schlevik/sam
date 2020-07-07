@@ -3,11 +3,13 @@ from typing import List, Type
 
 import click
 import numpy as np
+from loguru import logger
 
-from scripts.utils import write_json, EvalMetricParam
+from scripts.utils import write_json, EvalMetricParam, match_prediction_to_gold, extract_model_name
+from stresstest.ds_utils import from_squad
 from stresstest.eval_utils import get_mean_var_ci, get_mean_var_ci_bernoulli, EvalMetric
 
-from stresstest.util import load_json, sample_iter
+from stresstest.util import load_json, sample_iter, num_questions
 
 
 def _get_score(gold, predictions, metrics: List[Type[EvalMetric]], subsample=None):
@@ -37,23 +39,26 @@ def _get_score(gold, predictions, metrics: List[Type[EvalMetric]], subsample=Non
 
 
 @click.command()
-@click.option("--predictions", type=str, default='data/predictions.json')
-@click.option("--gold", type=str, default='data/stresstest.json')
-@click.option("--output", type=str, default="metrics/score.json")
+@click.argument("gold_files", nargs=-1, type=str)
+@click.option("--prediction-folder", type=str, default="data/predictions")
+@click.option("--output", type=str, default="metrics/result.json")
 @click.option("--metric", type=EvalMetricParam(), default='EM,F1')
-def evaluate(predictions, gold, output, metric):
+def evaluate(prediction_folder, gold_files, output, metric):
     eval_metrics = metric
-    gold = load_json(gold)
-    predictions = load_json(predictions)
-    click.echo(f"Evaluating {click.style(str(len(gold)), fg='green', bold=True)} sample(s).")
-    result = {'num_samples': len(predictions), 'full': _get_score(gold, predictions, eval_metrics)}
+    result = dict()
+    for gold_file in gold_files:
+        click.echo(f"Evaluating predictions on {click.style(gold_file, fg='blue')}")
+        gold = load_json(gold_file)
+        if isinstance(gold, dict):  # squad format
+            gold = from_squad(gold)
+        gold_descriptor, prediction_files = match_prediction_to_gold(gold_file, prediction_folder)
 
-    sample_sizes = [10, 25, 50, 100, 250, 500]
-    for k in sample_sizes:
-        too_small = len(gold) < k
-        if too_small:
-            click.echo(f"Omitting drawing {k} samples (and subsequent), not enough data to sample from!")
-            break
-        result[str(k)] = _get_score(gold, predictions, eval_metrics, subsample=k)
+        result[gold_file] = {'n': num_questions(gold)}
+        logger.debug(prediction_files)
+        for prediction_file in sorted(prediction_files):
+            model_name = extract_model_name(gold_descriptor, prediction_file)
+            click.echo(f"Evaluating predictions of model {click.style(model_name, fg='green')}")
+            predictions = load_json(prediction_file)
+            result[gold_file][model_name] = _get_score(gold, predictions, eval_metrics)
 
-    write_json(result, output)
+        write_json(result, output)

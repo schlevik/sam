@@ -10,7 +10,7 @@ from string import digits
 
 from statsmodels.stats.proportion import proportion_confint
 
-from stresstest.util import Entry
+from stresstest.classes import Entry
 
 
 class EvalMetric(ABC):
@@ -31,12 +31,12 @@ class EM(EvalMetric):
         self.relaxed = relaxed
         self.max_length = max_length
 
-    def __call__(self, gold: Iterable[Entry], predictions: Dict[str, Dict[str, str]], **kwargs):
+    def __call__(self, gold: Iterable[Entry], predictions: Dict[str, str], **kwargs):
         em = []
         for i, (story_id, story, question_id, question, answer, _) in enumerate(gold, 1):
             logger.debug(f"Passage: {story}")
             answer = answer or ''
-            prediction = predictions[story_id][question_id]
+            prediction = predictions[question_id]
             logger.debug(f"Question: {question}")
             logger.debug(f"Answer: {prediction}")
             logger.debug(f"Gold: {answer}")
@@ -61,11 +61,11 @@ class EM(EvalMetric):
 class F1(EvalMetric):
     binary = False
 
-    def __call__(self, gold: Iterable[Entry], predictions: Dict[str, Dict[str, str]], **kwargs):
+    def __call__(self, gold: Iterable[Entry], predictions: Dict[str, str], **kwargs):
         overall_f1 = []
         for i, (story_id, story, question_id, question, answer, _) in enumerate(gold, 1):
             gold_tokens = set(str(answer).lower().split(" "))
-            prediction_tokens = set(str(predictions[story_id][question_id]).lower().split(" "))
+            prediction_tokens = set(str(predictions[question_id]).lower().split(" "))
             logger.debug(f"Question: {question}")
 
             logger.debug(f"Answer Tokens: {gold_tokens}")

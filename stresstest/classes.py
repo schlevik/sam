@@ -2,6 +2,7 @@ import inspect
 import json
 import random
 import re
+from collections import namedtuple
 from copy import deepcopy
 from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple, Callable
 
@@ -242,6 +243,9 @@ class DataObjectMixin(Mapping):
         return f"{self.__class__.__name__}({attrs})"
 
 
+Entry = namedtuple("Entry", ["id", "passage", "qa_id", "question", "answer", "qa"])
+
+
 class World(DataObjectMixin):
     num_sentences: int
 
@@ -338,9 +342,14 @@ class Model:
         self.predictor = something_with_predict
         self.gpu = gpu
 
-    def predict(self, question, passage):
+    def predict(self, entry: Entry) -> str:
         # TODO: something something GPU
+        question = entry.question
+        passage = entry.passage
         return self.predictor.predict(question=question, passage=passage)['best_span_str']
+
+    def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        return (self.predictor.predict(question=entry.question, passage=entry.passage) for entry in batch)
 
     @classmethod
     def make(cls, path, gpu=False):

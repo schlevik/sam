@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import sys
 import uuid
 from copy import deepcopy
 
@@ -9,7 +10,7 @@ from joblib import delayed, Parallel
 from loguru import logger
 from tqdm import tqdm
 
-from scripts.utils import Domain
+from scripts.utils import Domain, BASELINE, INTERVENTION, write_json
 from stresstest.classes import Config
 from stresstest.comb_utils import generate_all_possible_template_choices, split
 from stresstest.realize import Realizer
@@ -29,7 +30,9 @@ def _generate_events(generator_class, config, first_modification,
 
 def _realize_events(generator_class, target_event_types, events, world, arranged_sentences, question_types,
                     answer_types,
-                    templates, uuid4, modification_data=None):
+                    templates, uuid4, modification_data=None, seed=None):
+    if seed:
+        random.seed(seed)
     logger.remove()
     # realizer = Realizer(**templates)
     story_id = uuid4()
@@ -198,17 +201,18 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
 
         subsample_str = subsample if subsample else 'full'
         subsample_str = f"{subsample_str}-{i}" if split_templates else subsample_str
-        file_name = f"stresstest-{'-'.join(answer_types)}-{{}}-{'-'.join(question_types)}-{n}-{subsample_str}.json"
+        file_name = f"{{}}-{'-'.join(answer_types)}-{'-'.join(question_types)}-{n}-{subsample_str}.json"
         click.echo(
             f"Generating from '{click.style(config, fg='green')}': {click.style(str(n), fg='green', bold=True)} passages, "
             f"{click.style(str(subsample_str), fg='green', bold=True)} realisation per passage.")
         click.echo(f"Saving baseline in "
-                   f"{click.style(os.path.join(out_path, file_name.format('baseline')), fg='green', bold=True)}.")
+                   f"{click.style(os.path.join(out_path, file_name.format(BASELINE)), fg='green', bold=True)}.")
         click.echo(f"Saving modified in "
-                   f"{click.style(os.path.join(out_path, file_name.format('modifier')), fg='green', bold=True)}.")
+                   f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='green', bold=True)}.")
 
         baseline, modified = generate(cfg, domain, num_workers, subsample, templates, uuid4)
-
+        baseline = sorted(baseline, key=lambda d: d['id'])
+        modified = sorted(modified, key=lambda d: d['id'])
         if do_print:
             _do_print(baseline, modified)
 
@@ -217,11 +221,8 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
         click.echo(f"Total Questions over modified passages: {sum(1 for m in modified for _ in m['qas'])}")
 
         if do_save:
-            with open(os.path.join(out_path, file_name.format('baseline')), "w+") as f:
-                json.dump(baseline, f)
-
-            with open(os.path.join(out_path, file_name.format('modifier')), "w+") as f:
-                json.dump(modified, f)
+            write_json(baseline, os.path.join(out_path, file_name.format(BASELINE)), pretty=False)
+            write_json(modified, os.path.join(out_path, file_name.format(INTERVENTION)), pretty=False)
 
 
 def generate(cfg, domain, num_workers, subsample, templates, uuid4):
@@ -274,13 +275,16 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
                             )
 
                             progress_bar.update()
+
+    seeds = [random.randint(0, sys.maxsize) for _ in all_template_choices]
     all_realised = Parallel(n_jobs=num_workers)(
         delayed(_realize_events)(
             domain.generator_modifier, event_type_targets,
             events=events, world=world, arranged_sentences=choice,
             question_types=question_types, answer_types=answer_types,
-            templates=templates, uuid4=uuid4, modification_data=modification_data
-        ) for (events, world, event_type_targets, choice, modification_data) in tqdm(all_template_choices)
+            templates=templates, uuid4=uuid4, modification_data=modification_data, seed=seed
+        ) for ((events, world, event_type_targets, choice, modification_data), seed) in
+        zip(tqdm(all_template_choices), seeds)
     )
     # all_realised = [
     #     _realize_events(

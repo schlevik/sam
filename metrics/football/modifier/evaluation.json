@@ -1,0 +1,64 @@
+{
+    "data/football/modifier/baseline-ssq-retrieval-40-50.json": {
+        "n": 4489,
+        "albert-squad": {
+            "EM": {
+                "human_readable": "0.8127 +/- 0.0114",
+                "mean": 0.8126531521496992,
+                "variance": null,
+                "95ci": 0.011414295079880343
+            },
+            "F1": {
+                "human_readable": "0.8595 +/- 0.0094",
+                "mean": 0.8595080574619827,
+                "variance": 0.10292726880254326,
+                "95ci": 0.00938762326264614
+            }
+        },
+        "bidaf-squad": {
+            "EM": {
+                "human_readable": "0.2947 +/- 0.0133",
+                "mean": 0.2947204277121853,
+                "variance": null,
+                "95ci": 0.013337027918182864
+            },
+            "F1": {
+                "human_readable": "0.3884 +/- 0.0131",
+                "mean": 0.38836236609849906,
+                "variance": 0.20152344672841735,
+                "95ci": 0.013135699940956366
+            }
+        }
+    },
+    "data/football/modifier/intervention-ssq-retrieval-40-50.json": {
+        "n": 6041,
+        "albert-squad": {
+            "EM": {
+                "human_readable": "0.6941 +/- 0.0116",
+                "mean": 0.694090382387022,
+                "variance": null,
+                "95ci": 0.01161978927176277
+            },
+            "F1": {
+                "human_readable": "0.7295 +/- 0.0108",
+                "mean": 0.7295374077722555,
+                "variance": 0.18299259305421475,
+                "95ci": 0.010789404271939416
+            }
+        },
+        "bidaf-squad": {
+            "EM": {
+                "human_readable": "0.1932 +/- 0.0100",
+                "mean": 0.1931799370965072,
+                "variance": null,
+                "95ci": 0.00995549888077149
+            },
+            "F1": {
+                "human_readable": "0.2401 +/- 0.0101",
+                "mean": 0.24006081295904205,
+                "variance": 0.16129185825058032,
+                "95ci": 0.010129474914155064
+            }
+        }
+    }
+}

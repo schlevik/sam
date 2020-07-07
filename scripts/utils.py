@@ -1,9 +1,17 @@
+import glob
 import json
+import os
+
 import click
+from loguru import logger
+
 from stresstest import implemented_domains
 from stresstest.eval_utils import EvalMetric
 from stresstest.textmetrics import Distance
 from stresstest.util import do_import
+
+BASELINE = 'baseline'
+INTERVENTION = 'intervention'
 
 
 class Domain(click.ParamType):
@@ -61,9 +69,14 @@ class EvalMetricParam(click.ParamType):
         return metric_classes
 
 
-def write_json(result, output):
-    with open(output, "w+") as f:
-        json.dump(result, f, indent=4, separators=(',', ': '))
+def write_json(result, path, pretty=True):
+    if os.path.dirname(path).replace(".", ""):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w+") as f:
+        if pretty:
+            json.dump(result, f, indent=4, separators=(',', ': '))
+        else:
+            json.dump(result, f)
 
 
 def get_templates(templates, action: str = None, n: int = None, command: str = "Executing command"):
@@ -81,22 +94,28 @@ def get_templates(templates, action: str = None, n: int = None, command: str = "
     click.echo(f"{click.style(command, fg='red')} for actions: '{actions_str}'; sentences: {n_str} !")
     return actions, sentences
 
-#
-# def generate(c, generator_class=None):
-#     generator_class = generator_class or StoryGenerator
-#     generator = generator_class(c)
-#     realizer = Realizer()
-#     ss = generator.generate_story()
-#     story, visits = realizer.realise_story(ss, generator.world)
-#     (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = \
-#         generator.generate_questions(ss, visits)
-#     realised_ssqs = [(q, realizer.realise_question(q)) for q in single_span_questions]
-#     realised_msqs = [(q, realizer.realise_question(q)) for q in multi_span_questions]
-#     realised_uaqs = [(q, realizer.realise_question(q)) for q in unanswerable_questions]
-#     realised_aqs = [(q, realizer.realise_question(q)) for q in abstractive_questions]
-#     qs = realised_ssqs
-#     ssqs = [(l, r) for l, r in zip(single_span_questions, realised_ssqs) if r]
-#     msqs = [(l, r) for l, r in zip(multi_span_questions, realised_msqs) if r]
-#     uaqs = [(l, r) for l, r in zip(unanswerable_questions, realised_uaqs) if r]
-#     aqs = [(l, r) for l, r in zip(abstractive_questions, realised_aqs) if r]
-#     return story, ssqs, msqs, uaqs, aqs
+
+def match_prediction_to_gold(gold_file, prediction_folder):
+    gold_descriptor = os.path.splitext(os.path.basename(gold_file))[0]
+    logger.debug(f"Files in prediction folder: {glob.glob(os.path.join(prediction_folder, '*.json'))}")
+
+    prediction_files = [p for p in glob.glob(os.path.join(prediction_folder, '*.json')) if
+                        os.path.basename(p).startswith(gold_descriptor)]
+    logger.debug(f"Files matching prefix '{gold_descriptor}': {prediction_files}")
+    return gold_descriptor, prediction_files
+
+
+def extract_model_name(gold_descriptor, prediction_file):
+    model_name = os.path.splitext(prediction_file)[0].split(gold_descriptor)[1][1:]
+    return model_name
+
+
+def get_output_predictions_file_name(in_file, output_folder, weights_path):
+    output_base = os.path.splitext(os.path.basename(in_file))[0]
+    weights_addon = os.path.basename(weights_path)
+    weights_addon = weights_addon.replace(".tar", "").replace(".gz", "").replace(".zip", "").replace(".tgz", "")
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+    output_file_name = f"{output_base}-{weights_addon}.json"
+    output = os.path.join(output_folder, output_file_name)
+    return output

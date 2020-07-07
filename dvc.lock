@@ -1,50 +1,11 @@
-workflows-pilot-combine:
-  cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
-    data/pilot/stresstest-ssq-modifier-retrieval-40-100.json data/pilot/stresstest-ssq-both-retrieval-40-100.json
-  deps:
-  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
-    md5: 8f5d1eaab1bed9726c7577a1cd418ea8
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-100.json
-    md5: b9cf805d3aedb215fbcb3c832b52e478
-  - path: scripts/dataops.py
-    md5: f8f4f5c651d7877a5145d86ed81fb2cf
-  outs:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-100.json
-    md5: 90fc1b679591f2142b9179f202c70ab7
-pilot-export-squad:
-  cmd: python main.py export --in-path data/pilot/stresstest-ssq-both-retrieval-40-100.json
-    --out-path data/pilot/stresstest-ssq-both-retrieval-40-100-squad --ds-format squad
-    --shuffle --split 80:20 --seed 56
-  deps:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-100.json
-    md5: 90fc1b679591f2142b9179f202c70ab7
-  outs:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-100-squad-20-split.json
-    md5: 116306979e9894b2eba13de0c6ac62ea
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-100-squad-80-split.json
-    md5: 9961dbab77639b58ab47b30fe4e68497
-pilot-combine:
-  cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
-    data/pilot/stresstest-ssq-modifier-retrieval-40-100.json data/pilot/stresstest-ssq-both-retrieval-40-100.json
-  deps:
-  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-100.json
-    md5: 8f5d1eaab1bed9726c7577a1cd418ea8
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-100.json
-    md5: b9cf805d3aedb215fbcb3c832b52e478
-  - path: scripts/dataops.py
-    md5: a5f3058c82bf83cbf678baffcee18d13
-  outs:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-100.json
-    md5: 90fc1b679591f2142b9179f202c70ab7
-pilot-generate-ssq-retrieval-40-100-split-templates:
+generate-football-modifier-ssq-retrieval:
   cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
-    --seed 56 --out-path data/pilot --domain football --num-workers 8 --split-templates
-    0.5 --do-save
+    --seed 56 --out-path data/football/modifier/ --subsample 50 --do-save
   deps:
   - path: conf/modifier-ssq-retrieval-unique-actors.json
     md5: 28a244cf99f6915b8b4c74e914058ff4
   - path: scripts/generate_modifier.py
-    md5: 507f750803f3e5d57848e2f76378ff98
+    md5: 58580d97d4dda8fc5554a0f0b171734b
   - path: stresstest/football/football_generator.py
     md5: 569914abf2f024262f95e715ec97d7f3
   - path: stresstest/football/generate_with_modifier.py
@@ -60,44 +21,275 @@ pilot-generate-ssq-retrieval-40-100-split-templates:
   - path: stresstest/realize.py
     md5: 4b30854b75f5301995bf1cad7d5e304d
   outs:
-  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
-    md5: f74629dcefebaf48d75fcb5a841f7a4c
-  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-full-1.json
-    md5: 4a29890fd607f5faff850b443142ea94
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json
-    md5: 95131c3669eb9151402937052d861096
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
-    md5: e1783325dab478086dcebd5e10c06243
-pilot-combine-split:
-  cmd: python main.py combine data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
-    data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
+  - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
+    md5: f7bd207393f6d9d554a38169afb29418
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: f36af512cc2a6e0ba6641edcd28a6214
+predict-football-modifier:
+  cmd: MODELS=models/bidaf-squad.tar.gz CLASSES='BiDAF' python main.py predict data/football/modifier/baseline-ssq-retrieval-40-50.json
+    data/football/modifier/intervention-ssq-retrieval-40-50.json --output-folder data/football/modifier/predictions
   deps:
-  - path: data/pilot/stresstest-ssq-baseline-retrieval-40-full-0.json
-    md5: f74629dcefebaf48d75fcb5a841f7a4c
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-0.json
-    md5: 95131c3669eb9151402937052d861096
+  - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
+    md5: f7bd207393f6d9d554a38169afb29418
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: f36af512cc2a6e0ba6641edcd28a6214
+  - path: models/albert-squad
+    md5: 8d09b19e15976988bb199e5928c67b3c.dir
+  - path: models/bidaf-squad.tar.gz
+    md5: adea30ccbb0c2cf05a6a551de8537188
+  - path: scripts/predict.py
+    md5: c3e988efcc066607bced2f9e93236ec3
+  outs:
+  - path: data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+    md5: 983921abc3864535ca26101cd15d6578
+  - path: data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+    md5: 5e8abbe3a66068ef5f9fe498a17a3f0b
+evaluate-football-modifier:
+  cmd: python main.py evaluate data/football/modifier/baseline-ssq-retrieval-40-50.json
+    data/football/modifier/intervention-ssq-retrieval-40-50.json --prediction-folder
+    data/football/modifier/predictions --output metrics/football/modifier/evaluation.json
+  deps:
+  - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
+    md5: f7bd207393f6d9d554a38169afb29418
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: f36af512cc2a6e0ba6641edcd28a6214
+  - path: data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+    md5: 2bf918411184e5f2c79e0276a77941cc
+  - path: data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+    md5: 983921abc3864535ca26101cd15d6578
+  - path: data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
+    md5: a1d1fc79dc5a4c46f291cf63e6892861
+  - path: data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+    md5: 5e8abbe3a66068ef5f9fe498a17a3f0b
+  - path: scripts/evaluate.py
+    md5: adeb051d1fa363b3c36766d5d143863f
+  outs:
+  - path: metrics/football/modifier/evaluation.json
+    md5: 39d9e26106d2dfcb5b8e685f4fe04d67
+evaluate-intervention-football-modifier:
+  cmd: python main.py evaluate-intervention --baseline-file data/football/modifier/baseline-ssq-retrieval-40-50.json
+    --predictions-folder data/football/modifier/predictions/ --output metrics/football/modifier/evaluation-by-intervention.json
+    --do-save
+  deps:
+  - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
+    md5: f7bd207393f6d9d554a38169afb29418
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: f36af512cc2a6e0ba6641edcd28a6214
+  - path: data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+    md5: 2bf918411184e5f2c79e0276a77941cc
+  - path: data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+    md5: 983921abc3864535ca26101cd15d6578
+  - path: data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
+    md5: a1d1fc79dc5a4c46f291cf63e6892861
+  - path: data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+    md5: 5e8abbe3a66068ef5f9fe498a17a3f0b
+  outs:
+  - path: metrics/football/modifier/evaluation-by-intervention.json
+    md5: ec33e32d49c09d7a631ef1dec19f70d2
+process-drop:
+  cmd: python main.py process-drop --input data/football/drop_dataset_dev.json --output
+    data/football/drop_nfl.json
+  deps:
+  - path: data/football/drop_dataset_dev.json
+    md5: b51befb910069359687b5a7346d21f8a
+  - path: scripts/compare.py
+    md5: 6b0aa8ecfa3ce9225be999cdb41fde89
+  outs:
+  - path: data/football/drop_nfl.json
+    md5: 4d895a9c6a0629c8f6453e88502abc2a
+evaluate-naturality-football-modifier:
+  cmd: python main.py quality --input data/football/modifier/intervention-ssq-retrieval-40-50.json
+    --output metrics/football/modifier/naturality.json --reference data/football/drop_nfl.json
+  deps:
+  - path: data/football/drop_nfl.json
+    md5: 4d895a9c6a0629c8f6453e88502abc2a
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: f36af512cc2a6e0ba6641edcd28a6214
+  - path: scripts/cohesion.py
+    md5: 7a3e9efcf56f0f936c937752e0ab1b28
+  outs:
+  - path: metrics/football/modifier/naturality.json
+    md5: e4cc691d60426faaa83d796fee5d388d
+count-football-modifier:
+  cmd: python main.py count --output metrics/football/modifier/count.json --domain
+    football
+  deps:
+  - path: scripts/count.py
+    md5: cc0bdb51c784ee6fb04b033d16c84fbd
+  - path: stresstest/football/football_generator.py
+    md5: 569914abf2f024262f95e715ec97d7f3
+  - path: stresstest/football/generate_with_modifier.py
+    md5: 70c689f9a006158cc67faf2575307be0
+  - path: stresstest/football/resources/team-names.json
+    md5: 3fd4f35f3dd738849f12ec721b7cdaf0
+  - path: stresstest/football/resources/templates_modifier.py
+    md5: c4f0f0358818bad480e86efc2ce3e9ad
+  - path: stresstest/generator.py
+    md5: 427afdf6a9a1b06eedddcfd329602aa4
+  - path: stresstest/generator.py
+    md5: 427afdf6a9a1b06eedddcfd329602aa4
+  - path: stresstest/realize.py
+    md5: 4b30854b75f5301995bf1cad7d5e304d
+  outs:
+  - path: metrics/football/modifier/count.json
+    md5: cea433e07dfcd331d5359fcff829f1aa
+evalate-diveristy-football-modifier:
+  cmd: python main.py diversity --input data/football/modifier/intervention-ssq-retrieval-40-50.json
+    --output metrics/football/modifier/diversity.json --reference data/football/drop_nfl.json
+  deps:
+  - path: data/football/drop_nfl.json
+    md5: 4d895a9c6a0629c8f6453e88502abc2a
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: 37bdb65c405e885ac651bd9505430038
+  - path: scripts/compare.py
+    md5: 6b0aa8ecfa3ce9225be999cdb41fde89
+  outs:
+  - path: metrics/football/modifier/diversity.json
+    md5: 352ad901e302fe5bad462fa4376f9623
+evalate-diversity-football-modifier:
+  cmd: python main.py diversity --input data/football/modifier/intervention-ssq-retrieval-40-50.json
+    --output metrics/football/modifier/diversity.json --reference data/football/drop_nfl.json
+  deps:
+  - path: data/football/drop_nfl.json
+    md5: 4d895a9c6a0629c8f6453e88502abc2a
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: f36af512cc2a6e0ba6641edcd28a6214
+  - path: scripts/compare.py
+    md5: 6b0aa8ecfa3ce9225be999cdb41fde89
+  outs:
+  - path: metrics/football/modifier/diversity.json
+    md5: 8d8521205e9c541d42ec12af061bee5e
+report-football-modifier:
+  cmd: python main.py report --diversity metrics/football/modifier/diversity.json
+    --count metrics/football/modifier/count.json --naturality metrics/football/modifier/naturality.json
+    --evaluation metrics/football/modifier/evaluation.json --evaluation-intervention
+    metrics/football/modifier/evaluation-by-intervention.json
+  deps:
+  - path: metrics/football/modifier/count.json
+    md5: cea433e07dfcd331d5359fcff829f1aa
+  - path: metrics/football/modifier/diversity.json
+    md5: 8d8521205e9c541d42ec12af061bee5e
+  - path: metrics/football/modifier/evaluation-by-intervention.json
+    md5: ec33e32d49c09d7a631ef1dec19f70d2
+  - path: metrics/football/modifier/evaluation.json
+    md5: 39d9e26106d2dfcb5b8e685f4fe04d67
+  - path: metrics/football/modifier/naturality.json
+    md5: e4cc691d60426faaa83d796fee5d388d
+generate-football-modifier-ssq-retrieval-40-100:
+  cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
+    --seed 56 --out-path data/football/modifier/train/ --subsample 100 --do-save
+  deps:
+  - path: conf/modifier-ssq-retrieval-unique-actors.json
+    md5: 28a244cf99f6915b8b4c74e914058ff4
+  - path: scripts/generate_modifier.py
+    md5: 58580d97d4dda8fc5554a0f0b171734b
+  - path: stresstest/football/football_generator.py
+    md5: 569914abf2f024262f95e715ec97d7f3
+  - path: stresstest/football/generate_with_modifier.py
+    md5: 70c689f9a006158cc67faf2575307be0
+  - path: stresstest/football/resources/team-names.json
+    md5: 3fd4f35f3dd738849f12ec721b7cdaf0
+  - path: stresstest/football/resources/templates_modifier.py
+    md5: c4f0f0358818bad480e86efc2ce3e9ad
+  - path: stresstest/generator.py
+    md5: 427afdf6a9a1b06eedddcfd329602aa4
+  - path: stresstest/generator_modifier.py
+    md5: 85262589763599cd7d3a87058e2f0af6
+  - path: stresstest/realize.py
+    md5: 4b30854b75f5301995bf1cad7d5e304d
+  outs:
+  - path: data/football/modifier/train/baseline-ssq-retrieval-40-100.json
+    md5: b534349d456d4862218426621744f919
+  - path: data/football/modifier/train/intervention-ssq-retrieval-40-100.json
+    md5: 855a535f3b41503dee0f1aba70840600
+combine-football-modifier-ssq-retrieval:
+  cmd: python main.py combine data/football/modifier/train/baseline-ssq-retrieval-40-100.json
+    data/football/modifier/train/intervention-ssq-retrieval-40-100.json data/football/modifier/train/both-ssq-retrieval-40-100.json
+  deps:
+  - path: data/football/modifier/train/baseline-ssq-retrieval-40-100.json
+    md5: b534349d456d4862218426621744f919
+  - path: data/football/modifier/train/intervention-ssq-retrieval-40-100.json
+    md5: 855a535f3b41503dee0f1aba70840600
   - path: scripts/dataops.py
-    md5: a5f3058c82bf83cbf678baffcee18d13
+    md5: 58970f7c90dd21efee27c09781661f65
   outs:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
-    md5: eaa56b6a1a3686246e89402f2e346c3c
-pilot-export-squad-split-0:
-  cmd: python main.py export --in-path data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
-    --out-path data/pilot/stresstest-ssq-both-retrieval-40-100-squad-0.json --ds-format
-    squad --shuffle --seed 56
+  - path: data/football/modifier/train/both-ssq-retrieval-40-100.json
+    md5: 1ea395227b38a4898e0c0c62c4e33f47
+export-squad-football-modifier-ssq-retrieval:
+  cmd: python main.py export --in-path data/football/modifier/train/both-ssq-retrieval-40-100.json
+    --out-path data/football/modifier/train/both-ssq-retrieval-40-100-squad --ds-format
+    squad --shuffle --split 80:20 --seed 56
   deps:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-full-0.json
-    md5: eaa56b6a1a3686246e89402f2e346c3c
+  - path: data/football/modifier/train/both-ssq-retrieval-40-100.json
+    md5: 1ea395227b38a4898e0c0c62c4e33f47
   outs:
-  - path: data/pilot/stresstest-ssq-both-retrieval-40-100-squad-0.json
-    md5: e734ff437a8dd2aed7c6f9e794cb58b1
-pilot-export-squad-split-1:
-  cmd: python main.py export --in-path data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
-    --out-path data/pilot/stresstest-ssq-modifier-retrieval-40-100-squad-1.json --ds-format
-    squad --shuffle --seed 56
+  - path: data/football/modifier/train/both-ssq-retrieval-40-100-squad-20-split.json
+    md5: c195d9d92465939845e5136db73bcf15
+  - path: data/football/modifier/train/both-ssq-retrieval-40-100-squad-80-split.json
+    md5: fcd34a61109f3e3c033bcc7cd8da1425
+generate-football-modifier-ssq-retrieval-distinct-templates:
+  cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
+    --seed 56 --out-path data/football/modifier/train-distinct-templates/ --domain
+    football --num-workers 8 --split-templates 0.5 --do-save
   deps:
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-full-1.json
-    md5: e1783325dab478086dcebd5e10c06243
+  - path: conf/modifier-ssq-retrieval-unique-actors.json
+    md5: 28a244cf99f6915b8b4c74e914058ff4
+  - path: scripts/generate_modifier.py
+    md5: 58580d97d4dda8fc5554a0f0b171734b
+  - path: stresstest/football/football_generator.py
+    md5: 569914abf2f024262f95e715ec97d7f3
+  - path: stresstest/football/generate_with_modifier.py
+    md5: 70c689f9a006158cc67faf2575307be0
+  - path: stresstest/football/resources/team-names.json
+    md5: 3fd4f35f3dd738849f12ec721b7cdaf0
+  - path: stresstest/football/resources/templates_modifier.py
+    md5: c4f0f0358818bad480e86efc2ce3e9ad
+  - path: stresstest/generator.py
+    md5: 427afdf6a9a1b06eedddcfd329602aa4
+  - path: stresstest/generator_modifier.py
+    md5: 85262589763599cd7d3a87058e2f0af6
+  - path: stresstest/realize.py
+    md5: 4b30854b75f5301995bf1cad7d5e304d
   outs:
-  - path: data/pilot/stresstest-ssq-modifier-retrieval-40-100-squad-1.json
-    md5: d20efe69e470562f74b34b2e1820fe2f
+  - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    md5: b66baee321f996e27285e0c210891076
+  - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
+    md5: 5256fcbfa9d6b4f3fd9ec45110757227
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    md5: 540313faddca1faaba4318afba74f4da
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    md5: b89012e018bc9120f93448881b3f18a0
+combine-football-modifier-ssq-retrieval-for-training-distinct-templates:
+  cmd: python main.py combine data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+  deps:
+  - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    md5: b66baee321f996e27285e0c210891076
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    md5: 540313faddca1faaba4318afba74f4da
+  - path: scripts/dataops.py
+    md5: 58970f7c90dd21efee27c09781661f65
+  outs:
+  - path: data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+    md5: 27edf9421e6aabe4997db9d2a0c73376
+export-squad-train-football-modifier-ssq-retrieval-for-training-distinct-templates:
+  cmd: python main.py export --in-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+    --out-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-0.json
+    --ds-format squad --shuffle --seed 56
+  deps:
+  - path: data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+    md5: 27edf9421e6aabe4997db9d2a0c73376
+  outs:
+  - path: data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-0.json
+    md5: 95fe6e9253a75aa8fcdfff0d5ec64701
+export-squad-eval-football-modifier-ssq-retrieval-for-training-distinct-templates:
+  cmd: python main.py export --in-path data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    --out-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-1.json
+    --ds-format squad --shuffle --seed 56
+  deps:
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    md5: b89012e018bc9120f93448881b3f18a0
+  outs:
+  - path: data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-1.json
+    md5: 13212b736decda2188c163720989a271
