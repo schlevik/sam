@@ -112,7 +112,7 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
     dataset, examples, features = load_examples(in_file)
     eval_sampler = SequentialSampler(dataset)
     eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=eval_batch_size)
-
+    model.to(device)
     # multi-gpu evaluate
     if n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
         model = torch.nn.DataParallel(model)
@@ -155,7 +155,8 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
         for i, feature_index in enumerate(feature_indices):
             eval_feature = features[feature_index.item()]
             unique_id = int(eval_feature.unique_id)
-
+            
+            
             output = [to_list(output[i]) for output in outputs]
 
             # Some models (XLNet, XLM) use 5 arguments for their predictions, while the other "simpler"
@@ -185,7 +186,7 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
     eval_time = timeit.default_timer() - start_time
     logger.info("  Evaluation done in total %f secs (%f sec per example)", eval_time, eval_time / len(dataset))
 
-    out_file = get_output_predictions_file_name(in_file, out_folder, model_path)
+    out_file = get_output_predictions_file_name(in_file, out_folder)
 
     if not os.path.exists(os.path.dirname(out_file)):
         os.makedirs(os.path.dirname(out_file))

@@ -89,8 +89,6 @@ stages:
       data/football/modifier/intervention-ssq-retrieval-40-50.json --prediction-folder
       data/football/modifier/predictions --output metrics/football/modifier/evaluation.json
     deps:
-    - data/football/modifier/baseline-ssq-retrieval-40-50.json
-    - data/football/modifier/intervention-ssq-retrieval-40-50.json
     - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
     - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
     - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
@@ -218,7 +216,7 @@ stages:
   cache-albert-football-modifier-ssq-retrieval:
     cmd: python main.py cache-examples data/football/modifier/baseline-ssq-retrieval-40-50.json
       data/football/modifier/intervention-ssq-retrieval-40-50.json --out-folder data/football/modifier/albert-squad/
-      --model-path models/albert-squad/ --num-workers 4
+      --model-path models/albert-squad/ --num-workers 4 --evaluate
     deps:
     - data/football/modifier/baseline-ssq-retrieval-40-50.json
     - data/football/modifier/intervention-ssq-retrieval-40-50.json
@@ -227,3 +225,23 @@ stages:
     outs:
     - data/football/modifier/albert-squad/baseline-ssq-retrieval-40-50-albert-squad.bin
     - data/football/modifier/albert-squad/intervention-ssq-retrieval-40-50-albert-squad.bin
+  predict-baseline-albert-football-modifier-ssq-retrieval:
+    cmd: python main.py predictions --in-file data/football/modifier/albert-squad/baseline-ssq-retrieval-40-50-albert-squad.bin
+      --model-path models/albert-squad --out-folder data/football/modifier/predictions/
+    deps:
+    - data/football/modifier/albert-squad/baseline-ssq-retrieval-40-50-albert-squad.bin
+    - models/albert-squad/
+    - scripts/predict_transformers.py
+    outs:
+    - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+    - data/football/modifier/predictions/nbest-baseline-ssq-retrieval-40-50-albert-squad.json
+  predict-intervention-albert-football-modifier-ssq-retrieval:
+    cmd: python main.py predictions --in-file data/football/modifier/albert-squad/intervention-ssq-retrieval-40-50-albert-squad.bin
+      --model-path models/albert-squad --out-folder data/football/modifier/predictions/
+    deps:
+    - data/football/modifier/albert-squad/intervention-ssq-retrieval-40-50-albert-squad.bin
+    - models/albert-squad/
+    - scripts/predict_transformers.py
+    outs:
+    - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
+    - data/football/modifier/predictions/nbest-intervention-ssq-retrieval-40-50-albert-squad.json

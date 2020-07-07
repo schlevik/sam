@@ -18,19 +18,19 @@
     },
     "albert-squad": {
         "evaluation_on_intervention": {
-            "human_readable": "0.4763 +/- 0.0196",
-            "mean": 0.4763242375601926,
-            "95ci": 0.019609054309669582
+            "human_readable": "0.4631 +/- 0.0196",
+            "mean": 0.46308186195826645,
+            "95ci": 0.019577489294932138
         },
         "n": 2492,
         "behaviour": {
-            "correct_baseline": 2056,
-            "correct_intervention": 1544,
-            "right->change->right": 1187,
-            "right->keep->wrong": 734,
-            "right->change->wrong": 135,
-            "wrong->change->right": 60,
-            "wrong->keep->right": 297
+            "correct_baseline": 1983,
+            "correct_intervention": 1584,
+            "right->change->right": 1154,
+            "right->keep->wrong": 703,
+            "right->change->wrong": 126,
+            "wrong->change->right": 65,
+            "wrong->keep->right": 365
         }
     }
 }
