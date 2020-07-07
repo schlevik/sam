@@ -1,15 +1,16 @@
 stages:
   count-football-modifier:
-    cmd: python main.py count --output metrics/football/modifier/count.json --domain football
+    cmd: python main.py count --output metrics/football/modifier/count.json --domain
+      football
     deps:
-      - scripts/count.py
-      - stresstest/football/football_generator.py
-      - stresstest/football/generate_with_modifier.py
-      - stresstest/generator.py
-      - stresstest/football/resources/templates_modifier.py
-      - stresstest/football/resources/team-names.json
-      - stresstest/generator.py
-      - stresstest/realize.py
+    - scripts/count.py
+    - stresstest/football/football_generator.py
+    - stresstest/football/generate_with_modifier.py
+    - stresstest/generator.py
+    - stresstest/football/resources/templates_modifier.py
+    - stresstest/football/resources/team-names.json
+    - stresstest/generator.py
+    - stresstest/realize.py
     metrics:
     - metrics/football/modifier/count.json:
         cache: false
@@ -18,35 +19,35 @@ stages:
       --seed 56 --out-path data/football/modifier/ --subsample 50 --do-save
     deps:
 
-      - scripts/generate_modifier.py
+    - scripts/generate_modifier.py
 
-      - stresstest/realize.py
+    - stresstest/realize.py
 
-      - stresstest/football/football_generator.py
+    - stresstest/football/football_generator.py
 
-      - stresstest/football/generate_with_modifier.py
+    - stresstest/football/generate_with_modifier.py
 
-      - stresstest/generator.py
+    - stresstest/generator.py
 
-      - stresstest/football/resources/templates_modifier.py
+    - stresstest/football/resources/templates_modifier.py
 
-      - stresstest/football/resources/team-names.json
+    - stresstest/football/resources/team-names.json
 
-      - stresstest/generator_modifier.py
+    - stresstest/generator_modifier.py
 
-      - conf/modifier-ssq-retrieval-unique-actors.json
+    - conf/modifier-ssq-retrieval-unique-actors.json
     outs:
 
-      - data/football/modifier/baseline-ssq-retrieval-40-50.json
+    - data/football/modifier/baseline-ssq-retrieval-40-50.json
 
-      - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
   evalate-diversity-football-modifier:
     cmd: python main.py diversity --input data/football/modifier/intervention-ssq-retrieval-40-50.json
       --output metrics/football/modifier/diversity.json --reference data/football/drop_nfl.json
     deps:
-      - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - data/football/drop_nfl.json
-      - scripts/compare.py
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - data/football/drop_nfl.json
+    - scripts/compare.py
     metrics:
     - metrics/football/modifier/diversity.json:
         cache: false
@@ -54,9 +55,9 @@ stages:
     cmd: python main.py quality --input data/football/modifier/intervention-ssq-retrieval-40-50.json
       --output metrics/football/modifier/naturality.json --reference data/football/drop_nfl.json
     deps:
-      - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - data/football/drop_nfl.json
-      - scripts/cohesion.py
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - data/football/drop_nfl.json
+    - scripts/cohesion.py
     metrics:
     - metrics/football/modifier/naturality.json:
         cache: false
@@ -65,69 +66,64 @@ stages:
       data/football/drop_nfl.json
     deps:
 
-      - data/football/drop_dataset_dev.json
+    - data/football/drop_dataset_dev.json
 
-      - scripts/compare.py
+    - scripts/compare.py
     outs:
-      - data/football/drop_nfl.json
+    - data/football/drop_nfl.json
   predict-football-modifier:
-    cmd: MODELS=models/bidaf-squad.tar.gz CLASSES='BiDAF' python main.py predict
-      data/football/modifier/baseline-ssq-retrieval-40-50.json
-      data/football/modifier/intervention-ssq-retrieval-40-50.json
-      --output-folder data/football/modifier/predictions
+    cmd: MODELS=models/bidaf-squad.tar.gz CLASSES='BiDAF' python main.py predict data/football/modifier/baseline-ssq-retrieval-40-50.json
+      data/football/modifier/intervention-ssq-retrieval-40-50.json --output-folder
+      data/football/modifier/predictions
     deps:
-      - data/football/modifier/baseline-ssq-retrieval-40-50.json
-      - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - models/albert-squad
-      - models/bidaf-squad.tar.gz
-      - scripts/predict.py
+    - data/football/modifier/baseline-ssq-retrieval-40-50.json
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - models/albert-squad
+    - models/bidaf-squad.tar.gz
+    - scripts/predict.py
     outs:
-      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
-      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+    - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+    - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
   evaluate-football-modifier:
-    cmd: python main.py evaluate data/football/modifier/baseline-ssq-retrieval-40-50.json 
-      data/football/modifier/intervention-ssq-retrieval-40-50.json
-      --prediction-folder data/football/modifier/predictions
-      --output metrics/football/modifier/evaluation.json
+    cmd: python main.py evaluate data/football/modifier/baseline-ssq-retrieval-40-50.json
+      data/football/modifier/intervention-ssq-retrieval-40-50.json --prediction-folder
+      data/football/modifier/predictions --output metrics/football/modifier/evaluation.json
     deps:
-      - data/football/modifier/baseline-ssq-retrieval-40-50.json
-      - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
-      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
-      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
-      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
-      - scripts/evaluate.py
+    - data/football/modifier/baseline-ssq-retrieval-40-50.json
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+    - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+    - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+    - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
+    - scripts/evaluate.py
     metrics:
     - metrics/football/modifier/evaluation.json:
-          cache: false
+        cache: false
   evaluate-intervention-football-modifier:
-    cmd: python main.py evaluate-intervention
-      --baseline-file data/football/modifier/baseline-ssq-retrieval-40-50.json
-      --predictions-folder data/football/modifier/predictions/
-      --output metrics/football/modifier/evaluation-by-intervention.json --do-save
+    cmd: python main.py evaluate-intervention --baseline-file data/football/modifier/baseline-ssq-retrieval-40-50.json
+      --predictions-folder data/football/modifier/predictions/ --output metrics/football/modifier/evaluation-by-intervention.json
+      --do-save
     deps:
-      - data/football/modifier/baseline-ssq-retrieval-40-50.json
-      - data/football/modifier/intervention-ssq-retrieval-40-50.json
-      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
-      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
-      - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
-      - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
+    - data/football/modifier/baseline-ssq-retrieval-40-50.json
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-bidaf-squad.json
+    - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-bidaf-squad.json
+    - data/football/modifier/predictions/baseline-ssq-retrieval-40-50-albert-squad.json
+    - data/football/modifier/predictions/intervention-ssq-retrieval-40-50-albert-squad.json
     metrics:
     - metrics/football/modifier/evaluation-by-intervention.json:
         cache: false
   report-football-modifier:
-    cmd: python main.py report
-      --diversity metrics/football/modifier/diversity.json
-      --count metrics/football/modifier/count.json
-      --naturality metrics/football/modifier/naturality.json
-      --evaluation metrics/football/modifier/evaluation.json
-      --evaluation-intervention metrics/football/modifier/evaluation-by-intervention.json
+    cmd: python main.py report --diversity metrics/football/modifier/diversity.json
+      --count metrics/football/modifier/count.json --naturality metrics/football/modifier/naturality.json
+      --evaluation metrics/football/modifier/evaluation.json --evaluation-intervention
+      metrics/football/modifier/evaluation-by-intervention.json
     deps:
-      - metrics/football/modifier/evaluation.json
-      - metrics/football/modifier/evaluation-by-intervention.json
-      - metrics/football/modifier/naturality.json
-      - metrics/football/modifier/count.json
-      - metrics/football/modifier/diversity.json
+    - metrics/football/modifier/evaluation.json
+    - metrics/football/modifier/evaluation-by-intervention.json
+    - metrics/football/modifier/naturality.json
+    - metrics/football/modifier/count.json
+    - metrics/football/modifier/diversity.json
 
 
   generate-football-modifier-ssq-retrieval-40-100:
@@ -135,90 +131,99 @@ stages:
       --seed 56 --out-path data/football/modifier/train/ --subsample 100 --do-save
     deps:
 
-      - scripts/generate_modifier.py
+    - scripts/generate_modifier.py
 
-      - stresstest/realize.py
+    - stresstest/realize.py
 
-      - stresstest/football/football_generator.py
+    - stresstest/football/football_generator.py
 
-      - stresstest/football/generate_with_modifier.py
+    - stresstest/football/generate_with_modifier.py
 
-      - stresstest/generator.py
+    - stresstest/generator.py
 
-      - stresstest/football/resources/templates_modifier.py
+    - stresstest/football/resources/templates_modifier.py
 
-      - stresstest/football/resources/team-names.json
+    - stresstest/football/resources/team-names.json
 
-      - stresstest/generator_modifier.py
+    - stresstest/generator_modifier.py
 
-      - conf/modifier-ssq-retrieval-unique-actors.json
+    - conf/modifier-ssq-retrieval-unique-actors.json
     outs:
-      - data/football/modifier/train/baseline-ssq-retrieval-40-100.json
-      - data/football/modifier/train/intervention-ssq-retrieval-40-100.json
+    - data/football/modifier/train/baseline-ssq-retrieval-40-100.json
+    - data/football/modifier/train/intervention-ssq-retrieval-40-100.json
 
   combine-football-modifier-ssq-retrieval:
     cmd: python main.py combine data/football/modifier/train/baseline-ssq-retrieval-40-100.json
-      data/football/modifier/train/intervention-ssq-retrieval-40-100.json
-      data/football/modifier/train/both-ssq-retrieval-40-100.json
+      data/football/modifier/train/intervention-ssq-retrieval-40-100.json data/football/modifier/train/both-ssq-retrieval-40-100.json
     deps:
-      - data/football/modifier/train/baseline-ssq-retrieval-40-100.json
-      - data/football/modifier/train/intervention-ssq-retrieval-40-100.json
-      - scripts/dataops.py
+    - data/football/modifier/train/baseline-ssq-retrieval-40-100.json
+    - data/football/modifier/train/intervention-ssq-retrieval-40-100.json
+    - scripts/dataops.py
     outs:
-      - data/football/modifier/train/both-ssq-retrieval-40-100.json
+    - data/football/modifier/train/both-ssq-retrieval-40-100.json
   export-squad-football-modifier-ssq-retrieval:
     cmd: python main.py export --in-path data/football/modifier/train/both-ssq-retrieval-40-100.json
       --out-path data/football/modifier/train/both-ssq-retrieval-40-100-squad --ds-format
       squad --shuffle --split 80:20 --seed 56
     deps:
-      - data/football/modifier/train/both-ssq-retrieval-40-100.json
+    - data/football/modifier/train/both-ssq-retrieval-40-100.json
     outs:
-      - data/football/modifier/train/both-ssq-retrieval-40-100-squad-20-split.json
-      - data/football/modifier/train/both-ssq-retrieval-40-100-squad-80-split.json
+    - data/football/modifier/train/both-ssq-retrieval-40-100-squad-20-split.json
+    - data/football/modifier/train/both-ssq-retrieval-40-100-squad-80-split.json
   generate-football-modifier-ssq-retrieval-distinct-templates:
     cmd: python main.py generate-modifier --config conf/modifier-ssq-retrieval-unique-actors.json
-      --seed 56 --out-path data/football/modifier/train-distinct-templates/ --domain football
-      --num-workers 8 --split-templates 0.5 --do-save
+      --seed 56 --out-path data/football/modifier/train-distinct-templates/ --domain
+      football --num-workers 8 --split-templates 0.5 --do-save
     deps:
-      - scripts/generate_modifier.py
-      - stresstest/realize.py
-      - stresstest/football/football_generator.py
-      - stresstest/football/generate_with_modifier.py
-      - stresstest/generator.py
-      - stresstest/football/resources/templates_modifier.py
-      - stresstest/football/resources/team-names.json
-      - stresstest/generator_modifier.py
-      - conf/modifier-ssq-retrieval-unique-actors.json
+    - scripts/generate_modifier.py
+    - stresstest/realize.py
+    - stresstest/football/football_generator.py
+    - stresstest/football/generate_with_modifier.py
+    - stresstest/generator.py
+    - stresstest/football/resources/templates_modifier.py
+    - stresstest/football/resources/team-names.json
+    - stresstest/generator_modifier.py
+    - conf/modifier-ssq-retrieval-unique-actors.json
     outs:
-      - data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
-      - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
-      - data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
-      - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    - data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    - data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
+    - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
   combine-football-modifier-ssq-retrieval-for-training-distinct-templates:
     cmd: python main.py combine data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
       data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
       data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
     deps:
-      - data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
-      - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
-      - scripts/dataops.py
+    - data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    - scripts/dataops.py
     outs:
-      - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+    - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
   export-squad-train-football-modifier-ssq-retrieval-for-training-distinct-templates:
-    cmd: python main.py export
-      --in-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+    cmd: python main.py export --in-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
       --out-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-0.json
       --ds-format squad --shuffle --seed 56
     deps:
-      - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
+    - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-full-0.json
     outs:
-      - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-0.json
+    - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-0.json
   export-squad-eval-football-modifier-ssq-retrieval-for-training-distinct-templates:
-    cmd: python main.py export
-      --in-path data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    cmd: python main.py export --in-path data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
       --out-path data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-1.json
       --ds-format squad --shuffle --seed 56
     deps:
-      - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    - data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
     outs:
-      - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-1.json
+    - data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-1.json
+  cache-albert-football-modifier-ssq-retrieval:
+    cmd: python main.py cache-examples data/football/modifier/baseline-ssq-retrieval-40-50.json
+      data/football/modifier/intervention-ssq-retrieval-40-50.json --out-folder data/football/modifier/albert-squad/
+      --model-path models/albert-squad/ --num-workers 4
+    deps:
+    - data/football/modifier/baseline-ssq-retrieval-40-50.json
+    - data/football/modifier/intervention-ssq-retrieval-40-50.json
+    - models/albert-squad/
+    - scripts/predict_transformers.py
+    outs:
+    - data/football/modifier/albert-squad/baseline-ssq-retrieval-40-50-albert-squad.bin
+    - data/football/modifier/albert-squad/intervention-ssq-retrieval-40-50-albert-squad.bin

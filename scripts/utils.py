@@ -110,12 +110,16 @@ def extract_model_name(gold_descriptor, prediction_file):
     return model_name
 
 
-def get_output_predictions_file_name(in_file, output_folder, weights_path):
+def get_output_predictions_file_name(in_file, output_folder, weights_path=""):
     output_base = os.path.splitext(os.path.basename(in_file))[0]
-    weights_addon = os.path.basename(weights_path)
-    weights_addon = weights_addon.replace(".tar", "").replace(".gz", "").replace(".zip", "").replace(".tgz", "")
+    if weights_path:
+        weights_addon = os.path.basename(weights_path)
+        weights_addon = weights_addon.replace(".tar", "").replace(".gz", "").replace(".zip", "").replace(".tgz", "")
+        weights_addon = f'-{weights_addon}'
+    else:
+        weights_addon = ''
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-    output_file_name = f"{output_base}-{weights_addon}.json"
+    output_file_name = f"{output_base}{weights_addon}.json"
     output = os.path.join(output_folder, output_file_name)
     return output

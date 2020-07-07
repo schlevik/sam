@@ -293,3 +293,21 @@ export-squad-eval-football-modifier-ssq-retrieval-for-training-distinct-template
   outs:
   - path: data/football/modifier/train-distinct-templates/both-ssq-retrieval-40-squad-1.json
     md5: 13212b736decda2188c163720989a271
+cache-albert-football-modifier-ssq-retrieval:
+  cmd: python main.py cache-examples data/football/modifier/baseline-ssq-retrieval-40-50.json
+    data/football/modifier/intervention-ssq-retrieval-40-50.json --out-folder data/football/modifier/albert-squad/
+    --model-path models/albert-squad/ --num-workers 4
+  deps:
+  - path: data/football/modifier/baseline-ssq-retrieval-40-50.json
+    md5: 858a23367039b6cb3292868a41a4a74f
+  - path: data/football/modifier/intervention-ssq-retrieval-40-50.json
+    md5: 2ab3aa30ff6270a8763b74d4fd7d0a8a
+  - path: models/albert-squad/
+    md5: 8d09b19e15976988bb199e5928c67b3c.dir
+  - path: scripts/predict_transformers.py
+    md5: 3d7d168e6e6678dd4960c350e98a0b46
+  outs:
+  - path: data/football/modifier/albert-squad/baseline-ssq-retrieval-40-50-albert-squad.bin
+    md5: 0905daa2846f5e091305cc2d4cca350c
+  - path: data/football/modifier/albert-squad/intervention-ssq-retrieval-40-50-albert-squad.bin
+    md5: 8054fa9210782a0578fd59ca2fa3a453
