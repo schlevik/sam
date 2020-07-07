@@ -49,8 +49,6 @@ def evaluate(prediction_folder, gold_files, output, metric):
     for gold_file in gold_files:
         click.echo(f"Evaluating predictions on {click.style(gold_file, fg='blue')}")
         gold = load_json(gold_file)
-        if isinstance(gold, dict):  # squad format
-            gold = from_squad(gold)
         gold_descriptor, prediction_files = match_prediction_to_gold(gold_file, prediction_folder)
 
         result[gold_file] = {'n': num_questions(gold)}

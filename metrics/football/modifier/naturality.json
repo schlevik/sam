@@ -1,7 +1,7 @@
 {
     "lemma_ttr": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.6506 +/- 0.0020",
             "mean": 0.6506337125187559,
             "variance": 0.00199300224547793,
@@ -19,7 +19,7 @@
     },
     "lemma_mattr": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.8052 +/- 0.0014",
             "mean": 0.805210973225502,
             "variance": 0.0009790767900927661,
@@ -37,7 +37,7 @@
     },
     "adjacent_overlap_verb_sent": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.1032 +/- 0.0041",
             "mean": 0.10321053994128096,
             "variance": 0.008753098517615925,
@@ -55,7 +55,7 @@
     },
     "adjacent_overlap_verb_sent_div_seg": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.3174 +/- 0.0136",
             "mean": 0.31740000000000007,
             "variance": 0.09581724,
@@ -73,7 +73,7 @@
     },
     "adjacent_overlap_binary_verb_sent": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.2482 +/- 0.0088",
             "mean": 0.2482,
             "variance": 0.04003676,
@@ -91,7 +91,7 @@
     },
     "adjacent_overlap_2_verb_sent": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.1635 +/- 0.0054",
             "mean": 0.16350233007231843,
             "variance": 0.015124470593630104,
@@ -109,7 +109,7 @@
     },
     "adjacent_overlap_2_verb_sent_div_seg": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.5021 +/- 0.0183",
             "mean": 0.502125,
             "variance": 0.17352673437500002,
@@ -127,7 +127,7 @@
     },
     "adjacent_overlap_binary_2_verb_sent": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.3709 +/- 0.0109",
             "mean": 0.370875,
             "variance": 0.062045484375,
@@ -145,7 +145,7 @@
     },
     "word2vec_1_all_sent": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.3312 +/- 0.0042",
             "mean": 0.3312181350344246,
             "variance": 0.009174154299899007,
@@ -163,7 +163,7 @@
     },
     "word2vec_2_all_sent": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.6609 +/- 0.0030",
             "mean": 0.6608633172918982,
             "variance": 0.0045851015814390135,
@@ -181,7 +181,7 @@
     },
     "pronoun_noun_ratio": {
         "ours": {
-            "n": 2000,
+            "n": 2,
             "human_readable": "0.0710 +/- 0.0014",
             "mean": 0.07097418511655107,
             "variance": 0.0009780143506282941,

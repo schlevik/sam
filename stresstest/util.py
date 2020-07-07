@@ -12,7 +12,9 @@ def load_json(path: str):
 
 
 def num_questions(sample: List[Dict[str, Any]]):
-    return sum(len(datum['qas']) for datum in sample)
+    if isinstance(sample, dict):
+        sample = sample['data']
+    return sum(len(datum['paragraphs'][0]['qas']) for datum in sample)
 
 
 T = TypeVar('T')
@@ -25,10 +27,14 @@ def batch(iterable: Iterable[T], batch_size=10) -> List[Iterable[T]]:
 
 
 def sample_iter(sample: List[Dict[str, Any]]) -> Generator[Entry, None, None]:
+    if isinstance(sample, dict):
+        sample = sample['data']
     for datum in sample:
-        passage = datum['passage']
+        datum_id = datum['title']
+        datum = datum['paragraphs'][0]
+        passage = datum['context']
         for qa in datum['qas']:
-            yield Entry(datum['id'], passage, qa['id'], qa['question'], qa['answer'], qa)
+            yield Entry(datum_id, passage, qa['id'], qa['question'], qa.get('answer') or qa['answers'][0]['text'], qa)
 
 
 def fmt_dict(dct: dict):

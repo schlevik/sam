@@ -25,7 +25,7 @@ def diversity(input, reference, output, attr, metric: List[Type[Distance]]):
     getter: Callable[[Any], str] = itemgetter(attr)
 
     # samples
-    corpus: List[str] = [getter(s) for s in sample]
+    corpus: List[str] = [s['paragraphs'][0]['context'] for s in sample['data']]
     corpus_reference: List[str] = [getter(s) for s in reference]
 
     n = len(corpus)
