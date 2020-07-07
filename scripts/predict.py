@@ -1,13 +1,11 @@
-import os
 import sys
-from collections import defaultdict
 from typing import List
 
 import click
 from loguru import logger
 from tqdm import tqdm
 
-from scripts.utils import write_json
+from scripts.utils import write_json, get_output_predictions_file_name
 from stresstest.classes import Model, Entry
 from stresstest.util import load_json, sample_iter, num_questions, fmt_dict, do_import, batch
 
@@ -60,11 +58,6 @@ def predict(in_files, output_folder, models, model_classes, gpu, batch_size):
                     logger.debug(f"Question: {entry.question}")
                     logger.debug(f"Prediction: {answer}")
                     predictions[entry.qa_id] = str(answer)
-            output_base = os.path.splitext(os.path.basename(in_file))[0]
-            weights_addon = os.path.basename(weights_path)
-            weights_addon = weights_addon.replace(".tar", "").replace(".gz", "").replace(".zip", "").replace(".tgz", "")
-            if not os.path.exists(output_folder):
-                os.mkdir(output_folder)
-            output = os.path.join(output_folder, f"{output_base}-{weights_addon}.json")
-            click.echo(f"Saving predictions to {click.style(output, fg='blue')}")
-            write_json(predictions, output, pretty=False)
+            output_file_name = get_output_predictions_file_name(in_file, output_folder, weights_path)
+            click.echo(f"Saving predictions to {click.style(output_file_name, fg='blue')}")
+            write_json(predictions, output_file_name, pretty=False)

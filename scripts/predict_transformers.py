@@ -46,6 +46,8 @@ from transformers.data.metrics.squad_metrics import (
 )
 from transformers.data.processors.squad import SquadResult, SquadV1Processor, SquadV2Processor
 
+from scripts.utils import get_output_predictions_file_name
+
 logger = logging.getLogger(__name__)
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -81,7 +83,7 @@ def _is_gpu_available():
 
 @click.command()
 @click.option('--in-file', type=str)
-@click.option('--out-file', type=str, default='')
+@click.option('--output-folder', type=str, default='')
 @click.option('--model-path', type=str)
 @click.option('--model-type', type=str)
 @click.option('--no-cuda', type=bool, default=None)
@@ -93,8 +95,8 @@ def _is_gpu_available():
 @click.option('--max-answer-length', type=int, default=30)
 @click.option('--verbose-logging', is_flag=True, default=False)
 @click.option('--null-score-diff-threshold', type=float, default=0.0)
-def predictions(in_file, model_path, model_type, out_file, no_cuda, do_lower_case, per_gpu_eval_batch_size, lang_id,
-                v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold):
+def predictions(in_file, model_path, model_type, output_folder, no_cuda, do_lower_case, per_gpu_eval_batch_size,
+                lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold):
     if no_cuda is None:
         no_cuda = not _is_gpu_available()
 
@@ -103,8 +105,6 @@ def predictions(in_file, model_path, model_type, out_file, no_cuda, do_lower_cas
 
     model = get_model(model_path)
     tokenizer = get_tokenizer(model_path, do_lower_case)
-    if not os.path.exists(os.path.dirname(out_file)):
-        os.makedirs(os.path.dirname(out_file))
 
     eval_batch_size = per_gpu_eval_batch_size * max(1, n_gpu)
 
@@ -186,8 +186,12 @@ def predictions(in_file, model_path, model_type, out_file, no_cuda, do_lower_cas
     eval_time = timeit.default_timer() - start_time
     logger.info("  Evaluation done in total %f secs (%f sec per example)", eval_time, eval_time / len(dataset))
 
+    out_file = get_output_predictions_file_name(in_file, output_folder, model_path)
+
+    if not os.path.exists(os.path.dirname(out_file)):
+        os.makedirs(os.path.dirname(out_file))
+
     # Compute predictions
-    out_folder = os.path.dirname(out_file)
     file_name = os.path.basename(out_file)
     output_prediction_file = os.path.join(out_folder, file_name)
     output_nbest_file = os.path.join(out_folder, f"nbest-{file_name}")
@@ -283,21 +287,6 @@ def get_model(model_name_or_path):
 def cache_examples(in_file, out_file, tokenizer, do_lower_case, evaluate, v2, max_seq_length, doc_stride,
                    max_query_length,
                    num_workers):
-    # input_dir = data_dir if data_dir else "."
-    # logger.info("Creating features from dataset file at %s", input_dir)
-    #
-    # if not data_dir and ((evaluate and not predict_file) or (not evaluate and not train_file)):
-    #     try:
-    #         import tensorflow_datasets as tfds
-    #     except ImportError:
-    #         raise ImportError("If not data_dir is specified, tensorflow_datasets needs to be installed.")
-    #
-    #     if version_2_with_negative:
-    #         logger.warn("tensorflow_datasets does not handle version 2 of SQuAD.")
-    #
-    #     tfds_examples = tfds.load("squad")
-    #     examples = SquadV1Processor().get_examples_from_dataset(tfds_examples, evaluate=evaluate)
-    # else:
     tokenizer = get_tokenizer(tokenizer, do_lower_case)
     processor = SquadV2Processor() if v2 else SquadV1Processor()
     data_dir = os.path.dirname(in_file)
