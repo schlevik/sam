@@ -12,6 +12,7 @@ from tqdm import tqdm
 def cli(debug):
     if not debug:
         logger.remove(0)
+        logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True, level='WARNING')
     else:
         logger.remove()
         logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True)

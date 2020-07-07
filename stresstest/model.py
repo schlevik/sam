@@ -110,23 +110,21 @@ class Albert(Model):
             self.tokenizer.decode(int(i))
             for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
         ]
+        logger.debug(f"Start index: {s.argmax()}")
+        logger.debug(f"End index: {e.argmax()}")
+        logger.debug(f"Tokens: {tokens}")
         return self.post_process(question, passage, tokens)
 
     @overrides
     def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        # TODO: so this is shit
         batch = list(batch)
         d = self.tokenizer.batch_encode_plus(((e.question.lower(), e.passage.lower()) for e in batch),
                                              return_tensors='pt', pad_to_max_length=True)
-        if self.gpu:
-            token_type_ids = d['token_type_ids'].cuda()
-            input_ids = d['input_ids'].cuda()
-        else:
-            input_ids = d['input_ids']
-            token_type_ids = d['token_type_ids']
 
-        ss, es = self.predictor(token_type_ids=token_type_ids,
-                                input_ids=input_ids)
+        ss, es = self.predictor(**self.move_to_gpu(d))
         result = []
+        # technically, this is shit...
         for j, (start, end, entry) in enumerate(zip(ss, es, batch)):
             tokens = [
                 self.tokenizer.decode(int(i))
