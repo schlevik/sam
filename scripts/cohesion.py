@@ -69,7 +69,7 @@ def quality(input, reference, output, attr, taaco_dir, indices):
     # scores = Dict[str, np.ndarray]
     getter: Callable[[Any], str] = itemgetter(attr)
 
-    corpus: List[str] = [getter(s) for s in sample]
+    corpus: List[str] = [s['paragraphs'][0]['context'] for s in sample['data']]
     n = len(corpus)
     logger.debug(f"Evaluating sample with n={n} paragraphs.")
 

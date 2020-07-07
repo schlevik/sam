@@ -12,18 +12,12 @@ from stresstest.util import load_json
 @click.command()
 @click.option("--in-path", default='data/in.json')
 @click.option("--out-path", default='data/out.json')
-@click.option("--ds-format", type=FormatParam(), default='squad')
-@click.option("--shuffle", is_flag=True, default=False)
+@click.option("--ds-format", type=FormatParam(), default=None)
 @click.option("--split", type=str, default=False)
-@click.option("--seed", type=int, default=False)
-def export(in_path, out_path, ds_format, shuffle, split, seed):
-    if seed:
-        random.seed(seed)
+def export(in_path, out_path, ds_format, split):
     click.echo(f'Reading dataset from {click.style(in_path, fg="green")}')
-    dataset = load_json(in_path)
+    dataset = load_json(in_path)['data']
 
-    if shuffle:
-        random.shuffle(dataset)
     if split:
         splits = []
         ratios = list(accumulate(map(float, split.split(":"))))
@@ -34,15 +28,21 @@ def export(in_path, out_path, ds_format, shuffle, split, seed):
             start_idx = math.ceil(start_percent / 100 * len(dataset))
             end_idx = math.ceil(end_percent / 100 * len(dataset))
             splits.append((int(end_percent - start_percent), dataset[start_idx:end_idx]))
-        for ratio, split in splits:
-            new_format = ds_format(split)
-            out_name = f"{out_path.rsplit('.json', 1)[0]}-{str(ratio)}-split.json"
+        for i, (ratio, split) in enumerate(splits):
+            if ds_format:
+                split = ds_format(split)
+            else:
+                split = {'version': 0.1, 'data': split}
+            out_name = f"{out_path.rsplit('.json', 1)[0]}-{i}-{str(ratio)}-split.json"
             click.echo(f'Writing out to: {click.style(out_name, fg="green")}')
-            write_json(new_format, out_name)
+            write_json(split, out_name)
     else:
-        new_format = ds_format(dataset)
+        if ds_format:
+            dataset = ds_format(dataset)
+        else:
+            dataset = {'version': 0.1, 'data': dataset}
         click.echo(f'Writing out to: {click.style(out_path, fg="green")}')
-        write_json(new_format, out_path, pretty=False)
+        write_json(dataset, out_path, pretty=False)
 
 
 @click.command()

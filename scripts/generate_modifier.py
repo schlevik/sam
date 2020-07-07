@@ -1,4 +1,3 @@
-import json
 import os
 import random
 import sys
@@ -13,6 +12,7 @@ from tqdm import tqdm
 from scripts.utils import Domain, BASELINE, INTERVENTION, write_json
 from stresstest.classes import Config
 from stresstest.comb_utils import generate_all_possible_template_choices, split
+from stresstest.ds_utils import match_answer_in_paragraph
 from stresstest.realize import Realizer
 
 
@@ -34,15 +34,14 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
     if seed:
         random.seed(seed)
     logger.remove()
-    # realizer = Realizer(**templates)
     story_id = uuid4()
-    modified = {"id": story_id, 'qas': []}
+    paragraph = {"id": story_id, 'qas': []}
 
     realizer = Realizer(**templates, unique_sentences=True)
 
     story, visits = realizer.realise_with_sentence_choices(events, world, arranged_sentences)
-    modified["passage"] = ' '.join(story)
-    modified['passage_sents'] = story
+    paragraph["context"] = ' '.join(story)
+    paragraph['passage_sents'] = story
     choices = realizer.context.choices
     template_choices = realizer.context.chosen_templates
 
@@ -59,7 +58,7 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
                     and logical.event_type in target_event_types:
                 question_data_str = "/".join(
                     f"{k}:{v}" for k, v in logical.question_data.items() if k not in ['modified', 'easier'])
-                modified['qas'].append({
+                qa = {
                     "id": f"{story_id}/{logical.reasoning}/{logical.type}/{logical.target}/{logical.event_type}/"
                           f"{question_data_str}",
                     "question": logical.realized,
@@ -71,12 +70,16 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
                     'event_type': logical.event_type,
                     'question_data': logical.question_data,
                     'modification_data': modification_data
-                })
-                # click.echo(logical)
-                # click.echo(f"{logical.event_type}|{logical.target}|{logical.question_data.get('n', None)}")
-                # click.echo(f"{logical.realized} {logical.answer}")
-                # click.echo()
-
+                }
+                try:
+                    qa['answers'] = [{
+                        'answer_start': match_answer_in_paragraph(qa=qa, datum=paragraph),
+                        'text': qa['answer']
+                    }]
+                except NotImplementedError:
+                    pass
+                paragraph['qas'].append(qa)
+    modified = {'title': paragraph['id'], 'paragraphs': [paragraph]}
     question_map = {}
     for question in single_span_questions + multi_span_questions + unanswerable_questions + abstractive_questions:
         question_map[(question.event_type, question.target, question.question_data.get("n", None))] = question
@@ -87,7 +90,7 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
         event.features = []
 
     # generate baseline
-    baseline = {
+    baseline_paragraph = {
         "id": story_id,
         "qas": []
     }
@@ -98,8 +101,8 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
     # print(20 * "===")
     # print("\n".join(story))
     # generator = load_class(config.get('generator.class'), StoryGenerator)(config)
-    baseline["passage"] = ' '.join(story)
-    baseline['passage_sents'] = story
+    baseline_paragraph["context"] = ' '.join(story)
+    baseline_paragraph['passage_sents'] = story
 
     generator = generator_class({})
     (single_span_questions, multi_span_questions, unanswerable_questions, abstractive_questions) = \
@@ -119,7 +122,7 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
                     and logical.event_type in target_event_types:
                 question_data_str = "/".join(
                     f"{k}:{v}" for k, v in logical.question_data.items() if k not in ['modified', 'easier'])
-                baseline['qas'].append({
+                qa = {
                     "id": f"{story_id}/{logical.reasoning}/{logical.type}/{logical.target}/{logical.event_type}/"
                           f"{question_data_str}",
                     "question": logical.realized,
@@ -131,11 +134,16 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
                     'event_type': logical.event_type,
                     'question_data': logical.question_data,
                     'modification_data': modification_data
-                })
-                # click.echo(logical)
-                # click.echo(f"{logical.event_type}|{logical.target}|{logical.question_data.get('n', None)}")
-                # click.echo(f"{logical.realized} {logical.answer}")
-                # click.echo()
+                }
+                try:
+                    qa['answers'] = [{
+                        'answer_start': match_answer_in_paragraph(qa=qa, datum=baseline_paragraph),
+                        'text': qa['answer']
+                    }]
+                except NotImplementedError:
+                    pass
+                baseline_paragraph['qas'].append(qa)
+    baseline = {'title': baseline_paragraph['id'], 'paragraphs': [baseline_paragraph]}
     return baseline, modified
 
 
@@ -211,18 +219,20 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
                    f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='green', bold=True)}.")
 
         baseline, modified = generate(cfg, domain, num_workers, subsample, templates, uuid4)
-        baseline = sorted(baseline, key=lambda d: d['id'])
-        modified = sorted(modified, key=lambda d: d['id'])
+        baseline = sorted(baseline, key=lambda d: d['title'])
+        modified = sorted(modified, key=lambda d: d['title'])
         if do_print:
             _do_print(baseline, modified)
 
         click.echo(f"Total Passages: {len(baseline)}")
-        click.echo(f"Total Questions over baseline passages: {sum(1 for b in baseline for _ in b['qas'])}")
-        click.echo(f"Total Questions over modified passages: {sum(1 for m in modified for _ in m['qas'])}")
+        click.echo(f"Total Questions over baseline passages: {sum(len(b['paragraphs'][0]['qas']) for b in baseline)}")
+        click.echo(f"Total Questions over modified passages: {sum(len(b['paragraphs'][0]['qas']) for b in modified)}")
 
         if do_save:
-            write_json(baseline, os.path.join(out_path, file_name.format(BASELINE)), pretty=False)
-            write_json(modified, os.path.join(out_path, file_name.format(INTERVENTION)), pretty=False)
+            write_json({"version": 0.1, "data": baseline}, os.path.join(out_path, file_name.format(BASELINE)),
+                       pretty=False)
+            write_json({"version": 0.1, "data": modified}, os.path.join(out_path, file_name.format(INTERVENTION)),
+                       pretty=False)
 
 
 def generate(cfg, domain, num_workers, subsample, templates, uuid4):
@@ -295,7 +305,7 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
     #     ) for (events, world, event_type_targets, choice, modification_data) in tqdm(all_template_choices)
     # ]
     baseline, modified = zip(*all_realised)
-    assert len(baseline) == len(set(b['passage'] for b in baseline))
-    assert len(modified) == len(set(b['passage'] for b in modified))
+    assert len(baseline) == len(set(b['paragraphs'][0]['context'] for b in baseline))
+    assert len(modified) == len(set(b['paragraphs'][0]['context'] for b in modified))
 
     return baseline, modified

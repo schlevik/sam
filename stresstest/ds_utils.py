@@ -5,17 +5,11 @@ def squad(dataset):
         paragraph = d['passage']
         for qa in d['qas']:
             answer = qa['answer']
-            assert len(qa['evidence']) == 1
-            evidence_idx = qa['evidence'][0]
-            evidence_sent = d['passage_sents'][evidence_idx]
-            idx_evidence_in_paragraph = paragraph.index(evidence_sent)
-            idx_answer_in_evidence = evidence_sent.index(answer)
-            idx_answer_in_paragraph = idx_evidence_in_paragraph + idx_answer_in_evidence
-            assert paragraph[idx_answer_in_paragraph:idx_answer_in_paragraph + len(answer)] == answer
+            idx_answer_in_paragraph = match_answer_in_paragraph(qa, d)
             qas.append({
                 'question': qa['question'],
                 'id': qa['id'],
-                'answers': [{'answer_start': idx_answer_in_evidence + idx_evidence_in_paragraph, 'text': answer}]
+                'answers': [{'answer_start': idx_answer_in_paragraph, 'text': answer}]
             })
         article = {
             'title': d['id'],
@@ -27,6 +21,20 @@ def squad(dataset):
         'data': data,
     }
     return result
+
+
+def match_answer_in_paragraph(qa, datum):
+    if len(qa['evidence']) > 1:
+        raise NotImplementedError("For now works only with SSQ retrieval type questions!")
+    answer = qa['answer']
+    evidence_idx = qa['evidence'][0]
+    passage = datum['context']
+    evidence_sent = datum['passage_sents'][evidence_idx]
+    idx_evidence_in_paragraph = passage.index(evidence_sent)
+    idx_answer_in_evidence = evidence_sent.index(answer)
+    idx_answer_in_paragraph = idx_evidence_in_paragraph + idx_answer_in_evidence
+    assert passage[idx_answer_in_paragraph:idx_answer_in_paragraph + len(answer)] == answer
+    return idx_answer_in_evidence + idx_evidence_in_paragraph
 
 
 def from_squad(dataset):
