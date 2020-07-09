@@ -7,10 +7,17 @@ from stresstest.realize import Realizer
 from stresstest.util import highlight
 
 
-def only(sents, n, action='test'):
-    sents = deepcopy(sents)
-    sents[action] = [sents[action][n]]
-    return sents
+def only(sents_or_bundle, n, action='test'):
+    sents_or_bundle = deepcopy(sents_or_bundle)
+    if isinstance(sents_or_bundle, Bundle):
+        sents_or_bundle.templates['sentences'][action] = [sents_or_bundle.templates['sentences'][action][n]]
+        sents_or_bundle.templates_modifier['sentences'][action] = [
+            sents_or_bundle.templates_modifier['sentences'][action][n]]
+    elif isinstance(sents_or_bundle, dict):
+        sents_or_bundle['sentences'][action] = [sents_or_bundle['sentences'][action][n]]
+    else:
+        sents_or_bundle[action] = [sents_or_bundle[action][n]]
+    return sents_or_bundle
 
 
 def get_questions(generator, realizer, events, visits, story) \
@@ -26,8 +33,7 @@ def get_questions(generator, realizer, events, visits, story) \
 
 def print_out(story, *questions, highlights=None):
     print("===STORY===:")
-    color_map = {h: "red" for name in highlights for h in name.split(" ")}
-    print(color_map)
+    color_map = {h: "red" for name in highlights for h in name.split(" ")} if highlights else {}
     for s in story:
         print(highlight(s, colors=color_map))
     print()
@@ -45,19 +51,23 @@ def interactive_env_football(do_print=True, do_realise=True, **kwargs):
     return interactive_env(bundle, modifier=False, do_print=do_print, do_realise=do_realise)
 
 
-def interactive_env_football_modifier(cfg=None, do_print=True, do_realise=True, first_modification=0,
+def interactive_env_football_modifier(changed_bundle=None, cfg=None, do_print=True, do_realise=True,
+                                      first_modification=0,
                                       fill_with_modification=None,
                                       modify_event_types=None,
+                                      modifier_type=None,
                                       modification_distance=1, total_modifiable_actions=2, **kwargs):
     generator_kwargs = dict(
         first_modification=first_modification,
         fill_with_modification=fill_with_modification,
-        modify_event_types=modify_event_types,
+        modify_event_types=modify_event_types or ['goal'],
         modification_distance=modification_distance,
         total_modifiable_actions=total_modifiable_actions,
+        modifier_type=modifier_type
     )
+    changed_bundle = changed_bundle or bundle
     generator_kwargs.update(kwargs)
-    return interactive_env(bundle=bundle, cfg=cfg, modifier=True, do_print=do_print, do_realise=do_realise,
+    return interactive_env(bundle=changed_bundle, cfg=cfg, modifier=True, do_print=do_print, do_realise=do_realise,
                            generator_kwargs=generator_kwargs)
 
 
@@ -70,6 +80,7 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
     elif isinstance(cfg, dict):
         cfg = Config(cfg)
     cfg.pprint()
+    print(modifier, "is modifier?")
     if modifier:
         g_class = bundle.generator_modifier
         templates = bundle.templates_modifier
@@ -109,3 +120,22 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
         print_out(story, ssq, maq, uaq, abq, highlights=actors + coactors)
 
     return generator, cfg, events, realizer, story, all_questions
+
+
+def showcase():
+    test_bundle = only(bundle, 0, 'goal')
+    templates = test_bundle.templates_modifier
+    generator, cfg, events, realizer, story, all_questions = interactive_env_football_modifier(
+        test_bundle, cfg={"world.num_sentences": 2}, do_print=False
+    )
+    realizer = Realizer(**templates)
+    story, visits = realizer.realise_story(events, generator.world)
+    ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
+    print_out(story, ssq)
+    for f in ['MODIFIER.RB', 'MODIFIER.VB.neg-impl', 'MODIFIER.MD']:
+        print(f"==== {f} ====")
+        events[0].features = [f]
+        realizer = Realizer(**templates)
+        story, visits = realizer.realise_story(events, generator.world)
+        ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
+        print_out(story, ssq)

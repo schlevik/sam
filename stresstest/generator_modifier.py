@@ -1,6 +1,6 @@
 import random
 from abc import ABC
-from typing import List, Dict
+from typing import List
 
 from loguru import logger
 from overrides import overrides
@@ -11,8 +11,11 @@ from stresstest.util import fmt_dict
 
 
 class ModifierGenerator(StoryGenerator, ABC):
+    def _is_event_modified(self, event):
+        return any(f.startswith(self.modifier_type) for f in event.features)
+
     def __init__(self, config, get_world, first_modification=0, fill_with_modification=None, modify_event_types=None,
-                 modification_distance=1, total_modifiable_actions=2):
+                 modification_distance=1, total_modifiable_actions=2, modifier_type=None):
         """
 
 
@@ -26,6 +29,7 @@ class ModifierGenerator(StoryGenerator, ABC):
             total_modifiable_actions: How many actions to modify
         """
         logger.debug(f"{ModifierGenerator.__name__} entering constructor")
+        self.modifier_type = modifier_type or 'MODIFIER.RB'
         super().__init__(config, get_world)
         self.first_modification = first_modification
         self.fill_with_modifications = fill_with_modification
@@ -38,8 +42,6 @@ class ModifierGenerator(StoryGenerator, ABC):
             raise YouIdiotException("Can't have less modifiable actions than modification distance tho!")
         self.in_modification_distance = False
         logger.debug(f"{ModifierGenerator.__name__} finish constructor")
-
-    MODIFIER = "modifier"
 
     def _is_current_event_before_first_modify(self):
         return self.current_event.sentence_nr < self.first_modification
@@ -72,7 +74,7 @@ class ModifierGenerator(StoryGenerator, ABC):
         if self._is_current_event_first_nonmodified_event() and not self.unique_actors:
             # if so, select an actor that did not appear in any modified event before the actual event
             modified_actors = [sent.actor for sent in self.sentences if
-                               sent.event_type in self.modify_event_type and self.MODIFIER in sent.features]
+                               sent.event_type in self.modify_event_type and self._is_event_modified(sent)]
             self.current_event.actor = Choices(
                 [p for p in self.get_actor_choices() if p not in modified_actors]).random()
         else:
@@ -127,12 +129,12 @@ class ModifierGenerator(StoryGenerator, ABC):
         logger.debug(f"Modify event #{self.current_event.sentence_nr}?")
         if self.current_event.event_type in self.modify_event_type and self._determine_if_modify():
             logger.debug("Modified!")
-            self.current_event.features.append(self.MODIFIER)
+            self.current_event.features.append(self.modifier_type)
         else:
             logger.debug("Not modified!")
 
     def get_relevant_events(self) -> List[Event]:
-        return [e for e in StoryGenerator.get_relevant_events(self) if self.MODIFIER not in e.features]
+        return [e for e in StoryGenerator.get_relevant_events(self) if not self._is_event_modified(e)]
 
     def post_process_question(self, q: Question):
         base_relevant = [e for e in StoryGenerator.get_relevant_events(self)]

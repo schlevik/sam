@@ -7,7 +7,8 @@ from stresstest.classes import Context
 
 sentences = {
     "goal": [
-        "%CONNECTIVE.VBD> $ACTOR $ACTORTEAM.name-pos-post @MODIFIER.RB.goal $VBD.goal a ($JJ.positive) goal .",
+        "%CONNECTIVE.VBD> $ACTOR $ACTORTEAM.name-pos-post @MODIFIER.RB.goal @MODIFIER.MD.goal "
+        "@MODIFIER.VB.neg-impl.goal $VBD.goal a ($JJ.positive) goal .",
 
         "%CONNECTIVE.VBD> $ACTOR @MODIFIER.RB.goal $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name .",
 
@@ -266,16 +267,24 @@ at = {
         "RB": {
             "goal": ['almost', 'nearly']
         },
+        "MD": {
+            "goal": ['did not', "did n't", 'could not', "would not", "wouldn't"]
+        },
+        "VB": {
+            "neg-impl": {
+                "goal": ['failed to', 'missed the [chance|opportunity] to']
+            }
+        }
     },
-    "CONDITION": {
-        "if": lambda: True,
-        "true": [
-            "and $PRONOUN $VBD.goal"
-        ],
-        "false": [
-            "$CONJ.contrastive $PRONOUN $VBD.nogoal"
-        ]
-    }
+    # "CONDITION": {
+    #     "if": lambda: True,
+    #     "true": [
+    #         "and $PRONOUN $VBD.goal"
+    #     ],
+    #     "false": [
+    #         "$CONJ.contrastive $PRONOUN $VBD.nogoal"
+    #     ]
+    # }
 }
 
 
