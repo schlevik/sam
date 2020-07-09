@@ -128,7 +128,8 @@ class Processor:
     def process_feature(self, word):
         logger.debug("...Word is a feature @...")
         if word[1:].startswith("MODIFIER"):
-            if "modifier" in self.context.sent.features:
+            modifier_type = word[1:].split("MODIFIER.", 1)[1].split(".", 1)[0]
+            if any(s.startswith(f"MODIFIER.{modifier_type}") for s in self.context.sent.features):
                 new_words, idx = self.accessor.access_at(word[1:]).random()
             else:
                 new_words = []
@@ -272,6 +273,13 @@ class Validator:
             elif process_function == self.processor.process_template:
                 try:
                     x = self.accessor.access_dollar(word[1:])
+                    assert isinstance(x, list) or "any" in x
+                except Exception as e:
+                    logger.error(str(e))
+                    return word
+            elif process_function == self.processor.process_feature:
+                try:
+                    x = self.accessor.access_at(word[1:])
                     assert isinstance(x, list) or "any" in x
                 except Exception as e:
                     logger.error(str(e))

@@ -12,7 +12,7 @@ class FootballModifierGenerator(FootballGenerator, ModifierGenerator):
                  first_modification=0,
                  fill_with_modification=None,
                  modify_event_types=None,
-                 modification_distance=1, total_modifiable_actions=2):
+                 modification_distance=1, total_modifiable_actions=2, modifier_type=None):
         """
 
 
@@ -29,7 +29,7 @@ class FootballModifierGenerator(FootballGenerator, ModifierGenerator):
         modify_event_types = modify_event_types or ['goal']
 
         super().__init__(config=config, get_world=get_world, team_names=team_names,
-                         first_modification=first_modification,
+                         first_modification=first_modification, modifier_type=None,
                          fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
                          modification_distance=modification_distance, total_modifiable_actions=total_modifiable_actions)
 
