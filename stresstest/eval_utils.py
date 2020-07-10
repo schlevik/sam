@@ -52,9 +52,10 @@ class EM(EvalMetric):
             else:
                 logger.debug("Wrong!")
                 em.append(0)
+        if em:
+            logger.debug(f'Mean EM: {sum(em) / len(em)}')
         else:
             logger.warning(f"Evaluating on empty gold!")
-        logger.debug(f'Mean EM: {sum(em) / len(em)}')
         return em
 
 
@@ -87,6 +88,8 @@ class F1(EvalMetric):
             f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0
             logger.debug(f"F1: {f1}")
             overall_f1.append(f1)
+        if overall_f1:
+            logger.debug(f'Mean EM: {sum(overall_f1) / len(overall_f1)}')
         else:
             logger.warning(f"Evaluating on empty gold!")
         return overall_f1
