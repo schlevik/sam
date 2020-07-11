@@ -98,7 +98,7 @@ dollar = {
         # "!PRPS !RANDINT th goal [of the season|for the club]"],
         # inserted as a gerund
         "VBG": {
-            "foul": ["disappointing (the crowd) with an $JJ.negative action"],
+            "foul": ["disappointing (the crowd) with a $JJ.negative action"],
             "goal": [
                 # "being $RDM.NOVB",
                 "drawing attention from even !PRPS biggest sceptics",
@@ -268,7 +268,7 @@ at = {
             "goal": ['almost', 'nearly']
         },
         "MD": {
-            "goal": ['did not', "did n't", 'could not', "would not", "wouldn't"]
+            "goal": ['did not', "did n't", 'could not', "could n't", "would not", "would n't"]
         },
         "VB": {
             "neg-impl": {

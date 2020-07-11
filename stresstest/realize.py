@@ -2,8 +2,10 @@ import inspect
 import random
 import textwrap
 from collections import defaultdict
+from itertools import zip_longest
 from typing import List, Callable, Optional, Dict, Tuple, Union, Any
 
+import nltk
 from loguru import logger
 
 from stresstest.classes import S, YouIdiotException, F, Event, Context, Question, World
@@ -385,7 +387,7 @@ def prepare_templates(templates, allow_conditions=False) -> dict:
 
 
 class Realizer:
-    context: Context
+    context: Optional[Context]
 
     def __init__(self, sentences, bang, dollar, at, percent,
                  question_templates, validate=True, unique_sentences=True):
@@ -508,7 +510,34 @@ class Realizer:
 
         logger.debug(f"Final sentence is: {ctx.realized}")
 
-        return " ".join(ctx.realized)
+        return " ".join(self.post_process(ctx.realized))
+
+    vocals = "aeiou"
+
+    def post_process(self, tokens: List[str]):
+        # tokens = sentence.split(" ")
+
+        result = []
+        for i, (prev_token, token, next_token) in \
+                enumerate(zip_longest([""] + tokens[:-1], tokens, tokens[1:], fillvalue="")):
+            logger.debug(token)
+            lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
+            if (token == 'a' or token == 'A') and len(next_token) > 0 and next_token[0] in self.vocals:
+                token = token + "n"
+            if token == 'th' and prev_token == '1':
+                token = 'st'
+            if token == 'th' and prev_token == '2':
+                token = 'nd'
+            if token == 'th' and prev_token == '3':
+                token = 'rd'
+            prev_prev_token = tokens[i - 2] if i >= 2 else ""
+            # TODO: well that's a bit hack-y
+            if prev_token == 'to' and token.endswith("ed"):
+                token = lemmatizer.lemmatize(token, 'v')
+            if prev_token in ('not', "n't") and prev_prev_token in ("could", "would", "did"):
+                token = lemmatizer.lemmatize(token, 'v')
+            result.append(token)
+        return result
 
     def _fix_units(self, question: Question, passage: List[str]):
         if question.target == 'distance' and question.answer:
@@ -570,7 +599,7 @@ class Realizer:
             # context access
             elif word.startswith("#"):
                 try:
-                    new_word = q.question_data[word[1:]]
+                    new_word = str(q.question_data[word[1:]])
                 except KeyError:
                     raise NotImplementedError(f"{word} is not in question data!")
                 stack.append(str(new_word))
@@ -578,7 +607,8 @@ class Realizer:
             else:
                 question_words.append(word)
         logger.debug(question_words)
-        q.realized = " ".join(question_words) + "?"
+        q.realized = " ".join(self.post_process(question_words)) + "?"
         answer = self._fix_units(q, passage)
         q.answer = answer
-        return " ".join(question_words) + "?", q.answer
+
+        return " ".join(self.post_process(question_words)) + "?", q.answer
