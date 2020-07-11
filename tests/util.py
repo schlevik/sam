@@ -119,13 +119,13 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
 
         print_out(story, ssq, maq, uaq, abq, highlights=actors + coactors)
 
-    return generator, cfg, events, realizer, story, all_questions
+    return generator, cfg, events, realizer, story, all_questions, visits
 
 
 def showcase():
     test_bundle = only(bundle, 0, 'goal')
     templates = test_bundle.templates_modifier
-    generator, cfg, events, realizer, story, all_questions = interactive_env_football_modifier(
+    generator, cfg, events, realizer, story, all_questions, visits = interactive_env_football_modifier(
         test_bundle, cfg={"world.num_sentences": 2}, do_print=False
     )
     realizer = Realizer(**templates)

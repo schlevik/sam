@@ -12,15 +12,9 @@ def _get_templates_dict(module):
     }
 
 
-class FootballBundle(Bundle):
-    ...
-
-
-bundle = FootballBundle(
+bundle = Bundle(
     generator=FootballGenerator,
-
+    templates=_get_templates_dict(templates),
     generator_modifier=FootballModifierGenerator,
-
+    templates_modifier=_get_templates_dict(templates_modifier)
 )
-FootballBundle.templates = property(lambda self: _get_templates_dict(templates))
-FootballBundle.templates_modifier = property(lambda self: _get_templates_dict(templates_modifier))
