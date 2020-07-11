@@ -37,9 +37,12 @@ class NaQANet(Model):
 class BiDAF(Model):
     @classmethod
     def make(cls, path, gpu=False):
-        from allennlp_models.rc.bidaf.bidaf_model import BidirectionalAttentionFlow
+        try:
+          from allennlp_models.rc.bidaf.bidaf_model import BidirectionalAttentionFlow
+        except:
+          import allennlp_models.rc
         cuda_device = 0 if gpu else -1
-        return cls("BiDAF", Predictor.from_path(path, 'reading-comprehension', cuda_device=cuda_device), gpu=gpu)
+        return cls("BiDAF", Predictor.from_path(path, cuda_device=cuda_device), gpu=gpu)
 
     def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
         return [

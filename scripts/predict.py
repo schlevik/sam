@@ -39,6 +39,7 @@ def predict(in_files, output_folder, models, model_classes, gpu, batch_size):
 
     for cls, weights_path in zip(model_classes, models):
         model_cls: Model = do_import(cls, relative_import='stresstest.model')
+        # TODO: Bidaf should also respect max answer length
         model = model_cls.make(weights_path, gpu=gpu)
         click.echo(f"Evaluating model '{click.style(model_cls.__name__, fg='green', bold=True)}' from weights file: "
                    f"{click.style(weights_path, fg='blue')}.")

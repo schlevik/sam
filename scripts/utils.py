@@ -12,7 +12,7 @@ from stresstest.util import do_import
 
 BASELINE = 'baseline'
 INTERVENTION = 'intervention'
-
+CONTROL = 'control'
 
 class Domain(click.ParamType):
     def convert(self, value, param, ctx):

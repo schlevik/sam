@@ -4,7 +4,7 @@ from typing import Dict
 
 import click
 
-from scripts.utils import write_json, match_prediction_to_gold, BASELINE, INTERVENTION, extract_model_name
+from scripts.utils import write_json, match_prediction_to_gold, BASELINE, INTERVENTION, extract_model_name, CONTROL
 from stresstest.eval_utils import get_mean_var_ci_bernoulli, EM
 
 from stresstest.util import load_json, sample_iter, highlight
@@ -36,7 +36,8 @@ def color_map(baseline, intervention, other=None):
 @click.option("--output", type=str, default="metrics/result-intervention.json")
 @click.option("--do-print", is_flag=True, default=False)
 @click.option("--do-save", is_flag=True, default=False)
-def evaluate_intervention(predictions_folder, baseline_file, output, do_print, do_save):
+@click.option("--control", is_flag=True, default=False)
+def evaluate_intervention(predictions_folder, baseline_file, output, do_print, do_save, control):
     gold = load_json(baseline_file)
     intervention_basename = os.path.basename(baseline_file).replace(BASELINE, INTERVENTION)
     intervention_file = baseline_file.replace(os.path.basename(baseline_file), intervention_basename)
@@ -61,8 +62,24 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
         assert b.qa_id == intervention.qa_id
     aligned_baseline, aligned_intervention = zip(*aligned)
 
+    if control:
+        control_basename = os.path.basename(baseline_file).replace(BASELINE, CONTROL)
+        control_file = baseline_file.replace(os.path.basename(baseline_file), control_basename)
+        gold_control = load_json(control_file)
+        gold_control_flat = list(sample_iter(gold_control))
+        q_c_by_id = {c.qa_id: c for c in gold_control_flat}
+        aligned = [(b, q_m_by_id[b.qa_id], q_c_by_id[b.qa_id]) for b in gold_flat if b.qa_id in q_c_by_id]
+        aligned = [(b, m, c) for b, m, c in aligned if b.answer != m.answer]
+        _, control_prediction_files = match_prediction_to_gold(control_file, predictions_folder)
+        aligned_baseline, aligned_intervention, aligned_control = zip(*aligned)
+        if control:
+            click.echo(f"And control gold: {click.style(control_file, fg='blue')}")
+        # assert c_aligned_baseline == aligned_baseline, c_aligned_intervention == aligned_intervention
+    else:
+        control_prediction_files = [None] * len(prediction_files)
     result = dict()
-    for predictions_file, prediction_intervention_file in zip(prediction_files, prediction_intervention_files):
+    for predictions_file, prediction_intervention_file, control_prediction_file in \
+            zip(sorted(prediction_files), sorted(prediction_intervention_files), sorted(control_prediction_files)):
         predictions: Dict[str, str] = load_json(predictions_file)
         predictions_intervention: Dict[str, str] = load_json(prediction_intervention_file)
         model_name = extract_model_name(gold_descriptor, predictions_file)
@@ -134,6 +151,42 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                             d not in wrong_change_right and d not in correct_change_correct]
         click.echo(f"Wrong predictions that the model didn't change but that became correct: {len(wrong_keep_right)}")
         # sanity checks
+        if control:
+            predictions_control: Dict[str, str] = load_json(control_prediction_file)
+            results_control = em(aligned_control, predictions_control)
+            click.echo(f"Got {sum(results_control)} correct for control.")
+            correct_baseline_control = [
+                (d, aligned_control[i], predictions[d.qa_id], predictions_control[d.qa_id]) for i, d
+                in enumerate(aligned_baseline) if results_baseline[i] == 1 and results_control[i] == 1
+            ]
+            correct_baseline_control_intervention = [
+                (d, aligned_intervention[i], aligned_control[i], predictions[d.qa_id],
+                 predictions_intervention[d.qa_id], predictions_control[d.qa_id]) for i, d
+                in enumerate(aligned_baseline) if (results_baseline[i] == 1 and results_intervention[i] == 1
+                                                   and results_control[i] == 1)
+            ]
+            if do_print:
+                click.echo(f"Examples for 'Correct baseline and Control'")
+                click.echo()
+                for baseline, ctrl, prediction, prediction_control in correct_baseline_control:
+                    click.echo(highlight(baseline.passage, colors=color_map(baseline.answer, ctrl.answer)))
+                    click.echo(highlight(ctrl.passage, colors=color_map(baseline.answer, ctrl.answer)))
+                    assert baseline.question == ctrl.question
+                    click.secho(baseline.question, fg='blue')
+                    click.secho(f"{baseline.answer} vs {prediction}", fg='green')
+                    click.secho(f"{ctrl.answer} vs {prediction_control}", fg='red')
+                    click.echo(20 * "===")
+                for b, i, c, p_b, p_i, p_c in correct_baseline_control_intervention:
+                    click.echo(highlight(i.passage, colors=color_map(b.answer, i.answer)))
+                    click.echo(highlight(c.passage, colors=color_map(b.answer, c.answer)))
+                    assert b.question == c.question == i.question
+                    assert i.answer == c.answer
+                    click.secho(b.question, fg='blue')
+                    click.secho(f"{b.answer} vs {p_b}", fg='green')
+                    click.secho(f"{c.answer} vs {p_c}", fg='red')
+                    click.secho(f"{i.answer} vs {p_i}", fg='magenta')
+                    click.echo(20 * "===")
+
         assert len(correct_before_intervention) > len(correct_change_correct)
         assert len(correct_before_intervention) == len(correct_keep_wrong) + len(correct_change_wrong) + len(
             correct_change_correct)
@@ -162,8 +215,18 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                     click.echo(20 * "===")
 
         # result = {'num_samples': len(predictions), 'full': _get_score(gold, predictions)}
-        overall_results = [1 if correct + results_intervention[i] == 2 else 0 for i, correct in
-                           enumerate(results_baseline)]
+        # overall_results = [1 if correct + results_intervention[i] == 2 else 0 for i, correct in
+        #                   enumerate(results_baseline)]
+        overall_results = []
+
+        if control:
+            for b, i, c in zip(results_baseline, results_intervention, results_control):
+                if b and c:
+                    overall_results.append(1 if b + i == 2 else 0)
+        else:
+            for b, i in zip(results_baseline, results_intervention):
+                if b:
+                    overall_results.append(1 if b + i == 2 else 0)
         mean, var, ci = get_mean_var_ci_bernoulli(overall_results)
         printable_result = f'{mean:.4f} +/- {ci:.4f}'
 
@@ -174,7 +237,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             'evaluation_on_intervention': {
                 'human_readable': printable_result,
                 'mean': mean,
-                '95ci': ci
+                '95ci': ci,
+                'control': control
             },
             'n': len(aligned),
             'behaviour': {
@@ -187,5 +251,11 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 'wrong->keep->right': len(wrong_keep_right)
             }
         }
+        if control:
+            result[model_name]['behaviour'].update({
+                'correct_control': sum(results_control),
+                'correct_baseline_control': len(correct_baseline_control),
+                'right+control->change->right': len(correct_baseline_control_intervention)
+            })
     if do_save:
         write_json(result, output)
