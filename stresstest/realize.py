@@ -194,7 +194,7 @@ class Processor:
 
         # to not use the same template twice
         exclude = [
-            choice for name, choice in self.context.current_choices if name.startswith(word + '.')
+            choice for name, choice in self.context.current_choices if name.startswith(word + '.') or name == word
         ]
         logger.debug(f"Excluding choices: {exclude}")
         try:
@@ -412,21 +412,7 @@ class Realizer:
             validator.validate(self.question_templates, 'question_templates')
             logger.debug("Validation done, looks ok.")
 
-    def with_feedback(self, e: Exception):
-        if isinstance(e, AttributeError) and "object has no attribute 'random'" in str(e):
-            msg = f"{self.context.word} is not a leaf path and template doesn't provide .any"
-        elif isinstance(e, TypeError) and "list indices must be integers or slices, not str" in str(e):
-            msg = ""
-        elif isinstance(e, KeyError) and "dict object has no attribute" in str(e):
-            msg = f"{self.context.word} is not a valid template path!"
-        elif isinstance(e, YouIdiotException):
-            msg = str(e)
-        else:
-            msg = "And i don't even know what's wrong!"
-        logger.debug(f"{self.context.chosen_templates[-1]}")
-        logger.debug(f"{self.context.choices}")
-        logger.error(msg)
-        return YouIdiotException(msg)
+
 
     def realise_story(self, events: List[Event], world) -> Tuple[List[str], Dict]:
         self.context = Context()
@@ -468,7 +454,7 @@ class Realizer:
         logger.debug(f"Use unique sentences?: {self.unique_sentences}")
         if self.unique_sentences:
             exclude = [idx for event_type, idx in self.context.chosen_templates if
-                       event_type.startswith(ctx.sent.event_type + '.')]
+                       event_type.startswith(ctx.sent.event_type + '.') or event_type == ctx.sent.event_type]
             logger.debug(f'Choices to exclude... {exclude}')
             if len(exclude) >= len(self.sentences[ctx.sent.event_type]):
                 raise YouIdiotException(f"Your story has more '{ctx.sent.event_type}' events (> {len(exclude)}) "

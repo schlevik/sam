@@ -1,14 +1,17 @@
 from flaky import flaky
 
 from stresstest.classes import Event
-from tests.resources.templates import sentences
-from tests.util import TestRealizer, only
+from stresstest.realize import Realizer
+from tests.resources.templates import sentences, templates
+from tests.util import only
 
 
 @flaky(max_runs=5, min_passes=5)
 def test_different_dollar_templates_flat():
-    sents = only(sentences, 0)  # flat
-    r = TestRealizer(sentences=sents)
+    # sents = only(sentences, 0)  # flat
+    only_templates = only(templates, 0)
+    r = Realizer(**only_templates)
+    # r = TestRealizer(sentences=sents)
     logic_sents = [Event(0)]
     logic_sents[0].event_type = 'test'
     world = {}
@@ -20,8 +23,8 @@ def test_different_dollar_templates_flat():
 
 @flaky(max_runs=5, min_passes=5)
 def test_different_dollar_templates_flat_with_multiple_sentences():
-    sents = only(sentences, 0)  # flat
-    r = TestRealizer(sentences=sents, unique_sentences=False)
+    only_templates = only(templates, 0)
+    r = Realizer(unique_sentences=False, **only_templates)
     logic_sents = [Event(0), Event(1)]
     logic_sents[0].event_type = 'test'
     logic_sents[1].event_type = 'test'
@@ -34,8 +37,8 @@ def test_different_dollar_templates_flat_with_multiple_sentences():
 
 @flaky(max_runs=5, min_passes=5)
 def test_different_dollar_templates_flat_with_multiple_sentences_when_not_leaf():
-    sents = only(sentences, 2)  # flat
-    r = TestRealizer(sentences=sents, unique_sentences=False)
+    only_templates = only(templates, 2)
+    r = Realizer(**only_templates, unique_sentences=False)
     logic_sents = [Event(0), Event(1)]
     logic_sents[0].event_type = 'test'
     logic_sents[1].event_type = 'test'
@@ -48,8 +51,8 @@ def test_different_dollar_templates_flat_with_multiple_sentences_when_not_leaf()
 
 @flaky(max_runs=5, min_passes=5)
 def test_different_dollar_templates_nested():
-    sents = only(sentences, 1)  # nested
-    r = TestRealizer(sentences=sents)
+    only_templates = only(templates, 1)
+    r = Realizer(**only_templates, unique_sentences=False)
     logic_sents = [Event(0)]
     logic_sents[0].event_type = 'test'
     world = {}
@@ -62,7 +65,7 @@ def test_different_dollar_templates_nested():
 @flaky(max_runs=5, min_passes=5)
 def test_different_sentences():
     sents = sentences  # nested
-    r = TestRealizer(sentences=sents)
+    r = Realizer(**templates)
     ii = [0, 1, 2, 3]
     logic_sents = [Event(i) for i in ii]
     for i in ii:
@@ -70,4 +73,4 @@ def test_different_sentences():
     world = {}
     realised_sents, visits = r.realise_story(logic_sents, world)
     for i in ii:
-        assert any(str(i) in sent for sent in realised_sents)
+        assert any([str(i) in sent for sent in realised_sents]), f"{i} not in story!"
