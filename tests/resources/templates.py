@@ -1,5 +1,3 @@
-import random
-
 sentences = {
     "test": [
         "$a $a $a",
@@ -34,6 +32,9 @@ percent = {
 bang = {
 
 }
-templates = {
+question_templates = {}
 
+templates = {
+    'dollar': dollar, 'sentences': sentences, 'at': at, 'percent': percent, 'bang': bang,
+    'question_templates': question_templates
 }
