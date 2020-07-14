@@ -127,9 +127,13 @@ class Processor:
 
     def process_feature(self, word):
         logger.debug("...Word is a feature @...")
-        if word[1:].startswith("MODIFIER"):
-            modifier_type = word[1:].split("MODIFIER.", 1)[1].split(".", 1)[0]
-            if any(s.startswith(f"MODIFIER.{modifier_type}") for s in self.context.sent.features):
+        logger.debug(word[1:] in self.accessor.at)
+        logger.debug(self.accessor.at.keys())
+        modifier_type = word[1:].split(".", 1)[0]
+        logger.debug(modifier_type)
+        if modifier_type in self.accessor.at:
+
+            if any(s.startswith(f"{modifier_type}") for s in self.context.sent.features):
                 new_words, idx = self.accessor.access_at(word[1:]).random()
             else:
                 new_words = []
@@ -411,8 +415,6 @@ class Realizer:
             validator.validate(self.percent, 'percent')
             validator.validate(self.question_templates, 'question_templates')
             logger.debug("Validation done, looks ok.")
-
-
 
     def realise_story(self, events: List[Event], world) -> Tuple[List[str], Dict]:
         self.context = Context()

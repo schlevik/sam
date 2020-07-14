@@ -7,8 +7,8 @@ from stresstest.classes import Context
 
 sentences = {
     "goal": [
-        "%CONNECTIVE.VBD> $ACTOR $ACTORTEAM.name-pos-post @MODIFIER.RB.goal @MODIFIER.MD.goal "
-        "@MODIFIER.VB.neg-impl.goal $VBD.goal a ($JJ.positive) goal .",
+        "%CONNECTIVE.VBD> $ACTOR $ACTORTEAM.name-pos-post @RB.goal @MD.VBG.goal "
+        "@VB.neg-impl.VBD.goal $VBD.goal a ($JJ.positive) goal .",
 
         "%CONNECTIVE.VBD> $ACTOR @MODIFIER.RB.goal $VBD.goal a ($JJ.positive) goal for $ACTORTEAM.name .",
 
@@ -46,6 +46,9 @@ sentences = {
         "$ACTOR @MODIFIER.RB.goal $VBD.goal "
         "[$ACTORTEAM.name-pos-pre !NEXT $NN.goal|the !NEXT $NN.goal for $ACTORTEAM.name] "
         "to %CONNECTIVE.IVP after $REASON.S.goal .",
+
+        "$ACTORTEAM.name %CONNECTIVE.IVP when $ACTOR $VBD.goal $COACTOR $PASS-TYPE ."
+
     ],
     "foul": [
         "%CONNECTIVE.VBD> $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY "
@@ -216,7 +219,10 @@ dollar = {
     },
     # nouns/ noun phrases
     "NN": {
-        "opportunity": ["opportunity", "chance"],
+        "opportunity": ["chance", "opportunity", "occasion", "possibility"],
+        "attribute": ["grace", "guts", "nerve", "tenacity", "tenaciousness",
+                      "boldness", "power", "strength", "courage", "audaciousness"],
+        "obligation": ["commitment", " task", " responsibility"],
         "foul": ['foul (play)'],
         "goal": ["goal"]
     },
@@ -250,7 +256,14 @@ dollar = {
     },
     "CONJ": {
         "contrastive": ["but", "however"]
+    },
+    "MD": {
+        "neg": ["[would|could|did] [not|n't]"]
+    },
+    "MDG": {
+        "neg": ['not being able to', 'being unable to']
     }
+
 }
 
 
@@ -263,29 +276,136 @@ def _last_sentence(ctx):
 
 
 at = {
-    "MODIFIER": {
-        "RB": {
-            "goal": ['almost', 'nearly']
+    "RB": {
+        "goal": ['almost', 'nearly', 'just about', 'all but']  # TODO: more
+    },
+    "MD": {
+        "VBD": {
+            "goal": ["$MD.neg"]
         },
-        "MD": {
-            "goal": ['did not', "did n't", 'could not', "would not", "wouldn't"]
-        },
-        "VB": {
-            "neg-impl": {
-                "goal": ['failed to', 'missed the [chance|opportunity] to']
-            }
+        "VBG": {
+            "goal": ["$MDG.neg"]
         }
     },
-    # "CONDITION": {
-    #     "if": lambda: True,
-    #     "true": [
-    #         "and $PRONOUN $VBD.goal"
-    #     ],
-    #     "false": [
-    #         "$CONJ.contrastive $PRONOUN $VBD.nogoal"
-    #     ]
-    # }
+    # http://web.stanford.edu/group/csli_lnr/Lexical_Resources/simple-implicatives/simple-implicatives.prn
+    # Verbs of Implicit Negation and their Complements in the History of English, Iyeiri, 2010
+    "VB": {
+        "neg-impl": {
+            "VBD": {
+                "goal": ["$MD.neg [manage|get|happen] to",
+                         "$MD.neg succeed in"]  # negation + (--)
+            },
+            "VBG": {
+                "goal": ["not [managing|getting|happening] to",  # + infinitive
+                         "$MDG.neg [manage|get|happen] to",
+                         "not succeeding in",
+                         "$MDG.neg succeed in"]  # + gerund
+            },
+            'VBD-passive': {
+                "goal": ["$MD.neg [permitted|allowed] to"]  # negation + (--)
+
+            },
+            'VBG-passive': {
+                "goal": [
+                    "[not being|having not been] [permitted|allowed] to",  # + inf
+                ]
+            }
+        },
+        "pol-rev": {
+            "VBD": {
+                "goal": ['[failed|refused] to']  # (+-)
+            },
+            "VBG": {
+                "goal": ['[failing|refusing] to']
+            },
+            'VBD-passive': {
+                "goal": [
+                    "[was|has been] [refrained|refused|prohibited|prevented|hindered] from",  # + gerund
+                    "[was|has been] [prohibited|disallowed] to"  # + inf | TODO
+                ]
+            },
+            'VBG-passive': {
+                "goal": [
+                    "[being|having been] [refrained|refused|prohibited|prevented] from",  # + gerund
+                    "[being|having been] prohibited to"  # + inf
+                ]
+            }
+        },
+    },
+    # https://web.stanford.edu/group/csli_lnr/Lexical_Resources/phrasal-implicatives/ImplicativeTemplates.pdf
+    # Verbs of Implicit Negation and their Complements in the History of English, Iyeiri, 2010
+    "VP": {
+        # negation + (--)
+        "neg-impl": {
+            # not HAVE/USE OPPORTUNITY-OCCASION/ABILITY-ATTRIBUTE
+            "VBD": {
+                'goal': [
+                    "$MD.neg [get|have|find] the [$NN.opportunity|$NN.attribute] to",
+                    "$MD.neg [use|exploit] the $NN.opportunity"
+                    # not MEET OBLIGATION
+                    "$MD.neg [meet|fulfill] the $NN.obligation to"
+                ]
+            },
+            "VBG": {
+                # not HAVE/USE OPPORTUNITY-OCCASION/ABILITY-ATTRIBUTE
+                'goal': [
+                    "not [geting|having|finding] the [$NN.opportunity|$NN.attribute]",
+                    "not [using|exploiting] the $NN.opportunity"
+                    # not MEET OBLIGATION
+                    "not [meeting|fulfilling] the $NN.obligation to"
+                ]
+
+            }
+
+        },
+
+        "pol-rev": {  # (+-)
+            "VBD": {
+                "goal": [
+                    # LACK/FAIL/WASTE OPPORTUNITY-OCCASION
+                    '[missed|lost|wasted|gave up|threw away|squandered|neglected] the $NN.opportunity to',
+                    # LACK ATTRIBUTE/ABILITY
+                    'lacked the $NN.attribute to',
+                    'lost the nerve to'  # TODO: let native check
+                    # FAIL OBLIGATION
+                    'neglected the $NN.obligation to'  # TODO: let native check
+                    # USE ASSET: empty, i don't see how this fits
+                    # he buy a cake
+                    # he lacked the strength to buy a cake => not he buy a cake
+                    # he used the money to buy a cake => ?not he buy a cake
+                ]
+            },
+            "VBG": {
+                "goal": [
+                    # LACK/FAIL/WASTE OPPORTUNITY-OCCASION
+                    '[missing|losing|wasting|giving up|throwing away|squandering|neglecting] the $NN.opportunity to',
+                    # LACK ATTRIBUTE/ABILITY
+                    'lacking the $NN.attribute to',
+                    'losing the nerve to'  # TODO: let native check
+                    # FAIL OBLIGATION
+                    'neglecting the $NN.obligation to'  # TODO: let native check
+                    # USE ASSET: empty, i don't see how this fits
+                    # he buy a cake
+                    # he lacked the strength to buy a cake => not he buy a cake
+                    # he used the money to buy a cake => ?not he buy a cake
+                ]
+            }
+        }
+
+    },
+
 }
+
+
+# "CONDITION": {
+#     "if": lambda: True,
+#     "true": [
+#         "and $PRONOUN $VBD.goal"
+#     ],
+#     "false": [
+#         "$CONJ.contrastive $PRONOUN $VBD.nogoal"
+#     ]
+# }
 
 
 def _is_contrastive_or_matchstart(ctx):
