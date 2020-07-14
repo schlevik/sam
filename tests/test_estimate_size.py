@@ -1,5 +1,5 @@
 from stresstest.classes import Context
-from stresstest.realize import Accessor, SizeEstimator, Processor
+from stresstest.realize import Accessor, SizeEstimator, Processor, RandomChooser
 from tests.util import only
 
 sentences = {
@@ -25,35 +25,36 @@ dollar = {
     },
     "c": "8 9".split()  # 1 + 1 = 2
 }
+templates = {
+    'dollar': dollar, 'sentences': sentences, 'at': {}, 'percent': {}, 'bang': {}, 'question_templates': {}
+}
 
 
 def test_estimate_size_works_per_sentence():
-    sents = only(sentences, 0)  # flat
-
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 0)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 3
     assert r._estimate_words(a.sentences['test'][0]) == 3
 
 
 def test_estimate_size_works_with_alternative():
-    sents = only(sentences, 4)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 4)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 5
     assert r._estimate_words(a.sentences['test'][0]) == 5
 
 
 def test_estimate_size_works_with_option():
-    sents = only(sentences, 5)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 5)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 9
     assert r._estimate_words(a.sentences['test'][0]) == 9
 
 
 def test_estimate_size_works():
-    sents = sentences
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 61

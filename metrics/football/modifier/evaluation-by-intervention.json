@@ -1,26 +1,10 @@
 {
-    "bidaf-squad": {
-        "evaluation_on_intervention": {
-            "human_readable": "0.0072 +/- 0.0033",
-            "mean": 0.0072231139646869984,
-            "95ci": 0.0033247740349480566
-        },
-        "n": 2492,
-        "behaviour": {
-            "correct_baseline": 726,
-            "correct_intervention": 372,
-            "right->change->right": 18,
-            "right->keep->wrong": 620,
-            "right->change->wrong": 88,
-            "wrong->change->right": 16,
-            "wrong->keep->right": 338
-        }
-    },
     "albert-squad": {
         "evaluation_on_intervention": {
-            "human_readable": "0.4631 +/- 0.0196",
-            "mean": 0.46308186195826645,
-            "95ci": 0.019577489294932138
+            "human_readable": "0.5964 +/- 0.0219",
+            "mean": 0.5963541666666666,
+            "95ci": 0.021945720440258,
+            "control": true
         },
         "n": 2492,
         "behaviour": {
@@ -30,7 +14,31 @@
             "right->keep->wrong": 703,
             "right->change->wrong": 126,
             "wrong->change->right": 65,
-            "wrong->keep->right": 365
+            "wrong->keep->right": 365,
+            "correct_control": 2399,
+            "correct_baseline_control": 1920,
+            "right+control->change->right": 1145
+        }
+    },
+    "bidaf-squad": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.0664 +/- 0.0325",
+            "mean": 0.06637168141592921,
+            "95ci": 0.032454303221878755,
+            "control": true
+        },
+        "n": 2492,
+        "behaviour": {
+            "correct_baseline": 726,
+            "correct_intervention": 372,
+            "right->change->right": 18,
+            "right->keep->wrong": 620,
+            "right->change->wrong": 88,
+            "wrong->change->right": 16,
+            "wrong->keep->right": 338,
+            "correct_control": 743,
+            "correct_baseline_control": 226,
+            "right+control->change->right": 15
         }
     }
 }

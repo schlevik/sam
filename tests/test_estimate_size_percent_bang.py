@@ -1,5 +1,5 @@
 from stresstest.classes import F, Context
-from stresstest.realize import SizeEstimator, Processor, Accessor
+from stresstest.realize import SizeEstimator, Processor, Accessor, RandomChooser
 from tests.util import only
 
 sentences = {
@@ -50,7 +50,6 @@ class TestD(F):
     def __call__(self, ctx: dict) -> str:
         pass
 
-
 bang = {
     "C": TestC,
     "D": TestD,
@@ -59,51 +58,56 @@ bang = {
     "G": (lambda ctx: ..., ['$b', '$a'])  # 6
 }
 
+templates = {
+    'dollar': dollar, 'sentences': sentences, 'at': {}, 'percent': percent, 'bang': bang, 'question_templates': {}
+}
+
+
+
 
 def test_estimate_size_works_per_sentence():
-    sents = only(sentences, 0)  # flat
-    # r = TestRealizer(sentences=sents, dollar=dollar, percent=percent)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 0)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 12
 
 
 def test_bang_works_with_explicitly_defined():
-    sents = only(sentences, 3)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 3)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 2
 
 
 def test_bang_works_with_options_when_explicitly_defined():
-    sents = only(sentences, 4)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 4)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 9
 
 
 def test_bang_works_with_number_when_implicitly_defined_no_args():
-    sents = only(sentences, 5)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 5)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 3
 
 
 def test_bang_works_with_number_when_implicitly_defined_with_args():
-    sents = only(sentences, 6)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 6)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 18
 
 
 def test_bang_works_with_options_when_implicitly_defined_with_args():
-    sents = only(sentences, 7)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 7)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 6
 
 
 def test_full_grammar():
-    a = Accessor(context=Context(), sentences=sentences, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 68

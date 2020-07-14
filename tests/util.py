@@ -72,7 +72,7 @@ def interactive_env_football_modifier(changed_bundle=None, cfg=None, do_print=Tr
 
 
 def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
-                    do_realise=True, generator_kwargs=None):
+                    do_realise=True, generator_kwargs=None,unique_sentences=True):
     if not cfg:
         cfg = Config({})
     elif isinstance(cfg, str):
@@ -104,7 +104,7 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
             assert len(set(actors + coactors)) == 2 * generator.world.num_sentences
             print('yes')
     if not do_realise:
-        return generator, cfg, events, None, None, None
+        return generator, cfg, events, None, None, None, None
 
     realizer = Realizer(**templates)
     story, visits = realizer.realise_story(events, generator.world)
@@ -119,23 +119,23 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
 
         print_out(story, ssq, maq, uaq, abq, highlights=actors + coactors)
 
-    return generator, cfg, events, realizer, story, all_questions
+    return generator, cfg, events, realizer, story, all_questions, visits
 
 
 def showcase():
     test_bundle = only(bundle, 0, 'goal')
     templates = test_bundle.templates_modifier
-    generator, cfg, events, realizer, story, all_questions = interactive_env_football_modifier(
-        test_bundle, cfg={"world.num_sentences": 2}, do_print=False
+    generator, cfg, events, realizer, story, all_questions, visits = interactive_env_football_modifier(
+        test_bundle, cfg={"world.num_sentences": 2}, do_print=False, do_realise=False
     )
-    realizer = Realizer(**templates)
+    realizer = Realizer(**templates, unique_sentences=False)
     story, visits = realizer.realise_story(events, generator.world)
     ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
     print_out(story, ssq)
-    for f in ['MODIFIER.RB', 'MODIFIER.VB.neg-impl', 'MODIFIER.MD']:
+    for f in ['RB', 'VB', 'MD', 'VBP']:
         print(f"==== {f} ====")
         events[0].features = [f]
-        realizer = Realizer(**templates)
+        realizer = Realizer(**templates, unique_sentences=False)
         story, visits = realizer.realise_story(events, generator.world)
         ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
         print_out(story, ssq)

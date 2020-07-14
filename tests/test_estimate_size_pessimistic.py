@@ -1,6 +1,6 @@
 from stresstest.classes import F, Context
-from stresstest.realize import Accessor, Processor, SizeEstimator
-from tests.util import  only
+from stresstest.realize import Accessor, Processor, SizeEstimator, RandomChooser
+from tests.util import only
 
 sentences = {
     "test": [
@@ -48,45 +48,49 @@ bang = {
     "D": TestD,
 }
 
+templates = {
+    'dollar': dollar, 'sentences': sentences, 'at': {}, 'percent': percent, 'bang': bang, 'question_templates': {}
+}
+
 
 def test_pessimistic_bang():
-    sents = only(sentences, 1)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 1)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 2
 
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test'], pessimistic=True) == 1
 
-    sents = only(sentences, 2)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates,2)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 16
 
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test'], pessimistic=True) == 2
 
 
 def test_pessimistic_condition():
-    sents = only(sentences, 0)
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    only_templates = only(templates, 0)
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test']) == 20
 
-    a = Accessor(context=Context(), sentences=sents, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **only_templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
     assert r.estimate_size(a.sentences['test'], pessimistic=True) == 4
 
 
 def test_combined():
-    a = Accessor(context=Context(), sentences=sentences, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
 
     assert r.estimate_size(a.sentences['test']) == 358
 
-    a = Accessor(context=Context(), sentences=sentences, dollar=dollar, percent=percent, bang=bang)
-    r = SizeEstimator(Processor(a))
+    a = Accessor(context=Context(), **templates)
+    r = SizeEstimator(Processor(a, RandomChooser()))
 
     assert r.estimate_size(a.sentences['test'], pessimistic=True) == 23

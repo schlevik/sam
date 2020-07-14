@@ -9,7 +9,7 @@ from joblib import delayed, Parallel
 from loguru import logger
 from tqdm import tqdm
 
-from scripts.utils import Domain, BASELINE, INTERVENTION, write_json
+from scripts.utils import Domain, BASELINE, INTERVENTION, write_json, CONTROL
 from stresstest.classes import Config
 from stresstest.comb_utils import generate_all_possible_template_choices, split
 from stresstest.ds_utils import match_answer_in_paragraph
@@ -85,6 +85,8 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
         question_map[(question.event_type, question.target, question.question_data.get("n", None))] = question
 
     # remove modifier
+    idx_to_remove = [i for i, e in enumerate(events) if any(f.startswith("MODIFIER") for f in e.features)]
+
     events = deepcopy(events)
     for event in events:
         event.features = []
@@ -144,18 +146,52 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
                     pass
                 baseline_paragraph['qas'].append(qa)
     baseline = {'title': baseline_paragraph['id'], 'paragraphs': [baseline_paragraph]}
-    return baseline, modified
+
+    # TODO: move modifier into parameter and from there into config/cli option
+
+    control_deleted_story = [s for i, s in enumerate(story) if i not in idx_to_remove]
+    control_deleted_paragraph = {
+        "id": story_id,
+        "qas": modified['paragraphs'][0]['qas'],
+        "context": ' '.join(control_deleted_story),
+        'passage_sents': control_deleted_story
+    }
+    # TODO: fix evidence?
+    control_deleted = {'title': control_deleted_paragraph['id'], 'paragraphs': [control_deleted_paragraph]}
+
+    # if REDO: is not that easy, because we might potentially delete whole branches...
+    # need to make choices tree-like rather than sequential
+    # defeats the point....
+    # events_control = [e for i, e in enumerate(events) if i not in idx_to_remove]
+    # chosen_templates_control = [e for i, e in enumerate(template_choices) if i not in idx_to_remove]
+    # choices_control = [e for i, e in enumerate(choices) if i not in idx_to_remove]
+    # realizer = Realizer(**templates, unique_sentences=True)
+    # control_redone_story, _ = realizer.realise_with_choices(events_control, world, choices_control,
+    #                                                             chosen_templates_control)
+    # control_redone_paragraph = {
+    #     "id": story_id,
+    #     "qas": modified['paragraphs'][0]['qas'],
+    #     "context": ' '.join(control_redone_story),
+    #     'passage_sents': control_redone_story
+    # }
+    # control_redone = {'title': control_redone_paragraph['id'], 'paragraphs': [control_redone_paragraph]}
+    return baseline, modified, control_deleted
 
 
-def _do_print(baseline, modified):
-    for b, m in zip(baseline, modified):
+def _do_print(baseline, modified, deleted):
+    for b, m, d in zip(baseline, modified, deleted):
+        b = b['paragraphs'][0]
+        m = m['paragraphs'][0]
+        d = d['paragraphs'][0]
         click.echo("Baseline Story:")
         for i, sent in enumerate(b['passage_sents']):
             click.echo(f'[{i}]: {sent}')
 
         click.echo("Baseline Questions:")
+
         for qa in b['qas']:
             click.echo(f"{qa['question']}: {qa['answer']} ({qa['evidence']})")
+
         click.echo("Modified Story:")
         for i, sent in enumerate(m['passage_sents']):
             click.echo(f'[{i}]: {sent}')
@@ -165,6 +201,10 @@ def _do_print(baseline, modified):
         if m['qas']:
             click.echo(m['qas'][0]['modification_data'])
 
+        click.echo("Deleted Story:")
+        for i, sent in enumerate(d['passage_sents']):
+            click.echo(f'[{i}]: {sent}')
+        click.echo("Redone Story:")
         click.echo(20 * "===")
 
 
@@ -214,15 +254,19 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
             f"Generating from '{click.style(config, fg='green')}': {click.style(str(n), fg='green', bold=True)} passages, "
             f"{click.style(str(subsample_str), fg='green', bold=True)} realisation per passage.")
         click.echo(f"Saving baseline in "
-                   f"{click.style(os.path.join(out_path, file_name.format(BASELINE)), fg='green', bold=True)}.")
+                   f"{click.style(os.path.join(out_path, file_name.format(BASELINE)), fg='blue', bold=True)}.")
         click.echo(f"Saving modified in "
-                   f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='green', bold=True)}.")
+                   f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='blue', bold=True)}.")
+        click.echo(f"Saving control in "
+                   f"{click.style(os.path.join(out_path, file_name.format(CONTROL)), fg='blue', bold=True)}.")
 
-        baseline, modified = generate(cfg, domain, num_workers, subsample, templates, uuid4)
+        baseline, modified, control = generate(cfg, domain, num_workers, subsample, templates,
+                                               uuid4)
         baseline = sorted(baseline, key=lambda d: d['title'])
         modified = sorted(modified, key=lambda d: d['title'])
+        control = sorted(control, key=lambda d: d['title'])
         if do_print:
-            _do_print(baseline, modified)
+            _do_print(baseline, modified, control)
 
         click.echo(f"Total Passages: {len(baseline)}")
         click.echo(f"Total Questions over baseline passages: {sum(len(b['paragraphs'][0]['qas']) for b in baseline)}")
@@ -232,6 +276,8 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
             write_json({"version": 0.1, "data": baseline}, os.path.join(out_path, file_name.format(BASELINE)),
                        pretty=False)
             write_json({"version": 0.1, "data": modified}, os.path.join(out_path, file_name.format(INTERVENTION)),
+                       pretty=False)
+            write_json({"version": 0.1, "data": control}, os.path.join(out_path, file_name.format(CONTROL)),
                        pretty=False)
 
 
@@ -296,6 +342,7 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
         ) for ((events, world, event_type_targets, choice, modification_data), seed) in
         zip(tqdm(all_template_choices), seeds)
     )
+    # for debugging, without parallel
     # all_realised = [
     #     _realize_events(
     #         domain.generator_modifier, event_type_targets,
@@ -304,8 +351,8 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
     #         templates=templates, uuid4=uuid4, modification_data=modification_data
     #     ) for (events, world, event_type_targets, choice, modification_data) in tqdm(all_template_choices)
     # ]
-    baseline, modified = zip(*all_realised)
+    baseline, modified, control_deleted = zip(*all_realised)
     assert len(baseline) == len(set(b['paragraphs'][0]['context'] for b in baseline))
     assert len(modified) == len(set(b['paragraphs'][0]['context'] for b in modified))
 
-    return baseline, modified
+    return baseline, modified, control_deleted
