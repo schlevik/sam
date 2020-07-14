@@ -101,7 +101,7 @@ dollar = {
         # "!PRPS !RANDINT th goal [of the season|for the club]"],
         # inserted as a gerund
         "VBG": {
-            "foul": ["disappointing (the crowd) with an $JJ.negative action"],
+            "foul": ["disappointing (the crowd) with a $JJ.negative action"],
             "goal": [
                 # "being $RDM.NOVB",
                 "drawing attention from even !PRPS biggest sceptics",
