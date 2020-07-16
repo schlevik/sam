@@ -72,7 +72,7 @@ def interactive_env_football_modifier(changed_bundle=None, cfg=None, do_print=Tr
 
 
 def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
-                    do_realise=True, generator_kwargs=None,unique_sentences=True):
+                    do_realise=True, generator_kwargs=None, unique_sentences=True):
     if not cfg:
         cfg = Config({})
     elif isinstance(cfg, str):
@@ -122,20 +122,22 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
     return generator, cfg, events, realizer, story, all_questions, visits
 
 
-def showcase():
-    test_bundle = only(bundle, 0, 'goal')
+def showcase(given_bundle=None, n=0):
+    test_bundle = only(given_bundle, n, 'goal') or only(bundle, n, 'goal')
     templates = test_bundle.templates_modifier
     generator, cfg, events, realizer, story, all_questions, visits = interactive_env_football_modifier(
         test_bundle, cfg={"world.num_sentences": 2}, do_print=False, do_realise=False
     )
-    realizer = Realizer(**templates, unique_sentences=False)
-    story, visits = realizer.realise_story(events, generator.world)
-    ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
-    print_out(story, ssq)
-    for f in ['RB', 'VB', 'MD', 'VBP']:
+    # realizer = Realizer(**templates, unique_sentences=False)
+    # story, visits = realizer.realise_story(events, generator.world)
+    # ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
+    # print_out(story, ssq)
+    for f in ['VP-neg-impl', 'RB', 'MD', 'VP-pol-rev', 'VB-neg-impl', 'VB-pol-rev']:
         print(f"==== {f} ====")
         events[0].features = [f]
+        generator.modifier_type = f
         realizer = Realizer(**templates, unique_sentences=False)
         story, visits = realizer.realise_story(events, generator.world)
-        ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
-        print_out(story, ssq)
+        # ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
+        print(story[0])
+        # print_out(story, [])
