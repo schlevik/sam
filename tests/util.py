@@ -10,7 +10,7 @@ from stresstest.util import highlight
 def only(sents_or_bundle, n, action='test'):
     sents_or_bundle = deepcopy(sents_or_bundle)
     if isinstance(sents_or_bundle, Bundle):
-        sents_or_bundle.templates['sentences'][action] = [sents_or_bundle.templates['sentences'][action][n]]
+        # sents_or_bundle.templates['sentences'][action] = [sents_or_bundle.templates['sentences'][action][n]]
         sents_or_bundle.templates_modifier['sentences'][action] = [
             sents_or_bundle.templates_modifier['sentences'][action][n]]
     elif isinstance(sents_or_bundle, dict):
@@ -86,7 +86,7 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
         templates = bundle.templates_modifier
     else:
         g_class = bundle.generator
-        templates = bundle.templates
+        # templates = bundle.templates
     generator_kwargs = generator_kwargs or {}
     generator = g_class(cfg, **generator_kwargs)
     events = generator.generate_story()
@@ -123,7 +123,7 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
 
 
 def showcase(given_bundle=None, n=0):
-    test_bundle = only(given_bundle, n, 'goal') or only(bundle, n, 'goal')
+    test_bundle = only(given_bundle, n, 'goal') if given_bundle else only(bundle, n, 'goal')
     templates = test_bundle.templates_modifier
     generator, cfg, events, realizer, story, all_questions, visits = interactive_env_football_modifier(
         test_bundle, cfg={"world.num_sentences": 2}, do_print=False, do_realise=False

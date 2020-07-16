@@ -1,5 +1,13 @@
 dollar = {
     # just some random stuff that makes things look pretty
+    "NP": {
+
+    },
+    "VP": {
+        "attention": ['put an exclamation mark', 'became the talking point of the day', 'attracted (lots of) attention']
+    },
+
+
     "MODIFIER": {
         "VBG": ["@MD.VBG.goal @VB-pol-rev.VBG.goal @VP-pol-rev.VBG.goal @VB-neg-impl.VBG.goal @VP-neg-impl.VBG.goal"],
         "VBD": ["@MD.VBD.goal @VB-pol-rev.VBD.goal @VP-pol-rev.VBD.goal @VB-neg-impl.VBD.goal @VP-neg-impl.VBD.goal"],
@@ -14,7 +22,7 @@ dollar = {
             "VBI": [
                 "@MD.VBI.goal-nonactor @VB-pol-rev.VBI.goal-nonactor "
                 "@VP-pol-rev.VBI.goal-nonactor @VB-neg-impl.VBI.goal-nonactor @VP-neg-impl.VBI.goal-nonactor"],
-            
+
         }
     },
     "RDM": {
@@ -133,9 +141,7 @@ dollar = {
         "name-pos-post":
             ["of $NONACTORTEAM.name", ", a player of $NONACTORTEAM.name ,"]
     },
-    "VP": {
-        "attention": ['put an exclamation mark', 'became the talking point of the day', 'attracted (lots of) attention']
-    },
+
 
     # variable resolution for the team of the action's coactor
     "COACTORTEAM": {
@@ -174,7 +180,7 @@ dollar = {
         'neg': ["harshly"]
     },
 
-    ### VERBS
+    # verbs
     "VBD": {
         "foul": ["fouled", "felled", "scythed down"],
         "shoot": ['shot', "curled", "put", "hammered", "drilled"],
@@ -182,10 +188,10 @@ dollar = {
         "nogoal": ["missed", "shot wide"],
         "pass": ["played", "prodded", "passed"]
     },
-    "VBDO": {
-        "goal": ["curled the ball", "put the ball", "hammered the ball"],
-        "nogoal": ["missed", "shot wide"]
-    },
+    # "VBDO": {
+    #     "goal": ["curled the ball", "put the ball", "hammered the ball"],
+    #     "nogoal": ["missed", "shot wide"]
+    # },
     "VBD-PASSIVE": {
         "foul": ["was $VBD.foul", "was sent to the ground", "was scythed down"],
     },
@@ -194,9 +200,9 @@ dollar = {
         "score": ["scoring", 'slotting in', 'hitting'],
         "foul": ["fouling", "felling", 'scything down', 'upending']
     },
-    "VBGO": {
-        "goal": ["scoring", "hammering the ball in", "curling the ball in", "slotting the ball in"]
-    },
+    # "VBGO": {
+    #     "goal": ["scoring", "hammering the ball in", "curling the ball in", "slotting the ball in"]
+    # },
     "CONJ": {
         "contrastive": ["but", "however"]
     },

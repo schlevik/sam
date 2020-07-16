@@ -14,14 +14,14 @@ def _get_templates_dict(module):
 
 def _reload_bundle():
     # some dynamic reimport stuff
-    from stresstest.football.resources import modifier as modifier, baseline
+    from stresstest.football.resources import modifier as modifier
     bundle = Bundle(
         generator=FootballGenerator,
-        templates=_get_templates_dict(baseline),
+        # templates=_get_templates_dict(baseline),
         generator_modifier=FootballModifierGenerator,
         templates_modifier=_get_templates_dict(modifier)
     )
-    del modifier, baseline
+    del modifier,  # baseline
     return bundle
 
 

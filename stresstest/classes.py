@@ -252,7 +252,7 @@ class World(DataObjectMixin):
 
 class Bundle(DataObjectMixin):
     generator: Any
-    templates: Dict[str, Any]
+    #templates: Dict[str, Any]
     generator_modifier: Dict[str, Any]
     templates_modifier: Dict[str, Any]
     world: World

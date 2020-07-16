@@ -29,8 +29,9 @@ class FootballModifierGenerator(FootballGenerator, ModifierGenerator):
         modify_event_types = modify_event_types or ['goal']
 
         super().__init__(config=config, get_world=get_world, team_names=team_names,
-                         first_modification=first_modification, modifier_type=None,
+                         first_modification=first_modification, modifier_type=modifier_type,
                          fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
-                         modification_distance=modification_distance, total_modifiable_actions=total_modifiable_actions)
+                         modification_distance=modification_distance, total_modifiable_actions=total_modifiable_actions,
+                         )
 
         logger.debug(f"{FootballModifierGenerator.__name__} finish constructor")

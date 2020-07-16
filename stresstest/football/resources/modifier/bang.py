@@ -20,7 +20,7 @@ bang = {
     # difference in time from last event
     # TODO: it's a tiny bit buggy because it doesn't register itself in ctx['visited'], ok for span-based though
     "MINDIFF": (lambda ctx: ctx.sent.attributes['time'] -
-                            stresstest.football.resources.modifier.sentences.sentences[ctx.sent_nr - 1].attributes[
+                            ctx.sentences[ctx.sent_nr - 1].attributes[
                                 'time']),
     "OTHERTEAM": (
         lambda ctx: next(t.name for t in ctx.world.teams if t.id != ctx.sent.actor.team.id))
