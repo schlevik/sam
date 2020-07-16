@@ -6,7 +6,9 @@ from itertools import zip_longest
 from typing import List, Callable, Optional, Dict, Tuple, Union, Any
 
 import nltk
+import pattern.text.en as pattern_en
 from loguru import logger
+from pattern.text.en import tenses
 
 from stresstest.classes import S, YouIdiotException, F, Event, Context, Question, World
 
@@ -129,12 +131,10 @@ class Processor:
 
     def process_feature(self, word):
         logger.debug("...Word is a feature @...")
-        logger.debug(word[1:] in self.accessor.at)
         logger.debug(self.accessor.at.keys())
         modifier_type = word[1:].split(".", 1)[0]
-        logger.debug(modifier_type)
+        logger.debug(f"{modifier_type} in {self.accessor.at.keys()}?: {modifier_type in self.accessor.at}")
         if modifier_type in self.accessor.at:
-
             if any(s.startswith(f"{modifier_type}") for s in self.context.sent.features):
                 new_words, idx = self.accessor.access_at(word[1:]).random()
             else:
@@ -508,22 +508,40 @@ class Realizer:
         result = []
         for i, (prev_token, token, next_token) in \
                 enumerate(zip_longest([""] + tokens[:-1], tokens, tokens[1:], fillvalue="")):
-            logger.debug(token)
             lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
+            prev_prev_token = tokens[i - 2] if i >= 2 else ""
             if (token == 'a' or token == 'A') and len(next_token) > 0 and next_token[0] in self.vocals:
                 token = token + "n"
-            if token == 'th' and prev_token == '1':
+            elif token == 'into' and next_token == 'between':
+                token = 'in'
+            elif token == 'th' and prev_token == '1':
                 token = 'st'
-            if token == 'th' and prev_token == '2':
+            elif token == 'th' and prev_token == '2':
                 token = 'nd'
-            if token == 'th' and prev_token == '3':
+            elif token == 'th' and prev_token == '3':
                 token = 'rd'
-            prev_prev_token = tokens[i - 2] if i >= 2 else ""
+            # prev_prev_prev_token = tokens[i - 3] if i >= 3 else ""
             # TODO: well that's a bit hack-y
-            if prev_token == 'to' and token.endswith("ed"):
+            elif prev_token == 'to' and (
+                    token.endswith("ed") or token.endswith("ing") or tenses(token)[0][0] == 'past'):
                 token = lemmatizer.lemmatize(token, 'v')
-            if prev_token in ('not', "n't") and prev_prev_token in ("could", "would", "did"):
+            elif prev_token == 'in' or prev_token == 'from' and (
+                    token.endswith("ed") or token == 'put' or token.endswith("ing")):
+                # VERY HACKY
+
+                if (prev_prev_token in ['refrained', "refused", "prohibited", "prevented", "hindered"]
+                        or prev_token == "in" and prev_prev_token == 'succeed'):
+                    token = lemmatizer.lemmatize(token)
+                    try:
+                        token = pattern_en.verbs[token][5]
+                    except:
+                        if not token.endswith("ing"):
+                            token = lemmatizer.lemmatize(token).rsplit("e", 1)[0] + "ing"
+
+            elif prev_token in ('not', "n't") and prev_prev_token in ("could", "would", "did"):
                 token = lemmatizer.lemmatize(token, 'v')
+            else:
+                pass
             result.append(token)
         return result
 
