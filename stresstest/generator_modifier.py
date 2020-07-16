@@ -29,7 +29,7 @@ class ModifierGenerator(StoryGenerator, ABC):
             total_modifiable_actions: How many actions to modify
         """
         logger.debug(f"{ModifierGenerator.__name__} entering constructor")
-        self.modifier_type = modifier_type or 'MODIFIER.RB'
+        self.modifier_type = modifier_type or 'RB'
         super().__init__(config, get_world)
         self.first_modification = first_modification
         self.fill_with_modifications = fill_with_modification
