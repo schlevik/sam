@@ -3,6 +3,7 @@ import re
 
 from loguru import logger
 
+import stresstest.football.resources.modifier.sentences
 from stresstest.classes import Context
 
 sentences = {
@@ -463,7 +464,7 @@ bang = {
     "PRP": (lambda ctx: "she" if ctx.world.gender == 'female' else "he"),
     # difference in time from last event
     # TODO: it's a tiny bit buggy because it doesn't register itself in ctx['visited'], ok for span-based though
-    "MINDIFF": (lambda ctx: ctx.sent.attributes['time'] - ctx.sentences[ctx.sent_nr - 1].attributes['time']),
+    "MINDIFF": (lambda ctx: ctx.sent.attributes['time'] - stresstest.football.resources.modifier.sentences.sentences[ctx.sent_nr - 1].attributes['time']),
     "OTHERTEAM": (
         lambda ctx: next(t.name for t in ctx.world.teams if t.id != ctx.sent.actor.team.id))
 
