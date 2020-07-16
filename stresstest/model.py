@@ -1,4 +1,4 @@
-import itertools
+import collections
 import string
 from typing import Iterable
 
@@ -6,8 +6,51 @@ from allennlp.predictors import Predictor
 from loguru import logger
 from overrides import overrides
 from transformers import AlbertForQuestionAnswering, AlbertTokenizer
+from transformers.data.metrics.squad_metrics import _get_best_indexes
 
 from stresstest.classes import Model, Entry
+
+
+def _filter_albert(input, start_logits, end_logits, start_indexes, end_indexes, bad_tokens=(2, 3)):
+    _PrelimPrediction = collections.namedtuple(  # pylint: disable=invalid-name
+        "PrelimPrediction", ["start_index", "end_index", "start_logit", "end_logit"]
+    )
+    max_len = len(input)
+    prelim_predictions = []
+    for start_index in start_indexes:
+        for end_index in end_indexes:
+            # We could hypothetically create invalid predictions, e.g., predict
+            # that the start of the span is in the question. We throw out all
+            # invalid predictions.
+            if start_index >= max_len:
+                continue
+            if end_index >= max_len:
+                continue
+            # if start_index not in feature.token_to_orig_map:
+            #     continue
+            # if end_index not in feature.token_to_orig_map:
+            #     continue
+            # if not feature.token_is_max_context.get(start_index, False):
+            #     continue
+            if input[start_index] in bad_tokens:
+                continue
+            if end_index < start_index:
+                continue
+            length = end_index - start_index + 1
+            # if length > max_answer_length:
+            #     continue
+            prelim_predictions.append(
+                _PrelimPrediction(
+                    start_index=start_index,
+                    end_index=end_index,
+                    start_logit=start_logits[start_index],
+                    end_logit=end_logits[end_index],
+                )
+            )
+
+    prelim_predictions = sorted(prelim_predictions, key=lambda x: (x.start_logit + x.end_logit), reverse=True)
+
+    return prelim_predictions
 
 
 class NaQANet(Model):
@@ -28,9 +71,9 @@ class NaQANet(Model):
 
     @classmethod
     def make(cls, path, gpu=False):
-        from allennlp_models.rc.qanet.naqanet_model import NumericallyAugmentedQaNet
+        from allennlp_models.rc.models.naqanet import NumericallyAugmentedQaNet
         cuda_device = 0 if gpu else -1
-        predictor = Predictor.from_path(path, 'reading-comprehension', cuda_device=cuda_device)
+        predictor = Predictor.from_path(path, cuda_device=cuda_device)
         return NaQANet("NaQAnet", predictor, gpu=gpu)
 
 
@@ -38,9 +81,9 @@ class BiDAF(Model):
     @classmethod
     def make(cls, path, gpu=False):
         try:
-          from allennlp_models.rc.bidaf.bidaf_model import BidirectionalAttentionFlow
+            from allennlp_models.rc.models.bidaf import BidirectionalAttentionFlow
         except:
-          import allennlp_models.rc
+            import allennlp_models.rc
         cuda_device = 0 if gpu else -1
         return cls("BiDAF", Predictor.from_path(path, cuda_device=cuda_device), gpu=gpu)
 
@@ -104,14 +147,25 @@ class Albert(Model):
             return input_dict
 
     @overrides
-    def predict(self, question, passage):
+    def predict(self, entry: Entry):
+        question = entry.question
+        passage = entry.passage
         d = self.tokenizer.encode_plus(question.lower(), passage.lower(), return_tensors='pt')
 
         s, e = self.predictor(**self.move_to_gpu(d))
+        logger.debug(s)
+        start_indices = _get_best_indexes(s[0], 5)
+        end_indices = _get_best_indexes(e[0], 5)
+        logger.debug(f"Start indices: {start_indices}")
+        logger.debug(f"End indices: {end_indices}")
+        results = _filter_albert(d['input_ids'][0], s[0], e[0], start_indices, end_indices,
+                                 bad_tokens=[self.tokenizer.bos_token_id, self.tokenizer.eos_token_id,
+                                             self.tokenizer.cls_token_id, self.tokenizer.sep_token_id])
 
+        best_s, best_e, *_ = results[0]
         tokens = [
             self.tokenizer.decode(int(i))
-            for i in d['input_ids'][0][s.argmax():e.argmax() + 1]
+            for i in d['input_ids'][0][best_s:best_e + 1]
         ]
         logger.debug(f"Start index: {s.argmax()}")
         logger.debug(f"End index: {e.argmax()}")
