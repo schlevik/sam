@@ -1,160 +1,9 @@
 dollar = {
-    # just some random stuff that makes things look pretty
-    "NP": {
-
-    },
-    "VP": {
-        "attention": ['put an exclamation mark', 'became the talking point of the day', 'attracted (lots of) attention']
-    },
-
-
-    "MODIFIER": {
-        "VBG": ["@MD.VBG.goal @VB-pol-rev.VBG.goal @VP-pol-rev.VBG.goal @VB-neg-impl.VBG.goal @VP-neg-impl.VBG.goal"],
-        "VBD": ["@MD.VBD.goal @VB-pol-rev.VBD.goal @VP-pol-rev.VBD.goal @VB-neg-impl.VBD.goal @VP-neg-impl.VBD.goal"],
-        "VBI": ["@MD.VBI.goal @VB-pol-rev.VBI.goal @VP-pol-rev.VBI.goal @VB-neg-impl.VBI.goal @VP-neg-impl.VBI.goal"],
-        "nonactor": {
-            "VBD": [
-                "@MD.VBD.goal-nonactor @VB-pol-rev.VBD.goal-nonactor "
-                "@VP-pol-rev.VBD.goal-nonactor @VB-neg-impl.VBD.goal-nonactor @VP-neg-impl.VBD.goal-nonactor"],
-            "VBG": [
-                "@MD.VBG.goal-nonactor @VB-pol-rev.VBG.goal-nonactor @VP-pol-rev.VBG.goal-nonactor "
-                "@VB-neg-impl.VBG.goal-nonactor @VP-neg-impl.VBG.goal-nonactor"],
-            "VBI": [
-                "@MD.VBI.goal-nonactor @VB-pol-rev.VBI.goal-nonactor "
-                "@VP-pol-rev.VBI.goal-nonactor @VB-neg-impl.VBI.goal-nonactor @VP-neg-impl.VBI.goal-nonactor"],
-
-        }
-    },
-    "RDM": {
-        "S": {
-            "any": ["the stadium went wild"],
-            "goal": [
-                # "$RDM.PP.goal it was spectacular",
-                "$RDM.S.any"
-            ]
-        },
-        "CC-V": {
-            "goal": [
-                # "ended !PRPS dry run of !RANDINT games",
-                # "made the fans chant !PRPS name"
-                "made the fans roar"
-            ]
-        },
-        # TODO: no verb, need to look up how we call it
-        "NOVB": [""],  # ["a contender for the $RDM.AWARD",
-        # "a reward for !PRPS hard work",
-        # "!PRPS !RANDINT th goal [of the season|for the club]"],
-        # inserted as a gerund
-        "VBG": {
-            "foul": ["disappointing (the crowd) with a $JJ.negative action"],
-            "goal": [
-                # "being $RDM.NOVB",
-                "drawing attention from even !PRPS biggest sceptics",
-                "following a $JJ.positive juggle"
-            ]
-        },
-        "VBD": {
-            "foul": [
-                "(had only) just showed !PRPS reckless edge",
-                "disappointed"
-            ]
-        },
-        "AWARD": ["highlight of the day",
-                  "action of the match"],
-        "PP": {
-            "foul": ["for a [$JJ.promising|$JJ.attention] free-kick $NN.opportunity "
-                     "[for $NONACTORTEAM.name|for !PRPS opponents|]"
-                     'for which !PRP was booked'],
-            "goal": ["for !PRPS !RANDINT th league goal of the season"]
-        },
-        # "BEGINNING": ["$ACTORTEAM.name did well to withstand the barrage"]
-    },
-    "REASON": {
-        "S": {
-            "goal": ["$COACTOR (inadvertently) $VBD.pass the ball into !PRPS path (following $REASON.NP)"]
-        },
-
-        "NP": ["a run $POSITION.VERTICAL.PP", 'a (decisive) counter-attack'],
-
-        "PP": {
-            "goal": ["after $REASON.NP"]
-        },
-        "CC-V": {
-            "any": ["[ran|dribbled] !RANDINT metres ($POSITION.VERTICAL.PP)",
-                    ],  # TODO: on out wide / on the centre
-            "goal": [
-                "intercepted [$NONACTORTEAM.name-pos-pre goalkeeper's goal kick"
-                "| the goal kick of $NONACTORTEAM.name-pos-pre goal keeper]",
-                "$REASON.CC-V.any"]
-        }
-    },
-
-    "GOALKEEPER": ["goalkeeper", "woman between the posts", "last line of defence"],
-    "COREF-PLAYER": ["!PRP", "the player"],
-    "POSITION": {
-        "VERTICAL": {
-            "PP": ["on the flank", "out wide", "in the centre"]
-        },
-        "HORIZONTAL": ['the middle field', 'their own half', 'the attacking third'],
-        "BOX": ["near post", "far post", "penalty spot", "6-yard-area", "edge of the area"],
-        "GOAL": [
-            "the ($POSITION.HEIGHT.JJ) ($POSITION.LR) corner", "the middle of the goal", "the back of the net",
-            "between the posts"
-        ],
-        "HEIGHT": {
-            "JJ": ["lower", "upper"],
-            "NN": ["low", "high"]
-        },
-        "LR": ["left", "right"],
-        "PP": {
-            "GOAL": ["in $POSITION.GOAL", "under the bar", "off the [post|bar] and in $POSITION.GOAL"],
-        }
-    },
-    "INJURY": ["a (potential) ($BODYPART) injury"],
-    "BODYPART": ["knee", "head", "shoulder", "arm", "hip", "leg", "ankle"],
-    # NP description of assist
-    "PASS-TYPE": ["($JJ.positive) pass", "($JJ.accurate) cross",
-                  "($JJ.risky) through ball", "soft clearance", "stray ball"],
-    # NP distance description
-    "DISTANCE": {
-        "PP": ["from #sent.attributes.distance metres (away)"],
-        "JJ": ["#sent.attributes.distance metres"],
-    },
-
-    # NP time description
-    "TIME": ["in minute #sent.attributes.time",
-             "on the #sent.attributes.time th minute"],
-    # ACTOR ACCESSOR
-    "ACTOR": ["#sent.actor.first #sent.actor.last"],
-    # COACTOR ACCESSOR
-    "COACTOR": [
-        "#sent.attributes.coactor.first #sent.attributes.coactor.last"],
-    "ACTORTEAM": {
-        "name": ['#sent.actor.team.name'],
-        "name-pos-pre": ["$ACTORTEAM.name 's"],
-        "name-pos-post":
-            ["of $ACTORTEAM.name", ", a player of $ACTORTEAM.name ,"]
-    },
-    "NONACTORTEAM": {
-        "name": ["!OTHERTEAM"],
-        "name-pos-pre": ["$NONACTORTEAM.name 's"],
-        "name-pos-post":
-            ["of $NONACTORTEAM.name", ", a player of $NONACTORTEAM.name ,"]
-    },
-
-
-    # variable resolution for the team of the action's coactor
-    "COACTORTEAM": {
-        # accessor of the team name
-        "name": ['#sent.attributes.coactor.team.name'],
-        # possessive accessor before the actual co-actor
-        "name-pos-pre": ["$COACTORTEAM.name 's"],
-        # possessive accessor after the co-actor
-        "name-pos-post":
-            ["of $COACTORTEAM.name", "playing for $COACTORTEAM.name"]
-    },
-    # adjectives
     "JJ": {
+        "position": {
+            "height": ["lower", "upper"],
+        },
+        "distance": ["#sent.attributes.distance metres"],
         "positive":
             ["spectacular", "wonderful", "amazing", "stunning", "searing", "mesmerising"],
         "promising": ["promising", "auspicious", "promisingly looking", "auspiciously looking"],
@@ -163,46 +12,160 @@ dollar = {
         "attention": ["remarkable", "interesting"],
         "negative": ["bad", "harsh", "unnecessary"],
     },
-    # nouns/ noun phrases
-    "NN": {
-        "opportunity": ["chance", "opportunity", "occasion", "possibility"],
+    "NP": {
+        "opportunity": ["chance", "opportunity", "possibility"],
+        "obligation": ["commitment", "task", " responsibility"],
         "attribute": ["grace", "guts", "nerve", "tenacity", "tenaciousness",
                       "boldness", "power", "strength", "courage", "audaciousness", "finesse"],
-        "obligation": ["commitment", "task", " responsibility"],
+
+        "award": ["highlight of the day",
+                  "action of the match"],
+
         "foul": ['foul (play)'],
+
+        "shot": ['shot', 'drive', 'hammer', 'strike'],
         "goal": ["goal"],
-        "shot": ['shot', 'drive', 'hammer', 'strike']
+        "goal-cause": ["a run $PP.position.vertical", 'a (decisive) counter-attack'],
+
+        "goalkeeper": ["goalkeeper", "woman between the posts", "last line of defence"],
+        # TODO !person-gendered between the post
+        "coref-player": ["!PRP", "the player"],
+
+        "position": {
+            "vertical": ["the flank", "out wide", "the centre"],
+            "horizontal": ['the middle field', 'their own half', 'the attacking third'],
+            "box": ["near post", "far post", "penalty spot", "6-yard-area", "edge of the area"],
+            "goal": [
+                "the ($JJ.position.height) ($NP.position.lr) corner", "the middle of the goal", "the back of the net",
+                "between the posts",
+            ],
+            "height": ["low", "high"],
+            "lr": ["left", "right"],
+        },
+        "injury": ["a (potential) ($NP.bodypart) injury"],
+        "bodypart": ["knee", "head", "shoulder", "arm", "hip", "leg", "ankle"],
+        # NP description of assist
+        "pass-type": [
+            "($JJ.positive) pass", "($JJ.accurate) cross", "($JJ.risky) through ball", "soft clearance", "stray ball"
+        ],
+
+        # actor accessor
+        "actor": ["#sent.actor.first #sent.actor.last"],
+        # coactor accessor
+        "coactor": [
+            "#sent.attributes.coactor.first #sent.attributes.coactor.last"
+        ],
+
+        "team": {
+            # We don't need coactor team for the events we have now, because we know
+            # which team coactors come from for each event...
+            "actor": ['#sent.actor.team.name'],
+            "actor-possessive": ["$NP.team.actor 's"],
+            "actor-possessive-post": ["a player of $NP.team.actor ,"],
+            "nonactor": ["!OTHERTEAM"],
+            "nonactor-possessive": ["$NP.team.nonactor 's"],
+            "nonactor-possessive-post": ["a player of $NP.team.nonactor ,"],
+        },
+    },
+    "VP": {
+        "VBD": {
+            "attention": ['put an exclamation mark', 'became the talking point of the day',
+                          'attracted (lots of) attention'],
+            "attention-crowd": [
+                # "ended !PRPS dry run of !RANDINT games",
+                # "made the fans chant !PRPS name"
+                "made the fans [roar|scream|gasp]",
+                "made the crowd go wild",
+
+            ],
+            "foul-elaboration-coref": [
+                "(had only) just showed !PRPS reckless edge",
+            ],
+            "foul-elaboration": [
+                "disappointed"
+            ],
+            "any-cause": ["[ran|dribbled] !RANDINT metres ($PP.position.vertical)"],
+            "goal-cause": [
+                "intercepted [$NP.team.nonactor goalkeeper's goal kick"
+                "| the goal kick of $PP.team.nonactor-possessive goal keeper]",
+                "$VP.VBD.any-cause"],
+
+            "foul": ["fouled", "felled", "scythed down"],
+            "foul-passive": ["was $VP.VBD.foul", "was sent to the ground", "was scythed down"],
+            "shoot": ["shot",  "put", 
+                      "hammered", "drilled","curled",
+                      ],
+            "score": ["scored", 
+                      "slotted in"
+                      ],
+            "nogoal": ["missed", "shot wide"],
+            "pass": ["played", "prodded", "passed"],
+            "modifier": [
+                "@MD.VBD.goal @VB-pol-rev.VBD.goal @VP-pol-rev.VBD.goal @VB-neg-impl.VBD.goal @VP-neg-impl.VBD.goal"],
+            "modifier-nonactor": ["@MD.VBD.goal-nonactor @VB-pol-rev.VBD.goal-nonactor "
+                                  "@VP-pol-rev.VBD.goal-nonactor @VB-neg-impl.VBD.goal-nonactor @VP-neg-impl.VBD.goal-nonactor"],
+        },
+        "VBG": {
+            "shoot": ["shooting", "curling", "putting", "hammering", "drilling"],
+            "score": ["scoring", 'slotting in', 'hitting'],
+            "foul": ["fouling", "felling", 'scything down', 'upending'],
+            "foul-effect": ["disappointing [the crowd|everyone|] with a $JJ.negative action"],
+            "goal-effect": [
+                # "being $RDM.NOVB",
+                "drawing attention from everyone around",
+                "following a $JJ.positive juggle"
+            ],
+            "actor-possessive-post": ["playing for $NP.team.actor ,"],
+            "nonactor-possessive-post": ["playing for $NP.team.nonactor ,"],
+            'modifier': [
+                "@MD.VBG.goal @VB-pol-rev.VBG.goal @VP-pol-rev.VBG.goal @VB-neg-impl.VBG.goal @VP-neg-impl.VBG.goal"],
+            'modifier-nonactor': [
+                "@MD.VBG.goal-nonactor @VB-pol-rev.VBG.goal-nonactor @VP-pol-rev.VBG.goal-nonactor "
+                "@VB-neg-impl.VBG.goal-nonactor @VP-neg-impl.VBG.goal-nonactor"
+            ]
+        },
+        "VBI": {
+            "modifier": [
+                "@MD.VBI.goal @VB-pol-rev.VBI.goal @VP-pol-rev.VBI.goal @VB-neg-impl.VBI.goal @VP-neg-impl.VBI.goal"],
+            "modifier-nonactor": [
+                "@MD.VBI.goal-nonactor @VB-pol-rev.VBI.goal-nonactor "
+                "@VP-pol-rev.VBI.goal-nonactor @VB-neg-impl.VBI.goal-nonactor @VP-neg-impl.VBI.goal-nonactor"
+            ],
+        }
+    },
+    "PP": {
+        "goal-cause": ["after [$NP.goal-cause|$S.goal-cause]"],
+        "goal-cause-coref": ["after (!PRPS teammate) $NP.coactor 's $NP.pass-type"],
+        'goal-effect': ["for !PRPS !RANDINT th league goal of the season"],
+        "foul-effect": ["for a [$JJ.promising|$JJ.attention] free-kick $NP.opportunity ",
+                        "(for $NP.team.nonactor)"
+                        ],
+        "foul-cause-coref": ["for a [$JJ.promising|$JJ.attention] free-kick $NP.opportunity for !PRPS opponents"],
+        "foul-effect-coref": ["for which !PRP was booked", "for which she saw a [red|yellow] card"],
+        "position": {
+            "vertical": ["on the flank", "out wide", "in the centre"],
+            "goal": ["in $NP.position.goal", "under the bar",
+                     "off the [post|bar] and [in|just into] $NP.position.goal"],
+        },
+        "distance": ["from #sent.attributes.distance metres (away)"],
+        "time": ["in minute #sent.attributes.time",
+                 "[on|in] the #sent.attributes.time th minute"],
+        "team": {
+            "actor-possessive": ["of $NP.team.actor"],
+            "nonactor-possessive": ["of $NP.team.nonactor", ]
+        }
+    },
+    "S": {
+        "attention-crowd": ["the stadium went wild"],
+        "goal-cause": ["$NP.coactor (inadvertently) $VP.VBD.pass the ball into !PRPS path (following $NP.goal-cause)"],
     },
 
     # adverbials
-    "ADVJ": {
+    "RB": {
         # negative
         'neg': ["harshly"]
     },
 
-    # verbs
-    "VBD": {
-        "foul": ["fouled", "felled", "scythed down"],
-        "shoot": ['shot', "curled", "put", "hammered", "drilled"],
-        "score": ["scored", "hit", "slotted in"],
-        "nogoal": ["missed", "shot wide"],
-        "pass": ["played", "prodded", "passed"]
-    },
-    # "VBDO": {
-    #     "goal": ["curled the ball", "put the ball", "hammered the ball"],
-    #     "nogoal": ["missed", "shot wide"]
-    # },
-    "VBD-PASSIVE": {
-        "foul": ["was $VBD.foul", "was sent to the ground", "was scythed down"],
-    },
-    "VBG": {
-        "shoot": ["shooting", "curling", "putting", "hammering", "drilling"],
-        "score": ["scoring", 'slotting in', 'hitting'],
-        "foul": ["fouling", "felling", 'scything down', 'upending']
-    },
-    # "VBGO": {
-    #     "goal": ["scoring", "hammering the ball in", "curling the ball in", "slotting the ball in"]
-    # },
     "CONJ": {
         "contrastive": ["but", "however"]
     },
@@ -212,5 +175,4 @@ dollar = {
     "MDG": {
         "neg": ['not being able to', 'being unable to']
     }
-
 }

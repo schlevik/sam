@@ -1,84 +1,80 @@
 sentences = {
     "goal": [
-        "%CONNECTIVE.VBD> $ACTOR $ACTORTEAM.name-pos-post @RB.goal "
-        "$MODIFIER.VBD [$VBD.shoot in | $VBD.score] a ($JJ.positive) goal ($REASON.PP.goal).",
+        "%CONNECTIVE.VBD> $NP.actor $NP.team.actor-possessive-post @RB.goal "
+        "$VP.VBD.modifier [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] [$PP.goal-cause|$PP.goal-cause-coref|] .",
 
-        "%CONNECTIVE.VBD> $ACTOR @RB.goal $MODIFIER.VBD [$VBD.shoot in| $VBD.score] a ($JJ.positive) goal "
-        "for $ACTORTEAM.name .",
+        "%CONNECTIVE.VBD> $NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score]  "
+        "for $NP.team.actor .",
 
-        "$ACTORTEAM.name-pos-pre player $ACTOR $VP.attention %CONNECTIVE.ADVP , @RB.goal $MODIFIER.VBG "
-        "[$VBG.shoot in |$VBG.score] a ($JJ.positive) goal $DISTANCE.PP .",
+        "$NP.team.actor-possessive player $NP.actor $VP.VBD.attention %CONNECTIVE.ADVP , @RB.goal $VP.VBG.modifier "
+        "[$VP.VBG.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] a ($JJ.positive) goal $PP.distance .",
 
         # TODO: maybe rephrase the arrived, it's stupid
-        "$ACTOR 's goal ( , [$RDM.VBG.goal|$RDM.NOVB] , ) @RB.goal $MODIFIER.nonactor.VBD "
-        "arrived $TIME after !PRPS teammate $COACTOR 's $PASS-TYPE and [$RDM.CC-V.goal|$RDM.S.goal] .",
+        "$NP.actor 's $NP.goal ( , [VP.VBG.goal-effect] , ) @RB.goal $VP.VBD.modifier-nonactor "
+        "arrived $PP.time $PP.goal-cause-coref (and [$S.attention-crowd|$VP.VBD.attention-crowd]) .",
 
-        # TODO: MODIFIER VBI or post-processing
-        "$TIME a $PASS-TYPE [went to|arrived at] ($ACTORTEAM.name-pos-pre) $COACTOR $POSITION.VERTICAL.PP and "
-        "$COREF-PLAYER swept $POSITION.HEIGHT.NN to the $POSITION.BOX for $ACTOR to @RB.goal $MODIFIER.VBI "
-        "poke past the $GOALKEEPER .",
+        "$PP.time a $NP.pass-type [went to|arrived at] ($NP.team.actor-possessive) $NP.coactor "
+        "[$PP.position.vertical | who was (just) waiting $PP.position.vertical] and "
+        "$NP.coref-player swept $NP.position.height to the $NP.position.box for $NP.actor to @RB.goal $VP.VBI.modifier "
+        "poke past the $NP.goalkeeper .",
+
+        "A $JJ.positive $JJ.distance $NP.shot from $NP.actor @RB.goal $VP.VBG.modifier-nonactor "
+        "[flying $PP.position.goal|homing into $NP.position.goal]  past "
+        "[the $NP.goalkeeper|a helpess $NP.goalkeeper] ($PP.goal-effect) %CONNECTIVE.VP .",
+
+        "$NP.actor , one of $NP.team.actor-possessive better performers today, %CONNECTIVE.VP "
+        "as !PRP @RB.goal $VP.VBD.modifier scored $PP.time [$PP.goal-cause|$S.attention-crowd] .",
+
+        "$NP.actor @RB.goal $VP.VBD.modifier scored $PP.time to %CONNECTIVE.IVP when !PRP $VP.VBD.goal-cause "
+        "(and $VP.VBD.goal-cause) "
+        "before @RB.goal $VP.VBG.modifier $VP.VBG.shoot in the ball $PP.position.goal .",
+
+        "%CONNECTIVE.VBD> $NP.actor @RB.goal $VP.VBD.modifier scored $PP.time , @RB.goal $VP.VBG.modifier "
+        "[$VP.VBG.shoot in |$VP.VBG.score] the ball "
+        "$PP.position.goal after !PRP $VP.VBD.goal-cause (and $VP.VBD.goal-cause) .",
+
+        "%CONNECTIVE.VBD> the ball arrived [on|at] the $NP.position.box (at pace) and $VP.VBG.goal-effect , $NP.actor "
+        "@RB.goal $VP.VBD.modifier $VP.VBD.shoot the ball (just) $PP.position.goal "
+        "(to leave the $NP.goalkeeper with no chance) .",
 
         # TODO: modifier goal arrived
-        "A $JJ.positive $DISTANCE.JJ strike from $ACTOR @RB.goal $MODIFIER.nonactor.VBG "
-        "[flying $POSITION.PP.GOAL|homing into $POSITION.GOAL]  past "
-        "[the $GOALKEEPER|a helpess $GOALKEEPER] ($RDM.PP.goal) %CONNECTIVE.VP .",
+        "%CONNECTIVE.VBD> $NP.actor was free on the $NP.position.box , and with the defence slow to react, "
+        "the $NP.team.actor-possessive player 's $NP.shot @RB.goal "
+        "$VP.VBD.modifier-nonactor squirmed beyond the $NP.goalkeeper (and $PP.position.goal).",
 
-        "$ACTOR , one of $ACTORTEAM.name-pos-pre better performers today, %CONNECTIVE.VP "
-        "as !PRP @RB.goal $MODIFIER.VBD scored $TIME [$REASON.PP.goal| and $RDM.S.goal] .",
+        "%CONNECTIVE.VBD> $NP.actor , on the end of it , @RB.goal $VP.VBD.modifier [$VP.VBD.shoot] the ball "
+        "$PP.position.goal $VP.VBG.goal-effect .",
 
-        "$ACTOR @RB.goal $MODIFIER.VBD scored $TIME to %CONNECTIVE.IVP when !PRP $REASON.CC-V.goal "
-        "(and $REASON.CC-V.goal) "
-        "before @RB.goal $MODIFIER.VBG [$VBG.shoot in |$VBG.score] the ball $POSITION.PP.GOAL .",
+        "$NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in|$VP.VBD.score] "
+        "[$NP.team.actor-possessive !NEXT $NP.goal|the !NEXT $NP.goal for $NP.team.actor] "
+        "to %CONNECTIVE.IVP after $S.goal-cause .",
 
-        "%CONNECTIVE.VBD> $ACTOR @RB.goal $MODIFIER.VBD scored $TIME , @RB.goal $MODIFIER.VBG "
-        "[$VBG.shoot in |$VBG.score] the ball "
-        "$POSITION.PP.GOAL after !PRP $REASON.CC-V.goal (and $REASON.CC-V.goal) .",
-
-        "%CONNECTIVE.VBD> the ball arrived [on|at] the $POSITION.BOX (at pace) and [$RDM.VBG.goal] , $ACTOR "
-        "@RB.goal $MODIFIER.VBD $VBD.shoot the ball (just) $POSITION.PP.GOAL "
-        "(to leave the $GOALKEEPER with no chance) .",
-
-        # TODO: modifier goal arrived
-        "%CONNECTIVE.VBD> $ACTOR was free on the $POSITION.BOX , and with the defence slow to react, "
-        "the $ACTORTEAM.name-pos-pre player 's $NN.shot @RB.goal "
-        "$MODIFIER.nonactor.VBD squirmed beyond the $GOALKEEPER .",
-
-        "%CONNECTIVE.VBD> $ACTOR , on the end of it , @RB.goal $MODIFIER.VBD [$VBD.shoot] the ball "
-        "$POSITION.PP.GOAL $RDM.VBG.goal .",
-
-        "$ACTOR @RB.goal $MODIFIER.VBD [$VBD.shoot in|$VBD.score] "
-        "[$ACTORTEAM.name-pos-pre !NEXT $NN.goal|the !NEXT $NN.goal for $ACTORTEAM.name] "
-        "to %CONNECTIVE.IVP after $REASON.S.goal .",
-
-        "$ACTORTEAM.name %CONNECTIVE.IVP when $ACTOR @RB.goal $MODIFIER.VBD [$VBD.shoot in|$VBD.score from] "
-        "$COACTOR 's $PASS-TYPE ."
+        "$NP.team.actor %CONNECTIVE.IVP when $NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in|$VP.VBD.score from] "
+        "$NP.coactor 's $NP.pass-type ."
 
     ],
     "foul": [
-        "%CONNECTIVE.VBD> $COACTOR ($COACTORTEAM.name-pos-post) had gone down with $INJURY "
-        "after a ($JJ.negative) foul by ($ACTORTEAM.name-pos-pre) $ACTOR .",
+        "%CONNECTIVE.VBD> $NP.coactor ($NP.team.nonactor-possessive-post) had gone down with $NP.injury "
+        "after a ($JJ.negative) foul by ($NP.team.actor-possessive) $NP.actor .",
 
-        "%CONNECTIVE.VBD> ($COACTORTEAM.name-pos-pre) $COACTOR $VBD-PASSIVE.foul ($ADVJ.neg) by "
-        "[$ACTOR ($ACTORTEAM.name-pos-post)|($COACTORTEAM.name-pos-pre) $ACTOR] ($TIME) .",
+        "%CONNECTIVE.VBD> ($NP.team.nonactor-possessive) $NP.coactor $VP.VBD.foul-passive ($RB.neg) by "
+        "[$NP.actor ($NP.team.actor-possessive-post)|($NP.team.actor-possessive) $NP.actor] ($PP.time) .",
 
-        "%CONNECTIVE.VBD> $ACTOR $VBD.foul ($COACTORTEAM.name-pos-pre) $COACTOR ($TIME) .",
+        "%CONNECTIVE.VBD> $NP.actor $VP.VBD.foul ($NP.team.nonactor-possessive) $NP.coactor ($PP.time) .",
 
-        "%CONNECTIVE.VBD> $ACTOR $VBD.foul $COACTOR ($COACTORTEAM.name-pos-post) [$RDM.PP.foul|and $RDM.S.any] .",
+        "%CONNECTIVE.VBD> $NP.actor $VP.VBD.foul $NP.coactor ($NP.team.nonactor-possessive-post) [$PP.foul-cause-coref|and $S.attention-crowd] .",
 
-        "$RDM.S.any as $COACTOR was withdrawn $TIME with !PRPS $BODYPART in a brace following a ($JJ.negative) "
-        "challenge from $ACTOR .",
+        "$S.attention-crowd as $NP.coactor was withdrawn $PP.time with !PRPS $NP.bodypart in a brace following a ($JJ.negative) "
+        "challenge from $NP.actor .",
 
-        "%CONNECTIVE.VBG> $ACTOR $VBG.foul $COACTOR $RDM.PP.foul .",
+        "%CONNECTIVE.VBG> $NP.actor $VP.VBG.foul $NP.coactor [$PP.foul-cause-coref|$PP.foul-effect] .",
 
-        "%CONNECTIVE.VBG> $ACTOR $RDM.VBG.foul , "
-        "$VBG.foul $COACTOR near the $POSITION.BOX .",
+        "%CONNECTIVE.VBG> $NP.actor $VP.VBG.foul-effect , "
+        "$VP.VBG.foul $NP.coactor near the $NP.position.box .",
 
-        "%CONNECTIVE.VBD> $ACTOR $RDM.VBD.foul with a ($JJ.negative) $NN.foul ($RDM.PP.foul) .",
+        "%CONNECTIVE.VBD> $NP.actor [$VP.VBD.foul-elaboration-coref|$VP.VBD.foul-elaboration] with a ($JJ.negative) $NP.foul [$PP.foul-effect|$PP.foul-effect-coref|] .",
 
-        "%CONNECTIVE.VBG> $COACTOR winning the ball [in $POSITION.HORIZONTAL| $POSITION.VERTICAL.PP] "
-        "(for $ACTORTEAM.name) and drawing a $NN.foul from $ACTOR ."
-        # "If (only) #sent.actor $VBD.shoot the penalty, "
-        # "the score would be @CONDITION.then, otherwise it would "
-        # "stay @CONDITION.else, @CONDITION.value"
+        "%CONNECTIVE.VBG> $NP.coactor winning the ball [in $NP.position.horizontal| $PP.position.vertical] "
+        "(for $NP.team.actor) and drawing a $NP.foul from $NP.actor ."
     ]
 }

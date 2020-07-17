@@ -40,7 +40,7 @@ percent = {
 
             "supportive": [
                 "added more insult to the injury",
-                "continued where $ACTORTEAM.name left off",
+                "continued where [$NP.team.actor|they] left off",
             ]
         },
         "IVP": {
@@ -60,12 +60,12 @@ percent = {
 
             "supportive": [
                 "add more insult to the injury",
-                "continue where [$ACTORTEAM.name|they] left off",
+                "continue where [$NP.team.actor|they] left off",
             ]
         },
         "ADVP": {
             "condition": _is_contrastive_or_matchstart,
-            "matchstart": ['early in the game', 'as early as $TIME'],
+            "matchstart": ['early in the game', 'as early as $PP.time'],
             "supportive": ['to add on'],
             "neutral": ['later on', 'thereafter'],
             "contrastive": ['[decisively quickly|quickly|promptly] answering', 'with a [decisive|quick|prompt] answer']
@@ -80,19 +80,19 @@ percent = {
             "neutral": [
                 "Then",
                 "!MINDIFF minutes after that",
-                "$RDM.S.any as"
+                "$S.attention-crowd as"
             ],
             "contrastive": [
                 "However",
-                "$ACTORTEAM.name answered with a precise move , as",
-                "[But|The|But the] $ACTORTEAM.name retaliated as",
-                "$ACTORTEAM.name , however, came back when",
+                "$NP.team.actor answered with a precise move , as",
+                "[But|The|But the] $NP.team.actor retaliated as",
+                "$NP.team.actor , however, came back when",
             ],
 
             "supportive": [
-                "[To add|adding] insult to $NONACTORTEAM.name-pos-pre injury",
+                "[To add|adding] insult to $NP.team.actor-possessive injury",
                 "Further",
-                "The onslaught (by $ACTORTEAM.name) continued, as "
+                "The onslaught (by $NP.team.actor) continued, as "
             ]
         },
         "VBG>": {
@@ -103,7 +103,7 @@ percent = {
             ],
             "neutral": [
                 "Things proceeded with",
-                "$RDM.S.any seeing"
+                "$S.attention-crowd seeing"
             ],
             'contrastive': ["Things changed ( , however , ) with"]
         }

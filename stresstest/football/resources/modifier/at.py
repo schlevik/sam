@@ -62,7 +62,8 @@ at = {
         "VBD": {
             "goal": ['[failed|refused] to',
                      "[was|has been] [refrained|refused|prohibited|prevented|hindered] from",  # + gerund
-                     "[was|has been] [prohibited|disallowed] to"],  # + inf | TODO  # (+-)
+                     "[was|has been] [prohibited|disallowed] to"
+            ],  # + inf | TODO  # (+-)
             "goal-nonactor": ["failed to",
                               "[was|has been] [prevented|hindered] from"]
         },
@@ -99,11 +100,11 @@ at = {
         # not HAVE/USE OPPORTUNITY-OCCASION/ABILITY-ATTRIBUTE
         "VBD": {
             'goal': [
-                "[would|did] [n't|not] [get|have] the [$NN.opportunity|$NN.attribute] to",
-                "$MD.neg find the [$NN.opportunity|$NN.attribute] to",
-                "$MD.neg [use|exploit] the $NN.opportunity to",
+                "[would|did] [n't|not] [get|have] the [occasion|$NP.opportunity|$NP.attribute] to",
+                "$MD.neg find the [occasion|$NP.opportunity|$NP.attribute] to",
+                "$MD.neg [use|exploit] the $NP.opportunity to",
                 # not MEET OBLIGATION
-                "$MD.neg [meet|fulfill] the $NN.obligation to"
+                "$MD.neg [meet|fulfill] the $NP.obligation to"
             ],
             'goal-nonactor': [
                 "[would|did] [n't|not] [get|have] the [chance|possibility] to"
@@ -112,10 +113,10 @@ at = {
         "VBG": {
             # not HAVE/USE OPPORTUNITY-OCCASION/ABILITY-ATTRIBUTE
             'goal': [
-                "not [geting|having|finding] the [$NN.opportunity|$NN.attribute] to",
-                "not [using|exploiting] the $NN.opportunity to",
+                "not [geting|having|finding] the [$NP.opportunity|$NP.attribute] to",
+                "not [using|exploiting] the $NP.opportunity to",
                 # not MEET OBLIGATION
-                "not [meeting|fulfilling] the $NN.obligation to"
+                "not [meeting|fulfilling] the $NP.obligation to"
             ],
             'goal-nonactor': [
                 "not [getting|having] the [chance|possibility] to"
@@ -123,11 +124,11 @@ at = {
         },
         "VBI": {
             'goal': [
-                "not [get|have] the [$NN.opportunity|$NN.attribute] to",
-                "not find the [$NN.opportunity|$NN.attribute] to",
-                "not [use|exploit] the $NN.opportunity to",
+                "not [get|have] the [$NP.opportunity|$NP.attribute] to",
+                "not find the [$NP.opportunity|$NP.attribute] to",
+                "not [use|exploit] the $NP.opportunity to",
                 # not MEET OBLIGATION
-                "not [meet|fulfill] the $NN.obligation to"
+                "not [meet|fulfill] the $NP.obligation to"
             ],
             'goal-nonactor': [
                 "not [get|have] the [chance|possibility] to"
@@ -140,61 +141,61 @@ at = {
         "VBD": {
             "goal": [
                 # LACK/FAIL/WASTE OPPORTUNITY-OCCASION
-                '[missed|lost|wasted|gave up|threw away|squandered|neglected] the $NN.opportunity to',
+                '[missed|lost|wasted|gave up|threw away|squandered|neglected] the $NP.opportunity to',
                 # LACK ATTRIBUTE/ABILITY
-                'lacked the $NN.attribute to',
+                'lacked the $NP.attribute to',
                 'lost the nerve to',  # TODO: let native check
                 # FAIL OBLIGATION
-                'neglected the $NN.obligation to',  # TODO: let native check
+                'neglected the $NP.obligation to',  # TODO: let native check
                 # USE ASSET: empty, i don't see how this fits
-                'was denied the $NN.opportunity to'  # passive
+                'was denied the $NP.opportunity to'  # passive
             ],
             "goal-nonactor": [
-                'was denied the $NN.opportunity to',
+                'was denied the $NP.opportunity to',
                 'missed the [chance|possibility] to'
             ]
         },
         "VBG": {
             "goal": [
                 # LACK/FAIL/WASTE OPPORTUNITY-OCCASION
-                '[missing|losing|wasting|giving up|throwing away|squandering|neglecting] the $NN.opportunity to',
+                '[missing|losing|wasting|giving up|throwing away|squandering|neglecting] the $NP.opportunity to',
                 # LACK ATTRIBUTE/ABILITY
-                'lacking the $NN.attribute to',
+                'lacking the $NP.attribute to',
                 'losing the nerve to',  # TODO: let native check
                 # FAIL OBLIGATION
-                'neglecting the $NN.obligation to',  # TODO: let native check
+                'neglecting the $NP.obligation to',  # TODO: let native check
 
                 # PASSIVE VOICE
-                '[being|having been] denied the $NN.opportunity to'
+                '[being|having been] denied the [$NP.opportunity|occasion|attempt] to'
                 # USE ASSET: empty, i don't see how this fits
                 # he buy a cake
                 # he lacked the strength to buy a cake => not he buy a cake
                 # he used the money to buy a cake => ?not he buy a cake
             ],
             "goal-nonactor": [
-                'being denied the $NN.opportunity to',
+                'being denied the [$NP.opportunity|occasion|attempt] to',
                 'missing the [chance|possibility] to'
             ]
         },
         "VBI": {
             "goal": [
                 # LACK/FAIL/WASTE OPPORTUNITY-OCCASION
-                '[miss|lose|waste|give up|throw away|squander|neglect] the $NN.opportunity to',
+                '[miss|lose|waste|give up|throw away|squander|neglect] the $NP.opportunity to',
                 # LACK ATTRIBUTE/ABILITY
-                'lack the $NN.attribute to',
+                'lack the $NP.attribute to',
                 'lose the nerve to',  # TODO: let native check
                 # FAIL OBLIGATION
-                'neglect the $NN.obligation to',  # TODO: let native check
+                'neglect the $NP.obligation to',  # TODO: let native check
 
                 # PASSIVE VOICE
-                'be denied the $NN.opportunity to'
+                'be denied the $NP.opportunity to'
                 # USE ASSET: empty, i don't see how this fits
                 # he buy a cake
                 # he lacked the strength to buy a cake => not he buy a cake
                 # he used the money to buy a cake => ?not he buy a cake
             ],
             "goal-nonactor": [
-                'be denied the $NN.opportunity to',
+                'be denied the $NP.opportunity to',
                 'miss the [chance|possibility] to'
             ]
         }
