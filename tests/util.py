@@ -72,7 +72,9 @@ def interactive_env_football_modifier(changed_bundle=None, cfg=None, do_print=Tr
 
 
 def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
-                    do_realise=True, generator_kwargs=None, unique_sentences=True):
+                    do_realise=True, generator_kwargs=None):
+    if not modifier:
+        raise NotImplementedError()
     if not cfg:
         cfg = Config({})
     elif isinstance(cfg, str):
@@ -80,33 +82,26 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
     elif isinstance(cfg, dict):
         cfg = Config(cfg)
     cfg.pprint()
-    print(modifier, "is modifier?")
-    if modifier:
-        g_class = bundle.generator_modifier
-        templates = bundle.templates_modifier
-    else:
-        g_class = bundle.generator
+    #if modifier:
+    g_class = bundle.generator_modifier
+    templates = bundle.templates_modifier
+    #else:
+        #g_class = bundle.generator
         # templates = bundle.templates
     generator_kwargs = generator_kwargs or {}
     generator = g_class(cfg, **generator_kwargs)
     events = generator.generate_story()
     if generator.unique_actors:
-        print('unique actors?')
         actors = [e.actor for e in events]
-        print(actors)
         assert len(set(actors)) == generator.world.num_sentences
-        print('yes')
         if getattr(generator, 'unique_coactors', False):
-            print('unique coactors?')
             coactors = [e.attributes['coactor'] for e in events]
-            print(coactors)
             assert len(set(coactors)) == generator.world.num_sentences
             assert len(set(actors + coactors)) == 2 * generator.world.num_sentences
-            print('yes')
     if not do_realise:
         return generator, cfg, events, None, None, None, None
 
-    realizer = Realizer(**templates)
+    realizer = Realizer(**templates, unique_sentences=False)
     story, visits = realizer.realise_story(events, generator.world)
     ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
     all_questions = (ssq, maq, uaq, abq)
@@ -118,7 +113,7 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
         print('Coactors', coactors)
 
         print_out(story, ssq, maq, uaq, abq, highlights=actors + coactors)
-
+    print(realizer.context.chosen_templates)
     return generator, cfg, events, realizer, story, all_questions, visits
 
 

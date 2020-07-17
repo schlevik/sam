@@ -504,12 +504,16 @@ class Realizer:
 
     def post_process(self, tokens: List[str]):
         # tokens = sentence.split(" ")
-
+        lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
         result = []
         for i, (prev_token, token, next_token) in \
                 enumerate(zip_longest([""] + tokens[:-1], tokens, tokens[1:], fillvalue="")):
-            lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
+
             prev_prev_token = tokens[i - 2] if i >= 2 else ""
+            # capitalise
+            if i == 0:
+                token = token[0].upper() + token[1:]
+
             if (token == 'a' or token == 'A') and len(next_token) > 0 and next_token[0] in self.vocals:
                 token = token + "n"
             elif token == 'into' and next_token == 'between':
@@ -525,13 +529,12 @@ class Realizer:
             elif prev_token == 'to' and (
                     token.endswith("ed") or token.endswith("ing") or tenses(token)[0][0] == 'past'):
                 token = lemmatizer.lemmatize(token, 'v')
-            elif prev_token == 'in' or prev_token == 'from' and (
-                    token.endswith("ed") or token == 'put' or token.endswith("ing")):
+            elif prev_token == 'in' or prev_token == 'from' and (any(t[0] == 'past' for t in tenses(token))):
                 # VERY HACKY
 
                 if (prev_prev_token in ['refrained', "refused", "prohibited", "prevented", "hindered"]
-                        or prev_token == "in" and prev_prev_token == 'succeed'):
-                    token = lemmatizer.lemmatize(token)
+                        or (prev_token == "in" and prev_prev_token == 'succeed')):
+                    token = lemmatizer.lemmatize(token, 'v')
                     try:
                         token = pattern_en.verbs[token][5]
                     except:
