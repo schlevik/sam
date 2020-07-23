@@ -18,18 +18,18 @@ from stresstest.realize import Realizer
 
 def _generate_events(generator_class, config, first_modification,
                      fill_with_modification,
-                     modify_event_types, modification_distance, total_modifiable_actions):
+                     modify_event_types, modification_distance, total_modifiable_actions, modifier_type):
     generator = generator_class(config, first_modification=first_modification,
                                 fill_with_modification=fill_with_modification, modify_event_types=modify_event_types,
                                 modification_distance=modification_distance,
-                                total_modifiable_actions=total_modifiable_actions)
+                                total_modifiable_actions=total_modifiable_actions, modifier_type=modifier_type)
     events = generator.generate_story()
     world = generator.world
     return events, world
 
 
 def _realize_events(generator_class, target_event_types, events, world, arranged_sentences, question_types,
-                    answer_types,
+                    answer_types, modifier_type,
                     templates, uuid4, modification_data=None, seed=None):
     if seed:
         random.seed(seed)
@@ -85,7 +85,7 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
         question_map[(question.event_type, question.target, question.question_data.get("n", None))] = question
 
     # remove modifier
-    idx_to_remove = [i for i, e in enumerate(events) if any(f.startswith("MODIFIER") for f in e.features)]
+    idx_to_remove = [i for i, e in enumerate(events) if any(f.startswith(modifier_type) for f in e.features)]
 
     events = deepcopy(events)
     for event in events:
@@ -137,13 +137,12 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
                     'question_data': logical.question_data,
                     'modification_data': modification_data
                 }
-                try:
-                    qa['answers'] = [{
-                        'answer_start': match_answer_in_paragraph(qa=qa, datum=baseline_paragraph),
-                        'text': qa['answer']
-                    }]
-                except NotImplementedError:
-                    pass
+
+                qa['answers'] = [{
+                    'answer_start': match_answer_in_paragraph(qa=qa, datum=baseline_paragraph),
+                    'text': qa['answer']
+                }]
+
                 baseline_paragraph['qas'].append(qa)
     baseline = {'title': baseline_paragraph['id'], 'paragraphs': [baseline_paragraph]}
 
@@ -156,6 +155,7 @@ def _realize_events(generator_class, target_event_types, events, world, arranged
         "context": ' '.join(control_deleted_story),
         'passage_sents': control_deleted_story
     }
+
     # TODO: fix evidence?
     control_deleted = {'title': control_deleted_paragraph['id'], 'paragraphs': [control_deleted_paragraph]}
 
@@ -218,7 +218,9 @@ def _do_print(baseline, modified, deleted):
 @click.option("--domain", type=Domain(), default='football')
 @click.option("--num-workers", type=int, default=8)
 @click.option("--split-templates", type=float, default=False)
-def generate_modifier(config, out_path, seed, subsample, do_print, do_save, domain, num_workers, split_templates):
+@click.option("--modifier-type", type=str, default='RB')
+def generate_modifier(config, out_path, seed, subsample, do_print, do_save, domain, num_workers, split_templates,
+                      modifier_type):
     if seed:
         random.seed(seed)
     uuid4 = lambda: uuid.UUID(int=random.getrandbits(128)).hex
@@ -261,7 +263,7 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
                    f"{click.style(os.path.join(out_path, file_name.format(CONTROL)), fg='blue', bold=True)}.")
 
         baseline, modified, control = generate(cfg, domain, num_workers, subsample, templates,
-                                               uuid4)
+                                               uuid4, modifier_type)
         baseline = sorted(baseline, key=lambda d: d['title'])
         modified = sorted(modified, key=lambda d: d['title'])
         control = sorted(control, key=lambda d: d['title'])
@@ -281,7 +283,7 @@ def generate_modifier(config, out_path, seed, subsample, do_print, do_save, doma
                        pretty=False)
 
 
-def generate(cfg, domain, num_workers, subsample, templates, uuid4):
+def generate(cfg, domain, num_workers, subsample, templates, uuid4, modifier_type):
     all_template_choices = []
     max_sents = cfg["world.num_sentences"]
     first_modifications = range(max_sents - 1)
@@ -316,7 +318,8 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
                                 fill_with_modification=fill_with_modification,
                                 modify_event_types=[modify_event_type],
                                 modification_distance=modification_distance,
-                                total_modifiable_actions=total_modifiable_actions
+                                total_modifiable_actions=total_modifiable_actions,
+                                modifier_type=modifier_type
                             )
                             template_choices = generate_all_possible_template_choices(
                                 events,
@@ -337,7 +340,7 @@ def generate(cfg, domain, num_workers, subsample, templates, uuid4):
         delayed(_realize_events)(
             domain.generator_modifier, event_type_targets,
             events=events, world=world, arranged_sentences=choice,
-            question_types=question_types, answer_types=answer_types,
+            question_types=question_types, answer_types=answer_types, modifier_type=modifier_type,
             templates=templates, uuid4=uuid4, modification_data=modification_data, seed=seed
         ) for ((events, world, event_type_targets, choice, modification_data), seed) in
         zip(tqdm(all_template_choices), seeds)

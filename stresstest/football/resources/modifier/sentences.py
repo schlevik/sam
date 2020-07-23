@@ -7,10 +7,10 @@ sentences = {
         "for $NP.team.actor .",
 
         "$NP.team.actor-possessive player $NP.actor $VP.VBD.attention %CONNECTIVE.ADVP , @RB.goal $VP.VBG.modifier "
-        "[$VP.VBG.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] a ($JJ.positive) goal $PP.distance .",
+        "[$VP.VBG.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score a ($JJ.positive) goal]  $PP.distance .",
 
         # TODO: maybe rephrase the arrived, it's stupid
-        "$NP.actor 's $NP.goal ( , [VP.VBG.goal-effect] , ) @RB.goal $VP.VBD.modifier-nonactor "
+        "$NP.actor 's $NP.goal ( , $VP.VBG.goal-effect , ) @RB.goal $VP.VBD.modifier-nonactor "
         "arrived $PP.time $PP.goal-cause-coref (and [$S.attention-crowd|$VP.VBD.attention-crowd]) .",
 
         "$PP.time a $NP.pass-type [went to|arrived at] ($NP.team.actor-possessive) $NP.coactor "

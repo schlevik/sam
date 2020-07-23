@@ -34,6 +34,7 @@ def sample_iter(sample: List[Dict[str, Any]]) -> Generator[Entry, None, None]:
         datum = datum['paragraphs'][0]
         passage = datum['context']
         for qa in datum['qas']:
+            qa['passage_sents'] = datum['passage_sents']
             yield Entry(datum_id, passage, qa['id'], qa['question'], qa.get('answer') or qa['answers'][0]['text'], qa)
 
 

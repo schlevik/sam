@@ -1,12 +1,15 @@
 import math
+import os
 import random
 import sys
+from collections import defaultdict
 from itertools import accumulate
 
 import click
 
 from scripts.utils import FormatParam, write_json
 from stresstest.util import load_json
+from stresstest.eval_utils import align as do_align
 
 
 @click.command()
@@ -59,3 +62,48 @@ def combine(in_files, out_file):
         write_json(combined_dataset, out_file, pretty=False)
     else:
         click.echo(f"Nothing to write...")
+
+
+@click.command()
+@click.option("--baseline", type=str)
+@click.option("--intervention", type=str)
+@click.option("--control", type=str)
+@click.option('--out-folder', type=str)
+@click.option('--subsample', type=int, default=0)
+@click.option('--seed', type=int, default=56)
+def align(baseline, intervention, control, out_folder, subsample, seed):
+    random.seed(seed)
+    aligned_baseline, aligned_intervention, aligned_control = do_align(load_json(baseline), load_json(intervention),
+                                                                       load_json(control))
+    assert len(aligned_baseline) == len(aligned_intervention) == len(aligned_control)
+    if subsample and subsample < len(aligned_baseline):
+        choices = random.sample(range(len(aligned_baseline)), subsample)
+        aligned_baseline = [e for i, e in enumerate(aligned_baseline) if i in choices]
+        aligned_intervention = [e for i, e in enumerate(aligned_intervention) if i in choices]
+        aligned_control = [e for i, e in enumerate(aligned_control) if i in choices]
+    gold_baseline = to_squad_fmt(aligned_baseline)
+    gold_intervention = to_squad_fmt(aligned_intervention)
+    gold_control = to_squad_fmt(aligned_control)
+    baseline_out = os.path.join(out_folder, f"aligned-{subsample if subsample else ''}-{os.path.basename(baseline)}")
+    write_json(gold_baseline, baseline_out, pretty=False)
+    intervention_out = os.path.join(out_folder,
+                                    f"aligned-{subsample if subsample else ''}-{os.path.basename(intervention)}")
+    write_json(gold_intervention, intervention_out, pretty=False)
+    control_out = os.path.join(out_folder, f"aligned-{subsample if subsample else ''}-{os.path.basename(control)}")
+    write_json(gold_control, control_out, pretty=False)
+
+
+def to_squad_fmt(flat_ds):
+    unflattened = defaultdict(list)
+    result = []
+    for datum_id, passage, qa_id, question, answer, qa in flat_ds:
+        unflattened[datum_id].append((passage, qa))
+    for k, passages_and_qas in unflattened.items():
+        passages, qas = zip(*passages_and_qas)
+        entry = {
+            'title': k,
+            'paragraphs': [
+                {'id': k, 'context': passages[0], 'passage_sents': qas[0]['passage_sents'], 'qas': list(qas)}],
+        }
+        result.append(entry)
+    return {"version": 0.1, "data": result}

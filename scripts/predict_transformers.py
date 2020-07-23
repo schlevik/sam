@@ -15,38 +15,30 @@
 # limitations under the License.
 """ Finetuning the library models for question-answering on SQuAD (DistilBERT, Bert, XLM, XLNet)."""
 
-import argparse
-import glob
 import logging
 import os
-import random
 import timeit
 
 import click
-import numpy as np
 import torch
-from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from torch.utils.data.distributed import DistributedSampler
-from tqdm import tqdm, trange
 
-from transformers import (
-    MODEL_FOR_QUESTION_ANSWERING_MAPPING,
-    WEIGHTS_NAME,
-    AdamW,
-    AutoConfig,
-    AutoModelForQuestionAnswering,
-    AutoTokenizer,
-    get_linear_schedule_with_warmup,
-    squad_convert_examples_to_features,
-)
+from torch.utils.data import DataLoader, SequentialSampler
+from tqdm import tqdm
+from transformers import SquadV1Processor, squad_convert_examples_to_features
+
 from transformers.data.metrics.squad_metrics import (
     compute_predictions_log_probs,
     compute_predictions_logits,
     squad_evaluate,
 )
-from transformers.data.processors.squad import SquadResult, SquadV1Processor, SquadV2Processor
+from transformers.data.processors.squad import SquadResult
 
-from scripts.utils import get_output_predictions_file_name
+from scripts.evaluate_intervention import print_examples
+from scripts.utils import get_output_predictions_file_name, get_baseline_intervention_control_from_baseline
+from scripts.utils_transformers import to_list, _is_gpu_available, get_tokenizer, get_model, load_examples, Args, \
+    logger, debug_features_examples_dataset
+from stresstest.eval_utils import align, evaluate_intervention
+from stresstest.util import load_json
 
 logger = logging.getLogger(__name__)
 try:
@@ -54,38 +46,12 @@ try:
 except ImportError:
     from tensorboardX import SummaryWriter
 
-MODEL_CONFIG_CLASSES = list(MODEL_FOR_QUESTION_ANSWERING_MAPPING.keys())
-MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
-
-
-def set_seed(args):
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    if args.n_gpu > 0:
-        torch.cuda.manual_seed_all(args.seed)
-
-
-def to_list(tensor):
-    return tensor.detach().cpu().tolist()
-
-
-def _is_gpu_available():
-    import torch
-    try:
-        gpu = torch.cuda.is_available()
-        if gpu:
-            str(torch.rand(1).to(torch.device("cuda")))
-    except:
-        gpu = False
-    return gpu
-
 
 @click.command()
 @click.option('--in-file', type=str)
-@click.option('--out-folder', type=str, default='')
 @click.option('--model-path', type=str)
 @click.option('--model-type', type=str)
+@click.option('--out-folder', type=str)
 @click.option('--no-cuda', type=bool, default=None)
 @click.option('--do-lower-case', is_flag=True, default=False)
 @click.option('--per-gpu-eval-batch-size', type=int, default=8)
@@ -95,21 +61,28 @@ def _is_gpu_available():
 @click.option('--max-answer-length', type=int, default=30)
 @click.option('--verbose-logging', is_flag=True, default=False)
 @click.option('--null-score-diff-threshold', type=float, default=0.0)
-def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_case, per_gpu_eval_batch_size,
+def predictions(in_file, out_folder, model_path, model_type, no_cuda, do_lower_case, per_gpu_eval_batch_size,
                 lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold):
-    if no_cuda is None:
-        no_cuda = not _is_gpu_available()
-
-    device = torch.device("cuda" if torch.cuda.is_available() and not no_cuda else "cpu")
-    n_gpu = 0 if no_cuda else torch.cuda.device_count()
-
     model = get_model(model_path)
     tokenizer = get_tokenizer(model_path, do_lower_case)
+    args = Args(model_type, out_folder, in_file, no_cuda, do_lower_case, per_gpu_eval_batch_size, lang_id,
+                v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold)
+    dataset, examples, features = load_examples(args.eval_file)
+    evaluate(args, model, tokenizer, dataset, examples, features)
 
-    eval_batch_size = per_gpu_eval_batch_size * max(1, n_gpu)
+
+def evaluate(args: Args, model, tokenizer, dataset, examples, features, prefix="", return_raw=False):
+    if args.no_cuda is None:
+        args.no_cuda = not _is_gpu_available()
+    if args.predictions_folder:
+        assert args.eval_file, "Need name of the eval file to save predictions!"
+    device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    n_gpu = 0 if args.no_cuda else torch.cuda.device_count()
+
+    eval_batch_size = args.per_gpu_eval_batch_size * max(1, n_gpu)
 
     # Note that DistributedSampler samples randomly
-    dataset, examples, features = load_examples(in_file)
+
     eval_sampler = SequentialSampler(dataset)
     eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=eval_batch_size)
     model.to(device)
@@ -118,7 +91,7 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
         model = torch.nn.DataParallel(model)
 
     # Eval!
-    click.echo(f"Generating predictions for model {click.style(model_path, fg='blue')}, "
+    click.echo(f"Generating predictions for model {click.style(args.model_path, fg='blue')}, "
                f"running on {click.style(str(device), fg='green')}")
     click.echo("  Num examples = %d" % len(dataset))
     click.echo("  Batch size = %d" % eval_batch_size)
@@ -137,26 +110,25 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
                 "token_type_ids": batch[2],
             }
 
-            if model_type in ["xlm", "roberta", "distilbert", "camembert"]:
+            if args.model_type in ["xlm", "roberta", "distilbert", "camembert"]:
                 del inputs["token_type_ids"]
 
             feature_indices = batch[3]
 
             # XLNet and XLM use more arguments for their predictions
-            if model_type in ["xlnet", "xlm"]:
+            if args.model_type in ["xlnet", "xlm"]:
                 inputs.update({"cls_index": batch[4], "p_mask": batch[5]})
                 # for lang_id-sensitive xlm models
                 if hasattr(model, "config") and hasattr(model.config, "lang2id"):
                     inputs.update(
-                        {"langs": (torch.ones(batch[0].shape, dtype=torch.int64) * lang_id).to(device)}
+                        {"langs": (torch.ones(batch[0].shape, dtype=torch.int64) * args.lang_id).to(device)}
                     )
             outputs = model(**inputs)
 
         for i, feature_index in enumerate(feature_indices):
             eval_feature = features[feature_index.item()]
             unique_id = int(eval_feature.unique_id)
-            
-            
+
             output = [to_list(output[i]) for output in outputs]
 
             # Some models (XLNet, XLM) use 5 arguments for their predictions, while the other "simpler"
@@ -185,24 +157,28 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
 
     eval_time = timeit.default_timer() - start_time
     logger.info("  Evaluation done in total %f secs (%f sec per example)", eval_time, eval_time / len(dataset))
+    if args.predictions_folder:
+        out_file = get_output_predictions_file_name(args.eval_file, args.predictions_folder, prefix)
 
-    out_file = get_output_predictions_file_name(in_file, out_folder)
+        if not os.path.exists(os.path.dirname(out_file)):
+            os.makedirs(os.path.dirname(out_file))
 
-    if not os.path.exists(os.path.dirname(out_file)):
-        os.makedirs(os.path.dirname(out_file))
+        # Compute predictions
+        file_name = os.path.basename(out_file)
+        output_prediction_file = os.path.join(args.predictions_folder, file_name)
+        output_nbest_file = os.path.join(args.predictions_folder, f"nbest-{file_name}")
 
-    # Compute predictions
-    file_name = os.path.basename(out_file)
-    output_prediction_file = os.path.join(out_folder, file_name)
-    output_nbest_file = os.path.join(out_folder, f"nbest-{file_name}")
-
-    if v2:
-        output_null_log_odds_file = os.path.join(out_folder, f"null-odds-{file_name}")
+        if args.v2:
+            output_null_log_odds_file = os.path.join(args.predictions_folder, f"null-odds-{file_name}")
+        else:
+            output_null_log_odds_file = None
     else:
+        output_prediction_file = None
+        output_nbest_file = None
         output_null_log_odds_file = None
 
     # XLNet and XLM use a more complex post-processing procedure
-    if model_type in ["xlnet", "xlm"]:
+    if args.model_type in ["xlnet", "xlm"]:
         start_n_top = model.config.start_n_top if hasattr(model, "config") else model.module.config.start_n_top
         end_n_top = model.config.end_n_top if hasattr(model, "config") else model.module.config.end_n_top
 
@@ -210,91 +186,72 @@ def predictions(in_file, model_path, model_type, out_folder, no_cuda, do_lower_c
             examples,
             features,
             all_results,
-            n_best_size,
-            max_answer_length,
+            args.n_best_size,
+            args.max_answer_length,
             output_prediction_file,
             output_nbest_file,
             output_null_log_odds_file,
             start_n_top,
             end_n_top,
-            v2,
+            args.v2,
             tokenizer,
-            verbose_logging,
+            args.verbose_logging,
         )
     else:
         predictions = compute_predictions_logits(
             examples,
             features,
             all_results,
-            n_best_size,
-            max_answer_length,
-            do_lower_case,
+            args.n_best_size,
+            args.max_answer_length,
+            args.do_lower_case,
             output_prediction_file,
             output_nbest_file,
             output_null_log_odds_file,
-            verbose_logging,
-            v2,
-            null_score_diff_threshold,
+            args.verbose_logging,
+            args.v2,
+            args.null_score_diff_threshold,
             tokenizer,
         )
 
     # Compute the F1 and exact scores.
     # results = squad_evaluate(examples, predictions)
     # return results
-
-
-def get_tokenizer(name_or_model_name_or_path, do_lower_case):
-    return AutoTokenizer.from_pretrained(
-        # args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
-        name_or_model_name_or_path,
-        # do_lower_case=args.do_lower_case,
-        do_lower_case=do_lower_case,
-        # cache_dir=args.cache_dir if args.cache_dir else None,
-        cache_dir=None
-    )
-
-
-def get_model(model_name_or_path):
-    config = AutoConfig.from_pretrained(
-        # args.config_name if args.config_name else args.model_name_or_path,
-        model_name_or_path,
-        # cache_dir=args.cache_dir if args.cache_dir else None,
-        cache_dir=None,
-    )
-    model = AutoModelForQuestionAnswering.from_pretrained(
-        # args.model_name_or_path,
-        model_name_or_path,
-        # from_tf=bool(".ckpt" in args.model_name_or_path),
-        from_tf=bool(".ckpt" in model_name_or_path),
-        config=config,
-        # cache_dir=args.cache_dir if args.cache_dir else None,
-        cache_dir=None,
-    )
-    return model
+    if return_raw:
+        return predictions
+    else:
+        return squad_evaluate(examples, predictions)
 
 
 @click.command()
-@click.argument("in_files", nargs=-1)
-@click.option("--out-folder")
-@click.option('--model-path', type=str)
-@click.option('--do-lower-case', is_flag=True, default=False)
-@click.option('--evaluate', is_flag=True, default=False)
-@click.option('--v2', is_flag=True, default=False)
+@click.option("--model-path", type=str)
+@click.option("--model-type", type=str)
+@click.option("--no-cuda", is_flag=True, type=bool, default=None)
+@click.option("--baseline-gold-file", type=str)
+@click.option("--do-not-lower-case", is_flag=True, type=bool, default=False)
+@click.option("--per-gpu-eval-batch-size", type=int, default=8)
+@click.option("--max-answer-length", type=int, default=30)
+@click.option("--verbose-logging", is_flag=True, type=bool, default=False)
+@click.option('--stfu', type=bool, is_flag=True, default=False)
 @click.option('--max-seq-length', type=int, default=384)
 @click.option('--doc-stride', type=int, default=128)
 @click.option('--max-query-length', type=int, default=64)
-@click.option('--num-workers', type=int, default=1)
-def cache_examples(in_files, out_folder, model_path, do_lower_case, evaluate, v2, max_seq_length, doc_stride,
-                   max_query_length, num_workers):
+@click.option('--num-workers', type=int, default=4)
+@click.option('--predictions-folder', type=str, default='')
+def debug_eval(model_path, model_type, baseline_gold_file, no_cuda, do_not_lower_case, per_gpu_eval_batch_size,
+               verbose_logging, max_answer_length, max_seq_length, doc_stride, max_query_length, num_workers, stfu,
+               predictions_folder):
+    eval_files = get_baseline_intervention_control_from_baseline(baseline_gold_file)
+    model = get_model(model_path)
+    do_lower_case = not do_not_lower_case
     tokenizer = get_tokenizer(model_path, do_lower_case)
-    processor = SquadV2Processor() if v2 else SquadV1Processor()
-    for in_file in in_files:
-        data_dir = os.path.dirname(in_file)
-        file_name = os.path.basename(in_file)
-        if evaluate:
-            examples = processor.get_dev_examples(data_dir, filename=file_name)
-        else:
-            examples = processor.get_train_examples(data_dir, filename=file_name)
+    processor = SquadV1Processor()
+    defs = []
+
+    for eval_file in eval_files:
+        data_dir = os.path.dirname(eval_file)
+        file_name = os.path.basename(eval_file)
+        examples = processor.get_dev_examples(data_dir, filename=file_name)
 
         features, dataset = squad_convert_examples_to_features(
             examples=examples,
@@ -302,23 +259,66 @@ def cache_examples(in_files, out_folder, model_path, do_lower_case, evaluate, v2
             max_seq_length=max_seq_length,
             doc_stride=doc_stride,
             max_query_length=max_query_length,
-            is_training=not evaluate,
+            is_training=False,
             return_dataset="pt",
             threads=num_workers,
         )
-        out_file = os.path.join(out_folder, f"{os.path.splitext(file_name)[0]}-"
-                                            f"{os.path.basename(os.path.normpath(model_path))}.bin")
-        click.echo(f"Saving features into cached file {click.style(out_file, fg='blue')}")
-        if os.path.dirname(out_file).replace(".", ""):
-            os.makedirs(os.path.dirname(out_file), exist_ok=True)
-        torch.save({"features": features, "dataset": dataset, "examples": examples}, out_file)
+        defs.append((dataset, examples, features))
+    args = Args(model_path, model_type, per_gpu_eval_batch_size=per_gpu_eval_batch_size,
+                max_answer_length=max_answer_length, predictions_folder=predictions_folder)
 
+    if args.local_rank == -1 or no_cuda:
+        args.device = torch.device("cuda" if torch.cuda.is_available() and not no_cuda else "cpu")
+        args.n_gpu = 0 if no_cuda else torch.cuda.device_count()
+    else:  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
+        torch.cuda.set_device(args.local_rank)
+        args.device = torch.device("cuda", args.local_rank)
 
-def load_examples(location):
-    features_and_dataset = torch.load(location)
-    features, dataset, examples = (
-        features_and_dataset["features"],
-        features_and_dataset["dataset"],
-        features_and_dataset["examples"],
+    model.to(device=args.device)
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S",
+        level=logging.INFO if not stfu else logging.WARN,
     )
-    return dataset, examples, features
+    logger.warning(
+        "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s",
+        args.local_rank,
+        args.device,
+        args.n_gpu,
+        bool(args.local_rank != -1),
+        args.fp16,
+    )
+    baseline_dataset, intervention_dataset, control_dataset = defs
+    if not stfu:
+        debug_features_examples_dataset(*baseline_dataset, tokenizer)
+    args.eval_file = f'debug-{model_path}-baseline'
+    baseline_predictions = evaluate(args, model, tokenizer, *baseline_dataset, return_raw=True)
+    args.eval_file = f'debug-{model_path}-intervention'
+    intervention_predictions = evaluate(args, model, tokenizer, *intervention_dataset,
+                                        return_raw=True)
+
+    args.eval_file = f'debug-{model_path}-control'
+    control_predictions = evaluate(args, model, tokenizer, *control_dataset, return_raw=True)
+    golds = tuple(
+        load_json(g) for g in eval_files
+    )
+    aligneds = align(*golds)
+    # obtain predictions on all three of them
+    (overall_results, results_baseline, results_intervention, results_control,
+     correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+     wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
+     ) = evaluate_intervention(*aligneds,
+                               baseline_predictions, intervention_predictions, control_predictions)
+    print_examples(correct_baseline_control, correct_baseline_control_intervention, correct_change_correct,
+                   correct_keep_wrong, correct_change_wrong, wrong_change_right,
+                   wrong_keep_right)
+    click.echo(f"Got {sum(results_baseline)} correct for baseline.")
+    click.echo(f"Got {sum(results_intervention)} correct for intervention.")
+    click.echo(f"Out of {sum(results_baseline)} correct baseline results, got {len(correct_change_correct)} "
+               f"correct after intervention.")
+    click.echo(f"Out of {len(correct_baseline_control)} correct for both baseline and control "
+               f"got {len(correct_baseline_control_intervention)} correct after intervention.")
+    click.echo(f"Interventions that the model 'ignored': {len(correct_keep_wrong)}")
+    click.echo(f"Interventions that left the model 'confused': {len(correct_change_wrong)}")
+    click.echo(f"Wrong predictions that the model changed to correct: {len(wrong_change_right)}")
+    click.echo(f"Wrong predictions that the model didn't change but that became correct: {len(wrong_keep_right)}")
