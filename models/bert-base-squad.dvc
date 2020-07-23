@@ -1,3 +1,3 @@
 outs:
 - md5: c01df288a2ec06170b06988e196eabfd.dir
-  path: bert.base-squad
+  path: bert-base-squad

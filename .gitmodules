@@ -1,0 +1,3 @@
+[submodule "lib/taaco"]
+	path = lib/taaco
+	url = git@gitlab.com:schlevik/taaco.git

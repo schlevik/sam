@@ -44,7 +44,7 @@ def apply_taaco(corpus: List[str], taaco_dir, indices) -> Dict[str, List[float]]
                 f.write(doc)
         logger.debug(f"{len(glob.glob(os.path.join(data_path, '*')))} files created.")
         # run taaco
-        cmd = f'python cli_folders.py --indir {data_path} --outdir {results_path} ' \
+        cmd = f'python cli_folders.py --indir {data_path} --outfile {results_path} ' \
               f'--working-dir {temp_dir} --config taaco.ini'.split()
         subprocess.call(cmd, shell=False, cwd=taaco_dir, stdout=subprocess.DEVNULL)
         df = pd.read_csv(results_path, sep=',', header=0)
