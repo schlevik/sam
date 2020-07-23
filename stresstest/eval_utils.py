@@ -1,4 +1,6 @@
+import string
 from abc import abstractmethod, ABC
+from collections import defaultdict
 from typing import Dict, Iterable
 
 from scipy.stats import t
@@ -11,6 +13,7 @@ from string import digits
 from statsmodels.stats.proportion import proportion_confint
 
 from stresstest.classes import Entry
+from stresstest.util import sample_iter
 
 
 class EvalMetric(ABC):
@@ -105,3 +108,147 @@ def get_mean_var_ci_bernoulli(sample, alpha=0.05):
     lower, _ = proportion_confint(sum(sample), len(sample), alpha=alpha)
     mean = sum(sample) / len(sample)
     return mean, None, mean - lower
+
+
+def evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
+                          predictions_baseline, predictions_intervention, predictions_control):
+    longest_answer = max(len(b.answer.split()) for b in aligned_baseline + aligned_intervention)
+    em = EM(relaxed=True, max_length=longest_answer)
+    results_baseline = em(aligned_baseline, predictions_baseline)
+
+    # got it correct in first place
+    correct_before_intervention = [
+        (d, aligned_intervention[i], predictions_baseline[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+        in enumerate(aligned_baseline) if results_baseline[i] == 1
+    ]
+
+    results_intervention = em(aligned_intervention, predictions_intervention)
+
+    # changed prediction correctly in line with altered semantics
+    # model right -model changes prediction- model right
+    correct_change_correct = [
+        (d, aligned_intervention[i], predictions_baseline[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+        in enumerate(aligned_baseline) if results_baseline[i] == 1 and results_intervention[i] == 1
+    ]
+
+    # unimpressed: didn't change prediction although semantics dictated change
+    # model right -model keeps prediction- model wrong
+    correct_keep_wrong = [
+        (d, aligned_intervention[i], predictions_baseline[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+        in
+        enumerate(aligned_baseline) if
+        predictions_baseline[d.qa_id] ==
+        predictions_intervention[d.qa_id].replace("almost ", "").replace("nearly ", "")
+        and results_baseline[i]
+    ]
+
+    # confused: changed prediction when semantics dictated change but changed to wrong
+    # model right -model changes prediction- model wrong
+    correct_change_wrong = [
+        (d, aligned_intervention[i], predictions_baseline[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+        in
+        enumerate(aligned_baseline) if
+        predictions_baseline[d.qa_id] !=
+        predictions_intervention[d.qa_id].replace("almost ", "").replace("nearly ", "")
+        and results_baseline[i] and not results_intervention[i]
+    ]
+    # model wrong -model changes prediction- model right
+    wrong_change_right = [
+        (d, aligned_intervention[i], predictions_baseline[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+        in
+        enumerate(aligned_baseline) if
+        predictions_baseline[d.qa_id] !=
+        predictions_intervention[d.qa_id].replace("almost ", "").replace("nearly ", "")
+        and not results_baseline[i] and results_intervention[i]
+    ]
+    # model wrong -model keeps prediction- model right
+    wrong_keep_right = [
+        (d, aligned_intervention[i], predictions_baseline[d.qa_id], predictions_intervention[d.qa_id]) for i, d
+        in
+        enumerate(aligned_baseline) if
+        results_intervention[i] and not results_baseline[i] and
+        predictions_baseline[d.qa_id] == predictions_intervention[d.qa_id]
+    ]
+    if predictions_control:
+
+        results_control = em(aligned_control, predictions_control)
+        correct_baseline_control = [
+            (d, aligned_control[i], predictions_baseline[d.qa_id], predictions_control[d.qa_id]) for i, d
+            in enumerate(aligned_baseline) if results_baseline[i] == 1 and results_control[i] == 1
+        ]
+        correct_baseline_control_intervention = [
+            (d, aligned_intervention[i], aligned_control[i], predictions_baseline[d.qa_id],
+             predictions_intervention[d.qa_id], predictions_control[d.qa_id]) for i, d
+            in enumerate(aligned_baseline) if (results_baseline[i] == 1 and results_intervention[i] == 1
+                                               and results_control[i] == 1)
+        ]
+    else:
+        results_control = []
+        correct_baseline_control = []
+        correct_baseline_control_intervention = []
+    assert len(correct_before_intervention) > len(correct_change_correct)
+    assert len(correct_before_intervention) == len(correct_keep_wrong) + len(correct_change_wrong) + len(
+        correct_change_correct)
+    assert sum(results_intervention) == len(correct_change_correct) + len(wrong_change_right) + len(
+        wrong_keep_right), sum(results_intervention)
+    overall_results = []
+    if results_control:
+        for b, i, c in zip(results_baseline, results_intervention, results_control):
+            if b and c:
+                overall_results.append(1 if b + i == 2 else 0)
+    else:
+        for b, i in zip(results_baseline, results_intervention):
+            if b:
+                overall_results.append(1 if b + i == 2 else 0)
+
+    return (overall_results, results_baseline, results_intervention, results_control,
+            correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+            wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
+            )
+
+
+def align(baseline, intervention, control):
+    gold_flat = list(sample_iter(baseline))
+    gold_intervention_flat = list(sample_iter(intervention))
+    q_m_by_id = {m.qa_id: m for m in gold_intervention_flat}
+
+    if control:
+        gold_control_flat = list(sample_iter(control))
+        q_c_by_id = {c.qa_id: c for c in gold_control_flat}
+
+    else:
+        q_c_by_id = defaultdict(lambda: None)
+
+    aligned = [(b, q_m_by_id[b.qa_id], q_c_by_id[b.qa_id]) for b in gold_flat if b.qa_id in q_m_by_id]
+    aligned = [(b, m, c) for b, m, c in aligned if b.answer != m.answer]
+    aligned_baseline, aligned_intervention, aligned_control = zip(*aligned)
+    for b, i, c in aligned:
+        assert b.qa_id == i.qa_id
+    return aligned_baseline, aligned_intervention, aligned_control
+
+
+def split_and_eval_by_num_modifiers(baseline, intervention, control, pba, pia, pca, n):
+    aligned_n_mod = [(b, i, c) for b, i, c in zip(baseline, intervention, control) if
+                     i.qa['modification_data']['modification_distance'] == n]
+    baseline_n, intervention_n, control_n = zip(*aligned_n_mod)
+    overall, results_baseline = evaluate_intervention(baseline_n, intervention_n, control_n, pba, pia, pca)[:2]
+    mod_per_passage = \
+        sum(d.qa['modification_data']['modification_distance'] if d.qa['modification_data']['fill_with_modification']
+            else 1 for _, d, _ in aligned_n_mod) / len(aligned_n_mod)
+    return sum(overall) / len(overall), len(baseline_n), mod_per_passage, sum(results_baseline)/len(results_baseline)
+
+
+def split_and_eval_by_answer_type(baseline, intervention, control, pba, pia, pca):
+    at_numbers = [(b, i, c) for b, i, c in zip(baseline, intervention, control) if
+                  any(d in i.answer for d in string.digits)]
+    at_ne = [(b, i, c) for b, i, c in zip(baseline, intervention, control) if
+             not any(d in i.answer for d in string.digits)]
+    assert at_ne
+    assert at_numbers
+    assert len(at_ne) + len(at_numbers) == len(baseline)
+    overall_numbers = evaluate_intervention(*zip(*at_numbers), pba, pia, pca)[0]
+    overall_ne = evaluate_intervention(*zip(*at_ne), pba, pia, pca)[0]
+    return (
+        (sum(overall_numbers) / len(overall_numbers), len(at_numbers)),
+        (sum(overall_ne) / len(overall_ne), len(at_ne))
+    )

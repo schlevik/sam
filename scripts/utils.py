@@ -14,6 +14,7 @@ BASELINE = 'baseline'
 INTERVENTION = 'intervention'
 CONTROL = 'control'
 
+
 class Domain(click.ParamType):
     def convert(self, value, param, ctx):
         try:
@@ -123,3 +124,9 @@ def get_output_predictions_file_name(in_file, output_folder, weights_path=""):
     output_file_name = f"{output_base}{weights_addon}.json"
     output = os.path.join(output_folder, output_file_name)
     return output
+
+
+def get_baseline_intervention_control_from_baseline(baseline_file):
+    return (
+        baseline_file, baseline_file.replace(BASELINE, INTERVENTION), baseline_file.replace(BASELINE, CONTROL)
+    )

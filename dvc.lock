@@ -248,30 +248,32 @@ generate-football-modifier-ssq-retrieval-distinct-templates:
   - path: conf/modifier-ssq-retrieval-unique-actors.json
     md5: 28a244cf99f6915b8b4c74e914058ff4
   - path: scripts/generate_modifier.py
-    md5: 58580d97d4dda8fc5554a0f0b171734b
+    md5: fe0435e2c53c088b9cd5d03ee006d913
   - path: stresstest/football/football_generator.py
     md5: 569914abf2f024262f95e715ec97d7f3
   - path: stresstest/football/generate_with_modifier.py
-    md5: 70c689f9a006158cc67faf2575307be0
+    md5: ad87d16c86447d64b6716f53f6757fe6
   - path: stresstest/football/resources/team-names.json
     md5: 3fd4f35f3dd738849f12ec721b7cdaf0
-  - path: stresstest/football/resources/templates_modifier.py
-    md5: c4f0f0358818bad480e86efc2ce3e9ad
   - path: stresstest/generator.py
     md5: 427afdf6a9a1b06eedddcfd329602aa4
   - path: stresstest/generator_modifier.py
-    md5: 85262589763599cd7d3a87058e2f0af6
+    md5: 96d2639462ee7794f0dc31a689a74945
   - path: stresstest/realize.py
-    md5: 4b30854b75f5301995bf1cad7d5e304d
+    md5: cd91615f4f3c2c83a04731081e5fe431
   outs:
   - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
-    md5: b66baee321f996e27285e0c210891076
+    md5: de1fc61fa4f57492e14ed3831c0f7666
   - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
-    md5: 5256fcbfa9d6b4f3fd9ec45110757227
+    md5: cf1992492385e126981b6bc39fcc8889
+  - path: data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-0.json
+    md5: 0564303bf2651ead74d846e8d66b0c45
+  - path: data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-1.json
+    md5: 15b38d7350affb01d9183ceb431c209a
   - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
-    md5: 540313faddca1faaba4318afba74f4da
+    md5: 624f67b6e8f74b966ba0fcf178185b08
   - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
-    md5: b89012e018bc9120f93448881b3f18a0
+    md5: b09c84d0327f3308ebc3677654ff3b30
 combine-football-modifier-ssq-retrieval-for-training-distinct-templates:
   cmd: python main.py combine data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
     data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
@@ -374,3 +376,143 @@ predict-control-albert-football-modifier-ssq-retrieval:
     md5: c356fc98e0084d6f27f5ffc6b2543600
   - path: data/football/modifier/predictions/nbest-control-ssq-retrieval-40-50-albert-squad.json
     md5: 1f0ff3cddcdcc291e7677073fce94ea7
+align-and-subsample-football-modifier-ssq-retrieval-distinct-templates:
+  cmd: python main.py align --baseline data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
+    --intervention data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    --control data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-1.json
+    --out-folder data/football/modifier/train-distinct-templates/eval/ --subsample
+    2000 --seed 56
+  deps:
+  - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
+    md5: fad53d6b9050beb2e2877deb5cefb4a8
+  - path: data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-1.json
+    md5: a1552cc3a7e66b87d07dcef4ba06ce3d
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    md5: 0fad81456f22b76160adda8d5c94f99c
+  outs:
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-baseline-ssq-retrieval-40-full-1.json
+    md5: c9b48ea60d02be17c3452c989bd81e78
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-control-ssq-retrieval-40-full-1.json
+    md5: cca6029d7f3ced860130d55e8c06fe2f
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-intervention-ssq-retrieval-40-full-1.json
+    md5: e965dc14d9c10e178cd7ed6dfef83de5
+align-and-subsample-football-modifier-ssq-retrieval-distinct-templates-train-500:
+  cmd: python main.py align --baseline data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    --intervention data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    --control data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-0.json
+    --out-folder data/football/modifier/train-distinct-templates/train/ --subsample
+    500 --seed 56
+  deps:
+  - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-0.json
+    md5: de1fc61fa4f57492e14ed3831c0f7666
+  - path: data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-0.json
+    md5: 0564303bf2651ead74d846e8d66b0c45
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-0.json
+    md5: 624f67b6e8f74b966ba0fcf178185b08
+  - path: scripts/dataops.py
+    md5: 2fcc256ef3f48fce4fc39f0b2416fe88
+  outs:
+  - path: data/football/modifier/train-distinct-templates/train/aligned-500-baseline-ssq-retrieval-40-full-0.json
+    md5: 0bf23f3a78513856932c8abcb9c8c7d1
+  - path: data/football/modifier/train-distinct-templates/train/aligned-500-control-ssq-retrieval-40-full-0.json
+    md5: fd106aa8eaae1bb4677570413cbdf456
+  - path: data/football/modifier/train-distinct-templates/train/aligned-500-intervention-ssq-retrieval-40-full-0.json
+    md5: d331627f38fa0aab660a25f379e8d663
+align-and-subsample-football-modifier-ssq-retrieval-distinct-templates-eval:
+  cmd: python main.py align --baseline data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
+    --intervention data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    --control data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-1.json
+    --out-folder data/football/modifier/train-distinct-templates/eval/ --subsample
+    2000 --seed 56
+  deps:
+  - path: data/football/modifier/train-distinct-templates/baseline-ssq-retrieval-40-full-1.json
+    md5: cf1992492385e126981b6bc39fcc8889
+  - path: data/football/modifier/train-distinct-templates/control-ssq-retrieval-40-full-1.json
+    md5: 15b38d7350affb01d9183ceb431c209a
+  - path: data/football/modifier/train-distinct-templates/intervention-ssq-retrieval-40-full-1.json
+    md5: b09c84d0327f3308ebc3677654ff3b30
+  - path: scripts/dataops.py
+    md5: 2fcc256ef3f48fce4fc39f0b2416fe88
+  outs:
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-baseline-ssq-retrieval-40-full-1.json
+    md5: 6ce69e9e249566065040d9d48dfc6ceb
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-control-ssq-retrieval-40-full-1.json
+    md5: 2acbaa9dd39cd664d7ecd66a6157fea4
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-intervention-ssq-retrieval-40-full-1.json
+    md5: 65b7aac17ac20ab8a331cd716230fb30
+cache-albert-football-modifier-ssq-retrieval-distinct-templates-train-500:
+  cmd: python main.py cache-examples data/football/modifier/train-distinct-templates/train/aligned-500-baseline-ssq-retrieval-40-full-0.json
+    --out-folder data/football/modifier/albert-squad/distinct-templates-train-500/
+    --model-path models/albert-squad/ --num-workers 4
+  deps:
+  - path: data/football/modifier/train-distinct-templates/train/aligned-500-baseline-ssq-retrieval-40-full-0.json
+    md5: 0bf23f3a78513856932c8abcb9c8c7d1
+  - path: models/albert-squad/
+    md5: 8d09b19e15976988bb199e5928c67b3c.dir
+  - path: scripts/predict_transformers.py
+    md5: 03a79d8c267534723297f3d6872ea12b
+  outs:
+  - path: data/football/modifier/albert-squad/distinct-templates-train-500/aligned-500-baseline-ssq-retrieval-40-full-0-albert-squad.bin
+    md5: 29a9a32876f7d8dbd8e3b76b0f0a4b77
+cache-albert-football-modifier-ssq-retrieval-distinct-templates-eval:
+  cmd: python main.py cache-examples data/football/modifier/train-distinct-templates/eval/aligned-2000-baseline-ssq-retrieval-40-full-1.json
+    data/football/modifier/train-distinct-templates/eval/aligned-2000-intervention-ssq-retrieval-40-full-1.json
+    data/football/modifier/train-distinct-templates/eval/aligned-2000-control-ssq-retrieval-40-full-1.json
+    --out-folder data/football/modifier/albert-squad/distinct-templates-eval/ --model-path
+    models/albert-squad/ --num-workers 4 --evaluate --do-lower-case
+  deps:
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-baseline-ssq-retrieval-40-full-1.json
+    md5: 6ce69e9e249566065040d9d48dfc6ceb
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-control-ssq-retrieval-40-full-1.json
+    md5: 2acbaa9dd39cd664d7ecd66a6157fea4
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-intervention-ssq-retrieval-40-full-1.json
+    md5: 65b7aac17ac20ab8a331cd716230fb30
+  - path: models/albert-squad/
+    md5: 8d09b19e15976988bb199e5928c67b3c.dir
+  - path: scripts/predict_transformers.py
+    md5: 13e1684ab0c30ab518c79fe89ab7912d
+  outs:
+  - path: data/football/modifier/albert-squad/distinct-templates-eval/aligned-2000-baseline-ssq-retrieval-40-full-1-albert-squad.bin
+    md5: cd88a37ea21d646e8eac2beeb802b138
+  - path: data/football/modifier/albert-squad/distinct-templates-eval/aligned-2000-control-ssq-retrieval-40-full-1-albert-squad.bin
+    md5: abe8430c6ab3f72d36e01cfb57b5ec7e
+  - path: data/football/modifier/albert-squad/distinct-templates-eval/aligned-2000-intervention-ssq-retrieval-40-full-1-albert-squad.bin
+    md5: 0db95b30efc81831a1bd2c8c3c88491d
+cache-bert-base-football-modifier-ssq-retrieval-distinct-templates-train-500:
+  cmd: python main.py cache-examples data/football/modifier/train-distinct-templates/train/aligned-500-baseline-ssq-retrieval-40-full-0.json
+    --out-folder data/football/modifier/bert.base-squad/distinct-templates-train-500/
+    --model-path models/bert.base-squad/ --num-workers 4 --do-lower-case
+  deps:
+  - path: data/football/modifier/train-distinct-templates/train/aligned-500-baseline-ssq-retrieval-40-full-0.json
+    md5: 0bf23f3a78513856932c8abcb9c8c7d1
+  - path: models/bert.base-squad/
+    md5: c01df288a2ec06170b06988e196eabfd.dir
+  - path: scripts/predict_transformers.py
+    md5: 13e1684ab0c30ab518c79fe89ab7912d
+  outs:
+  - path: data/football/modifier/bert.base-squad/distinct-templates-train-500/aligned-500-baseline-ssq-retrieval-40-full-0-bert.base-squad.bin
+    md5: 241bd1bcbccd6692156b966e471dd4a3
+cache-bert-base-football-modifier-ssq-retrieval-distinct-templates-eval:
+  cmd: python main.py cache-examples data/football/modifier/train-distinct-templates/eval/aligned-2000-baseline-ssq-retrieval-40-full-1.json
+    data/football/modifier/train-distinct-templates/eval/aligned-2000-intervention-ssq-retrieval-40-full-1.json
+    data/football/modifier/train-distinct-templates/eval/aligned-2000-control-ssq-retrieval-40-full-1.json
+    --out-folder data/football/modifier/bert.base-squad/distinct-templates-eval/ --model-path
+    models/bert.base-squad/ --num-workers 4 --evaluate --do-lower-case
+  deps:
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-baseline-ssq-retrieval-40-full-1.json
+    md5: 6ce69e9e249566065040d9d48dfc6ceb
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-control-ssq-retrieval-40-full-1.json
+    md5: 2acbaa9dd39cd664d7ecd66a6157fea4
+  - path: data/football/modifier/train-distinct-templates/eval/aligned-2000-intervention-ssq-retrieval-40-full-1.json
+    md5: 65b7aac17ac20ab8a331cd716230fb30
+  - path: models/bert.base-squad/
+    md5: c01df288a2ec06170b06988e196eabfd.dir
+  - path: scripts/predict_transformers.py
+    md5: 13e1684ab0c30ab518c79fe89ab7912d
+  outs:
+  - path: data/football/modifier/bert.base-squad/distinct-templates-eval/aligned-2000-baseline-ssq-retrieval-40-full-1-bert.base-squad.bin
+    md5: 61ebd69f44de083691d18b96e3804938
+  - path: data/football/modifier/bert.base-squad/distinct-templates-eval/aligned-2000-control-ssq-retrieval-40-full-1-bert.base-squad.bin
+    md5: 97142259f9a4f29f752c92ea553baa60
+  - path: data/football/modifier/bert.base-squad/distinct-templates-eval/aligned-2000-intervention-ssq-retrieval-40-full-1-bert.base-squad.bin
+    md5: 8de7f4ce9b5931e131aa3030139e96a8

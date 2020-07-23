@@ -24,6 +24,7 @@ def squad(dataset):
 
 
 def match_answer_in_paragraph(qa, datum):
+    # TODO: rather return all mathches in the whole paragraph
     if len(qa['evidence']) > 1:
         raise NotImplementedError("For now works only with SSQ retrieval type questions!")
     answer = qa['answer']
