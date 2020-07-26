@@ -2,7 +2,7 @@ from loguru import logger
 from stresstest.football import FootballGenerator
 from stresstest.football.classes import FootballWorld
 from stresstest.generator_modifier import ModifierGenerator
-from stresstest.util import fmt_dict
+from stresstest.planned_generator import PlannedModifierGenerator
 
 
 class FootballModifierGenerator(FootballGenerator, ModifierGenerator):
@@ -35,3 +35,18 @@ class FootballModifierGenerator(FootballGenerator, ModifierGenerator):
                          )
 
         logger.debug(f"{FootballModifierGenerator.__name__} finish constructor")
+
+
+class PlannedFootballModifierGenerator(FootballGenerator, PlannedModifierGenerator):
+
+
+    def __init__(
+            self,
+            config,
+            event_plan,
+            modifier_type,
+            get_world=FootballWorld,
+            team_names: str = 'stresstest/football/resources/team-names.json'
+    ):
+        super().__init__(config=config, get_world=get_world, team_names=team_names, event_plan=event_plan,
+                         modifier_type=modifier_type)

@@ -497,8 +497,8 @@ class Realizer:
             logger.debug("...done!")
 
         logger.debug(f"Final sentence is: {ctx.realized}")
-
-        return " ".join(self.post_process(ctx.realized))
+        # normalise space
+        return " ".join(" ".join(self.post_process(ctx.realized)).split())
 
     vocals = "aeiou"
 
@@ -508,26 +508,36 @@ class Realizer:
         result = []
         for i, (prev_token, token, next_token) in \
                 enumerate(zip_longest([""] + tokens[:-1], tokens, tokens[1:], fillvalue="")):
-
             prev_prev_token = tokens[i - 2] if i >= 2 else ""
             # capitalise
             if i == 0:
                 token = token[0].upper() + token[1:]
-
+            if token == '1' and next_token == 'th':
+                try:
+                    if tokens[i + 2] == 'to' and tokens[i + 3] == 'last':
+                        token = ''
+                except IndexError:
+                    pass
+            if next_token == 'last' and token == 'to' and prev_token == 'th' and prev_prev_token == '1':
+                token = ''
             if (token == 'a' or token == 'A') and len(next_token) > 0 and next_token[0] in self.vocals:
                 token = token + "n"
             elif token == 'into' and next_token == 'between':
                 token = 'in'
             elif token == 'th' and prev_token == '1':
                 token = 'st'
+                try:
+                    if next_token == 'to' and tokens[i + 2] == 'last':
+                        token = ''
+                except IndexError:
+                    pass
             elif token == 'th' and prev_token == '2':
                 token = 'nd'
             elif token == 'th' and prev_token == '3':
                 token = 'rd'
-            # prev_prev_prev_token = tokens[i - 3] if i >= 3 else ""
-            # TODO: well that's a bit hack-y
-            elif prev_token == 'to' and (
-                    token.endswith("ed") or token.endswith("ing") or tenses(token)[0][0] == 'past'):
+            elif prev_token == 'to' \
+                    and (token.endswith("ed") or token.endswith("ing") or
+                         tenses(token) and tenses(token)[0][0] == 'past'):
                 token = lemmatizer.lemmatize(token, 'v')
             elif prev_token == 'in' or prev_token == 'from' and (any(t[0] == 'past' for t in tenses(token))):
                 # VERY HACKY
@@ -562,12 +572,12 @@ class Realizer:
             logger.debug(f"Answer: {answer}, Evidence: {question.evidence}")
             candidate_sentences = [passage[i] for i in question.evidence]
             candidate_spans = []
-            for candidate_sentence in candidate_sentences:
+            for idx, candidate_sentence in enumerate(candidate_sentences):
                 tokens = candidate_sentence.split()
                 logger.debug(f"Evidence tokens: {tokens}")
-                answer_position = next((i for i, token in enumerate(tokens) if str(token) == str(answer)), None)
-                logger.debug(f"Answer found in evidence: {answer_position}")
-                if answer_position:
+                answer_positions = [i for i, token in enumerate(tokens) if str(token) == str(answer)]
+                for answer_position in answer_positions:
+                    logger.debug(f"Answer found in evidence {idx}: {answer_position}")
                     unit_found = False
                     i = 0
                     while not unit_found:
@@ -575,6 +585,7 @@ class Realizer:
                             if tokens[answer_position + i].startswith(unit):
                                 candidate_spans.append(tokens[answer_position:answer_position + i + 1])
                                 unit_found = True
+                                logger.debug(f"Unit found in evidence {idx}: {answer_position + i}!")
                             if tokens[answer_position - i].startswith(unit):
                                 candidate_spans.append(tokens[answer_position - i:answer_position + 1])
                                 unit_found = True
@@ -582,6 +593,7 @@ class Realizer:
                         except IndexError:
                             break
             shortest_answer = sorted(candidate_spans, key=len)[0]
+            logger.debug(f"Shortest answer found: {shortest_answer}")
             new_answers.append(shortest_answer)
         new_answers = [' '.join(answer) for answer in new_answers]
         return new_answers if isinstance(question.answer, list) else new_answers[0]
@@ -590,9 +602,16 @@ class Realizer:
         self.processor.chooser = RandomChooser()
         logger.debug(f"Question: {q}")
         try:
-            template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()
+            # first see if there's a reasoning key
+            template, template_nr = self.question_templates[q.type][q.target][q.reasoning][q.event_type].random()
         except KeyError:
-            return None
+            try:
+                # if not, try without reasoning
+                template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()
+            except KeyError:
+                # if still not: ¯\_(ツ)_/¯
+                return None
+        logger.debug(f'Template: {template}')
         question_words = []
         template.reverse()
         stack = template
@@ -616,8 +635,8 @@ class Realizer:
             else:
                 question_words.append(word)
         logger.debug(question_words)
-        q.realized = " ".join(self.post_process(question_words)) + "?"
+        q.realized = " ".join(" ".join(self.post_process(question_words)).split()) + "?"
         answer = self._fix_units(q, passage)
         q.answer = answer
 
-        return " ".join(self.post_process(question_words)) + "?", q.answer
+        return q.realized, q.answer

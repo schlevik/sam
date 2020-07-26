@@ -4,6 +4,7 @@ import random
 import re
 from collections import namedtuple
 from copy import deepcopy
+from dataclasses import dataclass, field
 from typing import Iterable, TypeVar, Mapping, Dict, Any, Optional, Union, List, Iterator, Tuple, Callable
 
 from loguru import logger
@@ -252,9 +253,12 @@ class World(DataObjectMixin):
 
 class Bundle(DataObjectMixin):
     generator: Any
-    #templates: Dict[str, Any]
+    planned_generator: Any
+    # templates: Dict[str, Any]
     generator_modifier: Any
     templates_modifier: Dict[str, Any]
+    reasoning_map: Dict[str, str]
+    has_template_attribute: Callable[[str, str], str]
     world: World
 
 
@@ -354,3 +358,40 @@ class Model:
     @classmethod
     def make(cls, path, gpu=False):
         ...
+
+
+# @dataclass(frozen=True)
+# class QuestionPlan:
+#     type: QuestionTypes
+#     event_type: str
+#     target: str
+#     reasoning: 'Reasoning'
+#     question_data: Dict[str, Any]
+#     to_question: Callable[[List[Event], str, bool], Question]
+
+
+@dataclass(frozen=True)
+class EventPlan:
+    num_modifications: int
+    modification_distance: int
+    first_modification: int
+    modify_event_type: str
+    question_target: str
+    event_types: Tuple[str]
+    must_haves: List[str]
+    reasoning_type: 'Reasoning'
+    to_question: Callable[[List[Event], bool], Question] = field(repr=False, compare=False)
+    # question_plan: QuestionPlan
+
+    JUST: str = field(default='just', init=False, repr=False, compare=False)
+    ANY: str = field(default='any', init=False, repr=False, compare=False)
+    NOT: str = field(default='not', init=False, repr=False, compare=False)
+    MOD: str = field(default='modified', init=False, repr=False, compare=False)
+
+
+@dataclass
+class Reasoning:
+    name: str
+    cardinality_event_plans: Callable[[int], int] = field(repr=False, compare=False)
+    questions_per_event_plan: int
+    generate_all_event_plans: Callable[[int, str, List[str]], List[EventPlan]] = field(repr=False, compare=False)

@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Dict, List, Tuple, Optional, Callable, Any
 from loguru import logger
 
-from stresstest.classes import Choices, Event, World, Question, QuestionTypes, ReasoningTypes, Config, YouIdiotException
+from stresstest.classes import Choices, Event, World, Question, QuestionTypes, ReasoningTypes
 from stresstest.util import fmt_dict
 
 
@@ -88,12 +88,15 @@ class StoryGenerator(ABC):
         logger.debug("Done!")
         self.sentences.append(self.current_event)
 
-    def generate_story(self) -> List[Event]:
+    def generate_story(self, return_world=False) -> List[Event]:
         self.set_world()
         self.sentences: List[Event] = []
         for i in range(self.world['num_sentences']):
             self.generate_sentence(i)
-        return self.sentences
+        if return_world:
+            return self.sentences, self.world
+        else:
+            return self.sentences
 
     @abstractmethod
     def do_set_world(self):

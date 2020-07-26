@@ -3,7 +3,10 @@ from typing import Tuple, List
 
 from stresstest.classes import Config, Question, Bundle
 from stresstest.football import bundle
+from stresstest.generate_utils import generate_and_realise
 from stresstest.realize import Realizer
+from stresstest.reasoning import retrieval, retrieval_reverse
+from stresstest.reasoning.retrieval_two import retrieval_two_reverse, retrieval_two
 from stresstest.util import highlight
 
 
@@ -82,12 +85,12 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
     elif isinstance(cfg, dict):
         cfg = Config(cfg)
     cfg.pprint()
-    #if modifier:
+    # if modifier:
     g_class = bundle.generator_modifier
     templates = bundle.templates_modifier
-    #else:
-        #g_class = bundle.generator
-        # templates = bundle.templates
+    # else:
+    # g_class = bundle.generator
+    # templates = bundle.templates
     generator_kwargs = generator_kwargs or {}
     generator = g_class(cfg, **generator_kwargs)
     events = generator.generate_story()
@@ -136,3 +139,12 @@ def showcase(given_bundle=None, n=0):
         # ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
         print(story[0])
         # print_out(story, [])
+
+
+def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_type='RB', max_sents=5, max_modifier=3,
+                            config=None, per_modify_distance_per_reasoning=1):
+    config = config or {"world.num_sents": max_sents, 'unique_actors': True}
+    reasonings = [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse]
+    return generate_and_realise(bundle, config, modify_event_type, modifier_type, max_sents,
+                                per_modify_distance_per_reasoning,
+                                reasonings, max_modifiers=max_modifier, num_workers=11)
