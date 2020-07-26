@@ -142,9 +142,9 @@ def showcase(given_bundle=None, n=0):
 
 
 def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_type='RB', max_sents=5, max_modifier=3,
-                            config=None, per_modify_distance_per_reasoning=1):
+                            config=None, per_modify_distance_per_reasoning=1, reasonings=None, num_workers=1):
     config = config or {"world.num_sents": max_sents, 'unique_actors': True}
-    reasonings = [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse]
+    reasonings = reasonings or [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse]
     return generate_and_realise(bundle, config, modify_event_type, modifier_type, max_sents,
                                 per_modify_distance_per_reasoning,
-                                reasonings, max_modifiers=max_modifier, num_workers=11)
+                                reasonings, max_modifiers=max_modifier, num_workers=num_workers)
