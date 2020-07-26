@@ -360,16 +360,6 @@ class Model:
         ...
 
 
-# @dataclass(frozen=True)
-# class QuestionPlan:
-#     type: QuestionTypes
-#     event_type: str
-#     target: str
-#     reasoning: 'Reasoning'
-#     question_data: Dict[str, Any]
-#     to_question: Callable[[List[Event], str, bool], Question]
-
-
 @dataclass(frozen=True)
 class EventPlan:
     num_modifications: int
@@ -380,7 +370,7 @@ class EventPlan:
     event_types: Tuple[str]
     must_haves: List[str]
     reasoning_type: 'Reasoning'
-    to_question: Callable[[List[Event], bool], Question] = field(repr=False, compare=False)
+    to_question: Callable[[List[Event], bool, Any], Question] = field(repr=False, compare=False)
     # question_plan: QuestionPlan
 
     JUST: str = field(default='just', init=False, repr=False, compare=False)

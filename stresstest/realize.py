@@ -221,12 +221,13 @@ class Processor:
         # self.context['stack'].extend(new_words)
         return new_words
 
-    def process_function(self, word):
+    def process_function(self, word, args=None):
+        args = args or self.context
         logger.debug("...Word is a function !...")
         # get and execute
         func = self.accessor.access_bang(word[1:])
         # new_words = str(func(self.context)).split()
-        new_words = self.chooser.choose(lambda: func(self.context))
+        new_words = self.chooser.choose(lambda: func(args))
         logger.debug(f"... new words: {new_words}")
         self.context.current_choices.append((word, new_words))
         # self.context['stack'].extend(new_words[::-1])
@@ -598,7 +599,7 @@ class Realizer:
         new_answers = [' '.join(answer) for answer in new_answers]
         return new_answers if isinstance(question.answer, list) else new_answers[0]
 
-    def realise_question(self, q: Question, passage: List[str]):
+    def realise_question(self, q: Question, passage: List[str], ignore_missing_keys=True):
         self.processor.chooser = RandomChooser()
         logger.debug(f"Question: {q}")
         try:
@@ -610,7 +611,11 @@ class Realizer:
                 template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()
             except KeyError:
                 # if still not: ¯\_(ツ)_/¯
-                return None
+                if ignore_missing_keys:
+                    return None
+                else:
+                    raise YouIdiotException(f"Question templates are missing the key "
+                                            f"{'.'.join([q.type, q.target, q.reasoning, q.event_type])}")
         logger.debug(f'Template: {template}')
         question_words = []
         template.reverse()
@@ -631,7 +636,9 @@ class Realizer:
                 except KeyError:
                     raise NotImplementedError(f"{word} is not in question data!")
                 stack.append(str(new_word))
-
+            elif word.startswith("!"):
+                new_words = self.processor.process_function(word, args=q.question_data)
+                stack.extend(new_words[::-1])
             else:
                 question_words.append(word)
         logger.debug(question_words)

@@ -48,7 +48,9 @@ def _reload_bundle() -> Bundle:
             'retrieval': ['time', 'distance', 'coactor'],
             'retrieval-reverse': ['time', 'distance', 'coactor'],
             'retrieval-two': ['time', 'distance', 'coactor'],
-            'retrieval-two-reverse': ['time', 'distance', 'coactor']
+            'retrieval-two-reverse': ['time', 'distance', 'coactor'],
+            'bridge': ['time', 'distance', 'coactor'],
+            'bridge-reverse': ['time', 'distance', 'coactor']
         },
         has_template_attribute=_has
     )

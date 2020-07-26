@@ -32,18 +32,20 @@ def generate_and_realise(bundle, config, modify_event_type, modifier_type, max_s
         seeds = [random.randint(0, sys.maxsize) for _ in result]
     else:
         seeds = [None for _ in result]
-    realized = Parallel(num_workers)(
-        (delayed(_do_realize)
-         (config, event_plan, events, modifier_type,
-          template_choices, templates, world, seed)
-         ) for (event_plan, events, template_choices, world), seed in
-        zip(tqdm(result, desc='Realising...', disable=mute), seeds))
-    # extract as a function and do parallel as well
-    # for event_plan, events, template_choices, world in tqdm(result, desc='Realising...', disable=mute):
-    #     baseline_story, mqs, qs, story = _do_realize(config, event_plan, events, modifier_type,
-    #                                                  template_choices, templates, world)
-    #     # do control
-    #     realized.append((events, story, mqs, baseline_story, qs, event_plan, template_choices))
+    if num_workers > 1:
+        realized = Parallel(num_workers)(
+            (delayed(_do_realize)
+             (config, event_plan, events, modifier_type,
+              template_choices, templates, world, seed)
+             ) for (event_plan, events, template_choices, world), seed in
+            zip(tqdm(result, desc='Realising...', disable=mute), seeds))
+    else:
+        realized = [
+            _do_realize(
+                config, event_plan, events, modifier_type,
+                template_choices, templates, world, seed
+            ) for (event_plan, events, template_choices, world), seed in
+            zip(tqdm(result, desc='Realising...', disable=mute), seeds)]
     return [(*z1, *z2) for z1, z2 in zip(result, realized)]
 
 
@@ -64,13 +66,14 @@ def _do_realize(config, event_plan, events, modifier_type, template_choices, tem
     # this is for single span extraction only atm
     qs = generator_instance.generate_questions_from_plan(event_plan, events)[0]
     mqs = generator_instance.generate_questions_from_plan(event_plan, events, True)[0]
+
     for q, mq in zip(qs, mqs):
         try:
-            realizer.realise_question(q, story)
+            realizer.realise_question(q, story, ignore_missing_keys=False)
         except IndexError as e:
             print(f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}")
-
         mq.realized = q.realized
+        assert mq.realized, f"{mq}\n{story}"
         try:
             mq.answer = realizer._fix_units(mq, story)
         except IndexError as e:
@@ -107,11 +110,19 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                         eps.append(random.choice(eps))
 
                 seeds = [random.randint(0, sys.maxsize) for _ in eps]
-                stories_and_worlds = Parallel(num_workers)(
-                    delayed(_do_generate)(
-                        PlannedFootballModifierGenerator, config=config,
-                        modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
-                    for ep, seed in zip(eps, seeds))
+                if num_workers > 1:
+                    stories_and_worlds = Parallel(num_workers)(
+                        delayed(_do_generate)(
+                            PlannedFootballModifierGenerator, config=config,
+                            modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
+                        for ep, seed in zip(eps, seeds))
+                else:
+                    stories_and_worlds = [
+                        _do_generate(
+                            PlannedFootballModifierGenerator, config=config,
+                            modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
+                        for ep, seed in zip(eps, seeds)
+                    ]
                 stories, worlds = zip(*stories_and_worlds)
                 for story, ep in zip(stories, eps):
                     template_choice = generate_one_possible_template_choice(
