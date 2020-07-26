@@ -61,7 +61,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
                 else:
                     evidence = [i for i, m in enumerate(ets) if m == non_modified or m == modified][:2]
             assert len(evidence) == 2
-            answer = events[evidence[-1]]['actor'] if not reverse else events[evidence[0]]['actor']
+            answer = events[evidence[-1]].actor if not reverse else events[evidence[0]].actor
             return Question(
                 type=QuestionTypes.DIRECT,
                 target='actor',
@@ -99,7 +99,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
                         evidence = [i for i, m in enumerate(ets) if m == non_modified or m == modified][-2:]
                     else:
                         evidence = [i for i, m in enumerate(ets) if m == non_modified or m == modified][:2]
-                answer = events[evidence[-1]]['attributes'][attr] if not reverse else events[evidence[0]]['attributes'][
+                answer = events[evidence[-1]].attributes[attr] if not reverse else events[evidence[0]].attributes[
                     attr]
                 return Question(
                     type=QuestionTypes.DIRECT,

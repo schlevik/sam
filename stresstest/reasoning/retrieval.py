@@ -60,42 +60,16 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
     non_modified = (EventPlan.JUST, modify_event_type)
     # fill_with_modifications = [True, False]
     event_plans: List[EventPlan] = []
-    # first_modifications = list(range(max_sents - 1))
-    # logger.debug(f"First modification to appear in: {first_modifications}")
-    # for first_modification in first_modifications:
-    #     for fill_with_modification in fill_with_modifications:
-    #         modification_distances = range(1, max_sents - first_modification)
-    #         for modification_distance in modification_distances:
-    #             modification_data = {
-    #                 'first_modification': first_modification,
-    #                 'fill_with_modification': fill_with_modification,
-    #                 # 'modify_event_type': modify_event_type,
-    #                 'modification_distance': modification_distance,
-    #             }
     for first_modification, fill_with_modification, modification_distance in get_modification_data(max_sents):
-        # logger.debug(json.dumps(modification_data, indent=4))
-        # event_types = [either] * max_sents
-        # event_types[first_modification] = modified
-        # event_types[first_modification + modification_distance] = non_modified
-        # for i in range(1, modification_distance):
-        #     event_types[first_modification + i] = modified if fill_with_modification else other
-        # for i in range(first_modification):
-        #     event_types[i] = other
-        # logger.debug(event_types)
-        # if reverse:
-        #     event_types = event_types[::-1]
         event_types = get_event_types(modify_event_type, max_sents, first_modification, fill_with_modification,
                                       modification_distance, reverse)
 
-        # if modification distance == 1 then there's nothing to fill so they become identical
-        # if modification_distance > 1 or fill_with_modification:
-        # python closures are python closures
         def to_question(events, is_modified, generator, fm=first_modification, md=modification_distance):
             if reverse:
                 evidence = len(events) - 1 - (fm if not is_modified else fm + md)
             else:
                 evidence = fm if not is_modified else fm + md
-            answer = events[evidence]['actor']
+            answer = events[evidence].actor
             return Question(
                 type=QuestionTypes.DIRECT,
                 target='actor',
@@ -127,7 +101,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
                     evidence = len(events) - 1 - (fm if not is_modified else fm + md)
                 else:
                     evidence = fm if not is_modified else fm + md
-                answer = events[evidence]['attributes'][attr]
+                answer = events[evidence].attributes[attr]
                 return Question(
                     type=QuestionTypes.DIRECT,
                     target=attr,

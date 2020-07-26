@@ -79,7 +79,7 @@ class Accessor:
         for k in word.split("."):
             try:
                 n = n[k]
-            except KeyError:
+            except (KeyError, TypeError) as _:
                 n = getattr(n, k)
                 if not n:
                     raise NotImplementedError()

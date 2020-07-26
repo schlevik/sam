@@ -201,106 +201,49 @@ class YouIdiotException(Exception):
     ...
 
 
-class DataObjectMixin(Mapping):
-    def __iter__(self) -> Iterator:
-        return iter(self.__dict__)
-
-    def __len__(self) -> int:
-        return len(self.__dict__)
-
-    def _get_annotations(self):
-        annotations = dict(self.__annotations__)
-        classes = [c for c in inspect.getmro(self.__class__)]
-        classes = classes[:classes.index(DataObjectMixin)]
-        for base_class in classes:
-            annotations.update(base_class.__annotations__)
-        return annotations
-
-    def __init__(self, *args, **kwargs):
-        annotations = self._get_annotations()
-
-        for a, k in zip(args, annotations.keys()):
-            setattr(self, k, a)
-        for k, v in kwargs.items():
-            if k not in annotations:
-                raise YouIdiotException(f"You tried to create {self.__class__} with constructor {k}, but it's not in"
-                                        f" it's annotations! ({list(self.__annotations__.keys())})")
-            setattr(self, k, v)
-        for k in annotations.keys():
-            if k not in self.__dict__:
-                setattr(self, k, None)
-
-    def __getitem__(self, item):
-        try:
-            return self.__dict__[item]
-        except KeyError:
-            raise YouIdiotException(f"{self.__class__.__name__} doesn't have attribute {item}!")
-
-    def __hash__(self):
-        return hash(tuple(self.__dict__.items()))
-
-    def __repr__(self):
-        attrs = ", ".join(f"{k}={self[k]}" for k in self._get_annotations())
-        return f"{self.__class__.__name__}({attrs})"
-
-
 Entry = namedtuple("Entry", ["id", "passage", "qa_id", "question", "answer", "qa"])
 
 
-class World(DataObjectMixin):
-    num_sentences: int
+@dataclass
+class World:
+    num_sentences: int = None
 
 
-class Bundle(DataObjectMixin):
+@dataclass
+class Bundle:
     generator: Any
     planned_generator: Any
     # templates: Dict[str, Any]
     generator_modifier: Any
     templates_modifier: Dict[str, Any]
-    reasoning_map: Dict[str, str]
-    has_template_attribute: Callable[[str, str], str]
-    world: World
+    reasoning_map: Dict[str, List[str]]
+    has_template_attribute: Callable[[str, Union[str, List[str]]], str]
+    world: Callable[[Any], World]
 
 
-class Event(DataObjectMixin):
+@dataclass
+class Event:
     sentence_nr: int
-    event_type: str
-    attributes: Dict[str, Union[str, Any]]
-    actor: Any
-    cause: Optional[str]
-    effect: Optional[str]
-    modes: List[Tuple[str, str]]
-    features: List[str]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.cause = None
-        self.effect = None
-        self.modes = []
-        self.features = []
-
-    def __getitem__(self, item):
-        return self.__dict__[item]
-
-    def __repr__(self):
-        return (f"{self.event_type} by {self.actor.get('id', '')}: with {self.attributes}, "
-                f"caused by {self.cause} resulting in {self.effect}. "
-                f"Modes: {self.modes}, Features: {self.features}")
+    event_type: str = None
+    attributes: Dict[str, Union[str, Any]] = None
+    actor: Any = None
+    features: List[str] = field(default_factory=list)
 
 
-class Context(DataObjectMixin):
-    world: World
-    sentences: List[Event]
-    chosen_templates: List[Tuple[str, int]]
-    visits: Dict[int, List[str]]
-    sent: Event
-    realized: List[str]
-    choices: List[List[Tuple[str, Any]]]
-    stack: List[str]
-    word: str
-    other: Dict[str, Any]
-    realizer: Any
-    sent_nr: int
+@dataclass
+class Context:
+    world: World = None
+    sentences: List[Event] = field(default_factory=list)
+    chosen_templates: List[Tuple[str, int]] = None
+    visits: Dict[int, List[str]] = field(default_factory=dict)
+    sent: Event = None
+    realized: List[str] = field(default_factory=list)
+    choices: List[List[Tuple[str, Any]]] = field(default_factory=list)
+    stack: List[str] = field(default_factory=list)
+    word: str = None
+    other: Dict[str, Any] = field(default_factory=dict)
+    realizer: Any = None
+    sent_nr: int = None
 
     @property
     def current_choices(self) -> List[Tuple[str, Any]]:
@@ -319,21 +262,16 @@ class ReasoningTypes:
     OrderingHard = 'ordering-hard'  # order of appearance != actual order (e.g. "x, but before that y" => y < x)
 
 
-class Question(DataObjectMixin):
+@dataclass
+class Question:
     type: str
     target: str
     evidence: List[int]
     event_type: str
-    reasoning: Optional[str]  # something like retrieval, counting, etc
-    question_data: Dict[str, Any]
+    reasoning: str  # something like retrieval, counting, etc
     answer: str
-    realized: Optional[str]
-
-    def __init__(self, *args, **kwargs):
-        self.question_data = {}
-        self.reasoning = None
-        self.realized = None
-        super().__init__(*args, **kwargs)
+    question_data: Dict[str, Any] = field(default_factory=dict)
+    realized: Optional[str] = None
 
 
 class Model:

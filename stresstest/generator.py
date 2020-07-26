@@ -91,7 +91,7 @@ class StoryGenerator(ABC):
     def generate_story(self, return_world=False) -> List[Event]:
         self.set_world()
         self.sentences: List[Event] = []
-        for i in range(self.world['num_sentences']):
+        for i in range(self.world.num_sentences):
             self.generate_sentence(i)
         if return_world:
             return self.sentences, self.world
