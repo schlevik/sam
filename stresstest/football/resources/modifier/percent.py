@@ -1,19 +1,22 @@
-def _current_sentence(ctx):
-    return ctx['sent']
+from stresstest.classes import Context, Event
 
 
-def _last_sentence(ctx):
-    return ctx['sentences'][ctx['sent_nr'] - 1]
+def _current_sentence(ctx: Context) -> Event:
+    return ctx.sent
 
 
-def _is_contrastive_or_matchstart(ctx):
-    if ctx['sent_nr'] == 0:
+def _last_sentence(ctx: Context) -> Event:
+    return ctx.sentences[ctx.sent_nr - 1]
+
+
+def _is_contrastive_or_matchstart(ctx: Context):
+    if ctx.sent_nr == 0:
         return 'matchstart'
     # self last sentence in contrast to current sentence
     last_sentence = _last_sentence(ctx)
     current_sentence = _current_sentence(ctx)
     if last_sentence.event_type == current_sentence.event_type:
-        if last_sentence.actor['team'] == current_sentence.actor['team']:
+        if last_sentence.actor.team == current_sentence.actor.team:
             return 'supportive'
         else:
             return 'contrastive'

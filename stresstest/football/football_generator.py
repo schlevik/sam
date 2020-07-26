@@ -75,22 +75,22 @@ class FootballGenerator(StoryGenerator):
                 "id": f"player{i}",
                 "first": names.get_first_name(self.world.gender),
                 "last": names.get_last_name(),
-                'team': self.world['teams'][0],
+                'team': self.world.teams[0],
                 "position": self.POSITIONS.random()
             })
             p2 = Player(**{
                 "id": f"player{i + num_players}",
                 "first": names.get_first_name(self.world.gender),
                 "last": names.get_last_name(),
-                'team': self.world['teams'][1],
+                'team': self.world.teams[1],
                 "position": self.POSITIONS.random()
             })
             self.world.players.extend((p1, p2))
-            self.world.players_by_id[p1['id']] = p1
-            self.world.players_by_id[p2['id']] = p2
+            self.world.players_by_id[p1.id] = p1
+            self.world.players_by_id[p2.id] = p2
 
     def get_actor_choices(self) -> Choices:
-        return Choices(self.world['players'])
+        return Choices(self.world.players)
 
     def filter_attributes(self, choices):
         if self.current_event.event_type == 'foul':
@@ -119,8 +119,8 @@ class FootballGenerator(StoryGenerator):
 
         if name == 'coactor':
             logger.debug(f"Chosen Actors: {[a.id for a in self.chosen_actors]}")
-            own_team = Choices(p for p in self.world['players'] if p['team'] != self.current_event.actor['team'])
-            other_team = Choices(p for p in self.world['players'] if p['team'] == self.current_event.actor['team'])
+            own_team = Choices(p for p in self.world.players if p.team != self.current_event.actor.team)
+            other_team = Choices(p for p in self.world.players if p.team == self.current_event.actor.team)
             if self.current_event.event_type == 'foul':
                 if self.unique_coactors:
                     remaining_pool = other_team - self.chosen_actors
@@ -144,8 +144,8 @@ class FootballGenerator(StoryGenerator):
 
     def post_process_attribute_answers(self, attribute_name, attribute_value):
         if attribute_name == 'coactor':
-            return " ".join((attribute_value['first'], attribute_value['last']))
+            return " ".join((attribute_value.first, attribute_value.last))
         return attribute_value
 
-    def post_process_actor_answer(self, actor):
-        return " ".join((actor['first'], actor['last']))
+    def post_process_actor_answer(self, actor: Player):
+        return " ".join((actor.first, actor.last))

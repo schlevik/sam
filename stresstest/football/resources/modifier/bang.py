@@ -1,16 +1,15 @@
 import random
 from typing import Dict
 
-import stresstest.football.resources.modifier.sentences
 from stresstest.classes import Context, Event
 from stresstest.football.classes import Player
 
 
 def _is_first_event_of_its_type_for_team(ctx: Context):
     event_type = ctx.sent.event_type
-    team = ctx.sent['actor']['team']
+    team = ctx.sent.actor.team
     return next(sent.sentence_nr for sent in ctx.sentences
-                if sent.event_type == event_type and sent.actor['team'] == team) == ctx.sent_nr
+                if sent.event_type == event_type and sent.actor.team == team) == ctx.sent_nr
 
 
 def bridge_short(qdata: Dict[str, Event]):

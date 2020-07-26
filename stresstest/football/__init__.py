@@ -3,6 +3,7 @@ from typing import List, Union
 from loguru import logger
 
 from stresstest.classes import Bundle
+from stresstest.football.classes import FootballWorld
 from stresstest.football.football_generator import FootballGenerator
 from stresstest.football.generate_with_modifier import FootballModifierGenerator, PlannedFootballModifierGenerator
 
@@ -40,6 +41,7 @@ def _reload_bundle() -> Bundle:
     from stresstest.football.resources import modifier as modifier
     bundle = Bundle(
         generator=FootballGenerator,
+        world=FootballWorld,
         # templates=_get_templates_dict(baseline),
         generator_modifier=FootballModifierGenerator,
         planned_generator=PlannedFootballModifierGenerator,
