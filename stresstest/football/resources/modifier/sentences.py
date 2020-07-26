@@ -1,16 +1,16 @@
 sentences = {
     "goal": [
         "%CONNECTIVE.VBD> $NP.actor $NP.team.actor-possessive-post @RB.goal "
-        "$VP.VBD.modifier [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] [$PP.goal-cause|$PP.goal-cause-coref|] .",
+        "$VP.VBD.modifier [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] $PP.distance [$PP.goal-cause|$PP.goal-cause-coref] .",
 
         "%CONNECTIVE.VBD> $NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score]  "
         "for $NP.team.actor .",
 
         "$NP.team.actor-possessive player $NP.actor $VP.VBD.attention %CONNECTIVE.ADVP , @RB.goal $VP.VBG.modifier "
-        "[$VP.VBG.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score a ($JJ.positive) goal]  $PP.distance .",
+        "[$VP.VBG.shoot in a ($JJ.positive) $NP.goal | $VP.VBG.score a ($JJ.positive) goal]  $PP.distance $PP.goal-cause-coref .",
 
         # TODO: maybe rephrase the arrived, it's stupid
-        "$NP.actor 's $NP.goal ( , $VP.VBG.goal-effect , ) @RB.goal $VP.VBD.modifier-nonactor "
+        "$NP.actor 's $JJ.distance $NP.goal ( , $VP.VBG.goal-effect , ) @RB.goal $VP.VBD.modifier-nonactor "
         "arrived $PP.time $PP.goal-cause-coref (and [$S.attention-crowd|$VP.VBD.attention-crowd]) .",
 
         "$PP.time a $NP.pass-type [went to|arrived at] ($NP.team.actor-possessive) $NP.coactor "
@@ -18,8 +18,9 @@ sentences = {
         "$NP.coref-player swept $NP.position.height to the $NP.position.box for $NP.actor to @RB.goal $VP.VBI.modifier "
         "poke past the $NP.goalkeeper .",
 
-        "A $JJ.positive $JJ.distance $NP.shot from $NP.actor @RB.goal $VP.VBG.modifier-nonactor "
+        "$PP.time a $JJ.positive $JJ.distance $NP.shot from $NP.actor @RB.goal $VP.VBG.modifier-nonactor "
         "[flying $PP.position.goal|homing into $NP.position.goal]  past "
+        #                                                THIS IS WEIRD
         "[the $NP.goalkeeper|a helpess $NP.goalkeeper] ($PP.goal-effect) %CONNECTIVE.VP .",
 
         "$NP.actor , one of $NP.team.actor-possessive better performers today, %CONNECTIVE.VP "
@@ -31,7 +32,7 @@ sentences = {
 
         "%CONNECTIVE.VBD> $NP.actor @RB.goal $VP.VBD.modifier scored $PP.time , @RB.goal $VP.VBG.modifier "
         "[$VP.VBG.shoot in |$VP.VBG.score] the ball "
-        "$PP.position.goal after !PRP $VP.VBD.goal-cause (and $VP.VBD.goal-cause) .",
+        "$PP.distance $PP.position.goal  after !PRP $VP.VBD.goal-cause (and $VP.VBD.goal-cause) .",
 
         "%CONNECTIVE.VBD> the ball arrived [on|at] the $NP.position.box (at pace) and $VP.VBG.goal-effect , $NP.actor "
         "@RB.goal $VP.VBD.modifier $VP.VBD.shoot the ball (just) $PP.position.goal "
@@ -62,17 +63,19 @@ sentences = {
 
         "%CONNECTIVE.VBD> $NP.actor $VP.VBD.foul ($NP.team.nonactor-possessive) $NP.coactor ($PP.time) .",
 
-        "%CONNECTIVE.VBD> $NP.actor $VP.VBD.foul $NP.coactor ($NP.team.nonactor-possessive-post) [$PP.foul-cause-coref|and $S.attention-crowd] .",
+        "%CONNECTIVE.VBD> $NP.actor $VP.VBD.foul $NP.coactor ($NP.team.nonactor-possessive-post) "
+        "[$PP.foul-cause-coref|and $S.attention-crowd] .",
 
-        "$S.attention-crowd as $NP.coactor was withdrawn $PP.time with !PRPS $NP.bodypart in a brace following a ($JJ.negative) "
-        "challenge from $NP.actor .",
+        "$S.attention-crowd as $NP.coactor was withdrawn $PP.time with !PRPS $NP.bodypart in a brace following a "
+        "($JJ.negative) challenge from $NP.actor .",
 
         "%CONNECTIVE.VBG> $NP.actor $VP.VBG.foul $NP.coactor [$PP.foul-cause-coref|$PP.foul-effect] .",
 
         "%CONNECTIVE.VBG> $NP.actor $VP.VBG.foul-effect , "
         "$VP.VBG.foul $NP.coactor near the $NP.position.box .",
 
-        "%CONNECTIVE.VBD> $NP.actor [$VP.VBD.foul-elaboration-coref|$VP.VBD.foul-elaboration] with a ($JJ.negative) $NP.foul [$PP.foul-effect|$PP.foul-effect-coref|] .",
+        "%CONNECTIVE.VBD> $NP.actor [$VP.VBD.foul-elaboration-coref|$VP.VBD.foul-elaboration] with a ($JJ.negative) "
+        "$NP.foul [$PP.foul-effect|$PP.foul-effect-coref|] .",
 
         "%CONNECTIVE.VBG> $NP.coactor winning the ball [in $NP.position.horizontal| $PP.position.vertical] "
         "(for $NP.team.actor) and drawing a $NP.foul from $NP.actor ."
