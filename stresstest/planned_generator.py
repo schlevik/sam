@@ -24,11 +24,19 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
         elif mod == EventPlan.JUST or mod == EventPlan.MOD:
             # exactly event-type
             logger.debug(f"Setting EXACTLY {event_type}")
-            self.current_event.event_type = event_type
+            if event_type == '_':
+                super().set_action()
+            else:
+                self.current_event.event_type = event_type
         elif mod == EventPlan.NOT:
             # all but event-type
             logger.debug(f"Setting ALL BUT {event_type}")
             self.current_event.event_type = (self.EVENT_TYPES - event_type).random()
+
+        else:
+            raise NotImplementedError()
+
+        logger.debug(f"action: {self.current_event.event_type}")
 
     @abstractmethod
     def create_attribute(self, name: str):
@@ -47,14 +55,14 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
 
     def generate_questions_from_plan(self, event_plan: EventPlan, events: List[Event], modified=False):
         questions = []
-        question = event_plan.to_question(events, modified)
+        question = event_plan.to_question(events, modified, self)
         self.post_process_question(question)
         if event_plan.question_target == 'actor':
             question.answer = self.post_process_actor_answer(question.answer)
-            questions.append(question)
         elif event_plan.question_target in self.ATTRIBUTES:
             question.answer = self.post_process_attribute_answers(event_plan.question_target, question.answer)
         else:
             raise NotImplementedError()
         questions.append(question)
+
         return questions, None, None, None

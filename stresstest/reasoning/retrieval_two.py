@@ -48,7 +48,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
         #    i for i, m in enumerate(event_types[first_modification:], first_modification) if
         #    m == non_modified) - first_modification
 
-        def to_question(events, is_modified, ets=event_types,  # fm=first_modification, md=modification_distance,
+        def to_question(events, is_modified, generator, ets=event_types,
                         met=modify_event_type):
             if is_modified:
                 if reverse:
@@ -86,7 +86,8 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
         ))
         for attribute in attributes:
             # python closures are python closures
-            def to_question(events, is_modified, ets=event_types,  # fm=first_modification, md=modification_distance,
+            def to_question(events, is_modified, generator, ets=event_types,
+                            # fm=first_modification, md=modification_distance,
                             attr=attribute):
                 if is_modified:
                     if reverse:

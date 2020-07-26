@@ -90,7 +90,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
         # if modification distance == 1 then there's nothing to fill so they become identical
         # if modification_distance > 1 or fill_with_modification:
         # python closures are python closures
-        def to_question(events, is_modified, fm=first_modification, md=modification_distance):
+        def to_question(events, is_modified, generator, fm=first_modification, md=modification_distance):
             if reverse:
                 evidence = len(events) - 1 - (fm if not is_modified else fm + md)
             else:
@@ -120,7 +120,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
         ))
         for attribute in attributes:
             # python closures are python closures
-            def to_question(events, is_modified, fm=first_modification, md=modification_distance,
+            def to_question(events, is_modified, generator, fm=first_modification, md=modification_distance,
                             attr=attribute):
                 assert len(events) == 5
                 if reverse:
