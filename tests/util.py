@@ -6,6 +6,7 @@ from stresstest.football import bundle
 from stresstest.generate_utils import generate_and_realise
 from stresstest.realize import Realizer
 from stresstest.reasoning import retrieval, retrieval_reverse
+from stresstest.reasoning.bridge import bridge_reverse, bridge
 from stresstest.reasoning.retrieval_two import retrieval_two_reverse, retrieval_two
 from stresstest.util import highlight
 
@@ -144,7 +145,8 @@ def showcase(given_bundle=None, n=0):
 def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_type='RB', max_sents=5, max_modifier=3,
                             config=None, per_modify_distance_per_reasoning=1, reasonings=None, num_workers=1):
     config = config or {"world.num_sents": max_sents, 'unique_actors': True}
-    reasonings = reasonings or [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse]
+    reasonings = reasonings or [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse, bridge,
+                                bridge_reverse]
     return generate_and_realise(bundle, config, modify_event_type, modifier_type, max_sents,
                                 per_modify_distance_per_reasoning,
                                 reasonings, max_modifiers=max_modifier, num_workers=num_workers)
