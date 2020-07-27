@@ -52,7 +52,13 @@ def _reload_bundle() -> Bundle:
             'retrieval-two': ['time', 'distance', 'coactor'],
             'retrieval-two-reverse': ['time', 'distance', 'coactor'],
             'bridge': ['time', 'distance', 'coactor'],
-            'bridge-reverse': ['time', 'distance', 'coactor']
+            'bridge-reverse': ['time', 'distance', 'coactor'],
+            'argmax': {
+                'distance': ['distance', 'coactor']
+            },
+            'argmin': {
+                'distance': ['distance', 'coactor', 'time']
+            }
         },
         has_template_attribute=_has
     )

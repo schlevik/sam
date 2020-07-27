@@ -167,6 +167,24 @@ question_templates = {
     },
     "overall": {
         "actor": {
+            'argmax-distance': {
+                'goal': [
+                    "Who shot the farthest goal",
+                    "Who scored the farthest goal",
+                    "Who scored from farthest away",
+                    "The farthest goal was scored by whom",
+
+                ]
+            },
+            'argmin-distance': {
+                'goal': [
+                    "Who shot the closest goal",
+                    "who scored the shortest goal",
+                    "who scored from the closest distance",
+                    "The closest goal was shot by whom",
+                    "The closest goal was scored by whom",
+                ]
+            },
             "goal": [
                 "Who scored",
                 "Who scored a goal",
@@ -179,18 +197,62 @@ question_templates = {
 
         },
         "coactor": {
+            'argmin-distance': {
+                'goal': [
+                    "Who helped scoring closest goal",
+                ]
+            },
+            'argmax-distance': {
+                'goal': [
+                    "Who helped to score the farthest goal",
+                    "Who helped to scoring the farthest goal",
+                    "Who assisted the farthest goal"
+                ]
+            },
             "foul": [
                 "Who was fouled",
                 "They fouled whom"
             ]
         },
         "distance": {
+            'argmax-distance': {
+                'goal': [
+                    "What was the farthest goal",
+                    "The farthest goal was scored from how far",
+                    "From how far away was the longest goal scored",
+                    "They scored the farthest goal from how far (away)",
+                ]
+            },
+            'argmin-distance': {
+                'goal': [
+                    "What was the closest goal",
+                    "The closest goal was scored from how far (away)",
+                    "From how far away was the shortest goal scored",
+                    "They scored the closest goal from how far (away)",
+                ]
+            },
             "goal": [
                 "From how far away were goals scored",
                 "From how far away were goals shot",
                 "The goals were shot from how far (away)",
                 "They scored the goals from how far (away)"
             ],
+        },
+        "time": {
+            'argmax-distance': {
+                'goal': [
+                    "When was the farthest goal scored",
+                    "They scored the farthest goal when",
+
+                ]
+            },
+            'argmin-distance': {
+                'goal': [
+                    "When was the closest goal scored",
+                    "when was the goal from the closest distance scored",
+                    "They scored the goal that was the closest when",
+                ]
+            },
         }
     }
 }

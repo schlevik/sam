@@ -305,12 +305,12 @@ class EventPlan:
     first_modification: int
     modify_event_type: str
     question_target: str
-    event_types: Tuple[str]
+    event_types: Tuple
     must_haves: List[str]
     reasoning_type: 'Reasoning'
     to_question: Callable[[List[Event], bool, Any], Question] = field(repr=False, compare=False)
     # question_plan: QuestionPlan
-
+    ORDER: str = field(default='order', init=False, repr=False, compare=False)
     JUST: str = field(default='just', init=False, repr=False, compare=False)
     ANY: str = field(default='any', init=False, repr=False, compare=False)
     NOT: str = field(default='not', init=False, repr=False, compare=False)
@@ -322,4 +322,5 @@ class Reasoning:
     name: str
     cardinality_event_plans: Callable[[int], int] = field(repr=False, compare=False)
     questions_per_event_plan: int
-    generate_all_event_plans: Callable[[int, str, List[str]], List[EventPlan]] = field(repr=False, compare=False)
+    generate_all_event_plans: Callable[[int, str, Union[List[str], Dict[str, List[str]]]], List[EventPlan]] = field(
+        repr=False, compare=False)

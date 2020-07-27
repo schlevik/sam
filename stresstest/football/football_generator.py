@@ -100,7 +100,7 @@ class FootballGenerator(StoryGenerator):
 
     def create_attribute(self, name):
         if name == 'distance':
-            return random.choice(list(range(18, 35)))
+            return random.choice(list(range(11, 35)))
 
         if name == 'time':
             last_ts = 0

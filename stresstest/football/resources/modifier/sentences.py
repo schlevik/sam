@@ -16,7 +16,7 @@ sentences = {
         "$PP.time a $NP.pass-type [went to|arrived at] ($NP.team.actor-possessive) $NP.coactor "
         "[$PP.position.vertical | who was (just) waiting $PP.position.vertical] and "
         "$NP.coref-player swept $NP.position.height to the $NP.position.box for $NP.actor to @RB.goal $VP.VBI.modifier "
-        "poke past the $NP.goalkeeper .",
+        "poke past the $NP.goalkeeper for a $JJ.positive $JJ.distance $NP.goal .",
 
         "$PP.time a $JJ.positive $JJ.distance $NP.shot from $NP.actor @RB.goal $VP.VBG.modifier-nonactor "
         "[flying $PP.position.goal|homing into $NP.position.goal]  past "
@@ -47,7 +47,7 @@ sentences = {
         "$PP.position.goal $VP.VBG.goal-effect .",
 
         "$NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in|$VP.VBD.score] "
-        "[$NP.team.actor-possessive !NEXT $NP.goal|the !NEXT $NP.goal for $NP.team.actor] "
+        "[$NP.team.actor-possessive !NEXT $NP.goal|the !NEXT $NP.goal for $NP.team.actor] $PP.distance "
         "to %CONNECTIVE.IVP after $S.goal-cause .",
 
         "$NP.team.actor %CONNECTIVE.IVP when $NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in|$VP.VBD.score from] "

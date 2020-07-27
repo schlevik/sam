@@ -120,8 +120,8 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                     stories_and_worlds = [
                         _do_generate(
                             PlannedFootballModifierGenerator, config=config,
-                            modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
-                        for ep, seed in zip(eps, seeds)
+                            modifier_type=modifier_type, ep=ep, mute=False, seed=seed)
+                        for ep, seed in zip(eps, tqdm(seeds, position=1, leave=False))
                     ]
                 stories, worlds = zip(*stories_and_worlds)
                 for story, ep in zip(stories, eps):
