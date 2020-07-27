@@ -21,7 +21,7 @@ class StoryGenerator(ABC):
     def ATTRIBUTES(self) -> Choices:
         ...
 
-    def __init__(self, config, get_world: Callable[[], World], *args, **kwargs):
+    def __init__(self, config, get_world: Callable[[int], World], *args, **kwargs):
 
         logger.debug(f"{StoryGenerator.__name__} entering constructor")
         logger.debug(fmt_dict(locals()))
@@ -35,9 +35,7 @@ class StoryGenerator(ABC):
         logger.debug(f"{StoryGenerator.__name__} finish constructor")
 
     def set_world(self):
-        self.world = self.get_world()
-        self.world.num_sentences = self.cfg.get("world.num_sentences", 5)
-
+        self.world = self.get_world(self.cfg.get("world.num_sentences", 5))
         self.do_set_world()
 
     def set_action(self):

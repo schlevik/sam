@@ -71,6 +71,7 @@ class FootballGenerator(StoryGenerator):
                                         f"than sentences ({self.world.num_sentences}) if choosing uniquely for "
                                         "actor and coactor!")
         for i in range(1, num_players + 1):
+            assert self.world.gender == 'female'
             p1 = Player(**{
                 "id": f"player{i}",
                 "first": names.get_first_name(self.world.gender),
@@ -107,14 +108,25 @@ class FootballGenerator(StoryGenerator):
                 last_ts = sentence.attributes.get("time", 0)
                 if last_ts:
                     break
-
-            rv = expon(scale=20)
+            m = 3
+            # rv = expon(scale=20)
             # TODO: if too slow, change to linear...
-            if last_ts + 1 >= 90:
+            if last_ts >= 91-m:
                 return last_ts + 1
-            p = [rv.pdf(x) for x in range(last_ts + 1, 90)]
-            sum_p = sum(p)
-            p_norm = [x / sum_p for x in p]
+            # p = [rv.pdf(x) for x in range(last_ts + 1, 90)]
+            # m = 91 - last_ts
+            # t = 5
+            # p2 = [-m*x+t-last_ts for x in range(last_ts + 1, 90)]
+            # sum_p = sum(p)
+            # sum_p_2 = sum(p2)
+            # p2_norm = [x / sum_p_2 for x in p2]
+            # p_norm = [x / sum_p for x in p]
+
+            b = (90 - last_ts) / m
+            p = [-m * x + (90 - last_ts) + (0.5 * b) for x in range(1, int(b))] + \
+                [-(1 / m) * x + b for x in range(int(b), 90 - last_ts)]
+            p_norm = [x / sum(p) for x in p]
+
             return random.choices(list(range(last_ts + 1, 90)), weights=p_norm, k=1)[0]
 
         if name == 'coactor':

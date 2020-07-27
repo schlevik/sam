@@ -206,7 +206,7 @@ Entry = namedtuple("Entry", ["id", "passage", "qa_id", "question", "answer", "qa
 
 @dataclass
 class World:
-    num_sentences: int = None
+    num_sentences: int
 
 
 @dataclass

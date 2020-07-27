@@ -1,6 +1,5 @@
-import json
 from functools import partial
-from typing import List
+from typing import List, cast, Callable, Any
 
 from loguru import logger
 
@@ -8,18 +7,22 @@ from stresstest.classes import EventPlan, Question, QuestionTypes, Reasoning, Ev
 from stresstest.reasoning.retrieval import get_event_types, get_modification_data
 
 
-def to_question(events: List[Event], is_modified, generator, et, met, target='actor', reverse=False):
-    #
+def to_question(events: List[Event], is_modified, generator, event_types,
+                modify_event_type, target='actor', reverse=False) -> Question:
+    # the first (or last) appearance of (just _): bridge event
     evidence = [
-        next(iter([i for i, (mod, _) in enumerate(et) if mod == 'just'][::-1 if reverse else 1]))
+        next(iter([i for i, (mod, _) in enumerate(event_types) if mod == 'just'][::-1 if reverse else 1]))
     ]
+    # the other appearance of (Just, modify_event_type): actual event
     if is_modified:
         evidence += [
-            next(i for i, (mod, _) in enumerate(et) if mod == 'just' and i not in evidence)
+            next(i for i, (mod, _) in enumerate(event_types) if mod == 'just' and i not in evidence)
         ]
+
     else:
+        # the first (or last) appearance of (mod, modify_event_type): actual event
         evidence += [
-            next(iter([i for i, (mod, _) in enumerate(et) if mod == 'modified'][::-1 if reverse else 1]))
+            next(iter([i for i, (mod, _) in enumerate(event_types) if mod == 'modified'][::-1 if reverse else 1]))
         ]
     evidence = sorted(evidence)
     answer_event = events[evidence[-1] if not reverse else evidence[0]]
@@ -29,7 +32,7 @@ def to_question(events: List[Event], is_modified, generator, et, met, target='ac
         type=QuestionTypes.DIRECT,
         target=target,
         evidence=evidence,
-        event_type=met,
+        event_type=modify_event_type,
         reasoning=bridge_reverse.name,
         question_data={
             "bridge-event": bridge_event,
@@ -38,17 +41,9 @@ def to_question(events: List[Event], is_modified, generator, et, met, target='ac
     )
 
 
-def generate_all_bridge_event_plans(max_sents, modify_event_type, attributes, reverse=False) -> List[EventPlan]:
-    """
-    Cardinality: (max_sents-1)^2 * |attributes|
-    Args:
-        reasoning_type:
-        max_sents:
-        modify_event_type:
-
-    Returns:
-
-    """
+def generate_all_bridge_event_plans(
+        max_sents: int, modify_event_type: str, attributes: List[str], reverse=False
+) -> List[EventPlan]:
     modified = (EventPlan.MOD, modify_event_type)
     other = (EventPlan.NOT, modify_event_type)
     either = (EventPlan.ANY, "_")
@@ -73,11 +68,7 @@ def generate_all_bridge_event_plans(max_sents, modify_event_type, attributes, re
     for event_types in all_event_types:
 
         if reverse:
-            print(event_types)
-            print('turns into')
             event_types = event_types[::-1]
-            print(event_types)
-            print(20 * '====')
         event_plans.append(EventPlan(
             event_types=tuple(event_types),
             num_modifications=sum(et == modified for et in event_types),
@@ -86,7 +77,13 @@ def generate_all_bridge_event_plans(max_sents, modify_event_type, attributes, re
             modify_event_type=modify_event_type,
             reasoning_type=bridge,
             question_target='actor',
-            to_question=partial(to_question, et=event_types, met=modify_event_type, reverse=reverse),
+            to_question=cast(Callable[[List[Event], bool, Any], Question],
+                             partial(to_question,
+                                     event_types=event_types,
+                                     modify_event_type=modify_event_type,
+                                     reverse=reverse
+                                     )
+                             ),
             must_haves=[],
             # ),
         ))
@@ -104,8 +101,13 @@ def generate_all_bridge_event_plans(max_sents, modify_event_type, attributes, re
                 modify_event_type=modify_event_type,
                 reasoning_type=bridge,
                 question_target=attribute,
-                to_question=partial(to_question, et=event_types, met=modify_event_type, target=attribute,
-                                    reverse=reverse),
+                to_question=cast(Callable[[List[Event], bool, Any], Question],
+                                 partial(to_question,
+                                         event_types=event_types,
+                                         modify_event_type=modify_event_type,
+                                         target=attribute, reverse=reverse
+                                         )
+                                 ),
                 must_haves=must_haves, ))
 
     return event_plans
@@ -121,5 +123,5 @@ bridge_reverse = Reasoning(
     name='bridge-reverse',
     cardinality_event_plans=lambda max_sent: (max_sent - 1) * (max_sent - 1),
     questions_per_event_plan=3,
-    generate_all_event_plans=partial(generate_all_bridge_event_plans, reverse=True),
+    generate_all_event_plans=cast(Callable[[int, str, List[str]], List[EventPlan]], partial(generate_all_bridge_event_plans, reverse=True)),
 )

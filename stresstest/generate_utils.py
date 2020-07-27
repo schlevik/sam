@@ -91,7 +91,7 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                       max_modifiers=4, use_mod_distance=False, mute=False, num_workers=8):
     attr = attrgetter('modification_distance' if use_mod_distance else 'num_modifications')
     result = []
-    with tqdm(disable=mute, total=per_modify_distance_per_reasoning * max_modifiers * len(reasonings)) as pbar:
+    with tqdm(disable=mute, position=0, total=max_modifiers * len(reasonings)) as pbar:
         for reasoning in reasonings:
             all_event_plans = reasoning.generate_all_event_plans(max_sents, modify_event_type,
                                                                  bundle.reasoning_map[reasoning.name])
@@ -115,7 +115,7 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                         delayed(_do_generate)(
                             PlannedFootballModifierGenerator, config=config,
                             modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
-                        for ep, seed in zip(eps, seeds))
+                        for ep, seed in zip(eps, tqdm(seeds, position=1, leave=False)))
                 else:
                     stories_and_worlds = [
                         _do_generate(
@@ -133,9 +133,9 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                         template_choice = generate_one_possible_template_choice(
                             story, bundle.templates_modifier['sentences'], ep.must_haves, bundle.has_template_attribute
                         )
-                        print("Yup, we're in a forever-loop....")
-                    pbar.update()
+                        tqdm.write("Yup, we're in a forever-loop....")
                     template_choices.append(template_choice)
+                pbar.update()
                 try:
                     assert len(stories) == len(eps) == len(template_choices) == len(worlds)
                 except AssertionError:
