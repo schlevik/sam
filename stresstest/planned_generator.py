@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from collections import defaultdict, OrderedDict
 from typing import List, Optional, Callable
 from loguru import logger
 
@@ -15,9 +16,28 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
         super().__init__(config, get_world, *args, **kwargs)
         self.event_plan = event_plan
         self.modifier_type = modifier_type
+        self.ordered_attribute_map = defaultdict(dict)
 
-    def set_action(self):
-        mod, event_type = self.event_plan.event_types[self.current_event.sentence_nr]
+    def _init_order_map(self, order_attr):
+        logger.debug(f"Setting up order map for attribute '{order_attr}'")
+        orders = sorted(
+            list((o, i) for i, (m, (_, _, o)) in enumerate(self.event_plan.event_types) if m == EventPlan.ORDER)
+        )
+        attributes = []
+        while len(attributes) < len(orders):
+            new_attribute = self.create_attribute(order_attr)
+            if new_attribute not in attributes:
+                attributes.append(new_attribute)
+        attributes = sorted(attributes)
+        logger.debug(attributes)
+        logger.debug(orders)
+        for attribute, (_, idx) in zip(attributes, orders):
+            self.ordered_attribute_map[order_attr][idx] = attribute
+        logger.debug(self.event_plan.event_types)
+        logger.debug(self.ordered_attribute_map[order_attr])
+        # raise NotImplementedError()
+
+    def _do_set_action(self, mod, event_type):
         logger.debug(f"mod: {mod}, event_type: {event_type}")
         if mod == EventPlan.ANY:
             super().set_action()
@@ -28,13 +48,23 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
                 super().set_action()
             else:
                 self.current_event.event_type = event_type
+            if mod == EventPlan.MOD:
+                self.current_event.features.append(self.modifier_type)
         elif mod == EventPlan.NOT:
             # all but event-type
             logger.debug(f"Setting ALL BUT {event_type}")
             self.current_event.event_type = (self.EVENT_TYPES - event_type).random()
 
-        else:
-            raise NotImplementedError()
+        elif mod == EventPlan.ORDER:
+            (mod, event_type), order_attr, order = event_type
+            self._do_set_action(mod, event_type)
+            if not self.ordered_attribute_map[order_attr]:
+                self._init_order_map(order_attr)
+            # raise NotImplementedError()
+
+    def set_action(self):
+        mod, event_type = self.event_plan.event_types[self.current_event.sentence_nr]
+        self._do_set_action(mod, event_type)
 
         logger.debug(f"action: {self.current_event.event_type}")
 
@@ -46,12 +76,15 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
         self.current_event.attributes = dict()
         attributes = self.filter_attributes(self.ATTRIBUTES)
         for attribute in attributes:
-            self.current_event.attributes[attribute] = self.create_attribute(attribute)
+            preset_attr = self.ordered_attribute_map[attribute].get(self.current_event.sentence_nr, None)
+            if preset_attr is not None:
+                logger.debug(f"Setting {attribute} to {preset_attr}")
+                self.current_event.attributes[attribute] = preset_attr
+            else:
+                self.current_event.attributes[attribute] = self.create_attribute(attribute)
 
     def set_everything_else(self):
-        mod, _ = self.event_plan.event_types[self.current_event.sentence_nr]
-        if mod == EventPlan.MOD:
-            self.current_event.features.append(self.modifier_type)
+        ...
 
     def generate_questions_from_plan(self, event_plan: EventPlan, events: List[Event], modified=False):
         questions = []

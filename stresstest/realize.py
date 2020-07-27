@@ -605,9 +605,12 @@ class Realizer:
         try:
             # first see if there's a reasoning key
             template, template_nr = self.question_templates[q.type][q.target][q.reasoning][q.event_type].random()
-        except KeyError:
+        except KeyError as e:
             try:
                 # if not, try without reasoning
+                logger.debug(str(e))
+                logger.warning(f"{'.'.join([q.type, q.target, q.reasoning, q.event_type])} "
+                               'not found, trying without reasoning key....')
                 template, template_nr = self.question_templates[q.type][q.target][q.event_type].random()
             except KeyError:
                 # if still not: ¯\_(ツ)_/¯
