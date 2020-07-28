@@ -58,6 +58,14 @@ def _reload_bundle() -> Bundle:
             },
             'argmin': {
                 'distance': ['distance', 'coactor', 'time']
+            },
+            'comparison': [
+                ('distance', False),
+                ('time', True),
+            ],
+            'comparison-reverse': {
+                ('distance', False),
+                ('time', True),
             }
         },
         has_template_attribute=_has

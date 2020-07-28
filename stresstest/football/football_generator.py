@@ -7,7 +7,7 @@ from scipy.stats import expon
 from stresstest.classes import Choices, Config, YouIdiotException
 from stresstest.football.classes import Team, Player, FootballWorld
 from stresstest.generator import StoryGenerator
-from stresstest.util import fmt_dict
+from stresstest.print_utils import fmt_dict
 
 
 class FootballGenerator(StoryGenerator):

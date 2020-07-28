@@ -8,8 +8,9 @@ from stresstest.realize import Realizer
 from stresstest.reasoning import retrieval, retrieval_reverse
 from stresstest.reasoning.argselect import argmin, argmax
 from stresstest.reasoning.bridge import bridge_reverse, bridge
+from stresstest.reasoning.comparison import comparison_reverse, comparison
 from stresstest.reasoning.retrieval_two import retrieval_two_reverse, retrieval_two
-from stresstest.util import highlight
+from stresstest.print_utils import highlight
 
 
 def only(sents_or_bundle, n, action='test'):
@@ -145,9 +146,9 @@ def showcase(given_bundle=None, n=0):
 
 def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_type='RB', max_sents=5, max_modifier=3,
                             config=None, per_modify_distance_per_reasoning=1, reasonings=None, num_workers=1):
-    config = config or {"world.num_sents": max_sents, 'unique_actors': True}
+    config = config or {"world.num_sentences": max_sents, 'unique_actors': True, 'world.num_players': 4 * max_sents}
     reasonings = reasonings or [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse, bridge,
-                                bridge_reverse, argmax, argmin]
+                                bridge_reverse, argmax, argmin, comparison, comparison_reverse]
     return generate_and_realise(bundle, config, modify_event_type, modifier_type, max_sents,
                                 per_modify_distance_per_reasoning,
                                 reasonings, max_modifiers=max_modifier, num_workers=num_workers)

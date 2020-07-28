@@ -1,5 +1,4 @@
 from itertools import chain, islice
-import click
 import ujson as json
 from typing import Dict, Any, List, Generator, Iterable, TypeVar
 
@@ -38,10 +37,6 @@ def sample_iter(sample: List[Dict[str, Any]]) -> Generator[Entry, None, None]:
             yield Entry(datum_id, passage, qa['id'], qa['question'], qa.get('answer') or qa['answers'][0]['text'], qa)
 
 
-def fmt_dict(dct: dict):
-    return "{{{}}}".format(', '.join(f"'{k}': {v}" for k, v in dct.items() if k != "self" and not k.startswith("_")))
-
-
 def do_import(class_string: str, relative_import: str = ""):
     try:
         module_name, cls_name = class_string.rsplit(".", 1)
@@ -62,11 +57,3 @@ def do_import(class_string: str, relative_import: str = ""):
     return cls
 
 
-def highlight(text, colors):
-    result = []
-    for t in text.split():
-        if t in colors.keys():
-            result.append(click.style(t, fg=colors[t]))
-        else:
-            result.append(t)
-    return " ".join(result)

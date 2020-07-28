@@ -8,7 +8,8 @@ from scripts.utils import write_json, match_prediction_to_gold, BASELINE, INTERV
 from stresstest.eval_utils import get_mean_var_ci_bernoulli, align
 from stresstest.eval_utils import evaluate_intervention as eval_intervention
 
-from stresstest.util import load_json, highlight
+from stresstest.util import load_json
+from stresstest.print_utils import highlight
 
 
 def color_map(baseline, intervention, other=None):

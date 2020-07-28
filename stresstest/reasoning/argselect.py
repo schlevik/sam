@@ -14,10 +14,10 @@ def to_question(events: List[Event], is_modified, generator, event_types,
 
         evidence = [
             i for i, (_, ((mod, _), _, order)) in enumerate(event_types) if
-            mod == EventPlan.MOD and order == (0 if reverse else 3)
+            mod == EventPlan.Mod and order == (0 if reverse else 3)
         ]
     else:
-        evidence = [i for i, (_, ((mod, _), _, order)) in enumerate(event_types) if mod == EventPlan.JUST]
+        evidence = [i for i, (_, ((mod, _), _, order)) in enumerate(event_types) if mod == EventPlan.Just]
 
     answer = events[evidence[0]].actor if target == 'actor' else events[evidence[0]].attributes[target]
     return Question(
@@ -32,15 +32,15 @@ def to_question(events: List[Event], is_modified, generator, event_types,
 
 
 def either(argmax_attribute, order):
-    return EventPlan.ORDER, ((EventPlan.ANY, "_"), argmax_attribute, order)
+    return EventPlan.Order, ((EventPlan.Any, "_"), argmax_attribute, order)
 
 
 def modified(modify_event_type, argmax_attribute, order):
-    return EventPlan.ORDER, ((EventPlan.MOD, modify_event_type), argmax_attribute, order)
+    return EventPlan.Order, ((EventPlan.Mod, modify_event_type), argmax_attribute, order)
 
 
 def just(modify_event_type, argmax_attribute, order):
-    return EventPlan.ORDER, ((EventPlan.JUST, modify_event_type), argmax_attribute, order)
+    return EventPlan.Order, ((EventPlan.Just, modify_event_type), argmax_attribute, order)
 
 
 def generate_all_argselect_event_plans(
@@ -65,7 +65,7 @@ def generate_all_argselect_event_plans(
         for event_types in all_event_types:
             event_plans.append(EventPlan(
                 event_types=tuple(event_types),
-                num_modifications=sum(mod == EventPlan.MOD for _, ((mod, et), *_) in event_types),
+                num_modifications=sum(mod == EventPlan.Mod for _, ((mod, et), *_) in event_types),
                 modification_distance=...,
                 first_modification=...,
                 modify_event_type=modify_event_type,
@@ -80,18 +80,18 @@ def generate_all_argselect_event_plans(
                                          )
                                  ),
                 must_haves=[
-                    argmax_attribute if et == modify_event_type and (mod == EventPlan.JUST or mod == EventPlan.MOD)
+                    argmax_attribute if et == modify_event_type and (mod == EventPlan.Just or mod == EventPlan.Mod)
                     else None for _, ((mod, et), *_) in event_types],
                 # ),
             ))
             for attribute in target_attributes:
                 must_have = (attribute, argmax_attribute) if (attribute != argmax_attribute) else argmax_attribute
                 must_haves = [must_have
-                              if et == modify_event_type and (mod == EventPlan.JUST or mod == EventPlan.MOD)
+                              if et == modify_event_type and (mod == EventPlan.Just or mod == EventPlan.Mod)
                               else None for _, ((mod, et), *_) in event_types]
                 event_plans.append(EventPlan(
                     event_types=tuple(event_types),
-                    num_modifications=sum(mod == EventPlan.MOD for _, ((mod, et), *_) in event_types),
+                    num_modifications=sum(mod == EventPlan.Mod for _, ((mod, et), *_) in event_types),
                     modification_distance=...,
                     first_modification=...,
                     modify_event_type=modify_event_type,

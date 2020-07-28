@@ -44,11 +44,11 @@ def to_question(events: List[Event], is_modified, generator, event_types,
 def generate_all_bridge_event_plans(
         max_sents: int, modify_event_type: str, attributes: List[str], reverse=False
 ) -> List[EventPlan]:
-    modified = (EventPlan.MOD, modify_event_type)
-    other = (EventPlan.NOT, modify_event_type)
-    either = (EventPlan.ANY, "_")
-    non_modified = (EventPlan.JUST, modify_event_type)
-    just_any = (EventPlan.JUST, '_')
+    modified = (EventPlan.Mod, modify_event_type)
+    other = (EventPlan.Not, modify_event_type)
+    either = (EventPlan.Any, "_")
+    non_modified = (EventPlan.Just, modify_event_type)
+    just_any = (EventPlan.Just, '_')
     event_plans = []
     all_event_types = []
     j = 1
@@ -89,7 +89,7 @@ def generate_all_bridge_event_plans(
         ))
         for attribute in attributes:
             must_haves = [
-                attribute if et == modify_event_type and (mod == EventPlan.JUST or mod == EventPlan.MOD)
+                attribute if et == modify_event_type and (mod == EventPlan.Just or mod == EventPlan.Mod)
                 else None for mod, et in event_types
             ]
 

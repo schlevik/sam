@@ -7,7 +7,7 @@ from overrides import overrides
 
 from stresstest.classes import Event, QuestionTypes, Question, Choices, YouIdiotException
 from stresstest.generator import StoryGenerator
-from stresstest.util import fmt_dict
+from stresstest.print_utils import fmt_dict
 
 
 class ModifierGenerator(StoryGenerator, ABC):
