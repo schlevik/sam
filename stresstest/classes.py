@@ -300,6 +300,7 @@ class Model:
 
 @dataclass(frozen=True)
 class EventPlan:
+
     num_modifications: int
     modification_distance: int
     first_modification: int
@@ -310,11 +311,12 @@ class EventPlan:
     reasoning_type: 'Reasoning'
     to_question: Callable[[List[Event], bool, Any], Question] = field(repr=False, compare=False)
     # question_plan: QuestionPlan
-    ORDER: str = field(default='order', init=False, repr=False, compare=False)
-    JUST: str = field(default='just', init=False, repr=False, compare=False)
-    ANY: str = field(default='any', init=False, repr=False, compare=False)
-    NOT: str = field(default='not', init=False, repr=False, compare=False)
-    MOD: str = field(default='modified', init=False, repr=False, compare=False)
+    Order: str = field(default='order', init=False, repr=False, compare=False)
+    Just: str = field(default='just', init=False, repr=False, compare=False)
+    Any: str = field(default='any', init=False, repr=False, compare=False)
+    Not: str = field(default='not', init=False, repr=False, compare=False)
+    Mod: str = field(default='modified', init=False, repr=False, compare=False)
+    SameActor: str = field(default='same-actor-as', init=False, repr=False, compare=False)
 
 
 @dataclass

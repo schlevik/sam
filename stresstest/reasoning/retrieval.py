@@ -26,10 +26,10 @@ def get_modification_data(max_sents):
 
 def get_event_types(modify_event_type, max_sents, first_modification, fill_with_modification, modification_distance,
                     reverse):
-    modified = (EventPlan.MOD, modify_event_type)
-    other = (EventPlan.NOT, modify_event_type)
-    either = (EventPlan.ANY, "_")
-    non_modified = (EventPlan.JUST, modify_event_type)
+    modified = (EventPlan.Mod, modify_event_type)
+    other = (EventPlan.Not, modify_event_type)
+    either = (EventPlan.Any, "_")
+    non_modified = (EventPlan.Just, modify_event_type)
     event_types = [either] * max_sents
     event_types[first_modification] = modified
     event_types[first_modification + modification_distance] = non_modified
@@ -54,10 +54,10 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
     Returns:
 
     """
-    modified = (EventPlan.MOD, modify_event_type)
-    other = (EventPlan.NOT, modify_event_type)
-    either = (EventPlan.ANY, "_")
-    non_modified = (EventPlan.JUST, modify_event_type)
+    modified = (EventPlan.Mod, modify_event_type)
+    other = (EventPlan.Not, modify_event_type)
+    either = (EventPlan.Any, "_")
+    non_modified = (EventPlan.Just, modify_event_type)
     # fill_with_modifications = [True, False]
     event_plans: List[EventPlan] = []
     for first_modification, fill_with_modification, modification_distance in get_modification_data(max_sents):
@@ -96,7 +96,6 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
             # python closures are python closures
             def to_question(events, is_modified, generator, fm=first_modification, md=modification_distance,
                             attr=attribute):
-                assert len(events) == 5
                 if reverse:
                     evidence = len(events) - 1 - (fm if not is_modified else fm + md)
                 else:
@@ -113,7 +112,7 @@ def generate_all_retrieval_event_plans(max_sents, modify_event_type, attributes,
                 )
 
             must_haves = [
-                attribute if et == modify_event_type and (mod == EventPlan.JUST or mod == EventPlan.MOD)
+                attribute if et == modify_event_type and (mod == EventPlan.Just or mod == EventPlan.Mod)
                 else None for mod, et in event_types
             ]
             event_plans.append(EventPlan(

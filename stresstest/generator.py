@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple, Optional, Callable, Any
 from loguru import logger
 
 from stresstest.classes import Choices, Event, World, Question, QuestionTypes, ReasoningTypes
-from stresstest.util import fmt_dict
+from stresstest.print_utils import fmt_dict
 
 
 class StoryGenerator(ABC):

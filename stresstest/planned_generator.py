@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 from collections import defaultdict, OrderedDict
 from typing import List, Optional, Callable
 from loguru import logger
+from overrides import overrides
 
 from stresstest.classes import Event, World, EventPlan
 from stresstest.generator import StoryGenerator
@@ -14,14 +15,16 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
 
     def __init__(self, config, get_world: Callable[[], World], event_plan: EventPlan, modifier_type, *args, **kwargs):
         super().__init__(config, get_world, *args, **kwargs)
+        self.same_actors_map = defaultdict(lambda: None)
         self.event_plan = event_plan
         self.modifier_type = modifier_type
         self.ordered_attribute_map = defaultdict(dict)
 
     def _init_order_map(self, order_attr):
         logger.debug(f"Setting up order map for attribute '{order_attr}'")
+        # technically this should be recursive?
         orders = sorted(
-            list((o, i) for i, (m, (_, _, o)) in enumerate(self.event_plan.event_types) if m == EventPlan.ORDER)
+            list((args[2], i) for i, (m, args) in enumerate(self.event_plan.event_types) if m == EventPlan.Order)
         )
         attributes = []
         while len(attributes) < len(orders):
@@ -39,28 +42,32 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
 
     def _do_set_action(self, mod, event_type):
         logger.debug(f"mod: {mod}, event_type: {event_type}")
-        if mod == EventPlan.ANY:
+        if mod == EventPlan.Any:
             super().set_action()
-        elif mod == EventPlan.JUST or mod == EventPlan.MOD:
+        elif mod == EventPlan.Just or mod == EventPlan.Mod:
             # exactly event-type
             logger.debug(f"Setting EXACTLY {event_type}")
             if event_type == '_':
                 super().set_action()
             else:
                 self.current_event.event_type = event_type
-            if mod == EventPlan.MOD:
+            if mod == EventPlan.Mod:
                 self.current_event.features.append(self.modifier_type)
-        elif mod == EventPlan.NOT:
+        elif mod == EventPlan.Not:
             # all but event-type
             logger.debug(f"Setting ALL BUT {event_type}")
             self.current_event.event_type = (self.EVENT_TYPES - event_type).random()
 
-        elif mod == EventPlan.ORDER:
+        elif mod == EventPlan.Order:
             (mod, event_type), order_attr, order = event_type
             self._do_set_action(mod, event_type)
             if not self.ordered_attribute_map[order_attr]:
                 self._init_order_map(order_attr)
             # raise NotImplementedError()
+        elif mod == EventPlan.SameActor:
+            (mod, event_type), same_actor_idx = event_type
+            self._do_set_action(mod, event_type)
+            self.same_actors_map[self.current_event.sentence_nr] = same_actor_idx
 
     def set_action(self):
         mod, event_type = self.event_plan.event_types[self.current_event.sentence_nr]
@@ -71,6 +78,16 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
     @abstractmethod
     def create_attribute(self, name: str):
         ...
+
+    @overrides
+    def set_actor(self):
+        same_actor_idx = self.same_actors_map[self.current_event.sentence_nr]
+        if same_actor_idx is not None and same_actor_idx != self.current_event.sentence_nr:
+            self.current_event.actor = self.sentences[same_actor_idx].actor
+        else:
+            super_cls = super()
+            logger.debug("super_cls")
+            super_cls.set_actor()
 
     def set_attributes(self):
         self.current_event.attributes = dict()

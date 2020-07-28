@@ -24,7 +24,7 @@ sentences = {
         "[the $NP.goalkeeper|a helpess $NP.goalkeeper] ($PP.goal-effect) %CONNECTIVE.VP .",
 
         "$NP.actor , one of $NP.team.actor-possessive better performers today, %CONNECTIVE.VP "
-        "as !PRP @RB.goal $VP.VBD.modifier scored $PP.time [$PP.goal-cause|$S.attention-crowd] .",
+        "as !PRP @RB.goal $VP.VBD.modifier scored $PP.time [$PP.goal-cause|and $S.attention-crowd] .",
 
         "$NP.actor @RB.goal $VP.VBD.modifier scored $PP.time to %CONNECTIVE.IVP when !PRP $VP.VBD.goal-cause "
         "(and $VP.VBD.goal-cause) "
@@ -50,9 +50,12 @@ sentences = {
         "[$NP.team.actor-possessive !NEXT $NP.goal|the !NEXT $NP.goal for $NP.team.actor] $PP.distance "
         "to %CONNECTIVE.IVP after $S.goal-cause .",
 
-        "$NP.team.actor %CONNECTIVE.IVP when $NP.actor @RB.goal $VP.VBD.modifier [$VP.VBD.shoot in|$VP.VBD.score from] "
+        "$NP.team.actor %CONNECTIVE.VP with a $JJ.distance $NP.goal as $NP.actor @RB.goal $VP.VBD.modifier $VP.VBD.shoot in  "
+        "$NP.coactor 's $NP.pass-type .", 
+        
+        #|$VP.VBD.score a $JJ.distance $NP.goal from]
+        "$NP.actor %CONNECTIVE.VP when !PRP @RB.goal $VP.VBD.modifier $VP.VBD.score a $JJ.distance $NP.goal from "
         "$NP.coactor 's $NP.pass-type ."
-
     ],
     "foul": [
         "%CONNECTIVE.VBD> $NP.coactor ($NP.team.nonactor-possessive-post) had gone down with $NP.injury "

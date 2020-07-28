@@ -7,7 +7,8 @@ from tqdm import tqdm
 
 from scripts.utils import write_json, get_output_predictions_file_name
 from stresstest.classes import Model, Entry
-from stresstest.util import load_json, sample_iter, num_questions, fmt_dict, do_import, batch
+from stresstest.util import load_json, sample_iter, num_questions, do_import, batch
+from stresstest.print_utils import fmt_dict
 
 
 def _is_gpu_available():

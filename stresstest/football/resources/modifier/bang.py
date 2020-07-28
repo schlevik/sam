@@ -1,7 +1,7 @@
 import random
 from typing import Dict
 
-from stresstest.classes import Context, Event
+from stresstest.classes import Context, Event, YouIdiotException
 from stresstest.football.classes import Player
 
 
@@ -55,6 +55,21 @@ def bridge_impl(qdata: Dict[str, Event]):
         return bridge_long(qdata)
 
 
+def compare_actors(qdata: Dict[str, Player]):
+    actor_of_non_modified_events = qdata["target-of-modified-events"]
+    actor_of_modified_events = qdata['target-of-non-modified-events']
+    if not isinstance(actor_of_modified_events, Player) or not isinstance(actor_of_non_modified_events, Player):
+        raise YouIdiotException(f"We compare actors only! "
+                                f"was {actor_of_modified_events}, {actor_of_non_modified_events}")
+    actor_of_non_modified_events = f"{actor_of_non_modified_events.first} {actor_of_non_modified_events.last} "
+    actor_of_modified_events = f"{actor_of_modified_events.first} {actor_of_modified_events.last} "
+
+    if random.choice([True, False]):
+        return f"{actor_of_modified_events} or {actor_of_non_modified_events}"
+    else:
+        return f"{actor_of_non_modified_events} or {actor_of_modified_events}"
+
+
 bang = {
     "NEXT": (lambda ctx: "first" if _is_first_event_of_its_type_for_team(ctx) else "next", 2),
     # "PREAMBLE": Preamble,
@@ -62,13 +77,12 @@ bang = {
     "PRPS": (lambda ctx: "her" if ctx.world.gender == 'female' else "his"),
     "PRP": (lambda ctx: "she" if ctx.world.gender == 'female' else "he"),
     # difference in time from last event
-    # TODO: it's a tiny bit buggy because it doesn't register itself in ctx['visited'], ok for span-based though
     "MINDIFF": (lambda ctx: ctx.sent.attributes['time'] -
-                            ctx.sentences[ctx.sent_nr - 1].attributes[
-                                'time']),
+                            ctx.sentences[ctx.sent_nr - 1].attributes['time']),
     "OTHERTEAM": (
         lambda ctx: next(t.name for t in ctx.world.teams if t.id != ctx.sent.actor.team.id)),
     'bridge-short': bridge_short,
     'bridge-long': bridge_long,
-    'bridge-impl': bridge_impl
+    'bridge-impl': bridge_impl,
+    'compare-alternatives': compare_actors,
 }

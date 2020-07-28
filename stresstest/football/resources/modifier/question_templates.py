@@ -185,6 +185,45 @@ question_templates = {
                     "The closest goal was scored by whom",
                 ]
             },
+
+            'comparison-time': {
+                'goal': [
+                    "Who scored later , !compare-alternatives",
+                    "Out of those two, who scored the last goal, !compare-alternatives",
+                    "Did !compare-alternatives score later (in the match)",
+                    "!compare-alternatives was the player who scored later",
+
+                ]
+            },
+            'comparison-reverse-time': {
+                'goal': [
+                    "Who scored earlier , !compare-alternatives",
+                    "Out of those two, who scored the first goal, !compare-alternatives",
+                    "Did !compare-alternatives score earlier",
+                    "!compare-alternatives was the one who scored earlier",
+
+                ]
+            },
+            'comparison-distance': {
+                'goal': [
+                    "Who scored the farther goal , !compare-alternatives",
+                    "Did !compare-alternatives score the farther goal",
+                    "Who scored from farther away , !compare-alternatives",
+                    "!compare-alternatives was the one who scored from farther away",
+
+                ]
+            },
+            'comparison-reverse-distance': {
+                'goal': [
+                    "Who scored the closer goal , !compare-alternatives",
+                    "Did !compare-alternatives score the closer goal",
+                    "Who scored from less far away , !compare-alternatives",
+                    "Who scored the closer goal , !compare-alternatives",
+                    "!compare-alternatives was the one who scored the closer goal",
+                    "!compare-alternatives scored the closer goal"
+
+                ]
+            },
             "goal": [
                 "Who scored",
                 "Who scored a goal",
@@ -200,6 +239,17 @@ question_templates = {
             'argmin-distance': {
                 'goal': [
                     "Who helped scoring closest goal",
+                ]
+            },
+            'comparison-distance': {
+                'goal': [
+                    "Who helped to score the farther goal , !compare-alternatives",
+                    "Who assisted the farther goal , !compare-alternatives",
+                    "Did !compare-alternatives assist the farther goal",
+                    "!compare-alternatives was the one who assisted the farther goal",
+                    "!compare-alternatives was the one who helped score the farther goal",
+                    "After whose pass was the farthest goal scored, !compare-alternatives",
+
                 ]
             },
             'argmax-distance': {
