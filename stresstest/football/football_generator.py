@@ -1,13 +1,21 @@
 import random
 
 import names
+from names import FILES
 from loguru import logger
-from scipy.stats import expon
 
 from stresstest.classes import Choices, Config, YouIdiotException
 from stresstest.football.classes import Team, Player, FootballWorld
 from stresstest.generator import StoryGenerator
 from stresstest.print_utils import fmt_dict
+
+
+def _load_names(file):
+    with open(file) as nf:
+        return [line.split()[0].capitalize() for line in nf.readlines()]
+
+
+cached_names = {k: Choices(_load_names(v)) for k, v in FILES.items()}
 
 
 class FootballGenerator(StoryGenerator):
@@ -74,8 +82,9 @@ class FootballGenerator(StoryGenerator):
             assert self.world.gender == 'female'
             p1 = Player(**{
                 "id": f"player{i}",
-                "first": names.get_first_name(self.world.gender),
-                "last": names.get_last_name(),
+                "first": cached_names[f'first:{self.world.gender}'].random(),
+                # names.get_first_name(self.world.gender),
+                "last": cached_names[f'last'].random(),  # names.get_last_name(),
                 'team': self.world.teams[0],
                 "position": self.POSITIONS.random()
             })
@@ -111,7 +120,7 @@ class FootballGenerator(StoryGenerator):
             m = 3
             # rv = expon(scale=20)
             # TODO: if too slow, change to linear...
-            if last_ts >= 91-m:
+            if last_ts >= 91 - m:
                 return last_ts + 1
             # p = [rv.pdf(x) for x in range(last_ts + 1, 90)]
             # m = 91 - last_ts
