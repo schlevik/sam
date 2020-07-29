@@ -149,6 +149,8 @@ def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_ty
     config = config or {"world.num_sentences": max_sents, 'unique_actors': True, 'world.num_players': 4 * max_sents}
     reasonings = reasonings or [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse, bridge,
                                 bridge_reverse, argmax, argmin, comparison, comparison_reverse]
-    return generate_and_realise(bundle, config, modify_event_type, modifier_type, max_sents,
-                                per_modify_distance_per_reasoning,
-                                reasonings, max_modifiers=max_modifier, num_workers=num_workers)
+    reasoning_map = {
+        r: per_modify_distance_per_reasoning for r in reasonings
+    }
+    return generate_and_realise(bundle, config, modify_event_type, modifier_type,
+                                reasoning_map, max_modifiers=max_modifier, num_workers=num_workers)
