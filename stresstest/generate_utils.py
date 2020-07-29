@@ -4,7 +4,7 @@ from copy import deepcopy
 from functools import partial
 from operator import attrgetter
 import random
-from typing import List
+from typing import List, Dict
 
 from joblib import delayed, Parallel
 from loguru import logger
@@ -16,12 +16,13 @@ from stresstest.football.generate_with_modifier import PlannedFootballModifierGe
 from stresstest.realize import Realizer
 
 
-def generate_and_realise(bundle, config, modify_event_type, modifier_type, max_sents, per_modify_distance_per_reasoning,
-                         reasonings, max_modifiers, use_mod_distance=False, mute=False, num_workers=8,
+def generate_and_realise(bundle, config, modify_event_type, modifier_type,
+                         reasonings: Dict[Reasoning, int],
+                         max_modifiers, use_mod_distance=False, mute=False, num_workers=8,
                          deterministic=True):
     # TODO: do parallel
     result = generate_balanced(
-        modify_event_type, config, bundle, max_sents, reasonings, modifier_type, per_modify_distance_per_reasoning,
+        modify_event_type, config, bundle, reasonings, modifier_type,
         max_modifiers, use_mod_distance, mute, num_workers=num_workers
     )
 
@@ -53,46 +54,50 @@ def _do_realize(config, event_plan, events, modifier_type, template_choices, tem
     if seed:
         random.seed(seed)
     realizer = Realizer(**templates, validate=False)
-    story, visits = realizer.realise_with_sentence_choices(events, world, template_choices)
+    modified_story, visits = realizer.realise_with_sentence_choices(events, world, template_choices)
     choices = realizer.context.choices
-    events = deepcopy(events)
-    for event in events:
+    indices_to_remove = [i for i, e in enumerate(events) if modifier_type in e.features]
+    baseline_events = deepcopy(events)
+    for event in baseline_events:
         event.features = []
     realizer = Realizer(**templates, unique_sentences=True)
-    baseline_story, baseline_visits = realizer.realise_with_choices(events, world, choices, template_choices)
+    baseline_story, baseline_visits = realizer.realise_with_choices(baseline_events, world, choices, template_choices)
     generator = partial(PlannedFootballModifierGenerator, config=config,
                         modifier_type=modifier_type)
     generator_instance: PlannedFootballModifierGenerator = generator(event_plan=event_plan)
     # this is for single span extraction only atm
-    qs = generator_instance.generate_questions_from_plan(event_plan, events)[0]
+    qs = generator_instance.generate_questions_from_plan(event_plan, baseline_events)[0]
     mqs = generator_instance.generate_questions_from_plan(event_plan, events, True)[0]
-
+    control_story = [s for i, s in enumerate(modified_story) if i not in indices_to_remove]
+    assert len(control_story) == len(baseline_story) - len(indices_to_remove)
     for q, mq in zip(qs, mqs):
         try:
-            realizer.realise_question(q, story, ignore_missing_keys=False)
+            realizer.realise_question(q, modified_story, ignore_missing_keys=False)
         except IndexError as e:
             print(f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}")
+            raise ValueError(f"Couldn't realize {q}") from e
         mq.realized = q.realized
-        assert mq.realized, f"{mq}\n{story}"
+        assert mq.realized, f"{mq}\n{modified_story}"
         try:
-            mq.answer = realizer._fix_units(mq, story)
+            mq.answer = realizer._fix_units(mq, modified_story)
         except IndexError as e:
-            print(f"{mq}\n{story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}")
-            raise NotImplementedError(e)
+            print(f"{mq}\n{modified_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}")
+            raise ValueError(f"Couldn't fix units for {mq}") from e
         assert q.answer in " ".join(
-            story), f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}"
+            modified_story), f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}"
         assert mq.answer in " ".join(
-            story), f"{mq}\n{story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}"
-    return baseline_story, mqs, qs, story
+            modified_story), f"{mq}\n{modified_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}"
+    return baseline_story, mqs, qs, modified_story, control_story
 
 
-def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: List[Reasoning],
-                      modifier_type, per_modify_distance_per_reasoning=10,
-                      max_modifiers=4, use_mod_distance=False, mute=False, num_workers=8):
+def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reasoning, int],
+                      modifier_type, max_modifiers, use_mod_distance, mute, num_workers):
     attr = attrgetter('modification_distance' if use_mod_distance else 'num_modifications')
     result = []
-    with tqdm(disable=mute, position=0, total=max_modifiers * len(reasonings)) as pbar:
-        for reasoning in reasonings:
+    max_sents = config.get("world.num_sentences")
+    with tqdm(desc="Generating Reasoning Plans...", disable=mute, position=0,
+              total=max_modifiers * len(reasonings)) as pbar:
+        for reasoning, per_modify_distance_per_reasoning in reasonings.items():
             all_event_plans = reasoning.generate_all_event_plans(max_sents, modify_event_type,
                                                                  bundle.reasoning_map[reasoning.name])
             event_plans_by_num_modifications = defaultdict(list)
@@ -115,7 +120,8 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                         delayed(_do_generate)(
                             PlannedFootballModifierGenerator, config=config,
                             modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
-                        for ep, seed in zip(eps, tqdm(seeds, position=1, leave=False)))
+                        for ep, seed in zip(eps, tqdm(seeds, position=1, leave=False, desc=f"{reasoning.name}, "
+                                                                                           f"#{num_modifiers} mod")))
                 else:
                     stories_and_worlds = [
                         _do_generate(
@@ -133,14 +139,9 @@ def generate_balanced(modify_event_type, config, bundle, max_sents, reasonings: 
                         template_choice = generate_one_possible_template_choice(
                             story, bundle.templates_modifier['sentences'], ep.must_haves, bundle.has_template_attribute
                         )
-                        tqdm.write("Yup, we're in a forever-loop....")
+                        logger.warning("Yup, we're in a forever-loop....")
                     template_choices.append(template_choice)
                 pbar.update()
-                try:
-                    assert len(stories) == len(eps) == len(template_choices) == len(worlds)
-                except AssertionError:
-                    print(len(stories), len(eps), len(template_choices), len(worlds))
-                    raise NotImplementedError()
                 assert len(stories) == len(eps) == len(template_choices) == len(worlds)
                 result.extend(zip(eps, stories, template_choices, worlds))
 

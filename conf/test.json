@@ -1,0 +1,23 @@
+{
+  "for_dataset": "squad",
+  "num_modifiers": 3,
+  "reasoning_map": {
+    "retrieval": 1,
+    "retrieval_reverse": 1,
+    "retrieval_two": 1,
+    "retrieval_two_reverse": 1,
+    "bridge": 1,
+    "bridge_reverse": 1,
+    "comparison": 1,
+    "comparison_reverse": 1,
+    "argmax": 1,
+    "argmin": 1
+  },
+  "world": {
+    "num_sentences": 6,
+    "num_players": 12
+  },
+  "domain": "football",
+  "modify_event_type": "goal",
+  "unique_actors": true
+}
