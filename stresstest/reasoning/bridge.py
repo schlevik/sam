@@ -33,7 +33,7 @@ def to_question(events: List[Event], is_modified, generator, event_types,
         target=target,
         evidence=evidence,
         event_type=modify_event_type,
-        reasoning=bridge_reverse.name,
+        reasoning=bridge_reverse.name if reverse else bridge.name,
         question_data={
             "bridge-event": bridge_event,
         },
