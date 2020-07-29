@@ -74,8 +74,8 @@ question_templates = {
             "bridge-reverse": {
                 "goal": [
                     "The goal before !bridge-short was scored from how far (away)",
-                    "Before !bridge-long , from how far away was the next goal scored",
-                    "Before !bridge-short , from how far away was the next goal scored",
+                    "Before !bridge-long , from how far away was the (previous) goal scored",
+                    "Before !bridge-short , from how far away was the (previous) goal scored",
                     "From how far (away) was the goal before !bridge-short scored"
                 ],
             }
@@ -110,8 +110,8 @@ question_templates = {
             "bridge-reverse": {
                 "goal": [
                     "The goal before !bridge-short was scored when",
-                    "Before !bridge-long , when was the next goal scored",
-                    "Before !bridge-short , when was the next goal scored",
+                    "Before !bridge-long , when was the (previous) goal scored",
+                    "Before !bridge-short , when was the (previous) goal scored",
                     "When was the goal before !bridge-short scored",
                 ],
             }
@@ -145,8 +145,8 @@ question_templates = {
                     "Who assisted (the goal) just after !bridge-long",
                     "Whose pass led to a goal (just) after !bridge-short",
                     "Whose pass led to a goal (just) after !bridge-long",
-                    "After !bridge-short , who scored (the next goal)",
-                    "After !bridge-long , who scored (the next goal)",
+                    "After !bridge-short , who helped score (the next goal)",
+                    "After !bridge-long , who helped score (the next goal)",
                     "Who helped score the goal after !bridge-long",
                     "Who helped score the goal after !bridge-short"
                 ],
@@ -157,8 +157,8 @@ question_templates = {
                     "Who assisted (the goal) just before !bridge-long",
                     "Whose pass led to a goal (just) before !bridge-short",
                     "Whose pass led to a goal (just) before !bridge-long",
-                    "After !bridge-short , who before (the next goal)",
-                    "After !bridge-long , who before (the next goal)",
+                    "Before !bridge-short , who helped score (the previous goal)",
+                    "Before !bridge-long , who helped score (the previous goal)",
                     "Who helped score the goal before !bridge-long",
                     "Who helped score the goal before !bridge-short"
                 ],
@@ -238,7 +238,8 @@ question_templates = {
         "coactor": {
             'argmin-distance': {
                 'goal': [
-                    "Who helped scoring closest goal",
+                    "Who helped to score the closest goal",
+                    "Who helped in scoring the closest goal",
                 ]
             },
             'comparison-distance': {

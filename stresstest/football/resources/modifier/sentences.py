@@ -54,7 +54,7 @@ sentences = {
         "$NP.coactor 's $NP.pass-type .", 
         
         #|$VP.VBD.score a $JJ.distance $NP.goal from]
-        "$NP.actor %CONNECTIVE.VP when !PRP @RB.goal $VP.VBD.modifier $VP.VBD.score a $JJ.distance $NP.goal from "
+        "$NP.actor @RB.goal $VP.VBD.modifier %CONNECTIVE.VP when !PRP @RB.goal $VP.VBD.modifier $VP.VBD.score a $JJ.distance $NP.goal from "
         "$NP.coactor 's $NP.pass-type ."
     ],
     "foul": [
