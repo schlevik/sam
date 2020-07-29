@@ -8,7 +8,7 @@ from overrides import overrides
 from transformers import AlbertForQuestionAnswering, AlbertTokenizer
 from transformers.data.metrics.squad_metrics import _get_best_indexes
 
-from stresstest.classes import Model, Entry
+from stresstest.classes import Model, Entry, Choices
 
 
 def _filter_albert(input, start_logits, end_logits, start_indexes, end_indexes, bad_tokens=(2, 3)):
@@ -196,3 +196,43 @@ class Albert(Model):
         # except:
         #     raise ValueError(f"This should not happen! Question: {question} Passage: {passage} prediction: {result}")
         # return result
+
+
+class RandomBaseline(Model):
+    def __init__(self, name):
+        super().__init__(name, None, False)
+
+    @classmethod
+    def make(cls, path=None, gpu=False):
+        return cls("Random")
+
+    def predict(self, entry: Entry) -> str:
+        events = entry.qa['events']
+
+        candidates = [str(a) if isinstance(a, int) else f"{a['first']} {a['last']}"
+                      for e in events for a in list(e['attributes'].values()) + [e['actor']]]
+        print(candidates)
+        choices = Choices([c for c in candidates if c in entry.passage])
+        print(choices)
+
+        return choices.random()
+
+
+class EducatedBaseline(Model):
+    def __init__(self, name):
+        super().__init__(name, None, False)
+
+    @classmethod
+    def make(cls, path=None, gpu=False):
+        return cls("Educated")
+
+    def predict(self, entry: Entry) -> str:
+        events = entry.qa['events']
+        answer_is_numbers = any(d in entry.answer for d in string.digits)
+        if answer_is_numbers:
+            candidates = [str(a) for e in events for a in list(e['attributes'].values()) if isinstance(a, int)]
+        else:
+            candidates = [f"{a['first']} {a['last']}" for e in events for a in
+                          list(e['attributes'].values()) + [e['actor']] if isinstance(a, dict)]
+        choices = Choices([c for c in candidates if c in entry.passage])
+        return choices.random()
