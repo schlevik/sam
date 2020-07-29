@@ -19,31 +19,68 @@ def _is(et, cmd, arg):
 
 
 def to_question(events: List[Event], is_modified, generator, event_types,
-                comparison_attribute, modify_event_type, target='actor', reverse=False) -> Question:
+                comparison_attribute, modify_event_type, target='actor', reverse=False, temp_ordered=False) -> Question:
     assert target == 'actor'
-    non_modified_events = [
-        i for i, e in enumerate(event_types) if
-        _is(e, EventPlan.Just, modify_event_type)
-    ]
-    modified_events = [
-        i for i, e in enumerate(event_types) if
-        _is(e, EventPlan.Mod, modify_event_type)
-    ]
-    evidence = non_modified_events + modified_events
+    for e in event_types:
+        logger.debug(e)
+    logger.debug(f"temp ordered: {temp_ordered}")
+    logger.debug(f"is modified: {is_modified}")
+    logger.debug(f"comparison attribute: {comparison_attribute}")
+    logger.debug(f"reverse: {reverse}")
+    idx_of_true_when_modified = \
+        [i for i, e in enumerate(event_types) if _is(e, EventPlan.Just, '_') and not _is(e, EventPlan.SameActor, '_')]
+    assert len(idx_of_true_when_modified) == 1
+    idx_of_true_when_modified = idx_of_true_when_modified[0]
+    if temp_ordered:
+        idx_of_true_when_not_modified = [i for i, e in enumerate(event_types) if _is(e, EventPlan.SameActor, '_')]
+        if is_modified:
+            idx_of_true_when_not_modified = [
+                i for i in idx_of_true_when_not_modified if _is(event_types[i], EventPlan.Just, '_')
+            ]
+            assert len(idx_of_true_when_not_modified) == 1
+            idx_of_true_when_not_modified = idx_of_true_when_not_modified[0]
+        else:
+            idx_of_true_when_not_modified = idx_of_true_when_not_modified[0 if reverse else -1]
+    else:
+        if is_modified:
+            idx_of_true_when_not_modified = [
+                i for i, e in enumerate(event_types) if
+                _is(e, EventPlan.Just, '_') and _is(e, EventPlan.SameActor, '_')
+            ]
+        else:
+            idx_of_true_when_not_modified = [
+                i for i, e in enumerate(event_types) if _is(e, EventPlan.SameActor, '_') and
+                                                        e[0] == EventPlan.Order and e[1][2] == (-99 if reverse else 99)
+            ]
+        assert len(idx_of_true_when_not_modified) == 1
+        idx_of_true_when_not_modified = idx_of_true_when_not_modified[0]
+    evidence = [idx_of_true_when_modified, idx_of_true_when_not_modified]
+
     logger.debug(f"Evidence: {evidence}")
     logger.debug(f"len(events): {len(events)}")
-    target_of_modified_events = events[modified_events[0]].actor \
-        if target == 'actor' \
-        else events[modified_events[0]].attributes[target]
-    if target == 'actor':
-        target_of_non_modified_events = next(
-            events[i] for i in non_modified_events if events[i].actor != target_of_modified_events
-        ).actor
-    else:
-        target_of_non_modified_events = next(
-            events[i] for i in non_modified_events if events[i].attributes[target] != target_of_modified_events
-        ).attributes[target]
-    answer = target_of_non_modified_events if is_modified else target_of_modified_events
+
+    # if not (isinstance(idx_of_true_when_modified, int) and isinstance(idx_of_true_when_not_modified, int) and len(
+    #         evidence) == 2):
+    #     print(idx_of_true_when_modified)
+    #     print(idx_of_true_when_not_modified)
+    #     print(event_types)
+    #     for e in event_types:
+    #         print(e)
+    #     print(reverse)  # false
+    #     print(is_modified)  # True
+    #     print(temp_ordered)  # false
+    #     raise NotImplementedError()
+    assert len(evidence) == 2
+    answer_when_modified = events[idx_of_true_when_modified].actor
+    answer_when_not_modified = events[idx_of_true_when_not_modified].actor
+    # if not answer_when_modified != answer_when_not_modified:
+    #     print(event_types)
+    #     for e in event_types:
+    #         print(e)
+    #     print(idx_of_true_when_modified)
+    #     print(idx_of_true_when_not_modified)
+    #     raise NotImplementedError()
+    answer = answer_when_modified if is_modified else answer_when_not_modified
     return Question(
         type=QuestionTypes.OVERALL,
         target=target,
@@ -51,8 +88,8 @@ def to_question(events: List[Event], is_modified, generator, event_types,
         event_type=modify_event_type,
         reasoning=f"{comparison.name}{'-reverse-' if reverse else '-'}{comparison_attribute}",
         question_data={
-            "target-of-modified-events": target_of_modified_events,
-            'target-of-non-modified-events': target_of_non_modified_events
+            "answer-when-modified": answer_when_modified,
+            'answer-when-not-modified': answer_when_not_modified
         },
         answer=answer,
     )
@@ -103,7 +140,10 @@ def generate_most_comparison_plans(
                 event_types[last] = same_actor_as(just(modify_event_type), first_occurrence)
 
                 if not temp_ordered:
-                    for f in first:
+                    ff, *fs = first
+                    event_types[ff] = order(event_types[f],
+                                            argmax_attribute=attribute, order=99 if not reverse else -99)
+                    for f in fs:
                         event_types[f] = order(event_types[f],
                                                argmax_attribute=attribute, order=2 if not reverse else 0)
                     event_types[middle] = order(event_types[middle], argmax_attribute=attribute, order=1)
@@ -127,7 +167,8 @@ def generate_most_comparison_plans(
                                          event_types=event_types,
                                          modify_event_type=modify_event_type,
                                          comparison_attribute=attribute,
-                                         reverse=reverse
+                                         reverse=reverse,
+                                         temp_ordered=temp_ordered,
                                          )
                                  ),
                 must_haves=[

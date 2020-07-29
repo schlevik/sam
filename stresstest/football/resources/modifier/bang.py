@@ -56,8 +56,8 @@ def bridge_impl(qdata: Dict[str, Event]):
 
 
 def compare_actors(qdata: Dict[str, Player]):
-    actor_of_non_modified_events = qdata["target-of-modified-events"]
-    actor_of_modified_events = qdata['target-of-non-modified-events']
+    actor_of_non_modified_events = qdata["answer-when-modified"]
+    actor_of_modified_events = qdata['answer-when-not-modified']
     if not isinstance(actor_of_modified_events, Player) or not isinstance(actor_of_non_modified_events, Player):
         raise YouIdiotException(f"We compare actors only! "
                                 f"was {actor_of_modified_events}, {actor_of_non_modified_events}")
