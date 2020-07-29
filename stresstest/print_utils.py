@@ -32,3 +32,22 @@ def highlight_passage_and_question(passage: List[str], question: Question, highl
     res.append(click.style(question.realized, fg='magenta'))
     res.append(question.answer)
     return "\n".join(res)
+
+
+def visualize(event_plans, eventss, template_choicess, worlds, baseline_stories, mqs, qs, stories, control_stories,
+              n=None):
+    out = []
+    for event_plan, events, template_choices, world, baseline_story, mqs, qs, story, control_story in list(zip(
+            event_plans, eventss, template_choicess, worlds, baseline_stories, mqs, qs, stories, control_stories))[:n]:
+        out.append(f"Reasoning: {click.style(event_plan.reasoning_type.name, fg='yellow', bold=True)}, "
+                   f"# Modifications: {event_plan.num_modifications}")
+        out.append(click.style("Baseline story: ", bold=True))
+        for q in qs:
+            out.append(highlight_passage_and_question(baseline_story, q))
+        out.append('----' * 20)
+        out.append(click.style("Modified/Control story: ", bold=True))
+        for mq in mqs:
+            out.append(highlight_passage_and_question(story, mq))
+        out.append('\n'.join(str(e) for e in event_plan.event_types))
+        out.append(20 * "=====")
+    return out
