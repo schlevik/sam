@@ -7,10 +7,9 @@ from typing import List
 import click
 import numpy as np
 import torch
+from loguru import logger
 from transformers import AutoTokenizer, AutoConfig, AutoModelForQuestionAnswering, SquadV2Processor, SquadV1Processor, \
     squad_convert_examples_to_features, MODEL_FOR_QUESTION_ANSWERING_MAPPING
-
-logger = logging.getLogger(__name__)
 
 
 def set_seed(args: 'Args'):
@@ -80,6 +79,7 @@ def get_model(model_name_or_path):
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
 def cache_examples(in_files, out_folder, model_path, do_not_lower_case, evaluate, v2, max_seq_length, doc_stride,
                    max_query_length, num_workers, debug_features):
+    print(f"debug_features: {debug_features}")
     do_lower_case = not do_not_lower_case
     tokenizer = get_tokenizer(model_path, do_lower_case)
     processor = SquadV2Processor() if v2 else SquadV1Processor()
@@ -119,16 +119,18 @@ def cache_examples(in_files, out_folder, model_path, do_not_lower_case, evaluate
 
 
 def debug_features_examples_dataset(dataset, examples, features, tokenizer):
-    logger.info("First passage as decoded by tokenizer: ")
-    logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in dataset[0][0] if e))
+    n = random.randint(0, len(features))
+    logger.info(f"passage {n} as decoded by tokenizer: ")
+    logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in dataset[n][0] if e))
     if len(dataset.tensors) == 6:
         logger.info("This is a dataset for evaluation!")
-
+        logger.info(f"Answer: {dataset[0][3]}")
     elif len(dataset.tensors) == 8:
         logger.info("This is a dataset for training!")
-        max_answer_length = max(dataset[i][4] - dataset[i][3] for i in range(len(dataset)))
-        logger.info("Max answer length: ", max_answer_length)
-
+        max_answer_length = max(dataset[i][4].item() - dataset[i][3].item() for i in range(len(dataset)))
+        start, end = dataset[n][3].item(), dataset[n][4].item() + 1
+        logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in dataset[n][0][start:end] if e))
+        logger.info(f"Max answer length: {max_answer_length}")
 
 
 def load_examples(location):
