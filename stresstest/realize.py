@@ -645,7 +645,7 @@ class Realizer:
             else:
                 question_words.append(word)
         logger.debug(question_words)
-        q.realized = " ".join(" ".join(self.post_process(question_words)).split()) + "?"
+        q.realized = " ".join(" ".join(self.post_process(question_words)).split()) + " ?"
         answer = self._fix_units(q, passage)
         q.answer = answer
 
