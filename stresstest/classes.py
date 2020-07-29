@@ -319,10 +319,10 @@ class EventPlan:
     SameActor: str = field(default='same-actor-as', init=False, repr=False, compare=False)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Reasoning:
     name: str
     cardinality_event_plans: Callable[[int], int] = field(repr=False, compare=False)
-    questions_per_event_plan: int
+    questions_per_event_plan: int = field(repr=False, compare=False)
     generate_all_event_plans: Callable[[int, str, Union[List[str], Dict[str, List[str]]]], List[EventPlan]] = field(
         repr=False, compare=False)
