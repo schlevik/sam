@@ -34,6 +34,7 @@ class DeterminedChooser(RandomChooser):
         self.choices = choices or [[]] * len(sentence_choices)
         self.sentence_choices = sentence_choices
         self.iter = self._iter()
+        self.skip = False
 
     def _iter(self):
         for choices_for_ith_sentence, ith_sentence_template in zip(self.choices, self.sentence_choices):
@@ -42,7 +43,9 @@ class DeterminedChooser(RandomChooser):
                 yield choice
 
     def choose(self, choices, exclude=None, *args, **kwargs):
-
+        if self.skip:
+            # raise NotImplementedError()
+            return super().choose(choices, exclude=exclude, *args, **kwargs)
         name, choice = next(self.iter)
         if isinstance(choices, S):
             # name, idx = next(self.iter)
@@ -108,6 +111,7 @@ class Processor:
         self.accessor = accessor
         self.context = self.accessor.context
         self.chooser = chooser
+        self._is_recording = True
 
     def decide_process_function(self, word) -> Optional[Callable[[str], List[str]]]:
         if word.startswith("(") and word.endswith(")"):
@@ -124,6 +128,10 @@ class Processor:
             r = self.process_function
         elif word.startswith("@"):
             r = self.process_feature
+        elif word == "{":
+            r = self.stop_recording
+        elif word == "}":
+            r = self.start_recording
         else:
             return None
         logger.debug(f"Deciding to process with {r.__name__}")
@@ -149,7 +157,7 @@ class Processor:
         logger.debug("...Word is an option ()...")
         # 50/50 whether to ignore it
         include, idx = self.chooser.choose([True, False])
-        self.context.current_choices.append((word, idx))
+        self.record(word, idx)
         if include:
             new_words = word[1:-1].split()
             logger.debug(f"... new words: {new_words}")
@@ -165,7 +173,7 @@ class Processor:
         # choice = random.choice(alternatives)
         choice, idx = self.chooser.choose(alternatives)
         logger.debug(f"...Choosing {choice}")
-        self.context.current_choices.append((word, idx))
+        self.record(word, idx)
         return choice.split()
 
     def process_condition(self, word):
@@ -179,7 +187,7 @@ class Processor:
         logger.debug(f"with result: {result}")
         # new_words, idx = branch[result].random()
         new_words, idx = self.chooser.choose(branch[result])
-        self.context.choices[self.context.sent_nr].append((word, idx))
+        self.record(word, idx)
 
         logger.debug(f"... new words: {new_words}")
         new_words = [str(w) for w in new_words]
@@ -216,7 +224,7 @@ class Processor:
             raise YouIdiotException(f"Template {self.context.chosen_templates[-1]} uses '{word}' "
                                     f"more often than there are unique alternatives!")
         new_words, idx = self.chooser.choose(choices, exclude)
-        self.context.current_choices.append((word, idx))
+        self.record(word, idx)
         logger.debug(f"... new words: {new_words}")
         # self.context['stack'].extend(new_words)
         return new_words
@@ -229,9 +237,32 @@ class Processor:
         # new_words = str(func(self.context)).split()
         new_words = self.chooser.choose(lambda: func(args))
         logger.debug(f"... new words: {new_words}")
-        self.context.current_choices.append((word, new_words))
+        self.record(word, new_words)
         # self.context['stack'].extend(new_words[::-1])
         return new_words
+
+    def start_recording(self, *args, **kwargs):
+        logger.debug("...Word is a start recording }...")
+        self._is_recording = True
+        self.chooser.skip = False
+        return []
+
+    def stop_recording(self, *args, **kwargs):
+        logger.debug("...Word is a stop recording {...")
+        self._is_recording = False
+        self.chooser.skip = True
+        return []
+
+    def record(self, word, idx):
+        if self._is_recording:
+            logger.debug(f"Recording: ({word},{idx})")
+            self.context.current_choices.append((word, idx))
+            assert "almost" not in word
+        else:
+            logger.debug(f"NOT RECORDING: ({word},{idx})")
+        logger.debug(f"IS RECORDING?: {self._is_recording}")
+        logger.debug(f"RECORDED SO FAR: {self.context.current_choices}")
+
 
 
 class Validator:

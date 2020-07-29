@@ -1,6 +1,6 @@
 at = {
     "RB": {
-        "goal": ['almost', 'nearly', 'all but']  # TODO: more
+        "goal": ['[almost|nearly|all but]']  # TODO: more
     },
     "MD": {
         "VBD": {
