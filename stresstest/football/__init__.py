@@ -54,7 +54,7 @@ def _reload_bundle() -> Bundle:
             'bridge': ['time', 'distance', 'coactor'],
             'bridge-reverse': ['time', 'distance', 'coactor'],
             'argmax': {
-                'distance': ['distance', 'coactor']
+                'distance': ['distance', 'coactor', 'time']
             },
             'argmin': {
                 'distance': ['distance', 'coactor', 'time']
