@@ -7,13 +7,25 @@ from random import shuffle, sample
 from typing import List, Dict, Tuple
 
 from loguru import logger
+from pyhocon import ConfigFactory
 
 from stresstest.classes import Event, Choices, YouIdiotException
 
 key = attrgetter('event_type')
 
 
-def split(templates: Dict[str, Dict[str, List[str]]], event_types_to_split: List[str], split_ratio: float):
+def paths(key, path=()):
+    if isinstance(key, list):
+        # key is leaf
+        yield path, key
+    else:
+        for n, s in key.items():
+            for p in paths(s, path + (n,)):
+                yield p
+
+
+def split(templates: Dict[str, Dict[str, List[str]]], event_types_to_split: List[str], split_ratio: float,
+          split_question_templates=False):
     first_split = deepcopy(templates)
     second_split = deepcopy(templates)
     for event_type, sents in templates['sentences'].items():
@@ -28,6 +40,28 @@ def split(templates: Dict[str, Dict[str, List[str]]], event_types_to_split: List
         else:
             second_split['sentences'][event_type] = sents
             first_split['sentences'][event_type] = sents
+    if split_question_templates:
+        first_q_templates = ConfigFactory.from_dict({})
+        second_q_templates = ConfigFactory.from_dict({})
+        for path, q_templates in paths(templates['question_templates']):
+            logger.debug(path)
+            logger.debug(q_templates)
+            shuffle(q_templates)
+            split_idx = round(split_ratio * len(q_templates))
+            q_templates_first = q_templates[split_idx:]
+            q_templates_second = q_templates[:split_idx]
+            assert len(q_templates_first) + len(q_templates_second) == len(q_templates)
+            first_q_templates.put('.'.join(path), q_templates_first)
+            second_q_templates.put('.'.join(path), q_templates_second)
+        # raise NotImplementedError
+
+        first_q_templates = first_q_templates.as_plain_ordered_dict()
+        second_q_templates = second_q_templates.as_plain_ordered_dict()
+        assert [k for k, _ in paths(first_q_templates)] == \
+               [k for k, _ in paths(second_q_templates)] == \
+               [k for k, _ in paths(templates['question_templates'])]
+        first_split['question_templates'] = first_q_templates
+        second_split['question_templates'] = second_q_templates
     return first_split, second_split
 
 
