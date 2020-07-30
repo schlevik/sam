@@ -63,10 +63,10 @@ def _reload_bundle() -> Bundle:
                 ('distance', False),
                 ('time', True),
             ],
-            'comparison-reverse': {
+            'comparison-reverse': [
                 ('distance', False),
                 ('time', True),
-            }
+            ]
         },
         has_template_attribute=_has
     )
