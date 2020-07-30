@@ -4,7 +4,7 @@ from typing import List, Optional, Callable
 from loguru import logger
 from overrides import overrides
 
-from stresstest.classes import Event, World, EventPlan
+from stresstest.classes import Event, World, EventPlan, YouIdiotException
 from stresstest.generator import StoryGenerator
 
 
@@ -86,7 +86,6 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
             self.current_event.actor = self.sentences[same_actor_idx].actor
         else:
             super_cls = super()
-            logger.debug("super_cls")
             super_cls.set_actor()
 
     def set_attributes(self):
@@ -98,7 +97,20 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
                 logger.debug(f"Setting {attribute} to {preset_attr}")
                 self.current_event.attributes[attribute] = preset_attr
             else:
-                self.current_event.attributes[attribute] = self.create_attribute(attribute)
+                if not self.unique_actors:
+                    self.current_event.attributes[attribute] = self.create_attribute(attribute)
+                else:
+                    attr = self.create_attribute(attribute)
+                    patience = 100
+
+                    while any(e.attributes[attribute] == attr for e in self.sentences if attribute in e.attributes):
+                        # unique attributes
+                        attr = self.create_attribute(attribute)
+                        patience -= 1
+                        if not patience:
+                            raise YouIdiotException("You tried to generate 100 'random' "
+                                                    "attributes but they were all the same!")
+                    self.current_event.attributes[attribute] = attr
 
     def set_everything_else(self):
         ...
@@ -113,6 +125,7 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
             question.answer = self.post_process_attribute_answers(event_plan.question_target, question.answer)
         else:
             raise NotImplementedError()
+        assert question.answer, f"{question}, {event_plan}, modified={modified}"
         questions.append(question)
 
         return questions, None, None, None
