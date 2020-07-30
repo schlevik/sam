@@ -99,6 +99,11 @@ class F1(EvalMetric):
         return overall_f1
 
 
+class EMRelaxed(EM):
+    def __init__(self):
+        super().__init__(relaxed=True)
+
+
 def get_mean_var_ci(sample, alpha=0.025):
     sample = np.array(sample)
     t_ci = t.ppf(1 - alpha, df=len(sample) - 1)
@@ -106,9 +111,12 @@ def get_mean_var_ci(sample, alpha=0.025):
 
 
 def get_mean_var_ci_bernoulli(sample, alpha=0.05):
-    lower, _ = proportion_confint(sum(sample), len(sample), alpha=alpha)
-    mean = sum(sample) / len(sample)
-    return mean, None, mean - lower
+    if sample:
+        lower, _ = proportion_confint(sum(sample), len(sample), alpha=alpha)
+        mean = sum(sample) / len(sample)
+        return mean, None, mean - lower
+    else:
+        return 0, None, 0
 
 
 def evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
@@ -209,12 +217,21 @@ def evaluate_intervention(aligned_baseline, aligned_intervention, aligned_contro
 
 
 def align(baseline, intervention, control, assert_same=False):
-    gold_flat = list(sample_iter(baseline))
-    gold_intervention_flat = list(sample_iter(intervention))
+    if isinstance(baseline, dict):
+        gold_flat = list(sample_iter(baseline))
+    else:
+        gold_flat = baseline
+    if isinstance(intervention, dict):
+        gold_intervention_flat = list(sample_iter(intervention))
+    else:
+        gold_intervention_flat = intervention
     q_m_by_id = {m.qa_id: m for m in gold_intervention_flat}
 
     if control:
-        gold_control_flat = list(sample_iter(control))
+        if isinstance(control, dict):
+            gold_control_flat = list(sample_iter(control))
+        else:
+            gold_control_flat = control
         q_c_by_id = {c.qa_id: c for c in gold_control_flat}
 
     else:

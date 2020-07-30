@@ -1,6 +1,6 @@
 from itertools import chain, islice
 import ujson as json
-from typing import Dict, Any, List, Generator, Iterable, TypeVar
+from typing import Dict, Any, List, Generator, Iterable, TypeVar, Union
 
 from stresstest.classes import Entry
 
@@ -25,7 +25,7 @@ def batch(iterable: Iterable[T], batch_size=10) -> List[Iterable[T]]:
         yield list(chain([first], islice(iterator, batch_size - 1)))
 
 
-def sample_iter(sample: List[Dict[str, Any]]) -> Generator[Entry, None, None]:
+def sample_iter(sample: Union[List[Dict[str, Any]], Dict]) -> Generator[Entry, None, None]:
     if isinstance(sample, dict):
         sample = sample['data']
     for datum in sample:
