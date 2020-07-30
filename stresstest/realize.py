@@ -264,7 +264,6 @@ class Processor:
         logger.debug(f"RECORDED SO FAR: {self.context.current_choices}")
 
 
-
 class Validator:
     def __init__(self, processor: Processor):
         self.processor = processor
@@ -613,20 +612,23 @@ class Realizer:
                     unit_found = False
                     i = 0
                     while not unit_found:
-                        try:
-                            if tokens[answer_position + i].startswith(unit):
-                                candidate_spans.append(tokens[answer_position:answer_position + i + 1])
-                                unit_found = True
-                                logger.debug(f"Unit found in evidence {idx}: {answer_position + i}!")
-                            if tokens[answer_position - i].startswith(unit):
-                                candidate_spans.append(tokens[answer_position - i:answer_position + 1])
-                                unit_found = True
-                            i += 1
-                        except IndexError:
-                            break
+                        if answer_position + i < len(tokens) and tokens[answer_position + i].startswith(unit):
+                            candidate_spans.append(tokens[answer_position:answer_position + i + 1])
+                            unit_found = True
+                            logger.debug(f"Unit found in evidence {idx}: {answer_position + i} ")
+                            logger.debug(f"adding: tokens[{answer_position}:{answer_position + i + 1}: "
+                                         f"{tokens[answer_position:answer_position + i + 1]}")
+                        if answer_position - i > 0 and tokens[answer_position - i].startswith(unit):
+                            candidate_spans.append(tokens[answer_position - i:answer_position + 1])
+                            unit_found = True
+                            logger.debug(f"Unit found in evidence {idx}: {answer_position + i} ")
+                            logger.debug(f"adding: tokens[{answer_position - i}:{answer_position + 1}]: "
+                                         f"{tokens[answer_position - i:answer_position + 1]}")
+                        i += 1
             shortest_answer = sorted(candidate_spans, key=len)[0]
-            logger.debug(f"Shortest answer found: {shortest_answer}")
+            logger.debug(f"Shortest answer found: {shortest_answer} in {sorted(candidate_spans, key=len)}")
             new_answers.append(shortest_answer)
+        assert new_answers
         new_answers = [' '.join(answer) for answer in new_answers]
         return new_answers if isinstance(question.answer, list) else new_answers[0]
 
@@ -678,6 +680,7 @@ class Realizer:
         logger.debug(question_words)
         q.realized = " ".join(" ".join(self.post_process(question_words)).split()) + " ?"
         answer = self._fix_units(q, passage)
+        assert answer, f"{q}, {passage}"
         q.answer = answer
 
         return q.realized, q.answer
