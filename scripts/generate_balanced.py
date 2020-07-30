@@ -5,6 +5,7 @@ import uuid
 import click
 
 from scripts.utils import Domain, BASELINE, INTERVENTION, write_json, CONTROL
+from stresstest.baseline_utils import mask_question, mask_passage
 from stresstest.classes import Config
 from stresstest.comb_utils import split
 from stresstest.ds_utils import to_squad
@@ -23,8 +24,11 @@ from stresstest.util import do_import
 @click.option("--num-workers", type=int, default=8)
 @click.option("--split-templates", type=float, default=False)
 @click.option("--modifier-type", type=str, default='RB')
+@click.option('--mask-q', is_flag=True, default=False)
+@click.option('--mask-p', is_flag=True, default=False)
+@click.option('--keep-answer-candidates', is_flag=True, default=False)
 def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_workers, split_templates,
-                      modifier_type):
+                      modifier_type, mask_q, mask_p, keep_answer_candidates):
     if seed:
         random.seed(seed)
     uuid4 = lambda: uuid.UUID(int=random.getrandbits(128)).hex
@@ -75,13 +79,12 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
             max_modifiers=num_modifiers,
             use_mod_distance=False,
             mute=False,
-            num_workers=num_workers
+            num_workers=num_workers,
+            deterministic=True
         )
         (event_plans, events, template_choices, worlds, baseline_stories, mqs, qs, modified_stories,
          control_stories) = zip(*res)
-        baseline, modified, control = to_squad(
-            uuid4, event_plans, events, template_choices, baseline_stories, mqs, qs, modified_stories, control_stories
-        )
+
         if do_print:
             lines = visualize(
                 event_plans, events, template_choices, worlds, baseline_stories, mqs, qs, modified_stories,
@@ -89,10 +92,22 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
             )
             for line in lines:
                 click.echo(line)
+        click.echo("Converting to squad format...")
+        baseline, modified, control = to_squad(
+            uuid4, event_plans, events, template_choices, baseline_stories, mqs, qs, modified_stories, control_stories,
+            mask_p, mask_q, keep_answer_candidates
+        )
+
+        click.echo("Saving...")
         if do_save:
+            click.echo("...Baseline")
             write_json({"version": 0.1, "data": baseline}, os.path.join(out_path, file_name.format(BASELINE)),
                        pretty=False)
+
+            click.echo("...Intervention")
             write_json({"version": 0.1, "data": modified}, os.path.join(out_path, file_name.format(INTERVENTION)),
                        pretty=False)
+
+            click.echo("...Control")
             write_json({"version": 0.1, "data": control}, os.path.join(out_path, file_name.format(CONTROL)),
                        pretty=False)
