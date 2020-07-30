@@ -1,17 +1,17 @@
 {
-  "for_dataset": "squad",
+  "for_dataset": "test",
   "num_modifiers": 3,
   "reasoning_map": {
-    "retrieval": 1,
-    "retrieval_reverse": 1,
-    "retrieval_two": 1,
-    "retrieval_two_reverse": 1,
-    "bridge": 1,
-    "bridge_reverse": 1,
-    "comparison": 1,
-    "comparison_reverse": 1,
-    "argmax": 1,
-    "argmin": 1
+    "retrieval": 100,
+    "retrieval_reverse": 100,
+    "retrieval_two": 100,
+    "retrieval_two_reverse": 100,
+    "bridge": 100,
+    "bridge_reverse": 100,
+    "comparison": 33,
+    "comparison_reverse": 33,
+    "argmax": 66,
+    "argmin": 66
   },
   "world": {
     "num_sentences": 6,
