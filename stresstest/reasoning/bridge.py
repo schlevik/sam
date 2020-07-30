@@ -28,6 +28,7 @@ def to_question(events: List[Event], is_modified, generator, event_types,
     answer_event = events[evidence[-1] if not reverse else evidence[0]]
     bridge_event = events[evidence[0] if not reverse else evidence[-1]]
     answer = answer_event.actor if target == 'actor' else answer_event.attributes[target]
+    assert answer
     return Question(
         type=QuestionTypes.DIRECT,
         target=target,

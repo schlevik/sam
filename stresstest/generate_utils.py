@@ -28,7 +28,7 @@ def generate_and_realise(bundle, config, modify_event_type, modifier_type,
 
     templates = bundle.templates_modifier
     # validate templates here real quick
-    realizer = Realizer(**templates, validate=True)
+    Realizer(**templates, validate=True)
     if deterministic:
         seeds = [random.randint(0, sys.maxsize) for _ in result]
     else:
@@ -71,18 +71,12 @@ def _do_realize(config, event_plan, events, modifier_type, template_choices, tem
     control_story = [s for i, s in enumerate(modified_story) if i not in indices_to_remove]
     assert len(control_story) == len(baseline_story) - len(indices_to_remove)
     for q, mq in zip(qs, mqs):
-        try:
-            realizer.realise_question(q, modified_story, ignore_missing_keys=False)
-        except IndexError as e:
-            print(f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}")
-            raise ValueError(f"Couldn't realize {q}") from e
+        realizer.realise_question(q, modified_story, ignore_missing_keys=False)
+        assert q.answer, f"{q}\n{modified_story}"
         mq.realized = q.realized
         assert mq.realized, f"{mq}\n{modified_story}"
-        try:
-            mq.answer = realizer._fix_units(mq, modified_story)
-        except IndexError as e:
-            print(f"{mq}\n{modified_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}")
-            raise ValueError(f"Couldn't fix units for {mq}") from e
+        mq.answer = realizer._fix_units(mq, modified_story)
+        assert mq.answer, f"{mq}\n{modified_story}"
         assert q.answer in " ".join(
             modified_story), f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}"
         assert mq.answer in " ".join(
@@ -100,6 +94,7 @@ def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reason
         for reasoning, per_modify_distance_per_reasoning in reasonings.items():
             all_event_plans = reasoning.generate_all_event_plans(max_sents, modify_event_type,
                                                                  bundle.reasoning_map[reasoning.name])
+
             event_plans_by_num_modifications = defaultdict(list)
             for ep in all_event_plans:
                 value = attr(ep)
@@ -113,21 +108,23 @@ def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reason
                     eps = event_plans
                     while len(eps) < per_modify_distance_per_reasoning:
                         eps.append(random.choice(eps))
-
                 seeds = [random.randint(0, sys.maxsize) for _ in eps]
                 if num_workers > 1:
                     stories_and_worlds = Parallel(num_workers)(
                         delayed(_do_generate)(
                             PlannedFootballModifierGenerator, config=config,
                             modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
-                        for ep, seed in zip(eps, tqdm(seeds, position=1, leave=False, desc=f"{reasoning.name}, "
-                                                                                           f"#{num_modifiers} mod")))
+                        for ep, seed in
+                        zip(eps, tqdm(seeds, position=1, leave=False, disable=mute, desc=f"{reasoning.name}, "
+                                                                                         f"#{num_modifiers} mod")))
                 else:
                     stories_and_worlds = [
                         _do_generate(
                             PlannedFootballModifierGenerator, config=config,
                             modifier_type=modifier_type, ep=ep, mute=False, seed=seed)
-                        for ep, seed in zip(eps, tqdm(seeds, position=1, leave=False))
+                        for ep, seed in
+                        zip(eps, tqdm(seeds, position=1, leave=False, disable=mute, desc=f"{reasoning.name}, "
+                                                                                         f"#{num_modifiers} mod"))
                     ]
                 stories, worlds = zip(*stories_and_worlds)
                 for story, ep in zip(stories, eps):
