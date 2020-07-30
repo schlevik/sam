@@ -1,6 +1,6 @@
 import glob
-import logging
 import os
+import sys
 
 import click
 import torch
@@ -11,19 +11,19 @@ from transformers import AutoModelForQuestionAnswering, AutoTokenizer, WEIGHTS_N
     get_linear_schedule_with_warmup
 
 from scripts.predict_transformers import evaluate
-from scripts.utils_transformers import set_seed, get_tokenizer, get_model, load_examples, Args
-
-logger = logging.getLogger(__name__)
+from scripts.utils_transformers import set_seed, get_tokenizer, get_model, load_examples, Args, convert_to_features
+from loguru import logger
 
 
 @click.command()
 @click.argument("train-file", type=str)
 @click.option("--model-path", type=str)
 @click.option("--model-type", type=str)
+@click.option("--save-model-folder", type=str)
 @click.option("--eval-file", type=str, default=None)
 @click.option("--predictions-folder", type=str, default=None)
 @click.option("--no-cuda", is_flag=True, type=bool, default=None)
-@click.option("--do-lower-case", is_flag=True, type=bool, default=True)
+@click.option('--do-not-lower-case', is_flag=True, default=False)
 @click.option("--per-gpu-eval-batch-size", type=int, default=8)
 @click.option("--lang-id", type=int, default=0)
 @click.option("--v2", type=bool, is_flag=True, default=False)
@@ -32,9 +32,8 @@ logger = logging.getLogger(__name__)
 @click.option("--evaluate-during-training", is_flag=True, type=bool, default=False)
 @click.option("--logging-steps", type=str, default='')
 @click.option("--max-grad-norm", type=float, default=1.0)
-@click.option("--save-model-folder", type=str, default=None)
 @click.option("--n-best-size", type=int, default=5)
-@click.option("--max-answer-length", type=int, default=30)
+@click.option("--max-answer-length", type=int, default=10)
 @click.option("--verbose-logging", is_flag=True, type=bool, default=False)
 @click.option("--null-score-diff-threshold", type=float, default=0.0)
 @click.option("--seed", type=int, default=42)
@@ -50,12 +49,24 @@ logger = logging.getLogger(__name__)
 @click.option("--max-steps", type=int, default=-1)
 @click.option("--per-gpu-train-batch-size", type=int, default=8)
 @click.option("--num-train-epochs", type=int, default=3)
+@click.option('--max-seq-length', type=int, default=384)
+@click.option('--doc-stride', type=int, default=128)
+@click.option('--max-query-length', type=int, default=64)
+@click.option('--num-workers', type=int, default=1)
+@click.option('--debug-features', type=bool, is_flag=True, default=False)
 # @click.option("--local-rank", type=int, default=-1)
 # @click.option("--device", default='cpu')
 def train(**kwargs):
+    doc_stride = kwargs.pop("doc_stride")
+    max_query_length = kwargs.pop('max_query_length')
+    max_seq_length = kwargs.pop("max_seq_length")
+    num_workers = kwargs.pop('num_workers')
+    debug_features = kwargs.pop('debug_features')
+    do_lower_case = not kwargs.pop('do_not_lower_case')
     kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
     args = Args(**kwargs)
-
+    args.do_lower_case = do_lower_case
+    logger.debug(args)
     if (
             os.path.exists(args.save_model_folder)
             and os.listdir(args.save_model_folder)
@@ -66,7 +77,7 @@ def train(**kwargs):
                 args.save_model_folder
             )
         )
-    os.makedirs(args.predictions_folder, exist_ok=True)
+    # os.makedirs(args.predictions_folder, exist_ok=True)
     os.makedirs(args.save_model_folder, exist_ok=True)
 
     # Setup CUDA, GPU & distributed training
@@ -81,18 +92,14 @@ def train(**kwargs):
     args.device = device
 
     # Setup logging
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        level=logging.INFO if args.local_rank in [-1, 0] else logging.WARN,
-    )
+    if not args.local_rank in [-1, 0]:
+        logger.remove()
+        logger.add(sys.stdout, level="WARNING")
     logger.warning(
-        "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s",
-        args.local_rank,
-        device,
-        args.n_gpu,
-        bool(args.local_rank != -1),
-        args.fp16,
+        f"Process rank: {args.local_rank}, device: {device}, n_gpu: "
+        f"{args.n_gpu}, distributed training: "
+        f"{bool(args.local_rank != -1)}, 16-bits training: {args.fp16}",
+
     )
 
     # Set seed
@@ -114,7 +121,7 @@ def train(**kwargs):
 
     model.to(args.device)
 
-    logger.info("Training/evaluation parameters %s", args)
+    # logger.info("Training/evaluation parameters %s", args)
 
     # Before we do anything with models, we want to ensure that we get fp16 execution of torch.einsum
     # if args.fp16 is set.
@@ -128,14 +135,24 @@ def train(**kwargs):
             apex.amp.register_half_function(torch, "einsum")
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
-
-    train_dataset, e, f = load_examples(args.train_file)
+    if args.train_file.endswith('bin'):
+        click.echo("Loading train features from cache...")
+        train_dataset, e, f = load_examples(args.eval_file)
+    elif args.train_file.endswith('json'):
+        click.echo("Converting features on the fly...")
+        train_dataset, e, f = convert_to_features(args.train_file, evaluate=False, tokenizer=tokenizer, v2=args.v2,
+                                                  doc_stride=doc_stride, max_query_length=max_query_length,
+                                                  max_seq_length=max_seq_length,
+                                                  num_workers=num_workers, debug_features=debug_features)
+    else:
+        raise NotImplementedError(f"Unknown file extension for evaluation file: {args.train_file}")
+    # train_dataset, e, f = load_examples(args.train_file)
     logger.info("loaded dataset")
     global_step, tr_loss = do_train(args, train_dataset, model, tokenizer)
-    logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
+    logger.info(f"global_step = {global_step}, average loss = {tr_loss}")
 
     if args.local_rank == -1 or torch.distributed.get_rank() == 0:
-        logger.info("Saving model checkpoint to %s", args.save_model_folder)
+        logger.info(f"Saving model checkpoint to {args.save_model_folder}")
         # Save a trained model, configuration and tokenizer using `save_pretrained()`.
         # They can then be reloaded using `from_pretrained()`
         # Take care of distributed/parallel training
@@ -161,9 +178,9 @@ def train(**kwargs):
                 os.path.dirname(c)
                 for c in sorted(glob.glob(args.save_model_folder + "/**/" + WEIGHTS_NAME, recursive=True))
             )
-            logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce model loading logs
+            # logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce model loading logs
 
-        logger.info("Evaluate the following checkpoints: %s", checkpoints)
+        logger.info(f"Evaluate the following checkpoints: {checkpoints}")
 
         for checkpoint in checkpoints:
             # Reload the model
@@ -243,18 +260,17 @@ def do_train(args: Args, train_dataset, model, tokenizer):
 
     # Train!
     logger.info("***** Running training *****")
-    logger.info("  Num examples = %d", len(train_dataset))
-    logger.info("  Num Epochs = %d", args.num_train_epochs)
-    logger.info("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
+    logger.info(f"Num examples = {len(train_dataset)}")
+    logger.info(f"Num Epochs = {args.num_train_epochs}")
+    logger.info(f"Instantaneous batch size per GPU = {args.per_gpu_train_batch_size}")
     # noinspection PyUnresolvedReferences
     logger.info(
-        "  Total train batch size (w. parallel, distributed & accumulation) = %d",
-        args.train_batch_size
-        * args.gradient_accumulation_steps
-        * (torch.distributed.get_world_size() if args.local_rank != -1 else 1),
+        "Total train batch size (w. parallel, distributed & accumulation) = {}".format(
+            args.train_batch_size * args.gradient_accumulation_steps * (
+                torch.distributed.get_world_size() if args.local_rank != -1 else 1)),
     )
-    logger.info("  Gradient Accumulation steps = %d", args.gradient_accumulation_steps)
-    logger.info("  Total optimization steps = %d", t_total)
+    logger.info(f"Gradient Accumulation steps = {args.gradient_accumulation_steps}")
+    logger.info(f"Total optimization steps = {t_total}")
 
     global_step = 1
     epochs_trained = 0
@@ -268,12 +284,12 @@ def do_train(args: Args, train_dataset, model, tokenizer):
             epochs_trained = global_step // (len(train_dataloader) // args.gradient_accumulation_steps)
             steps_trained_in_current_epoch = global_step % (len(train_dataloader) // args.gradient_accumulation_steps)
 
-            logger.info("  Continuing training from checkpoint, will skip to saved global_step")
-            logger.info("  Continuing training from epoch %d", epochs_trained)
-            logger.info("  Continuing training from global step %d", global_step)
-            logger.info("  Will skip the first %d steps in the first epoch", steps_trained_in_current_epoch)
+            logger.info(f"Continuing training from checkpoint, will skip to saved global_step")
+            logger.info(f"Continuing training from epoch {epochs_trained}")
+            logger.info(f"Continuing training from global step {global_step}")
+            logger.info(f"Will skip the first {steps_trained_in_current_epoch} steps in the first epoch")
         except ValueError:
-            logger.info("  Starting fine-tuning.")
+            logger.info("Starting fine-tuning.")
 
     tr_loss, logging_loss = 0.0, 0.0
     model.zero_grad()

@@ -1,5 +1,6 @@
 import os
 import string
+from itertools import groupby
 from typing import Dict
 
 import click
@@ -10,6 +11,14 @@ from stresstest.eval_utils import evaluate_intervention as eval_intervention
 
 from stresstest.util import load_json
 from stresstest.print_utils import highlight
+
+
+def reasoning_key(d):
+    return d.qa['reasoning']
+
+
+def num_modifier_key(d):
+    return d.qa['num_modifications']
 
 
 def color_map(baseline, intervention, other=None):
@@ -39,7 +48,10 @@ def color_map(baseline, intervention, other=None):
 @click.option("--do-print", is_flag=True, default=False)
 @click.option("--do-save", is_flag=True, default=False)
 @click.option("--control", is_flag=True, default=False)
-def evaluate_intervention(predictions_folder, baseline_file, output, do_print, do_save, control):
+@click.option("--split-reasoning", is_flag=True, default=False)
+@click.option("--split-num-modifier", is_flag=True, default=False)
+def evaluate_intervention(predictions_folder, baseline_file, output, do_print, do_save, control,
+                          split_reasoning, split_num_modifier):
     gold = load_json(baseline_file)
     intervention_basename = os.path.basename(baseline_file).replace(BASELINE, INTERVENTION)
     intervention_file = baseline_file.replace(os.path.basename(baseline_file), intervention_basename)
@@ -51,26 +63,10 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
     click.echo(f"Evaluation by intervention with baseline gold: {click.style(baseline_file, fg='blue')}")
     click.echo(f"And intervention gold: {click.style(intervention_file, fg='blue')}")
 
-    # gold_flat = list(sample_iter(gold))
-    # gold_intervention_flat = list(sample_iter(gold_intervention))
-
-    # q_m_by_id = {m.qa_id: m for m in gold_intervention_flat}
-    #
-    # aligned = [(b, q_m_by_id[b.qa_id]) for b in gold_flat if b.qa_id in q_m_by_id]
-    # aligned = [(b, m) for b, m in aligned if b.answer != m.answer]
-    #
-    # for b, intervention in aligned:
-    #     assert b.qa_id == intervention.qa_id
-    # aligned_baseline, aligned_intervention = zip(*aligned)
-
     if control:
         control_basename = os.path.basename(baseline_file).replace(BASELINE, CONTROL)
         control_file = baseline_file.replace(os.path.basename(baseline_file), control_basename)
         gold_control = load_json(control_file)
-        # gold_control_flat = list(sample_iter(gold_control))
-        # q_c_by_id = {c.qa_id: c for c in gold_control_flat}
-        # aligned = [(b, q_m_by_id[b.qa_id], q_c_by_id[b.qa_id]) for b in gold_flat if b.qa_id in q_c_by_id]
-        # aligned = [(b, m, c) for b, m, c in aligned if b.answer != m.answer]
         _, control_prediction_files = match_prediction_to_gold(control_file, predictions_folder)
 
         click.echo(f"And control gold: {click.style(control_file, fg='blue')}")
@@ -96,8 +92,9 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             overall_result, results_baseline, results_intervention, results_control,
             correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
             wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
-        ) = eval_intervention(aligned_baseline, aligned_intervention, aligned_control, predictions, predictions_intervention,
-                                  predictions_control)
+        ) = eval_intervention(aligned_baseline, aligned_intervention, aligned_control, predictions,
+                              predictions_intervention,
+                              predictions_control)
         click.echo(f"Got {sum(results_baseline)} correct for baseline.")
         click.echo(f"Got {sum(results_intervention)} correct for intervention.")
         click.echo(f"Out of {sum(results_baseline)} correct baseline results, got {len(correct_change_correct)} "
@@ -113,9 +110,6 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
 
         mean, var, ci = get_mean_var_ci_bernoulli(overall_result)
         printable_result = f'{mean:.4f} +/- {ci:.4f}'
-
-        # click.echo(f"Mean under the {click.style('EM', fg='green')} metric on "
-        #            f"{click.style(printable_result, fg='green', bold=True)}")
 
         result[model_name] = {
             'evaluation_on_intervention': {
@@ -144,6 +138,28 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             })
         click.echo(f"Overall result: {printable_result}.")
         click.echo()
+
+        if split_reasoning:
+            result[model_name]['by_reasoning'] = dict()
+            for reasoning, gold_split in groupby(sorted(aligned_baseline, key=reasoning_key), key=reasoning_key):
+                ab, ai, ac = align(gold_split, gold_intervention, gold_control)
+                res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
+                mean, var, ci = get_mean_var_ci_bernoulli(res)
+                pr = f'{mean:.4f} +/- {ci:.4f}'
+                result[model_name]['by_reasoning'][reasoning] = res
+                click.echo(f'{reasoning}: {pr}')
+        if split_num_modifier:
+            result[model_name]['by_num_modifier'] = dict()
+            for num_mod, gold_split in groupby(sorted(aligned_baseline, key=num_modifier_key), key=num_modifier_key):
+                ab, ai, ac = align(gold_split, gold_intervention, gold_control)
+                res = eval_intervention(
+                    ab, ai, ac, predictions, predictions_intervention,
+                    predictions_control)[0]
+                mean, var, ci = get_mean_var_ci_bernoulli(res)
+                pr = f'{mean:.4f} +/- {ci:.4f}'
+                result[model_name]['by_num_modifier'][num_mod] = res
+                click.echo(f'{model_name}: {num_mod}: {pr}')
+    click.echo(f"Result: {result}")
     if do_save:
         write_json(result, output)
 

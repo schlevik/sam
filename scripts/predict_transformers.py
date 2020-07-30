@@ -15,7 +15,6 @@
 # limitations under the License.
 """ Finetuning the library models for question-answering on SQuAD (DistilBERT, Bert, XLM, XLNet)."""
 
-import logging
 import os
 import timeit
 
@@ -25,7 +24,7 @@ import torch
 from torch.utils.data import DataLoader, SequentialSampler
 from tqdm import tqdm
 from transformers import SquadV1Processor, squad_convert_examples_to_features
-
+from loguru import logger
 from transformers.data.metrics.squad_metrics import (
     compute_predictions_log_probs,
     compute_predictions_logits,
@@ -36,11 +35,10 @@ from transformers.data.processors.squad import SquadResult
 from scripts.evaluate_intervention import print_examples
 from scripts.utils import get_output_predictions_file_name, get_baseline_intervention_control_from_baseline
 from scripts.utils_transformers import to_list, _is_gpu_available, get_tokenizer, get_model, load_examples, Args, \
-    logger, debug_features_examples_dataset
+    debug_features_examples_dataset, convert_to_features
 from stresstest.eval_utils import align, evaluate_intervention
 from stresstest.util import load_json
 
-logger = logging.getLogger(__name__)
 try:
     from torch.utils.tensorboard import SummaryWriter
 except ImportError:
@@ -48,27 +46,47 @@ except ImportError:
 
 
 @click.command()
-@click.option('--in-file', type=str)
+@click.argument("in-files", nargs=-1)
+@click.option('--out-folder', type=str)
 @click.option('--model-path', type=str)
 @click.option('--model-type', type=str)
-@click.option('--out-folder', type=str)
 @click.option('--no-cuda', type=bool, default=None)
-@click.option('--do-lower-case', is_flag=True, default=False)
 @click.option('--per-gpu-eval-batch-size', type=int, default=8)
+@click.option('--do-not-lower-case', is_flag=True, default=False)
 @click.option('--lang-id', type=int, default=0)
 @click.option('--v2', is_flag=True, default=False)
 @click.option('--n-best-size', type=int, default=5)
-@click.option('--max-answer-length', type=int, default=30)
+@click.option('--max-answer-length', type=int, default=10)
 @click.option('--verbose-logging', is_flag=True, default=False)
 @click.option('--null-score-diff-threshold', type=float, default=0.0)
-def predictions(in_file, out_folder, model_path, model_type, no_cuda, do_lower_case, per_gpu_eval_batch_size,
-                lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold):
+@click.option('--max-seq-length', type=int, default=384)
+@click.option('--doc-stride', type=int, default=128)
+@click.option('--max-query-length', type=int, default=64)
+@click.option('--num-workers', type=int, default=1)
+@click.option('--debug-features', type=bool, is_flag=True, default=False)
+def predictions(in_files, out_folder, model_path, model_type, no_cuda, per_gpu_eval_batch_size, do_not_lower_case,
+                lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold, **kwargs):
+    do_lower_case = not do_not_lower_case
     model = get_model(model_path)
     tokenizer = get_tokenizer(model_path, do_lower_case)
-    args = Args(model_type, out_folder, in_file, no_cuda, do_lower_case, per_gpu_eval_batch_size, lang_id,
-                v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold)
-    dataset, examples, features = load_examples(args.eval_file)
-    evaluate(args, model, tokenizer, dataset, examples, features)
+    args = Args(model_path=model_path, model_type=model_type, predictions_folder=out_folder,
+                no_cuda=no_cuda, do_lower_case=do_lower_case, per_gpu_eval_batch_size=per_gpu_eval_batch_size,
+                lang_id=lang_id, v2=v2, n_best_size=n_best_size, max_answer_length=max_answer_length,
+                verbose_logging=verbose_logging, null_score_diff_threshold=null_score_diff_threshold)
+    for in_file in in_files:
+        args.eval_file = in_file
+        logger.debug(args)
+        if args.eval_file.endswith('bin'):
+            click.echo("Loading features from cache...")
+            dataset, examples, features = load_examples(args.eval_file)
+        elif args.eval_file.endswith('json'):
+            click.echo("Converting features on the fly...")
+            assert len(kwargs.keys()) == 5
+            dataset, examples, features = convert_to_features(args.eval_file, evaluate=True, tokenizer=tokenizer, v2=v2,
+                                                              **kwargs)
+        else:
+            raise NotImplementedError(f"Unknown file extension for evaluation file: {args.eval_file}")
+        evaluate(args, model, tokenizer, dataset, examples, features)
 
 
 def evaluate(args: Args, model, tokenizer, dataset, examples, features, prefix="", return_raw=False):
@@ -156,12 +174,10 @@ def evaluate(args: Args, model, tokenizer, dataset, examples, features, prefix="
             all_results.append(result)
 
     eval_time = timeit.default_timer() - start_time
-    logger.info("  Evaluation done in total %f secs (%f sec per example)", eval_time, eval_time / len(dataset))
+    logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(dataset)} sec per example)")
     if args.predictions_folder:
         out_file = get_output_predictions_file_name(args.eval_file, args.predictions_folder, prefix)
-
-        if not os.path.exists(os.path.dirname(out_file)):
-            os.makedirs(os.path.dirname(out_file))
+        logger.info(f"Saving predictions in {out_file}")
 
         # Compute predictions
         file_name = os.path.basename(out_file)
@@ -173,6 +189,7 @@ def evaluate(args: Args, model, tokenizer, dataset, examples, features, prefix="
         else:
             output_null_log_odds_file = None
     else:
+        logger.info("Not saving predictions...")
         output_prediction_file = None
         output_nbest_file = None
         output_null_log_odds_file = None
@@ -275,11 +292,6 @@ def debug_eval(model_path, model_type, baseline_gold_file, no_cuda, do_not_lower
         args.device = torch.device("cuda", args.local_rank)
 
     model.to(device=args.device)
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        level=logging.INFO if not stfu else logging.WARN,
-    )
     logger.warning(
         "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s",
         args.local_rank,

@@ -120,7 +120,7 @@ def get_output_predictions_file_name(in_file, output_folder, weights_path=""):
     else:
         weights_addon = ''
     if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+        os.makedirs(output_folder)
     output_file_name = f"{output_base}{weights_addon}.json"
     output = os.path.join(output_folder, output_file_name)
     return output

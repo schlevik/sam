@@ -79,37 +79,15 @@ def get_model(model_name_or_path):
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
 def cache_examples(in_files, out_folder, model_path, do_not_lower_case, evaluate, v2, max_seq_length, doc_stride,
                    max_query_length, num_workers, debug_features):
-    print(f"debug_features: {debug_features}")
     do_lower_case = not do_not_lower_case
     tokenizer = get_tokenizer(model_path, do_lower_case)
-    processor = SquadV2Processor() if v2 else SquadV1Processor()
-    if doc_stride >= max_seq_length - max_query_length:
-        logger.warning(
-            "WARNING - You've set a doc stride which may be superior to the document length in some "
-            "examples. This could result in errors when building features from the examples. Please reduce the doc "
-            "stride or increase the maximum length to ensure the features are correctly built."
-        )
 
     for in_file in in_files:
-        data_dir = os.path.dirname(in_file)
         file_name = os.path.basename(in_file)
-        if evaluate:
-            examples = processor.get_dev_examples(data_dir, filename=file_name)
-        else:
-            examples = processor.get_train_examples(data_dir, filename=file_name)
-
-        features, dataset = squad_convert_examples_to_features(
-            examples=examples,
-            tokenizer=tokenizer,
-            max_seq_length=max_seq_length,
-            doc_stride=doc_stride,
-            max_query_length=max_query_length,
-            is_training=not evaluate,
-            return_dataset="pt",
-            threads=num_workers,
-        )
-        if debug_features:
-            debug_features_examples_dataset(dataset, examples, features, tokenizer)
+        dataset, examples, features = convert_to_features(in_file, evaluate, doc_stride,
+                                                          max_query_length,
+                                                          max_seq_length, num_workers,
+                                                          tokenizer, v2, debug_features)
         out_file = os.path.join(out_folder, f"{os.path.splitext(file_name)[0]}-"
                                             f"{os.path.basename(os.path.normpath(model_path))}.bin")
         click.echo(f"Saving features into cached file {click.style(out_file, fg='blue')}")
@@ -118,13 +96,42 @@ def cache_examples(in_files, out_folder, model_path, do_not_lower_case, evaluate
         torch.save({"features": features, "dataset": dataset, "examples": examples}, out_file)
 
 
+def convert_to_features(in_file, evaluate, doc_stride, max_query_length, max_seq_length,
+                        num_workers, tokenizer, debug_features=False, v2=False):
+    processor = SquadV2Processor() if v2 else SquadV1Processor()
+    data_dir = os.path.dirname(in_file)
+    file_name = os.path.basename(in_file)
+    if doc_stride >= max_seq_length - max_query_length:
+        logger.warning(
+            "WARNING - You've set a doc stride which may be superior to the document length in some "
+            "examples. This could result in errors when building features from the examples. Please reduce the doc "
+            "stride or increase the maximum length to ensure the features are correctly built."
+        )
+    if evaluate:
+        examples = processor.get_dev_examples(data_dir, filename=file_name)
+    else:
+        examples = processor.get_train_examples(data_dir, filename=file_name)
+    features, dataset = squad_convert_examples_to_features(
+        examples=examples,
+        tokenizer=tokenizer,
+        max_seq_length=max_seq_length,
+        doc_stride=doc_stride,
+        max_query_length=max_query_length,
+        is_training=not evaluate,
+        return_dataset="pt",
+        threads=num_workers,
+    )
+    if debug_features:
+        debug_features_examples_dataset(dataset, examples, features, tokenizer)
+    return dataset, examples, features
+
+
 def debug_features_examples_dataset(dataset, examples, features, tokenizer):
     n = random.randint(0, len(features))
     logger.info(f"passage {n} as decoded by tokenizer: ")
     logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in dataset[n][0] if e))
     if len(dataset.tensors) == 6:
         logger.info("This is a dataset for evaluation!")
-        logger.info(f"Answer: {dataset[0][3]}")
     elif len(dataset.tensors) == 8:
         logger.info("This is a dataset for training!")
         max_answer_length = max(dataset[i][4].item() - dataset[i][3].item() for i in range(len(dataset)))
