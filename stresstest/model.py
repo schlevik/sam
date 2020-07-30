@@ -211,11 +211,12 @@ class RandomBaseline(Model):
 
         candidates = [str(a) if isinstance(a, int) else f"{a['first']} {a['last']}"
                       for e in events for a in list(e['attributes'].values()) + [e['actor']]]
-        print(candidates)
         choices = Choices([c for c in candidates if c in entry.passage])
-        print(choices)
 
         return choices.random()
+
+    def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        return (self.predict(entry) for entry in batch)
 
 
 class EducatedBaseline(Model):
@@ -236,3 +237,38 @@ class EducatedBaseline(Model):
                           list(e['attributes'].values()) + [e['actor']] if isinstance(a, dict)]
         choices = Choices([c for c in candidates if c in entry.passage])
         return choices.random()
+
+    def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        return (self.predict(entry) for entry in batch)
+
+
+class InformedBaseline(Model):
+    def __init__(self, name):
+        super().__init__(name, None, False)
+
+    @classmethod
+    def make(cls, path=None, gpu=False):
+        return cls("Educated")
+
+    def predict(self, entry: Entry) -> str:
+        events = entry.qa['events']
+        answer_is_numbers = any(d in entry.answer for d in string.digits)
+        question_is_comparison = 'comparison' in entry.qa['reasoning']
+        if question_is_comparison:
+            candidates = [f"{a['first']} {a['last']}" for e in events for a in
+                          list(e['attributes'].values()) + [e['actor']] if isinstance(a, dict)]
+            candidates = [c for c in candidates if c in entry.question]
+            candidates = list(set(candidates))
+            assert all(c in entry.passage for c in candidates)
+            assert len(candidates) == 2
+        elif answer_is_numbers:
+            candidates = [str(a) for e in events for a in list(e['attributes'].values()) if isinstance(a, int)]
+        else:
+            candidates = [f"{a['first']} {a['last']}" for e in events for a in
+                          list(e['attributes'].values()) + [e['actor']] if isinstance(a, dict)]
+
+        choices = Choices([c for c in candidates if c in entry.passage])
+        return choices.random()
+
+    def predict_batch(self, batch: Iterable[Entry]) -> Iterable[str]:
+        return (self.predict(entry) for entry in batch)
