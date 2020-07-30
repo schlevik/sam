@@ -1,6 +1,6 @@
 from flaky import flaky
 
-from stresstest.classes import Event
+from stresstest.classes import Event, Question
 from stresstest.realize import Realizer
 from tests.resources.templates import sentences, templates
 from tests.util import only
@@ -74,3 +74,60 @@ def test_different_sentences():
     realised_sents, visits = r.realise_story(logic_sents, world)
     for i in ii:
         assert any([str(i) in sent for sent in realised_sents]), f"{i} not in story!"
+
+
+def test_fix_units():
+    q = Question(type='overall', target='distance', evidence=[3], event_type='goal', reasoning='argmin-distance',
+                 answer=str(14),
+                 question_data={}, realized='The closest goal was scored from how far away ?')
+    p = [
+        "Tricia Lusk almost opened the action when she nearly slotted in a 15 metres goal "
+        "from Tracy Hahn 's soft clearance .",
+
+        'The stadium went wild as Pok Formosa was withdrawn in minute 29 with her ankle in a brace following a '
+        'harsh challenge from Margaretta Sabins .',
+
+        'Further pressure on the attack resulted in Caryl Yacullo fouling Devin Mockler '
+        'for an auspiciously looking free-kick chance for her opponents .',
+
+        "14 minutes after that Wendy Miners nearly scored on the 49 th minute , all but putting in "
+        "the ball from 14 metres away under the bar after she ran 11 metres and intercepted "
+        "Dynamo Whalesharks goalkeeper's goal kick .",
+
+        'Rita Sander scored the next goal for Red-blue Elephants from 18 metres to '
+        'continue where they left off after Pauline Hunter played the ball into her path .',
+        'The stadium went wild seeing Claudia Johnson winning the ball out wide for Red-blue '
+        'Elephants and drawing a foul play from Sharon Schoolfield .'
+    ]
+    realizer = Realizer(**templates, validate=False)
+    answer = realizer._fix_units(q, p)
+    assert answer == '14 metres'
+
+
+def test_fix_units_2():
+    q = Question(type='direct', target='time', evidence=[3], event_type='goal', reasoning='retrieval',
+                 answer=str(42), question_data={'n': 1}, realized='When did they score the 1 st goal ?')
+
+    passage = [
+        'The match started as Terra Miller scythed down Maria Forest '
+        'for a promisingly looking free-kick opportunity for her opponents .',
+
+        'On the 11 th minute a spectacular 12 metres strike from Susan White almost '
+        'flying in the lower left corner past the woman between the posts for her 2 nd league '
+        'goal of the season advanced the action .',
+
+        'The stadium went wild as Lajuana Loader fouled Pearle Giebel on the 35 th minute .',
+
+        "7 minutes after that Trish Oieda scored in minute 42 , hitting the ball from 14 "
+        "metres away off the post and in the middle of the goal after she intercepted "
+        "FC Monkeys goalkeeper's goal kick .",
+
+        'Things proceeded with Marlene Croom winning the ball in the attacking '
+        'third and drawing a foul play from Mellisa Winnett .',
+
+        "Dynamo Whalesharks advanced the action with a 12 metres goal as "
+        "Silvana Waugaman put in Tabetha Bowe 's risky through ball ."]
+    realizer = Realizer(**templates, validate=False)
+    answer = realizer._fix_units(q, passage)
+    assert answer == 'minute 42'
+
