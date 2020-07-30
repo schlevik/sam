@@ -9,20 +9,6 @@ MASK = '🤪'
 
 _names = None
 
-
-def get_names():
-    global _names
-    if not _names:
-        with open(names.FILES['first:female']) as nf:
-            keep_f = [line.split()[0].capitalize() for line in nf.readlines()]
-        with open(names.FILES['first:male']) as nf:
-            keep_m = [line.split()[0].capitalize() for line in nf.readlines()]
-        with open(names.FILES['last']) as nf:
-            keep_l = [line.split()[0].capitalize() for line in nf.readlines()]
-        _names = set(keep_f + keep_m + keep_l)
-    return _names
-
-
 def mask(passage: str, keep=None):
     keep = keep or set()
     return " ".join(t if t in keep else MASK for t in passage.split(" "))
