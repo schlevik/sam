@@ -13,6 +13,7 @@ from string import digits
 from statsmodels.stats.proportion import proportion_confint
 
 from stresstest.classes import Entry
+from stresstest.print_utils import highlight
 from stresstest.util import sample_iter
 
 
@@ -207,7 +208,7 @@ def evaluate_intervention(aligned_baseline, aligned_intervention, aligned_contro
             )
 
 
-def align(baseline, intervention, control):
+def align(baseline, intervention, control, assert_same=False):
     gold_flat = list(sample_iter(baseline))
     gold_intervention_flat = list(sample_iter(intervention))
     q_m_by_id = {m.qa_id: m for m in gold_intervention_flat}
@@ -221,10 +222,12 @@ def align(baseline, intervention, control):
 
     aligned = [(b, q_m_by_id[b.qa_id], q_c_by_id[b.qa_id]) for b in gold_flat if b.qa_id in q_m_by_id]
     aligned = [(b, m, c) for b, m, c in aligned if b.answer != m.answer]
+    if assert_same:
+        assert len(aligned) == len(gold_flat)
     aligned_baseline, aligned_intervention, aligned_control = zip(*aligned)
     for b, i, c in aligned:
         assert b.qa_id == i.qa_id
-    return aligned_baseline, aligned_intervention, aligned_control
+    return list(aligned_baseline), list(aligned_intervention), list(aligned_control)
 
 
 def split_and_eval_by_num_modifiers(baseline, intervention, control, pba, pia, pca, n):
@@ -235,7 +238,7 @@ def split_and_eval_by_num_modifiers(baseline, intervention, control, pba, pia, p
     mod_per_passage = \
         sum(d.qa['modification_data']['modification_distance'] if d.qa['modification_data']['fill_with_modification']
             else 1 for _, d, _ in aligned_n_mod) / len(aligned_n_mod)
-    return sum(overall) / len(overall), len(baseline_n), mod_per_passage, sum(results_baseline)/len(results_baseline)
+    return sum(overall) / len(overall), len(baseline_n), mod_per_passage, sum(results_baseline) / len(results_baseline)
 
 
 def split_and_eval_by_answer_type(baseline, intervention, control, pba, pia, pca):
