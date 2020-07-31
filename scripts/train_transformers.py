@@ -30,7 +30,7 @@ from loguru import logger
 @click.option("--overwrite-output-dir", is_flag=True, type=bool, default=False)
 @click.option("--save-steps", type=int, default=500)
 @click.option("--evaluate-during-training", is_flag=True, type=bool, default=False)
-@click.option("--logging-steps", type=str, default='')
+@click.option("--logging-steps", type=int, default=500)
 @click.option("--max-grad-norm", type=float, default=1.0)
 @click.option("--n-best-size", type=int, default=5)
 @click.option("--max-answer-length", type=int, default=10)
@@ -39,7 +39,7 @@ from loguru import logger
 @click.option("--seed", type=int, default=42)
 @click.option("--fp16-opt-level", type=str, default="O1")
 @click.option("--weight-decay", type=float, default=0.0)
-@click.option("--fp16", type=bool, default=False)
+@click.option("--fp16", type=bool,  is_flag=True, default=False)
 @click.option("--warmup-steps", type=int, default=0)
 @click.option("--do-eval-after-training", is_flag=True, type=bool, default=False)
 @click.option("--eval-all-checkpoints", is_flag=True, type=bool, default=False)
@@ -63,7 +63,7 @@ def train(**kwargs):
     num_workers = kwargs.pop('num_workers')
     debug_features = kwargs.pop('debug_features')
     do_lower_case = not kwargs.pop('do_not_lower_case')
-    kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
+    #kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
     args = Args(**kwargs)
     args.do_lower_case = do_lower_case
     logger.debug(args)
@@ -358,7 +358,7 @@ def do_train(args: Args, train_dataset, model, tokenizer):
                 model.zero_grad()
                 global_step += 1
                 # Log metrics
-                if args.local_rank in [-1, 0] and args.logging_steps and global_step in args.logging_steps:
+                if args.local_rank in [-1, 0] and args.logging_steps and global_step % args.logging_steps == 0:
                     # Only evaluate when single GPU otherwise metrics may not average well
                     if args.local_rank == -1 and args.evaluate_during_training:
                         dataset, examples, features = load_examples(args.eval_file)
@@ -381,11 +381,11 @@ def do_train(args: Args, train_dataset, model, tokenizer):
                     tokenizer.save_pretrained(output_dir)
 
                     torch.save(args, os.path.join(output_dir, "training_args.bin"))
-                    logger.info("Saving model checkpoint to %s", output_dir)
+                    logger.info(f"Saving model checkpoint to  {output_dir}")
 
                     torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
                     torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
-                    logger.info("Saving optimizer and scheduler states to %s", output_dir)
+                    logger.info(f"Saving optimizer and scheduler states to {output_dir}")
 
             if 0 < args.max_steps < global_step:
                 epoch_iterator.close()

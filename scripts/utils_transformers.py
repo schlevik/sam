@@ -173,7 +173,7 @@ class Args:
     overwrite_output_dir: bool = False
     save_steps: int = 500
     evaluate_during_training: bool = False
-    logging_steps: List[int] = field(default_factory=list)
+    logging_steps: int = 0
     max_grad_norm: float = 1.0
     save_model_folder: str = ''
     seed: int = None
