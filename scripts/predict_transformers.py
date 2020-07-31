@@ -86,10 +86,11 @@ def predictions(in_files, out_folder, model_path, model_type, no_cuda, per_gpu_e
                                                               **kwargs)
         else:
             raise NotImplementedError(f"Unknown file extension for evaluation file: {args.eval_file}")
-        evaluate(args, model, tokenizer, dataset, examples, features)
+        evaluate(args, model, tokenizer, dataset, examples, features,
+                 suffix=os.path.basename(os.path.normpath(model_path)))
 
 
-def evaluate(args: Args, model, tokenizer, dataset, examples, features, prefix="", return_raw=False):
+def evaluate(args: Args, model, tokenizer, dataset, examples, features, suffix="", return_raw=False):
     if args.no_cuda is None:
         args.no_cuda = not _is_gpu_available()
     if args.predictions_folder:
@@ -176,7 +177,7 @@ def evaluate(args: Args, model, tokenizer, dataset, examples, features, prefix="
     eval_time = timeit.default_timer() - start_time
     logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(dataset)} sec per example)")
     if args.predictions_folder:
-        out_file = get_output_predictions_file_name(args.eval_file, args.predictions_folder, prefix)
+        out_file = get_output_predictions_file_name(args.eval_file, args.predictions_folder, suffix)
         logger.info(f"Saving predictions in {out_file}")
 
         # Compute predictions

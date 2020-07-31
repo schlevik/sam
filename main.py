@@ -48,6 +48,7 @@ class Cli:
                     self.cli.add_command(obj)
 
         content = f"succeeded!"
+        success = True
         try:
             self.cli()
         except Exception as e:
@@ -55,14 +56,15 @@ class Cli:
                       f"error:\n{traceback.format_exc()}"
             click.secho("YOU FAIL", bold=True, fg='red')
             click.echo(content)
+            success = False
             raise e
         finally:
             cmd = f'"python main.py {self.ctx.invoked_subcommand} {" ".join(self.ctx.obj)}"'
             click.secho(f"Command {cmd} {content}", fg='green')
             if self.notify:
-                self.send_email(content=content)
+                self.send_email(content=content, success=success)
 
-    def send_email(self, content, success=False):
+    def send_email(self, content, success=True):
         msg = EmailMessage()
         msg.set_content("content")
         msg['Subject'] = f'Your job {"failed" if not success else "succeeded"}!'

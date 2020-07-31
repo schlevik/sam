@@ -204,7 +204,7 @@ def train(**kwargs):
 
             # Evaluate
 
-            result = evaluate(args, model, tokenizer, dataset, examples, features, prefix=global_step)
+            result = evaluate(args, model, tokenizer, dataset, examples, features, suffix=global_step)
 
             result = dict((k + ("_{}".format(global_step) if global_step else ""), v) for k, v in result.items())
             results.update(result)
@@ -377,7 +377,7 @@ def do_train(args: Args, train_dataset, model, tokenizer):
                     # TODO: fix evaluate_during_training with on-the-fly created features
                     if args.local_rank == -1 and args.evaluate_during_training and False:
                         dataset, examples, features = load_examples(args.eval_file)
-                        results = evaluate(args, model, tokenizer, dataset, examples, features, prefix=str(global_step))
+                        results = evaluate(args, model, tokenizer, dataset, examples, features, suffix=str(global_step))
                         for key, value in results.items():
                             # noinspection PyUnboundLocalVariable
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
