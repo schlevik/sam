@@ -11,6 +11,7 @@ from transformers import AutoModelForQuestionAnswering, AutoTokenizer, WEIGHTS_N
     get_linear_schedule_with_warmup
 
 from scripts.predict_transformers import evaluate
+from scripts.utils import write_json
 from scripts.utils_transformers import set_seed, get_tokenizer, get_model, load_examples, Args, convert_to_features
 from loguru import logger
 
@@ -209,7 +210,7 @@ def train(**kwargs):
             results.update(result)
 
     logger.info("Results: {}".format(results))
-
+    write_json(results, os.path.join(args.save_model_folder, 'dev-results.json'))
     return results
 
 
