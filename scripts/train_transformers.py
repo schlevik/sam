@@ -39,7 +39,7 @@ from loguru import logger
 @click.option("--seed", type=int, default=42)
 @click.option("--fp16-opt-level", type=str, default="O1")
 @click.option("--weight-decay", type=float, default=0.0)
-@click.option("--fp16", type=bool,  is_flag=True, default=False)
+@click.option("--fp16", type=bool, is_flag=True, default=False)
 @click.option("--warmup-steps", type=int, default=0)
 @click.option("--do-eval-after-training", is_flag=True, type=bool, default=False)
 @click.option("--eval-all-checkpoints", is_flag=True, type=bool, default=False)
@@ -63,7 +63,7 @@ def train(**kwargs):
     num_workers = kwargs.pop('num_workers')
     debug_features = kwargs.pop('debug_features')
     do_lower_case = not kwargs.pop('do_not_lower_case')
-    #kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
+    # kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
     args = Args(**kwargs)
     args.do_lower_case = do_lower_case
     logger.debug(args)
@@ -137,7 +137,7 @@ def train(**kwargs):
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
     if args.train_file.endswith('bin'):
         click.echo("Loading train features from cache...")
-        train_dataset, e, f = load_examples(args.eval_file)
+        train_dataset, e, f = load_examples(args.train_file)
     elif args.train_file.endswith('json'):
         click.echo("Converting features on the fly...")
         train_dataset, e, f = convert_to_features(args.train_file, evaluate=False, tokenizer=tokenizer, v2=args.v2,
@@ -181,7 +181,20 @@ def train(**kwargs):
             # logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce model loading logs
 
         logger.info(f"Evaluate the following checkpoints: {checkpoints}")
-
+        if args.train_file.endswith('bin'):
+            click.echo("Loading train features from cache...")
+            dataset, examples, features = load_examples(args.eval_file)
+        elif args.train_file.endswith('json'):
+            click.echo("Converting features on the fly...")
+            dataset, examples, features = convert_to_features(
+                args.eval_file, evaluate=True, tokenizer=tokenizer,
+                v2=args.v2,
+                doc_stride=doc_stride, max_query_length=max_query_length,
+                max_seq_length=max_seq_length,
+                num_workers=num_workers, debug_features=debug_features
+            )
+        else:
+            raise NotImplementedError(f"Unknown file extension for evaluation file: {args.train_file}")
         for checkpoint in checkpoints:
             # Reload the model
             global_step = checkpoint.split("-")[-1] if len(checkpoints) > 1 else ""
@@ -189,7 +202,7 @@ def train(**kwargs):
             model.to(args.device)
 
             # Evaluate
-            dataset, examples, features = load_examples(args.eval_file)
+
             result = evaluate(args, model, tokenizer, dataset, examples, features, prefix=global_step)
 
             result = dict((k + ("_{}".format(global_step) if global_step else ""), v) for k, v in result.items())
@@ -360,16 +373,15 @@ def do_train(args: Args, train_dataset, model, tokenizer):
                 # Log metrics
                 if args.local_rank in [-1, 0] and args.logging_steps and global_step % args.logging_steps == 0:
                     # Only evaluate when single GPU otherwise metrics may not average well
-                    if args.local_rank == -1 and args.evaluate_during_training:
+                    # TODO: fix evaluate_during_training with on-the-fly created features
+                    if args.local_rank == -1 and args.evaluate_during_training and False:
                         dataset, examples, features = load_examples(args.eval_file)
                         results = evaluate(args, model, tokenizer, dataset, examples, features, prefix=str(global_step))
                         for key, value in results.items():
                             # noinspection PyUnboundLocalVariable
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
-                    logging_step_delta = \
-                        global_step - ([0] + args.logging_steps)[([0] + args.logging_steps).index(global_step) - 1]
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
-                    tb_writer.add_scalar("loss", (tr_loss - logging_loss) / logging_step_delta, global_step)
+                    tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
                     logging_loss = tr_loss
 
                 # Save model checkpoint
