@@ -111,7 +111,7 @@ def get_mean_var_ci(sample, alpha=0.025):
 
 
 def get_mean_var_ci_bernoulli(sample, alpha=0.05):
-    if sample:
+    if len(sample) > 0:
         lower, _ = proportion_confint(sum(sample), len(sample), alpha=alpha)
         mean = sum(sample) / len(sample)
         return mean, None, mean - lower
