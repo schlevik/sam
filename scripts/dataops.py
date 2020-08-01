@@ -1,3 +1,4 @@
+import json
 import math
 import os
 import random
@@ -7,8 +8,8 @@ from itertools import accumulate
 
 import click
 
-from scripts.utils import FormatParam, write_json
-from stresstest.util import load_json
+from scripts.utils import FormatParam, write_json, match_prediction_to_gold
+from stresstest.util import load_json, sample_iter
 from stresstest.eval_utils import align as do_align
 
 
@@ -91,6 +92,18 @@ def align(baseline, intervention, control, out_folder, subsample, seed):
     write_json(gold_intervention, intervention_out, pretty=False)
     control_out = os.path.join(out_folder, f"aligned-{subsample if subsample else ''}-{os.path.basename(control)}")
     write_json(gold_control, control_out, pretty=False)
+
+
+@click.command()
+@click.argument("gold-file", nargs=1)
+@click.argument('prediction-file', nargs=1)
+def convert_allennlp(gold_file, prediction_file):
+    with open(prediction_file) as f:
+        contents = f.read()
+    results = {}
+    for pred, entry in zip(contents.splitlines(), sample_iter(load_json(gold_file))):
+        results[entry.qa_id] = json.loads(pred)['best_span_str']
+        write_json(results, prediction_file)
 
 
 def to_squad_fmt(flat_ds):
