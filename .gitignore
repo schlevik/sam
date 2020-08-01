@@ -173,4 +173,4 @@ slack-bot.py
 .in
 daily.sh
 logs/
-scripts/test.py
+
