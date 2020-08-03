@@ -1,8 +1,9 @@
+from copy import deepcopy
 from itertools import chain, islice
 import ujson as json
 from typing import Dict, Any, List, Generator, Iterable, TypeVar, Union
 
-from stresstest.classes import Entry
+from stresstest.classes import Entry, Bundle
 
 
 def load_json(path: str):
@@ -57,3 +58,23 @@ def do_import(class_string: str, relative_import: str = ""):
     return cls
 
 
+def only(sents_or_bundle, n, action='test'):
+    if isinstance(n, int):
+        n = [n]
+    sents_or_bundle = deepcopy(sents_or_bundle)
+    if isinstance(sents_or_bundle, Bundle):
+        all_templates = sents_or_bundle.templates_modifier['sentences'][action]
+        sents_or_bundle.templates_modifier['sentences'][action] = []
+        for i, s in enumerate(all_templates):
+            if i in n:
+                sents_or_bundle.templates_modifier['sentences'][action].append(s)
+    elif isinstance(sents_or_bundle, dict):
+        all_templates = sents_or_bundle['sentences'][action]
+        sents_or_bundle['sentences'][action] = []
+        for i, s in enumerate(all_templates):
+            if i in n:
+                sents_or_bundle['sentences'][action].append(s)
+    else:
+        raise NotImplementedError
+        # sents_or_bundle[action] = [sents_or_bundle[action][n]]
+    return sents_or_bundle

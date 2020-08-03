@@ -1,6 +1,6 @@
 from stresstest.classes import F, Context
 from stresstest.realize import SizeEstimator, Processor, Accessor, RandomChooser
-from tests.util import only
+from stresstest.util import only
 
 sentences = {
     "test": [

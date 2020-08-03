@@ -1,5 +1,6 @@
-from copy import deepcopy
 from typing import Tuple, List
+
+import click
 
 from stresstest.classes import Config, Question, Bundle
 from stresstest.football import bundle
@@ -11,19 +12,7 @@ from stresstest.reasoning.bridge import bridge_reverse, bridge
 from stresstest.reasoning.comparison import comparison_reverse, comparison
 from stresstest.reasoning.retrieval_two import retrieval_two_reverse, retrieval_two
 from stresstest.print_utils import highlight
-
-
-def only(sents_or_bundle, n, action='test'):
-    sents_or_bundle = deepcopy(sents_or_bundle)
-    if isinstance(sents_or_bundle, Bundle):
-        # sents_or_bundle.templates['sentences'][action] = [sents_or_bundle.templates['sentences'][action][n]]
-        sents_or_bundle.templates_modifier['sentences'][action] = [
-            sents_or_bundle.templates_modifier['sentences'][action][n]]
-    elif isinstance(sents_or_bundle, dict):
-        sents_or_bundle['sentences'][action] = [sents_or_bundle['sentences'][action][n]]
-    else:
-        sents_or_bundle[action] = [sents_or_bundle[action][n]]
-    return sents_or_bundle
+from stresstest.util import only
 
 
 def get_questions(generator, realizer, events, visits, story) \
@@ -123,25 +112,57 @@ def interactive_env(bundle: Bundle, cfg=None, modifier=False, do_print=True,
     return generator, cfg, events, realizer, story, all_questions, visits
 
 
-def showcase(given_bundle=None, n=0):
+modifiers = ("almost nearly all but did would could manage happen get succeed permitted allowed"
+             "refrained refused prohibited prevented hindered blocked prevented disallowed failed failing not "
+             "refrained refusing find occasion opportunity chance possibility using exploiting"
+             "meeting fulfilling meet fulfill lacked lost nerve neglected denied missed miss "
+             "missing losing wasting giving up throwing squandering neglecting responsibility "
+             "lose waste give up throw away squander neglect n't").split()
+colors = {m: 'red' for m in modifiers}
+
+
+def showcase_all(out_file, given_bundle: Bundle = None, do_x_repetitions=12):
+    test_bundle = given_bundle or bundle
+    lines = []
+    for i in range(len(test_bundle.templates_modifier['sentences']['goal'])):
+        lines.append(click.style(f"goal[{i}]", fg='blue', bold=True))
+        for j in range(do_x_repetitions//6):
+            stories = showcase(test_bundle, i, False)
+            lines.extend(highlight(text=s, colors=colors) for s in stories)
+    for i in range(len(test_bundle.templates_modifier['sentences']['foul'])):
+        generator, cfg, events, realizer, story, all_questions, visits = interactive_env_football_modifier(
+            test_bundle, cfg={"world.num_sentences": 3}, do_print=False, do_realise=False, first_modification=1
+        )
+        lines.append(click.style(f"foul[{i}]", fg='blue', bold=True))
+        for j in range(do_x_repetitions):
+            templates = only(test_bundle.templates_modifier, n=i, action='foul')
+            realizer = Realizer(**templates, unique_sentences=False)
+            story, visits = realizer.realise_story(events, generator.world)
+            lines.append(story[0])
+    print("\n".join(lines))
+    with open(out_file, "w+") as f:
+        f.write('\n'.join(lines))
+
+
+def showcase(given_bundle=None, n=0, do_print=True):
     test_bundle = only(given_bundle, n, 'goal') if given_bundle else only(bundle, n, 'goal')
     templates = test_bundle.templates_modifier
     generator, cfg, events, realizer, story, all_questions, visits = interactive_env_football_modifier(
         test_bundle, cfg={"world.num_sentences": 2}, do_print=False, do_realise=False
     )
-    # realizer = Realizer(**templates, unique_sentences=False)
-    # story, visits = realizer.realise_story(events, generator.world)
-    # ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
-    # print_out(story, ssq)
+    sentences = []
     for f in ['VP-neg-impl', 'RB', 'MD', 'VP-pol-rev', 'VB-neg-impl', 'VB-pol-rev']:
-        print(f"==== {f} ====")
         events[0].features = [f]
         generator.modifier_type = f
         realizer = Realizer(**templates, unique_sentences=False)
         story, visits = realizer.realise_story(events, generator.world)
         # ssq, maq, uaq, abq = get_questions(generator, realizer, events, visits, story)
-        print(story[0])
+        if do_print:
+            print(f"==== {f} ====")
+            print(story[0])
         # print_out(story, [])
+        sentences.append(story[0])
+    return sentences
 
 
 def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_type='RB', max_sents=5, max_modifier=3,
