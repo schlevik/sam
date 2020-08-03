@@ -134,7 +134,7 @@ class DataTrainingArguments:
         metadata={"help": "Number of workers to pre-process the dataset."},
     )
     debug: bool = field(
-        default= ...
+        default=...
     )
 
 
@@ -200,6 +200,7 @@ def get_dataset(in_file, tokenizer, args: DataTrainingArguments, evaluate=False)
 #     "do_eval": True,
 #     'no_cuda': True
 # }
+
 def main():
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
@@ -272,21 +273,22 @@ def main():
         answers = []
         # Note that DistributedSampler samples randomly
         device = torch.device("cuda" if torch.cuda.is_available() and not training_args.no_cuda else "cpu")
-        n_gpu = 0 if training_args.no_cuda else torch.cuda.device_count()
+        # n_gpu = 0 if training_args.no_cuda else torch.cuda.device_count()
 
-        eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
+        # eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
         eval_sampler = torch.utils.data.SequentialSampler(eval_dataset)
-        eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler, batch_size=eval_batch_size)
+        eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler,
+                                                      batch_size=training_args.eval_batch_size, collate_fn=collate_eval)
         model.to(device)
         # multi-gpu evaluate
-        if n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
+        if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
             model = torch.nn.DataParallel(model)
 
         # Eval!
         click.echo(f"Generating predictions for model {click.style(model_path, fg='blue')}, "
                    f"running on {click.style(str(device), fg='green')}")
         click.echo("  Num examples = %d" % len(eval_dataset))
-        click.echo("  Batch size = %d" % eval_batch_size)
+        click.echo("  Batch size = %d" % training_args.eval_batch_size)
 
         start_time = timeit.default_timer()
         results = []
