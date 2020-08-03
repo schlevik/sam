@@ -41,10 +41,10 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
         n = cfg['split']['templates'][modify_event_type]
         click.echo(f"For event type '{modify_event_type}'")
         click.echo(f"Using only templates: {n}")
-        split_name = f"-{cfg['split']['name']}"
+        split_name = f"-{cfg['split']['name']}-"
         domain = only(domain, action=modify_event_type, n=n)
     else:
-        split_name = ""
+        split_name = "-"
     # if split_templates:
     #     first, second = split(domain.templates_modifier, event_types_to_split=[modify_event_type],
     #                           split_ratio=split_templates)
@@ -61,12 +61,11 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
 
     # for i, templates in enumerate(template_splits):
     num_modifiers = cfg['num_modifiers']
-    source_dataset_name = cfg['for_dataset']
     reasoning_map = {do_import(k, relative_import="stresstest.reasoning"): v for k, v in
                      cfg['reasoning_map'].items()}
     total = sum(t * num_modifiers for t in reasoning_map.values())
 
-    file_name = f"{{}}-{source_dataset_name}-{split_name}-{modifier_type.lower()}.json"
+    file_name = f"{{}}{split_name}{modifier_type.lower()}.json"
     click.echo(
         f"Generating from '{click.style(config, fg='green')}': {click.style(str(total), fg='green', bold=True)} "
         f"passages, and questions.")
@@ -91,7 +90,6 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
     )
     (event_plans, events, template_choices, worlds, baseline_stories, mqs, qs, modified_stories,
      control_stories) = zip(*res)
-
     if do_print:
         lines = visualize(
             event_plans, events, template_choices, worlds, baseline_stories, mqs, qs, modified_stories,
