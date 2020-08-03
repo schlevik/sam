@@ -23,6 +23,7 @@ from transformers.data.metrics.squad_metrics import squad_evaluate
 
 from scripts.utils import write_json, get_output_predictions_file_name
 from scripts.utils_transformers import get_tokenizer
+from stresstest.classes import YouIdiotException
 from stresstest.util import batch, sample_iter, load_json
 
 
@@ -308,8 +309,10 @@ def main():
         eval_time = timeit.default_timer() - start_time
         logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(eval_dataset)} sec per example)")
         predictions = dict()
-        for result, entry in zip(results, sample_iter(load_json(data_args.eval_file_path))):
-            predictions[entry.qa_id] = result
+        for result, example in zip(results, examples):
+            if predictions.get(example.qas_id):
+                raise YouIdiotException()
+            predictions[example.qas_id] = result
         if training_args.do_train:
             final_metric = squad_evaluate(examples, predictions)
             logger.debug(final_metric)
