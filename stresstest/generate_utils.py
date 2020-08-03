@@ -71,12 +71,13 @@ def _do_realize(config, event_plan, events, modifier_type, template_choices, tem
     control_story = [s for i, s in enumerate(modified_story) if i not in indices_to_remove]
     assert len(control_story) == len(baseline_story) - len(indices_to_remove)
     for q, mq in zip(qs, mqs):
-        realizer.realise_question(q, modified_story, ignore_missing_keys=False)
-        assert q.answer, f"{q}\n{modified_story}"
+        realizer.realise_question(q, baseline_story, ignore_missing_keys=False)
+        assert q.answer, f"{q}\n{baseline_story}"
         mq.realized = q.realized
         assert mq.realized, f"{mq}\n{modified_story}"
         mq.answer = realizer._fix_units(mq, modified_story)
         assert mq.answer, f"{mq}\n{modified_story}"
+        assert mq.answer != q.answer
         assert q.answer in " ".join(
             modified_story), f"{q}\n{baseline_story}\n{event_plan.event_types}\n{event_plan.must_haves}\n{template_choices}"
         assert mq.answer in " ".join(

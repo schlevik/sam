@@ -1,0 +1,23 @@
+{
+  "for_dataset": "test",
+  "num_modifiers": 3,
+  "reasoning_map": {
+    "retrieval": 200,
+    "retrieval_reverse": 200,
+    "retrieval_two": 75,
+    "retrieval_two_reverse": 75,
+    "bridge": 133,
+    "bridge_reverse": 133,
+    "comparison": 42,
+    "comparison_reverse": 42,
+    "argmax": 75,
+    "argmin": 75
+  },
+  "world": {
+    "num_sentences": 6,
+    "num_players": 12
+  },
+  "domain": "football",
+  "modify_event_type": "goal",
+  "unique_actors": true
+}
