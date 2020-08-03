@@ -155,7 +155,7 @@ class FootballGenerator(StoryGenerator):
                     logger.debug(f"Remaining pool: {[a.id for a in remaining_pool]}")
                 else:
                     # can't assist yourself, innit?
-                    remaining_pool = own_team - self.current_event.actor['team']
+                    remaining_pool = own_team - self.current_event.actor.team
                 player = remaining_pool.random()
             else:
                 raise NotImplementedError()
