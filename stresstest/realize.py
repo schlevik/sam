@@ -610,20 +610,24 @@ class Realizer:
                 for answer_position in answer_positions:
                     logger.debug(f"Answer found in evidence {idx}: {answer_position}")
                     unit_found = False
+                    done = False
                     i = 0
-                    while not unit_found:
+                    while not unit_found and not done:
                         if answer_position + i < len(tokens) and tokens[answer_position + i].startswith(unit):
                             candidate_spans.append(tokens[answer_position:answer_position + i + 1])
                             unit_found = True
                             logger.debug(f"Unit found in evidence {idx}: {answer_position + i} ")
                             logger.debug(f"adding: tokens[{answer_position}:{answer_position + i + 1}: "
                                          f"{tokens[answer_position:answer_position + i + 1]}")
+
                         if answer_position - i > 0 and tokens[answer_position - i].startswith(unit):
                             candidate_spans.append(tokens[answer_position - i:answer_position + 1])
                             unit_found = True
                             logger.debug(f"Unit found in evidence {idx}: {answer_position + i} ")
                             logger.debug(f"adding: tokens[{answer_position - i}:{answer_position + 1}]: "
                                          f"{tokens[answer_position - i:answer_position + 1]}")
+                        if answer_position + i > len(tokens) and answer_position - i < 0:
+                            done = True
                         i += 1
             shortest_answer = sorted(candidate_spans, key=len)[0]
             logger.debug(f"Shortest answer found: {shortest_answer} in {sorted(candidate_spans, key=len)}")

@@ -131,3 +131,27 @@ def test_fix_units_2():
     answer = realizer._fix_units(q, passage)
     assert answer == 'minute 42'
 
+
+def test_fix_units_3():
+    q = Question(type='direct', target='distance', evidence=[1, 2], event_type='goal', reasoning='bridge',
+                        answer=str(31),
+                        question_data=dict(), realized='After the foul on Mary Millwood , '
+                                                       'from how far away was the next goal scored ?')
+    passage = [
+        "Ethelyn Capello scored Arctic Monkeys 's first goal from 20 metres away "
+        "to set the tone for the match after Annmarie Dibiase inadvertently prodded the ball into her path .",
+        'Things proceeded with Mary Millwood being withdrawn in the 31 st minute with her hip '
+        'in a brace following a challenge from Amanda Testa .',
+        "Pale Lilac Elephants almost advanced the action with a 31 metres goal as Carol Nehls "
+        "all but curled in Cynthia Kittredge 's soft clearance .",
+        "Shannon Garber almost added more insult to the injury when she almost slotted in a "
+        "21 metres goal from Virginia Sheekey 's pass .",
+        "In the 52 nd minute a soft clearance went to Pale Lilac Elephants 's Ida Webb on the flank "
+        "and the player swept low to the 6-yard-area for Mamie Swart to poke past the goalkeeper "
+        "for a wonderful 25 metres goal .",
+        'Things proceeded with Judith Odougherty winning the ball in the middle field for '
+        'Pale Lilac Elephants and drawing a foul from Brenda Uttech .'
+    ]
+    realizer = Realizer(**templates, validate=False)
+    answer = realizer._fix_units(q, passage)
+    assert answer == '31 metres'
