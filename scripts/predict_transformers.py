@@ -48,8 +48,8 @@ except ImportError:
 @click.command()
 @click.argument("in-files", nargs=-1)
 @click.option('--out-folder', type=str)
-@click.option('--model-path', type=str)
-@click.option('--model-type', type=str)
+@click.option("model_paths", '--model-path', type=str, multiple=True)
+@click.option("model_types", '--model-type', type=str, multiple=True)
 @click.option('--no-cuda', type=bool, default=None)
 @click.option('--per-gpu-eval-batch-size', type=int, default=8)
 @click.option('--do-not-lower-case', is_flag=True, default=False)
@@ -64,30 +64,33 @@ except ImportError:
 @click.option('--max-query-length', type=int, default=64)
 @click.option('--num-workers', type=int, default=1)
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
-def predictions(in_files, out_folder, model_path, model_type, no_cuda, per_gpu_eval_batch_size, do_not_lower_case,
+def predictions(in_files, out_folder, model_paths, model_types, no_cuda, per_gpu_eval_batch_size, do_not_lower_case,
                 lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold, **kwargs):
-    do_lower_case = not do_not_lower_case
-    model = get_model(model_path)
-    tokenizer = get_tokenizer(model_path, do_lower_case)
-    args = Args(model_path=model_path, model_type=model_type, predictions_folder=out_folder,
-                no_cuda=no_cuda, do_lower_case=do_lower_case, per_gpu_eval_batch_size=per_gpu_eval_batch_size,
-                lang_id=lang_id, v2=v2, n_best_size=n_best_size, max_answer_length=max_answer_length,
-                verbose_logging=verbose_logging, null_score_diff_threshold=null_score_diff_threshold)
-    for in_file in in_files:
-        args.eval_file = in_file
-        logger.debug(args)
-        if args.eval_file.endswith('bin'):
-            click.echo("Loading features from cache...")
-            dataset, examples, features = load_examples(args.eval_file)
-        elif args.eval_file.endswith('json'):
-            click.echo("Converting features on the fly...")
-            assert len(kwargs.keys()) == 5
-            dataset, examples, features = convert_to_features(args.eval_file, evaluate=True, tokenizer=tokenizer, v2=v2,
-                                                              **kwargs)
-        else:
-            raise NotImplementedError(f"Unknown file extension for evaluation file: {args.eval_file}")
-        evaluate(args, model, tokenizer, dataset, examples, features,
-                 suffix=os.path.basename(os.path.normpath(model_path)))
+    assert len(model_paths) == len(model_types)
+    for model_path, model_type in zip(model_paths, model_types):
+        do_lower_case = not do_not_lower_case
+        model = get_model(model_path)
+        tokenizer = get_tokenizer(model_path, do_lower_case)
+        args = Args(model_path=model_path, model_type=model_type, predictions_folder=out_folder,
+                    no_cuda=no_cuda, do_lower_case=do_lower_case, per_gpu_eval_batch_size=per_gpu_eval_batch_size,
+                    lang_id=lang_id, v2=v2, n_best_size=n_best_size, max_answer_length=max_answer_length,
+                    verbose_logging=verbose_logging, null_score_diff_threshold=null_score_diff_threshold)
+        for in_file in in_files:
+            args.eval_file = in_file
+            logger.debug(args)
+            if args.eval_file.endswith('bin'):
+                click.echo("Loading features from cache...")
+                dataset, examples, features = load_examples(args.eval_file)
+            elif args.eval_file.endswith('json'):
+                click.echo("Converting features on the fly...")
+                assert len(kwargs.keys()) == 5
+                dataset, examples, features = convert_to_features(args.eval_file, evaluate=True, tokenizer=tokenizer,
+                                                                  v2=v2,
+                                                                  **kwargs)
+            else:
+                raise NotImplementedError(f"Unknown file extension for evaluation file: {args.eval_file}")
+            evaluate(args, model, tokenizer, dataset, examples, features,
+                     suffix=os.path.basename(os.path.normpath(model_path)))
 
 
 def evaluate(args: Args, model, tokenizer, dataset, examples, features, suffix="", return_raw=False):
@@ -176,17 +179,20 @@ def evaluate(args: Args, model, tokenizer, dataset, examples, features, suffix="
 
     eval_time = timeit.default_timer() - start_time
     logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(dataset)} sec per example)")
-    if args.predictions_folder:
-        out_file = get_output_predictions_file_name(args.eval_file, args.predictions_folder, suffix)
+    eval_file = args.eval_file
+    predictions_folder = args.predictions_folder
+    v2 = args.v2
+    if predictions_folder:
+        out_file = get_output_predictions_file_name(eval_file, predictions_folder, suffix)
         logger.info(f"Saving predictions in {out_file}")
 
         # Compute predictions
         file_name = os.path.basename(out_file)
-        output_prediction_file = os.path.join(args.predictions_folder, file_name)
-        output_nbest_file = os.path.join(args.predictions_folder, f"nbest-{file_name}")
+        output_prediction_file = os.path.join(predictions_folder, file_name)
+        output_nbest_file = os.path.join(predictions_folder, f"nbest-{file_name}")
 
-        if args.v2:
-            output_null_log_odds_file = os.path.join(args.predictions_folder, f"null-odds-{file_name}")
+        if v2:
+            output_null_log_odds_file = os.path.join(predictions_folder, f"null-odds-{file_name}")
         else:
             output_null_log_odds_file = None
     else:

@@ -20,6 +20,7 @@ def generate_dvc(command, sam, dataset_name, model_name, model_type, train_file,
                  notify):
     sam_path = sam.lower()
     sam_dataset_path = f"data/football/{sam_path}"
+    filter_file = f'{sam_dataset_path}/baseline-filter-{sam_path}.json'
     baseline_file = f"{sam_dataset_path}/baseline-{dataset_name}-{sam_path}.json"
     intervention_file = f"{sam_dataset_path}/intervention-{dataset_name}-{sam_path}.json"
     control_file = f"{sam_dataset_path}/control-{dataset_name}-{sam_path}.json"
@@ -38,7 +39,7 @@ def generate_dvc(command, sam, dataset_name, model_name, model_type, train_file,
 
         cmd = (
             f"python main.py --debug --notify {notify} train {train_path} --model-path {model_name} "
-            f"--model-type {model_name} --eval-file {eval_path} --save-model-folder {model_path} "
+            f"--model-type {model_type} --eval-file {eval_path} --save-model-folder {model_path} "
             f"--do-eval-after-training --num-workers 8 --per-gpu-train-batch-size {batch_size} "
             f"--max-answer-length 30 {extra_args}"
         )
@@ -48,12 +49,12 @@ def generate_dvc(command, sam, dataset_name, model_name, model_type, train_file,
             f"{cmd}"
         )
     elif command == 'predict-transformers':
-
         cmd = (f"python main.py --debug --notify {notify} "
                f"predictions {baseline_file} {intervention_file} {control_file} "
-               f"--model-path {model_path} --out-folder {predictions_folder} '--max-answer-length 10 {extra_args}")
+               f"--model-path {model_path} --model-type {model_type} "
+               f"--out-folder {predictions_folder} '--max-answer-length 10 {extra_args}")
 
-        stage_name = f"eval-{model_folder}-on-{sam_path}"
+        stage_name = f"predict-{model_folder}-on-{sam_path}"
 
         dvc_cmd = (f"dvc run -n {stage_name} -d scripts/predict_transformers.py -d {model_path} -d {baseline_file} "
                    f"-d {intervention_file} -d {control_file} -o {baseline_predictions} -o {control_predictions} "
@@ -67,7 +68,7 @@ def generate_dvc(command, sam, dataset_name, model_name, model_type, train_file,
         stage_name = f"evaluate-intervention-{dataset_name}-{sam_path}"
 
         dvc_cmd = (f"dvc run -n {stage_name} -d {baseline_file} -d {intervention_file} -d {control_file} "
-                   f"-d scripts/evaluate_intervention.py -d {predictions_folder} -o {eoi_metric_path} {cmd}")
+                   f"-d scripts/evaluate_intervention.py -d {predictions_folder} -M {eoi_metric_path} {cmd}")
     elif command == "generate":
         conf_name = f'conf/{dataset_name}.json'
         cmd = (f"python main.py generate-balanced --config {conf_name} --seed 56 "
@@ -77,11 +78,14 @@ def generate_dvc(command, sam, dataset_name, model_name, model_type, train_file,
                    f"-d {conf_name} -o {baseline_file} -o {intervention_file} -o {control_file} {cmd}")
     elif command == 'filter':
         # todo: evaluate all trained on dataset X on confs/test.json
-        ...
-        raise NotImplementedError()
+        stage_name = f'filter-{dataset_name}'
+        metric_file = f'metrics/{dataset_name}-filter.json'
+        cmd = (f"python main.py evaluate {filter_file} --prediction-folder {predictions_folder} "
+               f"--output -M {metric_file} --metric EM,F1 --split-reasoning")
+        dvc_cmd = (f"dvc run -n {stage_name} -d {filter_file} -d {predictions_folder}"
+                   f"-M {metric_file} {cmd}")
     elif command == 'predict-allennlp':
-        # todo: predict allennlp
-        stage_name = f"eval-{model_name}-on-{dataset_name}"
+        stage_name = f"predict-{model_name}-on-{dataset_name}"
         model_path = os.path.join(model_path, "model.tar.gz")
         cmd = (
             f"mkdir -p {predictions_folder} &&"
@@ -96,15 +100,42 @@ def generate_dvc(command, sam, dataset_name, model_name, model_type, train_file,
 
         dvc_cmd = (f"dvc run -n {stage_name} -d {model_path} -d {baseline_file} "
                    f"-d {intervention_file} -d {control_file} -o {baseline_predictions} -o {control_predictions} "
-                   f"-o {intervention_predictions}  {cmd}")
+                   f"-o {intervention_predictions}  '{cmd}'")
     elif command == 'predict-baselines':
-        # todo: simple baselines
-        raise NotImplementedError()
+        stage_name = f"predict-baselines-on-{sam_path}"
+        cmd = (
+            f"python main.py predict {baseline_file} {control_file} {intervention_file} "
+            f"--output-folder {predictions_folder} "
+            f"--model 'random-baseline' --cls RandomBaseline "
+            f"--model 'educated-baseline' --cls EducatedBaseline "
+            f"--model 'informed-baseline' --cls InformedBaseline"
+        )
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {baseline_file} "
+            f"-d {intervention_file} -d {control_file} -o {predictions_folder}"
+        )
     elif command == 'train-allennlp':
         cmd = f"TRAIN_SET={train_path} EVAL_SET={eval_path} CUDA=0 " \
               f"allennlp train conf/{model_name}.jsonnet -s {model_folder}"
         stage_name = f"train-{model_name}-on-{dataset_name}"
         dvc_cmd = f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} {cmd}"
+    elif command == 'train-bert-mixed':
+        raise NotImplementedError()
+    elif command == 'train-partial-baselines':
+        raise NotImplementedError()
+    elif command == 'finetune':
+        raise NotImplementedError()
+    elif command == 'train-t5':
+
+        cmd = (f"PYTHONPATH='.' python scripts/t5.py --model_name_or_path {model_name} --output_dir {model_folder} "
+               f"--train_file {train_path} --eval_file {eval_path} "
+               f"--do_train --do_eval --num_workers 8 --per_device_train_batch_size {batch_size} "
+               f"{extra_args}")
+        stage_name = f"train-{model_name}-on-{dataset_name}"
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
+            f"{cmd}"
+        )
     else:
         raise NotImplementedError()
     click.secho("Python command:", fg='green', bold=True)
