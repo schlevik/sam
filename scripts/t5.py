@@ -339,7 +339,7 @@ def main():
             predictions[example.qas_id] = result
         if training_args.do_train:
             final_metric = squad_evaluate(examples, predictions)
-            logger.debug(final_metric)
+            logger.info(final_metric)
             write_json(final_metric, os.path.join(training_args.output_dir, 'dev-results.json'))
         else:
             write_json(predictions, get_output_predictions_file_name(
