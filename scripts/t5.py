@@ -1,6 +1,7 @@
 # adapted from
 # https://colab.research.google.com/github/patil-suraj/exploring-T5/blob/master/T5_on_TPU.ipynb#scrollTo=v7TUzb-T-YtF
 import json
+import logging
 import os
 import timeit
 from dataclasses import dataclass, field
@@ -16,7 +17,8 @@ from torch.utils.data import TensorDataset
 from transformers import T5ForConditionalGeneration, T5Tokenizer, SquadV1Processor, SquadExample, HfArgumentParser, \
     TrainingArguments
 from transformers import Trainer, set_seed
-from loguru import logger
+
+logger = logging.getLogger(__name__)
 
 # process the examples in input and target text format and the eos token at the end
 from transformers.data.metrics.squad_metrics import squad_evaluate
@@ -38,8 +40,10 @@ def add_eos_to_example(example: SquadExample):
 def convert_to_features(example_batch, tokenizer: T5Tokenizer, max_ans_length, max_context_length):
     inputs = [e['input_text'] for e in example_batch]
     targets = [e['target_text'] for e in example_batch]
-    input_encodings = tokenizer.batch_encode_plus(inputs, pad_to_max_length=True, max_length=max_context_length)
-    target_encodings = tokenizer.batch_encode_plus(targets, pad_to_max_length=True, max_length=max_ans_length)
+    input_encodings = tokenizer.batch_encode_plus(inputs, truncation=True, pad_to_max_length=True,
+                                                  max_length=max_context_length)
+    target_encodings = tokenizer.batch_encode_plus(targets, truncation=True, pad_to_max_length=True,
+                                                   max_length=max_ans_length)
 
     return [*zip(input_encodings['input_ids'], input_encodings['attention_mask'], target_encodings['input_ids'],
                  target_encodings['attention_mask'])]
@@ -164,12 +168,12 @@ def get_dataset(in_file, tokenizer, args: DataTrainingArguments, evaluate=False)
     all_target_ids = torch.tensor([f[2] for f in features], dtype=torch.long)
     all_target_attention_mask = torch.tensor([f[3] for f in features], dtype=torch.long)
     n = random.randint(0, len(features))
-    logger.debug("Random Question")
-    logger.debug(examples[n].question_text)
-    logger.debug(" ".join(f"[{tokenizer.decode(e.item())}]" for e in all_input_ids[n] if e))
-    logger.debug("Its Answer")
-    logger.debug(examples[n].answer_text)
-    logger.debug(" ".join(f"[{tokenizer.decode(e.item())}]" for e in all_target_ids[n] if e))
+    logger.info("Random Question")
+    logger.info(examples[n].question_text)
+    logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in all_input_ids[n] if e))
+    logger.info("Its Answer")
+    logger.info(examples[n].answer_text)
+    logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in all_target_ids[n] if e))
     dataset = TensorDataset(
         all_input_ids,
         all_attention_masks,
@@ -210,6 +214,19 @@ def main():
     training_args: TrainingArguments
     # if training_args.do_eval and not training_args.do_train and not data_args.predictions_folder:
     #     raise ValueError("Supply predictions folder destination to save the predictions!")
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S",
+        level=logging.INFO if training_args.local_rank in [-1, 0] else logging.WARN,
+    )
+    logger.warning(
+        "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s",
+        training_args.local_rank,
+        training_args.device,
+        training_args.n_gpu,
+        bool(training_args.local_rank != -1),
+        training_args.fp16,
+    )
 
     logger.debug(model_args)
     logger.debug(training_args)
@@ -228,22 +245,28 @@ def main():
 
     # Set seed
     set_seed(training_args.seed)
-
+    if training_args.local_rank not in [-1, 0]:
+        # Make sure only the first process in distributed training will download model & vocab
+        torch.distributed.barrier()
     tokenizer = get_tokenizer(model_args.model_name_or_path, do_lower_case=False)
     model = T5ForConditionalGeneration.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
     )
-
+    if training_args.local_rank == 0:
+        # Make sure only the first process in distributed training will download model & vocab
+        torch.distributed.barrier()
     # Get datasets
-    if training_args.do_eval:
+    if training_args.do_eval and training_args.local_rank in [-1, 0]:
         eval_dataset, examples = get_dataset(data_args.eval_file_path, tokenizer, data_args, evaluate=True)
     else:
         eval_dataset, examples = None, None
     # Training
     if training_args.do_train:
-        train_dataset, _ = get_dataset(data_args.train_file_path, tokenizer, data_args)
-
+        if training_args.local_rank in [-1, 0]:
+            train_dataset, _ = get_dataset(data_args.train_file_path, tokenizer, data_args)
+        else:
+            train_dataset = None
         # Initialize our Trainer
         trainer = Trainer(
             model=model,
@@ -279,7 +302,8 @@ def main():
         # eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
         eval_sampler = torch.utils.data.SequentialSampler(eval_dataset)
         eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler,
-                                                      batch_size=training_args.per_device_eval_batch_size, collate_fn=collate_eval)
+                                                      batch_size=training_args.per_device_eval_batch_size,
+                                                      collate_fn=collate_eval)
         model.to(device)
         # multi-gpu evaluate
         # if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
