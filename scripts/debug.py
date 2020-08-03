@@ -3,7 +3,8 @@ import click
 from scripts.utils import Domain
 from stresstest.classes import Bundle
 from stresstest.realize import Realizer
-from tests.util import interactive_env_football_modifier, only
+from tests.util import interactive_env_football_modifier
+from stresstest.util import only
 
 
 @click.command()
