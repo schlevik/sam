@@ -281,8 +281,8 @@ def main():
                                                       batch_size=training_args.eval_batch_size, collate_fn=collate_eval)
         model.to(device)
         # multi-gpu evaluate
-        if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
-            model = torch.nn.DataParallel(model)
+        # if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
+        #    model = torch.nn.DataParallel(model)
 
         # Eval!
         click.echo(f"Generating predictions for model {click.style(model_path, fg='blue')}, "
@@ -293,10 +293,14 @@ def main():
         start_time = timeit.default_timer()
         results = []
         for batch in tqdm(eval_dataloader):
-            outs = model.generate(input_ids=batch['input_ids'],
-                                  attention_mask=batch['attention_mask'],
-                                  max_length=16,
-                                  early_stopping=True)
+            for k, v in batch.items():
+                if isinstance(v, torch.Tensor):
+                    batch[k] = v.to(training_args.device)
+            with torch.no_grad():
+                outs = model.generate(input_ids=batch['input_ids'],
+                                      attention_mask=batch['attention_mask'],
+                                      max_length=16,
+                                      early_stopping=True)
             outs = [tokenizer.decode(ids) for ids in outs]
             answers.extend(outs)
             logger.debug(outs)
