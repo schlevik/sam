@@ -278,7 +278,7 @@ def main():
         # eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
         eval_sampler = torch.utils.data.SequentialSampler(eval_dataset)
         eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler,
-                                                      batch_size=training_args.eval_batch_size, collate_fn=collate_eval)
+                                                      batch_size=training_args.per_device_eval_batch_size, collate_fn=collate_eval)
         model.to(device)
         # multi-gpu evaluate
         # if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
