@@ -25,7 +25,7 @@ at = {
                      "was [not|n't] [permitted|allowed] to"],
             "goal-nonactor": [
                 "[did|would] [not|n't] [get|happen] to",
-                'was [blocked|[prevented] from'
+                'was [blocked|prevented] from'
             ]
         },
         "VBI": {
@@ -34,7 +34,7 @@ at = {
                      "not be [permitted|allowed] to"],
             "goal-nonactor": [
                 "not [get|happen] to",
-                'not be [blocked|[prevented] from'
+                'not be [blocked|prevented] from'
             ]
         },
         "VBG": {
@@ -45,7 +45,7 @@ at = {
                      "[not being|having not been] [permitted|allowed] to", ],  # passive
             "goal-nonactor": [
                 "[not] [getting|happening] to",
-                'being [blocked|[prevented] from'
+                'being [blocked|prevented] from'
             ]
         },
         # 'VBD-passive': {

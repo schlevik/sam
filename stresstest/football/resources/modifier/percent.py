@@ -50,7 +50,7 @@ percent = {
             "condition": _is_contrastive_or_matchstart,
             "matchstart": [
                 "kick the match off",
-                "start (off) the match",
+                "start off the match",
                 "set the tone for the match",
                 "open the action"
             ],
@@ -78,8 +78,8 @@ percent = {
             "matchstart": [
                 "The match started as",
                 "After the kickoff",
-                "The tone was set with the game just #sent.attributes.time minutes old, when",
-                "The first $JJ.attention thing after the kick-off was, when"],
+                "The tone was set with the game just #sent.attributes.time minutes old , when",
+                "The first $JJ.attention thing after the kick-off was , when"],
             "neutral": [
                 "Then",
                 "!MINDIFF minutes after that",

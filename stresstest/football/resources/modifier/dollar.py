@@ -14,7 +14,7 @@ dollar = {
     },
     "NP": {
         "opportunity": ["chance", "opportunity", "possibility"],
-        "obligation": ["commitment", "task", " responsibility"],
+        "obligation": ["commitment", "responsibility"],
         "attribute": ["grace", "guts", "nerve", "tenacity", "tenaciousness",
                       "boldness", "power", "strength", "courage", "audaciousness", "finesse"],
 
@@ -61,7 +61,7 @@ dollar = {
             # which team coactors come from for each event...
             "actor": ['#sent.actor.team.name'],
             "actor-possessive": ["$NP.team.actor 's"],
-            "actor-possessive-post": ["a player of $NP.team.actor ,"],
+            "actor-possessive-post": ["a player of $NP.team.actor "],
             "nonactor": ["!OTHERTEAM"],
             "nonactor-possessive": ["$NP.team.nonactor 's"],
             "nonactor-possessive-post": ["a player of $NP.team.nonactor ,"],
@@ -149,7 +149,7 @@ dollar = {
         },
         "distance": ["from #sent.attributes.distance metres (away)"],
         "time": ["in minute #sent.attributes.time",
-                 "[on|in] the #sent.attributes.time th minute"],
+                 "in the #sent.attributes.time th minute"],
         "team": {
             "actor-possessive": ["of $NP.team.actor"],
             "nonactor-possessive": ["of $NP.team.nonactor", ]

@@ -555,16 +555,16 @@ class Realizer:
                 token = token + "n"
             elif token == 'into' and next_token == 'between':
                 token = 'in'
-            elif token == 'th' and prev_token == '1':
+            elif token == 'th' and prev_token.endswith('1'):
                 token = 'st'
                 try:
                     if next_token == 'to' and tokens[i + 2] == 'last':
                         token = ''
                 except IndexError:
                     pass
-            elif token == 'th' and prev_token == '2':
+            elif token == 'th' and prev_token.endswith('2'):
                 token = 'nd'
-            elif token == 'th' and prev_token == '3':
+            elif token == 'th' and prev_token.endswith('3'):
                 token = 'rd'
             elif prev_token == 'to' \
                     and (token.endswith("ed") or token.endswith("ing") or
