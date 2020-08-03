@@ -265,8 +265,16 @@ def main():
     if training_args.do_train:
         if training_args.local_rank in [-1, 0]:
             train_dataset, _ = get_dataset(data_args.train_file_path, tokenizer, data_args)
+            torch.save(train_dataset, 'features.bin')
         else:
+            torch.distributed.barrier()
             train_dataset = None
+
+        if training_args.local_rank in [-1, 0]:
+            torch.distributed.barrier()
+
+        else:
+            train_dataset = torch.load('features.bin')
         # Initialize our Trainer
         trainer = Trainer(
             model=model,
