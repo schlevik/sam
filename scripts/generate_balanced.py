@@ -46,7 +46,7 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
             click.echo(f"And question templates with index i where `i mod {div} == {rest}`")
             domain.templates_modifier['question_templates'], _ = \
                 filter_question_templates(lambda i, _: i % div == rest, domain.templates_modifier['question_templates'])
-        split_name = f"-split-"
+        split_name = f"-{split}-"
 
     else:
         split_name = "-"
