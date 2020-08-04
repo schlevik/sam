@@ -68,7 +68,7 @@ percent = {
         },
         "ADVP": {
             "condition": _is_contrastive_or_matchstart,
-            "matchstart": ['early in the game', 'as early as $PP.time'],
+            "matchstart": ['early in the game', 'early on'],
             "supportive": ['to add on'],
             "neutral": ['later on', 'thereafter'],
             "contrastive": ['[decisively quickly|quickly|promptly] answering', 'with a [decisive|quick|prompt] answer']
@@ -78,7 +78,7 @@ percent = {
             "matchstart": [
                 "The match started as",
                 "After the kickoff",
-                "The tone was set with the game just #sent.attributes.time minutes old , when",
+                "The tone was set with the game still being young , when",
                 "The first $JJ.attention thing after the kick-off was , when"],
             "neutral": [
                 "Then",

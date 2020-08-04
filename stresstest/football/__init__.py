@@ -29,10 +29,11 @@ def _has(template: str, attribute: Union[str, List[str]]):
     if attribute == 'time':
         return '.time ' in template
     if attribute == 'coactor':
-        return '.coactor ' in template or 'S.goal-cause ' in template or 'PP.goal-cause-coref ' in template
+        return '.coactor ' in template or '.goal-cause-coactor' in template or '.goal-cause-coactor ' in template
     if attribute == 'distance':
         return '.distance ' in template
     else:
+
         raise NotImplementedError()
 
 

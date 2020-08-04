@@ -26,7 +26,7 @@ dollar = {
         "shot": ['shot', 'drive', 'hammer', 'strike'],
         "goal": ["goal"],
         "goal-cause": ["a run $PP.position.vertical", 'a (decisive) counter-attack'],
-
+        "kick-type": ['free kick', 'penalty'],
         "goalkeeper": ["goalkeeper", "woman between the posts", "last line of defence"],
         # TODO !person-gendered between the post
         "coref-player": ["!PRP", "the player"],
@@ -134,8 +134,9 @@ dollar = {
         }
     },
     "PP": {
-        "goal-cause": ["after [$NP.goal-cause|$S.goal-cause]"],
-        "goal-cause-coref": ["after (!PRPS teammate) $NP.coactor 's $NP.pass-type"],
+        
+        "goal-cause": ["after $NP.goal-cause"],
+        "goal-cause-coactor": ["after (!PRPS teammate) $NP.coactor 's $NP.pass-type"],
         'goal-effect': ["for !PRPS !RANDINT th league goal of the season"],
         "foul-effect": ["for a [$JJ.promising|$JJ.attention] free-kick $NP.opportunity ",
                         "(for $NP.team.nonactor)"
@@ -157,7 +158,7 @@ dollar = {
     },
     "S": {
         "attention-crowd": ["the stadium went wild"],
-        "goal-cause": ["$NP.coactor (inadvertently) $VP.VBD.pass the ball into !PRPS path (following $NP.goal-cause)"],
+        "goal-cause-coactor": ["$NP.coactor (inadvertently) $VP.VBD.pass the ball into !PRPS path (following $NP.goal-cause)"],
     },
 
     # adverbials
