@@ -212,6 +212,13 @@ def main():
     model_args: ModelArguments
     data_args: DataTrainingArguments
     training_args: TrainingArguments
+    if training_args.fp16:
+        try:
+            import apex
+
+            apex.amp.register_half_function(torch, "einsum")
+        except ImportError:
+            raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
     # if training_args.do_eval and not training_args.do_train and not data_args.predictions_folder:
     #     raise ValueError("Supply predictions folder destination to save the predictions!")
     logging.basicConfig(
@@ -270,7 +277,7 @@ def main():
             torch.distributed.barrier()
             train_dataset = None
 
-        if training_args.local_rank in [-1, 0]:
+        if training_args.local_rank == 0:
             torch.distributed.barrier()
 
         else:
