@@ -204,15 +204,16 @@ class Args:
 
 def load_or_convert(args: Args, tokenizer, evaluate=False):
     attr = "eval_file" if evaluate else "train_file"
-    if getattr(args, attr).endswith('bin'):
+    file = getattr(args, attr)
+    if file.endswith('bin'):
         click.echo("Loading train features from cache...")
-        train_dataset, e, f = load_examples(args.train_file)
-    elif getattr(args, attr).endswith('json'):
+        train_dataset, e, f = load_examples(file)
+    elif file.endswith('json'):
         click.echo("Converting features on the fly...")
-        train_dataset, e, f = convert_to_features(args.train_file, evaluate=evaluate, tokenizer=tokenizer, v2=args.v2,
+        train_dataset, e, f = convert_to_features(file, evaluate=evaluate, tokenizer=tokenizer, v2=args.v2,
                                                   doc_stride=args.doc_stride, max_query_length=args.max_query_length,
                                                   max_seq_length=args.max_seq_length,
                                                   num_workers=args.num_workers, debug_features=args.debug_features)
     else:
-        raise NotImplementedError(f"Unknown file extension for evaluation file: {args.train_file}")
+        raise NotImplementedError(f"Unknown file extension for evaluation file: {file}")
     return train_dataset, e, f

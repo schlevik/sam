@@ -70,7 +70,7 @@ def predictions(in_files, out_folder, model_paths, model_types, no_cuda, per_gpu
     for model_path, model_type in zip(model_paths, model_types):
         model = get_model(model_path)
         args = Args(model_path=model_path, model_type=model_type, predictions_folder=out_folder,
-                    no_cuda=no_cuda, do_not_lowercase=do_not_lower_case,
+                    no_cuda=no_cuda, do_not_lower_case=do_not_lower_case,
                     per_gpu_eval_batch_size=per_gpu_eval_batch_size,
                     lang_id=lang_id, v2=v2, n_best_size=n_best_size, max_answer_length=max_answer_length,
                     verbose_logging=verbose_logging, null_score_diff_threshold=null_score_diff_threshold, **kwargs)

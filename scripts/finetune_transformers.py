@@ -34,6 +34,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
     if keep_predictions:
         args.eval_file = baseline_gold_path
     baseline_predictions = evaluate(args, model, tokenizer, *baseline_dataset, f'baseline-{run_nr}', return_raw=True)
+    logger.debug(baseline_predictions)
     if keep_predictions:
         args.eval_file = intervention_gold_path
     intervention_predictions = evaluate(args, model, tokenizer, *intervention_dataset, f'intervention-{run_nr}',
@@ -90,7 +91,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option('--max-seq-length', type=int, default=384)
 @click.option('--doc-stride', type=int, default=128)
 @click.option('--max-query-length', type=int, default=64)
-@click.option('--num-workers', type=int, default=1)
+@click.option('--num-workers', type=int, default=8)
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
 @click.option('--do-not-lower-case', type=bool, is_flag=True, default=False)
 def finetune(**kwargs):
@@ -105,7 +106,7 @@ def finetune(**kwargs):
         load_json(g) for g in gold_files
     )
     # load eval gold for evaluation
-    aligneds = align(*golds)
+    aligneds = align(*golds, assert_same=True)
 
     # run single step
     hyper_params = [{
@@ -138,22 +139,7 @@ def finetune(**kwargs):
     kwargs['device'] = device
     args.n_gpu = kwargs['n_gpu']
     args.device = kwargs['device']
-    # Setup logging
-    # logging.basicConfig(
-    #     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-    #     datefmt="%m/%d/%Y %H:%M:%S",
-    #     level=logging.DEBUG if args.local_rank in [-1, 0] and not mute else logging.WARN,
-    # )
-    # logger.warning(
-    #     "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s" %
-    #     args.local_rank,
-    #     device,
-    #     args.n_gpu,
-    #     bool(args.local_rank != -1),
-    #     args.fp16
-    # )
-    print(args.debug_features)
-    # Set seed
+
     logger.debug(args)
 
     if args.fp16:
