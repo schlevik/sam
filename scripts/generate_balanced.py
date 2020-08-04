@@ -6,6 +6,7 @@ import click
 
 from scripts.utils import Domain, BASELINE, INTERVENTION, write_json, CONTROL
 from stresstest.classes import Config
+from stresstest.comb_utils import filter_question_templates
 from stresstest.ds_utils import to_squad
 from stresstest.generate_utils import generate_and_realise
 from stresstest.print_utils import visualize
@@ -20,46 +21,36 @@ from stresstest.util import do_import, only
 @click.option("--do-save", is_flag=True, default=False)
 @click.option("--domain", type=Domain(), default='football')
 @click.option("--num-workers", type=int, default=8)
-# @click.option("--split-templates", type=float, default=False)
 @click.option("--modifier-type", type=str, default='RB')
 @click.option('--mask-q', is_flag=True, default=False)
 @click.option('--mask-p', is_flag=True, default=False)
 @click.option('--keep-answer-candidates', is_flag=True, default=False)
+@click.option('--split', type=str, default=None)
 def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_workers,
-                      modifier_type, mask_q, mask_p, keep_answer_candidates):
+                      modifier_type, mask_q, mask_p, keep_answer_candidates, split):
     if seed:
         random.seed(seed)
     uuid4 = lambda: uuid.UUID(int=random.getrandbits(128)).hex
 
     cfg = Config(config)
 
-    max_sents = cfg["world.num_sentences"]
-
     modify_event_type = cfg['modify_event_type']
-    split_templates = cfg.get('split', False)
-    if split_templates:
-        n = cfg['split']['templates'][modify_event_type]
+    if split:
+        n = cfg['split'][split][modify_event_type]
         click.echo(f"For event type '{modify_event_type}'")
         click.echo(f"Using only templates: {n}")
-        split_name = f"-{cfg['split']['name']}-"
+        qt_split = cfg['split'][split].get('question_templates')
         domain = only(domain, action=modify_event_type, n=n)
+        if qt_split:
+            click.echo("And question templates where {}")
+            div, rest = qt_split['div'], qt_split['rest']
+            domain.templates_modifier['question_templates'], _ = \
+                filter_question_templates(lambda i, _: i % div == rest, domain.templates_modifier['question_templates'])
+        split_name = f"-split-"
+
     else:
         split_name = "-"
-    # if split_templates:
-    #     first, second = split(domain.templates_modifier, event_types_to_split=[modify_event_type],
-    #                           split_ratio=split_templates)
-    #     template_splits = [first, second]
 
-    #    click.echo(f"Splitting templates with a {split_templates} ratio.")
-
-    # for event_type, templates in domain.templates_modifier['sentences'].items():
-    #     click.echo(f"For event type '{event_type}'")
-    #     click.echo(f"First split: {[templates.index(t) for t in first['sentences'][event_type]]}")
-    #     click.echo(f"Second split: {[templates.index(t) for t in second['sentences'][event_type]]}")
-    # else:
-    #     template_splits = [domain.templates_modifier]
-
-    # for i, templates in enumerate(template_splits):
     num_modifiers = cfg['num_modifiers']
     reasoning_map = {do_import(k, relative_import="stresstest.reasoning"): v for k, v in
                      cfg['reasoning_map'].items()}

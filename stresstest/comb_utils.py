@@ -4,7 +4,7 @@ from itertools import groupby, permutations, product
 from math import factorial
 from operator import attrgetter
 from random import shuffle, sample
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional, Callable
 
 from loguru import logger
 from pyhocon import ConfigFactory
@@ -25,9 +25,10 @@ def paths(key, path=()):
 
 
 def split(templates: Dict[str, Dict[str, List[str]]], event_types_to_split: List[str], split_ratio: float,
-          split_question_templates=False):
+          split_q_templates: Optional[Callable] = None):
     first_split = deepcopy(templates)
     second_split = deepcopy(templates)
+    split_q_templates = split_q_templates or []
     for event_type, sents in templates['sentences'].items():
         sents = deepcopy(sents)
         if event_type in event_types_to_split:
@@ -40,29 +41,38 @@ def split(templates: Dict[str, Dict[str, List[str]]], event_types_to_split: List
         else:
             second_split['sentences'][event_type] = sents
             first_split['sentences'][event_type] = sents
-    if split_question_templates:
-        first_q_templates = ConfigFactory.from_dict({})
-        second_q_templates = ConfigFactory.from_dict({})
-        for path, q_templates in paths(templates['question_templates']):
-            logger.debug(path)
-            logger.debug(q_templates)
-            shuffle(q_templates)
-            split_idx = round(split_ratio * len(q_templates))
-            q_templates_first = q_templates[split_idx:]
-            q_templates_second = q_templates[:split_idx]
-            assert len(q_templates_first) + len(q_templates_second) == len(q_templates)
-            first_q_templates.put('.'.join(path), q_templates_first)
-            second_q_templates.put('.'.join(path), q_templates_second)
-        # raise NotImplementedError
-
-        first_q_templates = first_q_templates.as_plain_ordered_dict()
-        second_q_templates = second_q_templates.as_plain_ordered_dict()
-        assert [k for k, _ in paths(first_q_templates)] == \
-               [k for k, _ in paths(second_q_templates)] == \
-               [k for k, _ in paths(templates['question_templates'])]
-        first_split['question_templates'] = first_q_templates
-        second_split['question_templates'] = second_q_templates
+    if split_q_templates:
+        first_q_predicate = split_q_templates
+        first_split, second_split = filter_question_templates(first_q_predicate,
+                                                              templates['question_templates'])
     return first_split, second_split
+
+
+def filter_question_templates(predicate, question_templates):
+    hits = ConfigFactory.from_dict({})
+    rest = ConfigFactory.from_dict({})
+    for path, q_templates in paths(question_templates):
+        logger.debug(path)
+        logger.debug(q_templates)
+        q_templates_hits = []
+        q_templates_rest = []
+        for i, q_template in enumerate(q_templates):
+            if predicate(i, q_template):
+                q_templates_hits.append(q_template)
+            else:
+                q_templates_rest.append(q_template)
+        assert len(q_templates_hits) + len(q_templates_rest) == len(q_templates)
+        assert set(q_templates_hits + q_templates_rest) == set(q_templates)
+        assert q_templates_hits
+        assert q_templates_rest
+        hits.put('.'.join(path), q_templates_hits)
+        rest.put('.'.join(path), q_templates_rest)
+    hits = hits.as_plain_ordered_dict()
+    rest = rest.as_plain_ordered_dict()
+    assert [k for k, _ in paths(hits)] == \
+           [k for k, _ in paths(rest)] == \
+           [k for k, _ in paths(question_templates)]
+    return hits, rest
 
 
 def calculate_num_of_permutations(events: List[Event], templates, events_to_permute):
