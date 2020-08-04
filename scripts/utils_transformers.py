@@ -159,7 +159,7 @@ class Args:
     eval_file: str = ""
     predictions_folder: str = None
     no_cuda: bool = None
-    do_lower_case: bool = True
+
     per_gpu_eval_batch_size: int = 8
     lang_id: int = 0
     v2: bool = False
@@ -190,3 +190,29 @@ class Args:
     n_gpu: int = None
     local_rank: int = -1
     device: str = 'cpu'
+    doc_stride: int = 128
+    max_query_length: int = 64
+    max_seq_length: int = 384
+    num_workers: int = 8
+    debug_features: bool = False
+    do_not_lower_case: bool = False
+
+    @property
+    def do_lower_case(self):
+        return not self.do_not_lower_case
+
+
+def load_or_convert(args: Args, tokenizer, evaluate=False):
+    attr = "eval_file" if evaluate else "train_file"
+    if getattr(args, attr).endswith('bin'):
+        click.echo("Loading train features from cache...")
+        train_dataset, e, f = load_examples(args.train_file)
+    elif getattr(args, attr).endswith('json'):
+        click.echo("Converting features on the fly...")
+        train_dataset, e, f = convert_to_features(args.train_file, evaluate=evaluate, tokenizer=tokenizer, v2=args.v2,
+                                                  doc_stride=args.doc_stride, max_query_length=args.max_query_length,
+                                                  max_seq_length=args.max_seq_length,
+                                                  num_workers=args.num_workers, debug_features=args.debug_features)
+    else:
+        raise NotImplementedError(f"Unknown file extension for evaluation file: {args.train_file}")
+    return train_dataset, e, f

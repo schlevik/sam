@@ -35,7 +35,7 @@ from transformers.data.processors.squad import SquadResult
 from scripts.evaluate_intervention import print_examples
 from scripts.utils import get_output_predictions_file_name, get_baseline_intervention_control_from_baseline
 from scripts.utils_transformers import to_list, _is_gpu_available, get_tokenizer, get_model, load_examples, Args, \
-    debug_features_examples_dataset, convert_to_features
+    debug_features_examples_dataset, convert_to_features, load_or_convert
 from stresstest.eval_utils import align, evaluate_intervention
 from stresstest.util import load_json
 
@@ -68,27 +68,17 @@ def predictions(in_files, out_folder, model_paths, model_types, no_cuda, per_gpu
                 lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold, **kwargs):
     assert len(model_paths) == len(model_types)
     for model_path, model_type in zip(model_paths, model_types):
-        do_lower_case = not do_not_lower_case
         model = get_model(model_path)
-        tokenizer = get_tokenizer(model_path, do_lower_case)
         args = Args(model_path=model_path, model_type=model_type, predictions_folder=out_folder,
-                    no_cuda=no_cuda, do_lower_case=do_lower_case, per_gpu_eval_batch_size=per_gpu_eval_batch_size,
+                    no_cuda=no_cuda, do_not_lowercase=do_not_lower_case,
+                    per_gpu_eval_batch_size=per_gpu_eval_batch_size,
                     lang_id=lang_id, v2=v2, n_best_size=n_best_size, max_answer_length=max_answer_length,
-                    verbose_logging=verbose_logging, null_score_diff_threshold=null_score_diff_threshold)
+                    verbose_logging=verbose_logging, null_score_diff_threshold=null_score_diff_threshold, **kwargs)
+        tokenizer = get_tokenizer(model_path, args.do_lower_case)
         for in_file in in_files:
             args.eval_file = in_file
             logger.debug(args)
-            if args.eval_file.endswith('bin'):
-                click.echo("Loading features from cache...")
-                dataset, examples, features = load_examples(args.eval_file)
-            elif args.eval_file.endswith('json'):
-                click.echo("Converting features on the fly...")
-                assert len(kwargs.keys()) == 5
-                dataset, examples, features = convert_to_features(args.eval_file, evaluate=True, tokenizer=tokenizer,
-                                                                  v2=v2,
-                                                                  **kwargs)
-            else:
-                raise NotImplementedError(f"Unknown file extension for evaluation file: {args.eval_file}")
+            dataset, examples, features = load_or_convert(args, tokenizer, evaluate=True)
             evaluate(args, model, tokenizer, dataset, examples, features,
                      suffix=os.path.basename(os.path.normpath(model_path)))
 

@@ -5,6 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 import click
+from loguru import logger
 import torch
 from ax.service.ax_client import AxClient
 from tqdm import trange
@@ -12,12 +13,10 @@ from tqdm import trange
 from scripts.predict_transformers import evaluate
 from scripts.train_transformers import do_train
 from scripts.utils_transformers import load_examples, Args, get_model, get_tokenizer, set_seed, \
-    debug_features_examples_dataset
+    debug_features_examples_dataset, load_or_convert
 from scripts.utils import write_json, get_baseline_intervention_control_from_baseline
 from stresstest.eval_utils import align, evaluate_intervention, get_mean_var_ci_bernoulli
 from stresstest.util import load_json
-
-logger = logging.getLogger(__name__)
 
 
 def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, aligned_intervention, aligned_control,
@@ -62,7 +61,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option("--model-path", type=str)
 @click.option("--model-type", type=str)
 @click.option("--no-cuda", is_flag=True, type=bool, default=None)
-@click.option("--do-lower-case", is_flag=True, type=bool, default=True)
+@click.option("--do-not-lower-case", is_flag=True, type=bool, default=False)
 @click.option("--per-gpu-eval-batch-size", type=int, default=8)
 @click.option("--lang-id", type=int, default=0)
 @click.option("--v2", type=bool, is_flag=True, default=False)
@@ -85,18 +84,21 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option("--num-train-epochs", type=int, default=3)
 @click.option("--hyperparam-opt-runs", type=int, default=1)
 @click.option("--baseline-gold-file", type=str)
-@click.option("--baseline-features-file", type=str)
 @click.option("--hyperparams", type=str, default="[]")
 @click.option("--keep-predictions", type=str, default="")
 @click.option('--stfu', type=bool, is_flag=True, default=False)
+@click.option('--max-seq-length', type=int, default=384)
+@click.option('--doc-stride', type=int, default=128)
+@click.option('--max-query-length', type=int, default=64)
+@click.option('--num-workers', type=int, default=1)
+@click.option('--debug-features', type=bool, is_flag=True, default=False)
+@click.option('--do-not-lower-case', type=bool, is_flag=True, default=False)
 def finetune(**kwargs):
     num_hpopt_runs = kwargs.pop('hyperparam_opt_runs')
-    feature_files = get_baseline_intervention_control_from_baseline(kwargs.pop("baseline_features_file"))
+    # feature_files = get_baseline_intervention_control_from_baseline(kwargs.pop("baseline_features_file"))
     out_file = kwargs.pop('out_file')
     # load eval datasets for predictions
-    features = tuple(
-        load_examples(f) for f in feature_files
-    )
+
     gold_files = get_baseline_intervention_control_from_baseline(kwargs.pop("baseline_gold_file"))
 
     golds = tuple(
@@ -113,10 +115,18 @@ def finetune(**kwargs):
         'value_type': hp.get('value_type', 'float'),
         'log_scale': hp.get('log_scale', True)
     } for hp in json.loads(kwargs.pop('hyperparams'))]
-    print(hyper_params)
+
+    logger.info(hyper_params)
     keep_predictions = kwargs.pop('keep_predictions')
+
     mute = kwargs.pop('stfu')
     args = Args(**kwargs)
+    args.debug_features = not mute
+    tokenizer = get_tokenizer(args.model_path, args.do_lower_case)
+    features = []
+    for f in gold_files:
+        args.eval_file = f
+        features.append(load_or_convert(args, tokenizer, evaluate=True))
     if args.local_rank == -1 or args.no_cuda:
         device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
         kwargs['n_gpu'] = 0 if args.no_cuda else torch.cuda.device_count()
@@ -129,22 +139,22 @@ def finetune(**kwargs):
     args.n_gpu = kwargs['n_gpu']
     args.device = kwargs['device']
     # Setup logging
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        level=logging.INFO if args.local_rank in [-1, 0] and not mute else logging.WARN,
-    )
-    logger.warning(
-        "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s",
-        args.local_rank,
-        device,
-        args.n_gpu,
-        bool(args.local_rank != -1),
-        args.fp16,
-    )
-
+    # logging.basicConfig(
+    #     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
+    #     datefmt="%m/%d/%Y %H:%M:%S",
+    #     level=logging.DEBUG if args.local_rank in [-1, 0] and not mute else logging.WARN,
+    # )
+    # logger.warning(
+    #     "Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s" %
+    #     args.local_rank,
+    #     device,
+    #     args.n_gpu,
+    #     bool(args.local_rank != -1),
+    #     args.fp16
+    # )
+    print(args.debug_features)
     # Set seed
-    set_seed(args)
+    logger.debug(args)
 
     if args.fp16:
         try:
@@ -155,9 +165,10 @@ def finetune(**kwargs):
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
 
     # load train dataset
-    train_dataset, train_examples, train_features = load_examples(args.train_file)
+
+    train_dataset, train_examples, train_features = load_or_convert(args, tokenizer)
     if not mute:
-        debug_features_examples_dataset(*train_dataset, train_examples, train_features, get_tokenizer(args.model_path, True))
+        debug_features_examples_dataset(train_dataset, train_examples, train_features, tokenizer)
     ax_client = AxClient()
     ax_client.create_experiment(
         name=f'{args.model_path}@{args.train_file}',
@@ -174,7 +185,7 @@ def finetune(**kwargs):
     (mean, results_baseline, results_intervention, results_control,
      correct_change_correct, correct_baseline_control, correct_baseline_control_intervention) = \
         train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr='eval',
-                               keep_predictions=bool(keep_predictions),train=False)
+                                   keep_predictions=bool(keep_predictions), train=False)
     result['pre_eval'] = {
         "overall": mean,
         "acc_baseline": sum(results_baseline) / len(results_baseline),
@@ -205,7 +216,8 @@ def finetune(**kwargs):
                 "acc_control": sum(results_control) / len(results_control),
                 'correct->change->correct': len(correct_change_correct),
                 'acc_baseline+control:': len(correct_baseline_control) / sum(results_baseline),
-                'correct+control->change->correct': len(correct_baseline_control_intervention) / len(correct_baseline_control),
+                'correct+control->change->correct': len(correct_baseline_control_intervention) / len(
+                    correct_baseline_control) if correct_baseline_control else 0,
             }
             click.echo(f"Results: {json.dumps(trial_result, indent=4)}")
             result["trials"].append(trial_result)

@@ -12,7 +12,7 @@ from transformers import AutoModelForQuestionAnswering, AutoTokenizer, WEIGHTS_N
 
 from scripts.predict_transformers import evaluate
 from scripts.utils import write_json
-from scripts.utils_transformers import set_seed, get_tokenizer, get_model, load_examples, Args, convert_to_features
+from scripts.utils_transformers import set_seed, get_tokenizer, get_model, load_examples, Args, load_or_convert
 from loguru import logger
 
 
@@ -58,15 +58,14 @@ from loguru import logger
 # @click.option("--local-rank", type=int, default=-1)
 # @click.option("--device", default='cpu')
 def train(**kwargs):
-    doc_stride = kwargs.pop("doc_stride")
-    max_query_length = kwargs.pop('max_query_length')
-    max_seq_length = kwargs.pop("max_seq_length")
-    num_workers = kwargs.pop('num_workers')
-    debug_features = kwargs.pop('debug_features')
-    do_lower_case = not kwargs.pop('do_not_lower_case')
+    # doc_stride = kwargs.pop("doc_stride")
+    # max_query_length = kwargs.pop('max_query_length')
+    # max_seq_length = kwargs.pop("max_seq_length")
+    # num_workers = kwargs.pop('num_workers')
+    # debug_features = kwargs.pop('debug_features')
+    # do_lower_case = not kwargs.pop('do_not_lower_case')
     # kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
     args = Args(**kwargs)
-    args.do_lower_case = do_lower_case
     logger.debug(args)
     if (
             os.path.exists(args.save_model_folder)
@@ -136,17 +135,7 @@ def train(**kwargs):
             apex.amp.register_half_function(torch, "einsum")
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
-    if args.train_file.endswith('bin'):
-        click.echo("Loading train features from cache...")
-        train_dataset, e, f = load_examples(args.train_file)
-    elif args.train_file.endswith('json'):
-        click.echo("Converting features on the fly...")
-        train_dataset, e, f = convert_to_features(args.train_file, evaluate=False, tokenizer=tokenizer, v2=args.v2,
-                                                  doc_stride=doc_stride, max_query_length=max_query_length,
-                                                  max_seq_length=max_seq_length,
-                                                  num_workers=num_workers, debug_features=debug_features)
-    else:
-        raise NotImplementedError(f"Unknown file extension for evaluation file: {args.train_file}")
+    train_dataset, *_ = load_or_convert(args, tokenizer)
     # train_dataset, e, f = load_examples(args.train_file)
     logger.info("loaded dataset")
     global_step, tr_loss = do_train(args, train_dataset, model, tokenizer)
@@ -182,20 +171,7 @@ def train(**kwargs):
             # logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce model loading logs
 
         logger.info(f"Evaluate the following checkpoints: {checkpoints}")
-        if args.train_file.endswith('bin'):
-            click.echo("Loading train features from cache...")
-            dataset, examples, features = load_examples(args.eval_file)
-        elif args.train_file.endswith('json'):
-            click.echo("Converting features on the fly...")
-            dataset, examples, features = convert_to_features(
-                args.eval_file, evaluate=True, tokenizer=tokenizer,
-                v2=args.v2,
-                doc_stride=doc_stride, max_query_length=max_query_length,
-                max_seq_length=max_seq_length,
-                num_workers=num_workers, debug_features=debug_features
-            )
-        else:
-            raise NotImplementedError(f"Unknown file extension for evaluation file: {args.train_file}")
+        dataset, examples, features = load_or_convert(args, tokenizer, evaluate=True)
         for checkpoint in checkpoints:
             # Reload the model
             global_step = checkpoint.split("-")[-1] if len(checkpoints) > 1 else ""
