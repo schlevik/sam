@@ -42,8 +42,8 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
         qt_split = cfg['split'][split].get('question_templates')
         domain = only(domain, action=modify_event_type, n=n)
         if qt_split:
-            click.echo("And question templates where {}")
             div, rest = qt_split['div'], qt_split['rest']
+            click.echo(f"And question templates with index i where `i mod {div} == {rest}`")
             domain.templates_modifier['question_templates'], _ = \
                 filter_question_templates(lambda i, _: i % div == rest, domain.templates_modifier['question_templates'])
         split_name = f"-split-"
