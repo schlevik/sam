@@ -11,6 +11,7 @@ dollar = {
         "risky": ["bold", "daring", "risky"],
         "attention": ["remarkable", "interesting"],
         "negative": ["bad", "harsh", "unnecessary"],
+        "important": ["important", "crucial"],
     },
     "NP": {
         "opportunity": ["chance", "opportunity", "possibility"],
@@ -76,19 +77,23 @@ dollar = {
                 # "made the fans chant !PRPS name"
                 "made the fans [roar|scream|gasp]",
                 "made the crowd go wild",
+                "[caused a stir|generated buzz] in the stand"
 
             ],
             "foul-elaboration-coref": [
                 "(had only) just showed !PRPS reckless edge",
             ],
             "foul-elaboration": [
-                "disappointed"
+                "disappointed",
+                "was overzealous"
             ],
             "any-cause": ["[ran|dribbled] !RANDINT metres ($PP.position.vertical)"],
             "goal-cause": [
                 "intercepted [$NP.team.nonactor goalkeeper's goal kick"
                 "| the goal kick of $PP.team.nonactor-possessive goal keeper]",
-                "$VP.VBD.any-cause"],
+                "$VP.VBD.any-cause",
+                "stole the ball from the defence",
+                "won a tackle [$PP.position.vertical|in $NP.position.horizontal|]"],
 
             "foul": ["fouled", "felled", "scythed down"],
             "foul-passive": ["was $VP.VBD.foul", "was sent to the ground", "was scythed down"],
@@ -113,7 +118,7 @@ dollar = {
             "goal-effect": [
                 # "being $RDM.NOVB",
                 "drawing attention from everyone around",
-                "following a $JJ.positive juggle"
+                "following a $JJ.positive juggle",
             ],
             "actor-possessive-post": ["playing for $NP.team.actor ,"],
             "nonactor-possessive-post": ["playing for $NP.team.nonactor ,"],

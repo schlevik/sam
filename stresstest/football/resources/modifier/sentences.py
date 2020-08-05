@@ -4,7 +4,7 @@ sentences = {
         "%CONNECTIVE.VBD> $PP.time $NP.actor , $NP.team.actor-possessive-post , { @RB.goal "
         "$VP.VBD.modifier } [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] $PP.distance [$PP.goal-cause-coactor|after $S.goal-cause-coactor] .",
         # TODO add more stuff & test
-        "$PP.goal-cause-coactor $NP.actor %CONNECTIVE.VP as !PRP { @RB.goal $VP.VBD.modifier } [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] $PP.distance "
+        "$PP.goal-cause-coactor $NP.actor %CONNECTIVE.VP (and $VP.VBD.attention) as !PRP { @RB.goal $VP.VBD.modifier } [$VP.VBD.shoot in a ($JJ.positive) $NP.goal | $VP.VBD.score] $PP.distance "
         "for $NP.team.actor $PP.time .",
         #2
         "$NP.team.actor-possessive player $NP.actor $VP.VBD.attention %CONNECTIVE.ADVP , { @RB.goal $VP.VBG.modifier } "

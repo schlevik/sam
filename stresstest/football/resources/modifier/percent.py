@@ -35,14 +35,21 @@ percent = {
                 "opened the action"
             ],
             "neutral": [
-                "advanced the action"
+                "advanced the action",
+                'brought the next thing',
             ],
             "contrastive": [
-                "constituted a counter strike"
+                "constituted a counter strike",
+                'stroke back',
+                "retaliated",
+                "repulsed",
+                "fought back",
             ],
 
             "supportive": [
                 "added more insult to the injury",
+                "went one better",
+                "insisted",
                 "continued where [$NP.team.actor|they] left off",
             ]
         },
@@ -55,7 +62,8 @@ percent = {
                 "open the action"
             ],
             "neutral": [
-                "advance the action"
+                "advance the action",
+                "brought the next thing",
             ],
             "contrastive": [
                 "constitute a counter strike"
