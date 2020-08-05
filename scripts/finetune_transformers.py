@@ -147,8 +147,7 @@ def finetune(**kwargs):
 
     mute = kwargs.pop('stfu')
     args = Args(**kwargs)
-    if args.seed:
-        set_seed(args)
+
     args.debug_features = not mute
     tokenizer = get_tokenizer(args.model_path, args.do_lower_case)
     features = []
@@ -166,7 +165,8 @@ def finetune(**kwargs):
     kwargs['device'] = device
     args.n_gpu = kwargs['n_gpu']
     args.device = kwargs['device']
-
+    if args.seed:
+        set_seed(args)
     logger.debug(args)
 
     if args.fp16:
