@@ -4,7 +4,7 @@ import uuid
 
 import click
 
-from scripts.utils import Domain, BASELINE, INTERVENTION, write_json, CONTROL
+from scripts.utils import Domain, BASELINE, INTERVENTION, write_json, CONTROL, COMBINED
 from stresstest.classes import Config
 from stresstest.comb_utils import filter_question_templates
 from stresstest.ds_utils import to_squad
@@ -26,8 +26,9 @@ from stresstest.util import do_import, only
 @click.option('--mask-p', is_flag=True, default=False)
 @click.option('--keep-answer-candidates', is_flag=True, default=False)
 @click.option('--split', type=str, default=None)
+@click.option('--combine', is_flag=True, type=bool, default=False)
 def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_workers,
-                      modifier_type, mask_q, mask_p, keep_answer_candidates, split):
+                      modifier_type, mask_q, mask_p, keep_answer_candidates, split, combine):
     if seed:
         random.seed(seed)
     uuid4 = lambda: uuid.UUID(int=random.getrandbits(128)).hex
@@ -57,16 +58,22 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
     total = sum(t * num_modifiers for t in reasoning_map.values())
 
     file_name = f"{{}}{split_name}{modifier_type.lower()}.json"
-    click.echo(
-        f"Generating from '{click.style(config, fg='green')}': {click.style(str(total), fg='green', bold=True)} "
-        f"passages, and questions.")
-    click.echo(f"Saving baseline in "
-               f"{click.style(os.path.join(out_path, file_name.format(BASELINE)), fg='blue', bold=True)}.")
-    click.echo(f"Saving modified in "
-               f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='blue', bold=True)}.")
-    click.echo(f"Saving control in "
-               f"{click.style(os.path.join(out_path, file_name.format(CONTROL)), fg='blue', bold=True)}.")
-
+    if not combine:
+        click.echo(
+            f"Generating from '{click.style(config, fg='green')}': {click.style(str(total), fg='green', bold=True)} "
+            f"passages, and questions.")
+        click.echo(f"Saving baseline in "
+                   f"{click.style(os.path.join(out_path, file_name.format(BASELINE)), fg='blue', bold=True)}.")
+        click.echo(f"Saving modified in "
+                   f"{click.style(os.path.join(out_path, file_name.format(INTERVENTION)), fg='blue', bold=True)}.")
+        click.echo(f"Saving control in "
+                   f"{click.style(os.path.join(out_path, file_name.format(CONTROL)), fg='blue', bold=True)}.")
+    else:
+        click.echo(
+            f"Generating from '{click.style(config, fg='green')}': {click.style(str(total), fg='green', bold=True)} "
+            f"passages, and questions.")
+        click.echo(f"Saving control in "
+                   f"{click.style(os.path.join(out_path, file_name.format(COMBINED)), fg='blue', bold=True)}.")
     res = generate_and_realise(
         modify_event_type=modify_event_type,
         config=cfg,
@@ -93,17 +100,32 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
         uuid4, event_plans, events, template_choices, baseline_stories, mqs, qs, modified_stories, control_stories,
         mask_p, mask_q, keep_answer_candidates
     )
+    combined = []
+    if combine:
+        for bi, mi in zip(baseline, modified):
+            for label, instance in zip([BASELINE, INTERVENTION], [bi, mi]):
+                new_id = f"{label}:" + instance['title']
+                instance['title'] = new_id
+                instance['paragraphs'][0]['id'] = new_id
+                new_qa_id = f"{label}:" + instance['paragraphs'][0]['qas'][0]['id']
+                instance['paragraphs'][0]['qas'][0]['id'] = new_qa_id
+                combined.append(instance)
 
     click.echo("Saving...")
     if do_save:
-        click.echo("...Baseline")
-        write_json({"version": 0.1, "data": baseline}, os.path.join(out_path, file_name.format(BASELINE)),
-                   pretty=False)
+        if not combine:
+            click.echo("...Baseline")
+            write_json({"version": 0.1, "data": baseline}, os.path.join(out_path, file_name.format(BASELINE)),
+                       pretty=False)
 
-        click.echo("...Intervention")
-        write_json({"version": 0.1, "data": modified}, os.path.join(out_path, file_name.format(INTERVENTION)),
-                   pretty=False)
+            click.echo("...Intervention")
+            write_json({"version": 0.1, "data": modified}, os.path.join(out_path, file_name.format(INTERVENTION)),
+                       pretty=False)
 
-        click.echo("...Control")
-        write_json({"version": 0.1, "data": control}, os.path.join(out_path, file_name.format(CONTROL)),
-                   pretty=False)
+            click.echo("...Control")
+            write_json({"version": 0.1, "data": control}, os.path.join(out_path, file_name.format(CONTROL)),
+                       pretty=False)
+        else:
+            click.echo("...Combined")
+            write_json({"version": 0.1, "data": combined}, os.path.join(out_path, file_name.format(COMBINED)),
+                       pretty=False)
