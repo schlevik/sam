@@ -29,13 +29,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
     print(args.device)
     model.to(args.device)
     # train
-    means = []
-    results_baselines = []
-    results_interventions = []
-    results_controls = []
-    corrects_change_corrects = []
-    corrects_baseline_controls = []
-    corrects_baseline_control_interventions = []
+    results = []
     for i in range(num_runs):
         if train:
             step, loss = do_train(args, train_dataset, model, tokenizer)
@@ -60,28 +54,29 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 
         mean, *_ = get_mean_var_ci_bernoulli(overall_results)
         # there's no point to evaluate multiple times if not training
-        if not train:
-            return (mean, results_baseline, results_intervention, results_control,
-                    correct_change_correct, correct_baseline_control, correct_baseline_control_intervention)
-        means.append(mean)
-        results_baselines.append(results_baseline)
-        results_interventions.append(results_intervention)
-        results_controls.append(results_control)
-        corrects_change_corrects.append(correct_change_correct)
-        corrects_baseline_controls.append(correct_baseline_control)
-        corrects_baseline_control_interventions.append(correct_baseline_control_intervention)
-    mean, var_mean, _ = get_mean_var_ci(means)
-    results_baseline, var_baseline, _ = get_mean_var_ci(results_baselines)
-    results_intervention, var_intervention, _ = get_mean_var_ci(results_interventions)
-    results_control, var_control, _ = get_mean_var_ci(results_controls)
-    correct_change_correct, var_change_correct, _ = get_mean_var_ci(corrects_change_corrects)
-    correct_baseline_control, var_correct_bc, _ = get_mean_var_ci(corrects_baseline_controls)
-    correct_baseline_control_intervention, var_correct_all, _ = get_mean_var_ci(corrects_baseline_control_interventions)
-    logger.info(f"Vars: mean:  {var_mean}, baseline: {var_baseline}, intervention: {var_intervention}, "
-                f"control: {var_control}, correct_all: {var_correct_all}")
 
-    return (mean, results_baseline, results_intervention, results_control,
-            correct_change_correct, correct_baseline_control, correct_baseline_control_intervention)
+        results.append({
+            "overall": mean,
+            "acc_baseline": sum(results_baseline) / len(results_baseline),
+            "acc_intervention": sum(results_intervention) / len(results_intervention),
+            "acc_control": sum(results_control) / len(results_control),
+            'correct->change->correct': len(correct_change_correct),
+            'correct(baseline+control)/correct(baseline):': len(correct_baseline_control) / sum(results_baseline),
+            'correct+control->change->correct': len(correct_baseline_control_intervention),
+        })
+    final_result = {
+        "overall": get_mean_var_ci([r['overall'] for r in results]),
+        "acc_baseline": get_mean_var_ci([r['acc_baseline'] for r in results]),
+        "acc_intervention": get_mean_var_ci([r['acc_intervention'] for r in results]),
+        "acc_control": get_mean_var_ci([r['acc_control'] for r in results]),
+        'correct->change->correct': get_mean_var_ci([r['correct->change->correct'] for r in results]),
+        'correct(baseline+control)/correct(baseline):': get_mean_var_ci(
+            [r['correct(baseline+control)/correct(baseline)'] for r in results]),
+        'correct+control->change->correct': get_mean_var_ci([r['correct+control->change->correct'] for r in results]),
+    }
+    logger.info(final_result)
+
+    return final_result
 
 
 @click.command()
@@ -152,6 +147,8 @@ def finetune(**kwargs):
 
     mute = kwargs.pop('stfu')
     args = Args(**kwargs)
+    if args.seed:
+        set_seed(args)
     args.debug_features = not mute
     tokenizer = get_tokenizer(args.model_path, args.do_lower_case)
     features = []
@@ -198,19 +195,9 @@ def finetune(**kwargs):
         "best_params": ...,
     }
     # first, eval and save what is the performance before training
-    (mean, results_baseline, results_intervention, results_control,
-     correct_change_correct, correct_baseline_control, correct_baseline_control_intervention) = \
-        train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr='eval',
-                                   keep_predictions=bool(keep_predictions), train=False)
-    result['pre_eval'] = {
-        "overall": mean,
-        "acc_baseline": sum(results_baseline) / len(results_baseline),
-        "acc_intervention": sum(results_intervention) / len(results_intervention),
-        "acc_control": sum(results_control) / len(results_control),
-        'correct->change->correct': len(correct_change_correct),
-        'acc_baseline+control:': len(correct_baseline_control) / sum(results_baseline),
-        'correct+control->change->correct': len(correct_baseline_control_intervention),
-    }
+
+    result['pre_eval'] = train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files,
+                                                    run_nr='eval', keep_predictions=bool(keep_predictions), train=False)
     click.echo(f"Results: {json.dumps(result['pre_eval'], indent=4)}")
     # run hyperparam optimisation
     with tempfile.TemporaryDirectory() as tempdir:
@@ -221,21 +208,9 @@ def finetune(**kwargs):
             single_step_args.update(parameters)
             args = Args(**single_step_args)
             args.predictions_folder = str(predictions_folder)
-            (mean, results_baseline, results_intervention, results_control,
-             correct_change_correct, correct_baseline_control, correct_baseline_control_intervention) = \
-                train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr=i,
-                                           keep_predictions=bool(keep_predictions), num_runs=runs_per_trial)
-            trial_result = {
-                "hyper_params": str(parameters),
-                "overall": mean,
-                "acc_baseline": sum(results_baseline) / len(results_baseline),
-                "acc_intervention": sum(results_intervention) / len(results_intervention),
-                "acc_control": sum(results_control) / len(results_control),
-                'correct->change->correct': len(correct_change_correct),
-                'acc_baseline+control:': len(correct_baseline_control) / sum(results_baseline),
-                'correct+control->change->correct': len(correct_baseline_control_intervention) / len(
-                    correct_baseline_control) if correct_baseline_control else 0,
-            }
+            trial_result = train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr=i,
+                                                      keep_predictions=bool(keep_predictions), num_runs=runs_per_trial)
+            mean = trial_result['overall'][0]
             click.echo(f"Results: {json.dumps(trial_result, indent=4)}")
             result["trials"].append(trial_result)
             result['tried_params'][i].append(parameters)
