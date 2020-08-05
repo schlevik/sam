@@ -15,42 +15,70 @@ from scripts.train_transformers import do_train
 from scripts.utils_transformers import load_examples, Args, get_model, get_tokenizer, set_seed, \
     debug_features_examples_dataset, load_or_convert
 from scripts.utils import write_json, get_baseline_intervention_control_from_baseline
-from stresstest.eval_utils import align, evaluate_intervention, get_mean_var_ci_bernoulli
+from stresstest.eval_utils import align, evaluate_intervention, get_mean_var_ci_bernoulli, get_mean_var_ci
 from stresstest.util import load_json
 
 
 def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, aligned_intervention, aligned_control,
                                baseline_dataset, intervention_dataset, control_dataset, baseline_gold_path,
                                intervention_gold_path, control_gold_path, run_nr=0, keep_predictions=False,
-                               train=True):
+                               train=True, num_runs=1):
     # load model
     model = get_model(args.model_path)
     tokenizer = get_tokenizer(args.model_path, do_lower_case=args.do_lower_case)
     print(args.device)
     model.to(args.device)
     # train
-    if train:
-        step, loss = do_train(args, train_dataset, model, tokenizer)
-    if keep_predictions:
-        args.eval_file = baseline_gold_path
-    baseline_predictions = evaluate(args, model, tokenizer, *baseline_dataset, f'baseline-{run_nr}', return_raw=True)
-    logger.debug(baseline_predictions)
-    if keep_predictions:
-        args.eval_file = intervention_gold_path
-    intervention_predictions = evaluate(args, model, tokenizer, *intervention_dataset, f'intervention-{run_nr}',
+    means = []
+    results_baselines = []
+    results_interventions = []
+    results_controls = []
+    corrects_change_corrects = []
+    corrects_baseline_controls = []
+    corrects_baseline_control_interventions = []
+    for i in range(num_runs):
+        if train:
+            step, loss = do_train(args, train_dataset, model, tokenizer)
+        if keep_predictions:
+            args.eval_file = baseline_gold_path
+        baseline_predictions = evaluate(args, model, tokenizer, *baseline_dataset, f'baseline-{run_nr}',
                                         return_raw=True)
-    if keep_predictions:
-        args.eval_file = control_gold_path
-    control_predictions = evaluate(args, model, tokenizer, *control_dataset, f'control-{run_nr}', return_raw=True)
+        if keep_predictions:
+            args.eval_file = intervention_gold_path
+        intervention_predictions = evaluate(args, model, tokenizer, *intervention_dataset, f'intervention-{run_nr}',
+                                            return_raw=True)
+        if keep_predictions:
+            args.eval_file = control_gold_path
+        control_predictions = evaluate(args, model, tokenizer, *control_dataset, f'control-{run_nr}', return_raw=True)
 
-    # obtain predictions on all three of them
-    (overall_results, results_baseline, results_intervention, results_control,
-     correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
-     wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
-     ) = evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
-                               baseline_predictions, intervention_predictions, control_predictions)
+        # obtain predictions on all three of them
+        (overall_results, results_baseline, results_intervention, results_control,
+         correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+         wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
+         ) = evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
+                                   baseline_predictions, intervention_predictions, control_predictions)
 
-    mean, *_ = get_mean_var_ci_bernoulli(overall_results)
+        mean, *_ = get_mean_var_ci_bernoulli(overall_results)
+        # there's no point to evaluate multiple times if not training
+        if not train:
+            return (mean, results_baseline, results_intervention, results_control,
+                    correct_change_correct, correct_baseline_control, correct_baseline_control_intervention)
+        means.append(mean)
+        results_baselines.append(results_baseline)
+        results_interventions.append(results_intervention)
+        results_controls.append(results_control)
+        corrects_change_corrects.append(correct_change_correct)
+        corrects_baseline_controls.append(correct_baseline_control)
+        corrects_baseline_control_interventions.append(correct_baseline_control_intervention)
+    mean, var_mean, _ = get_mean_var_ci(means)
+    results_baseline, var_baseline, _ = get_mean_var_ci(results_baselines)
+    results_intervention, var_intervention, _ = get_mean_var_ci(results_interventions)
+    results_control, var_control, _ = get_mean_var_ci(results_controls)
+    correct_change_correct, var_change_correct, _ = get_mean_var_ci(corrects_change_corrects)
+    correct_baseline_control, var_correct_bc, _ = get_mean_var_ci(corrects_baseline_controls)
+    correct_baseline_control_intervention, var_correct_all, _ = get_mean_var_ci(corrects_baseline_control_interventions)
+    logger.info(f"Vars: mean:  {var_mean}, baseline: {var_baseline}, intervention: {var_intervention}, "
+                f"control: {var_control}, correct_all: {var_correct_all}")
 
     return (mean, results_baseline, results_intervention, results_control,
             correct_change_correct, correct_baseline_control, correct_baseline_control_intervention)
@@ -94,7 +122,9 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option('--num-workers', type=int, default=8)
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
 @click.option('--do-not-lower-case', type=bool, is_flag=True, default=False)
+@click.option('--runs-per-trial', type=int, default=1)
 def finetune(**kwargs):
+    runs_per_trial = kwargs.pop('runs_per_trial')
     num_hpopt_runs = kwargs.pop('hyperparam_opt_runs')
     # feature_files = get_baseline_intervention_control_from_baseline(kwargs.pop("baseline_features_file"))
     out_file = kwargs.pop('out_file')
@@ -179,7 +209,7 @@ def finetune(**kwargs):
         "acc_control": sum(results_control) / len(results_control),
         'correct->change->correct': len(correct_change_correct),
         'acc_baseline+control:': len(correct_baseline_control) / sum(results_baseline),
-        'correct+control->change->correct': len(correct_baseline_control_intervention) / len(correct_baseline_control),
+        'correct+control->change->correct': len(correct_baseline_control_intervention),
     }
     # run hyperparam optimisation
     with tempfile.TemporaryDirectory() as tempdir:
