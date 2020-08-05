@@ -61,7 +61,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
             "acc_intervention": sum(results_intervention) / len(results_intervention),
             "acc_control": sum(results_control) / len(results_control),
             'correct->change->correct': len(correct_change_correct),
-            'correct(baseline+control)/correct(baseline):': len(correct_baseline_control) / sum(results_baseline),
+            'correct(baseline+control)/correct(baseline)': len(correct_baseline_control) / sum(results_baseline),
             'correct+control->change->correct': len(correct_baseline_control_intervention),
         })
     final_result = {

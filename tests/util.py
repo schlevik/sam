@@ -1,9 +1,12 @@
+from itertools import zip_longest
+from time import sleep
 from typing import Tuple, List
 
 import click
+import loguru
 
-from stresstest.classes import Config, Question, Bundle
-from stresstest.football import bundle
+from stresstest.classes import Config, Question, Bundle, EventPlan
+from stresstest.football import bundle, _reload_bundle
 from stresstest.generate_utils import generate_and_realise
 from stresstest.realize import Realizer
 from stresstest.reasoning import retrieval, retrieval_reverse
@@ -126,7 +129,7 @@ def showcase_all(out_file, given_bundle: Bundle = None, do_x_repetitions=12):
     lines = []
     for i in range(len(test_bundle.templates_modifier['sentences']['goal'])):
         lines.append(click.style(f"goal[{i}]", fg='blue', bold=True))
-        for j in range(do_x_repetitions//6):
+        for j in range(do_x_repetitions // 6):
             stories = showcase(test_bundle, i, False)
             lines.extend(highlight(text=s, colors=colors) for s in stories)
     for i in range(len(test_bundle.templates_modifier['sentences']['foul'])):
@@ -160,6 +163,7 @@ def showcase(given_bundle=None, n=0, do_print=True):
         if do_print:
             print(f"==== {f} ====")
             print(story[0])
+            print(story[1])
         # print_out(story, [])
         sentences.append(story[0])
     return sentences
@@ -175,3 +179,49 @@ def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_ty
     }
     return generate_and_realise(bundle, config, modify_event_type, modifier_type,
                                 reasoning_map, max_modifiers=max_modifier, num_workers=num_workers)
+
+
+def showcase_e2e(reasoning=retrieval, max_modifier=1):
+    loguru.logger.remove()
+    bundle = _reload_bundle()
+    res = interactive_env_aligned(bundle, reasonings=[reasoning], max_modifier=max_modifier)
+    result = next(r for r in res if r[0].num_modifications == 1)
+    eps, events, template_choices, worlds, baseline_stories, mqs, qs, modified_stories, control_stories = result
+    eps: EventPlan
+    q = qs[0]
+    mq = mqs[0]
+    click.secho(f"Generating event plan... for {reasoning.name}, target: {eps.question_target}", bold=True)
+    sleep(0.5)
+    for et, mh in zip_longest(eps.event_types, eps.must_haves, fillvalue=None):
+        click.echo(f" {et} (Must have: {mh})")
+    click.echo()
+    sleep(0.5)
+    click.secho("Generating events according to plan...", bold=True)
+    sleep(0.5)
+    for event in events:
+        click.echo(f" {event}")
+    click.echo()
+    sleep(0.5)
+    click.secho("Choosing templates in accordance with the event plan... ", bold=True)
+    sleep(0.5)
+    click.echo(f"Chosen: {template_choices}")
+    click.echo()
+    sleep(0.5)
+
+    click.secho("Generating non-modified story and question...", bold=True)
+    sleep(0.5)
+    color_map = {k: "green" for k in q.answer.split(" ")}
+    click.echo(click.style(q.realized, fg='blue'))
+    for l in baseline_stories:
+        click.echo(highlight(l, color_map))
+    click.echo()
+    sleep(0.5)
+    click.secho("Inserting modification...", bold=True)
+    color_map = {k: "red" for k in q.answer.split(" ")}
+    click.echo(click.style(mq.realized, fg='blue'))
+    color_map.update(**{k: "yellow" for k in ['almost', 'nearly', 'all', "but"]})
+    color_map.update(**{k: "green" for k in mq.answer.split(" ")})
+    for l in modified_stories:
+        click.echo(highlight(l, color_map))
+    click.echo()
+    color_map = {k: "green" for k in q.answer.split(" ")}
