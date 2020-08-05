@@ -224,7 +224,7 @@ def finetune(**kwargs):
             (mean, results_baseline, results_intervention, results_control,
              correct_change_correct, correct_baseline_control, correct_baseline_control_intervention) = \
                 train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr=i,
-                                           keep_predictions=bool(keep_predictions))
+                                           keep_predictions=bool(keep_predictions), num_runs=runs_per_trial)
             trial_result = {
                 "hyper_params": str(parameters),
                 "overall": mean,
