@@ -211,6 +211,7 @@ def finetune(**kwargs):
         'acc_baseline+control:': len(correct_baseline_control) / sum(results_baseline),
         'correct+control->change->correct': len(correct_baseline_control_intervention),
     }
+    click.echo(f"Results: {json.dumps(result['pre_eval'], indent=4)}")
     # run hyperparam optimisation
     with tempfile.TemporaryDirectory() as tempdir:
         predictions_folder = keep_predictions
