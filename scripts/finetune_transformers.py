@@ -24,15 +24,19 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
                                baseline_dataset, intervention_dataset, control_dataset, baseline_gold_path,
                                intervention_gold_path, control_gold_path, run_nr=0, keep_predictions=False,
                                train=True, num_runs=1, evaluate_on='eoi'):
-    # load model
-    model = get_model(args.model_path)
-    tokenizer = get_tokenizer(args.model_path, do_lower_case=args.do_lower_case)
-    model.to(args.device)
-    # train
-    results = []
     for i in range(num_runs):
+        set_seed(args)
+        # load model
+        model = get_model(args.model_path)
+        tokenizer = get_tokenizer(args.model_path, do_lower_case=args.do_lower_case)
+        model.to(args.device)
+        # train
+        results = []
         if train:
             step, loss = do_train(args, train_dataset, model, tokenizer)
+            print(20*"====")
+            print(torch.random.get_rng_state())
+
         if keep_predictions:
             args.eval_file = baseline_gold_path
         if evaluate_on == 'eoi' or evaluate_on == 'baseline':
