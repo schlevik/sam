@@ -337,6 +337,7 @@ def do_train(args: Args, train_dataset, model, tokenizer):
                 loss.backward()
 
             tr_loss += loss.item()
+            epoch_iterator.set_postfix(loss=loss.item())
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 if args.fp16:
                     torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args.max_grad_norm)

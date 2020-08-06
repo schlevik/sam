@@ -9,6 +9,7 @@ from loguru import logger
 import torch
 from ax.service.ax_client import AxClient
 from tqdm import trange
+from transformers.data.metrics.squad_metrics import squad_evaluate
 
 from scripts.predict_transformers import evaluate
 from scripts.train_transformers import do_train
@@ -22,11 +23,10 @@ from stresstest.util import load_json
 def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, aligned_intervention, aligned_control,
                                baseline_dataset, intervention_dataset, control_dataset, baseline_gold_path,
                                intervention_gold_path, control_gold_path, run_nr=0, keep_predictions=False,
-                               train=True, num_runs=1):
+                               train=True, num_runs=1, evaluate_on='eoi'):
     # load model
     model = get_model(args.model_path)
     tokenizer = get_tokenizer(args.model_path, do_lower_case=args.do_lower_case)
-    print(args.device)
     model.to(args.device)
     # train
     results = []
@@ -35,45 +35,59 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
             step, loss = do_train(args, train_dataset, model, tokenizer)
         if keep_predictions:
             args.eval_file = baseline_gold_path
-        baseline_predictions = evaluate(args, model, tokenizer, *baseline_dataset, f'baseline-{run_nr}',
-                                        return_raw=True)
-        if keep_predictions:
-            args.eval_file = intervention_gold_path
-        intervention_predictions = evaluate(args, model, tokenizer, *intervention_dataset, f'intervention-{run_nr}',
+        if evaluate_on == 'eoi' or evaluate_on == 'baseline':
+            baseline_predictions = evaluate(args, model, tokenizer, *baseline_dataset, f'baseline-{run_nr}',
                                             return_raw=True)
         if keep_predictions:
+            args.eval_file = intervention_gold_path
+
+        if evaluate_on == 'eoi' or evaluate_on == 'intervention':
+            intervention_predictions = evaluate(args, model, tokenizer, *intervention_dataset, f'intervention-{run_nr}',
+                                                return_raw=True)
+        if keep_predictions:
             args.eval_file = control_gold_path
-        control_predictions = evaluate(args, model, tokenizer, *control_dataset, f'control-{run_nr}', return_raw=True)
+        if evaluate_on == 'eoi':
+            control_predictions = evaluate(args, model, tokenizer, *control_dataset, f'control-{run_nr}',
+                                           return_raw=True)
+            # obtain predictions on all three of them
+            (overall_results, results_baseline, results_intervention, results_control,
+             correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+             wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
+             ) = evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
+                                       baseline_predictions, intervention_predictions, control_predictions)
 
-        # obtain predictions on all three of them
-        (overall_results, results_baseline, results_intervention, results_control,
-         correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
-         wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
-         ) = evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
-                                   baseline_predictions, intervention_predictions, control_predictions)
+            mean, *_ = get_mean_var_ci_bernoulli(overall_results)
+            # there's no point to evaluate multiple times if not training
 
-        mean, *_ = get_mean_var_ci_bernoulli(overall_results)
-        # there's no point to evaluate multiple times if not training
-
-        results.append({
-            "overall": mean,
-            "acc_baseline": sum(results_baseline) / len(results_baseline),
-            "acc_intervention": sum(results_intervention) / len(results_intervention),
-            "acc_control": sum(results_control) / len(results_control),
-            'correct->change->correct': len(correct_change_correct),
-            'correct(baseline+control)/correct(baseline)': len(correct_baseline_control) / sum(results_baseline),
-            'correct+control->change->correct': len(correct_baseline_control_intervention),
-        })
-    final_result = {
-        "overall": get_mean_var_ci([r['overall'] for r in results]),
-        "acc_baseline": get_mean_var_ci([r['acc_baseline'] for r in results]),
-        "acc_intervention": get_mean_var_ci([r['acc_intervention'] for r in results]),
-        "acc_control": get_mean_var_ci([r['acc_control'] for r in results]),
-        'correct->change->correct': get_mean_var_ci([r['correct->change->correct'] for r in results]),
-        'correct(baseline+control)/correct(baseline):': get_mean_var_ci(
-            [r['correct(baseline+control)/correct(baseline)'] for r in results]),
-        'correct+control->change->correct': get_mean_var_ci([r['correct+control->change->correct'] for r in results]),
-    }
+            results.append({
+                "overall": mean,
+                "acc_baseline": sum(results_baseline) / len(results_baseline),
+                "acc_intervention": sum(results_intervention) / len(results_intervention),
+                "acc_control": sum(results_control) / len(results_control),
+                'correct->change->correct': len(correct_change_correct),
+                'correct(baseline+control)/correct(baseline)': len(correct_baseline_control) / sum(results_baseline),
+                'correct+control->change->correct': len(correct_baseline_control_intervention),
+            })
+        elif evaluate_on == 'baseline':
+            results.append(squad_evaluate(baseline_dataset[1], baseline_predictions))
+        elif evaluate_on == 'intervention':
+            results.append(squad_evaluate(intervention_dataset[1], intervention_predictions))
+    if evaluate_on == 'eoi':
+        final_result = {
+            "overall": get_mean_var_ci([r['overall'] for r in results]),
+            "acc_baseline": get_mean_var_ci([r['acc_baseline'] for r in results]),
+            "acc_intervention": get_mean_var_ci([r['acc_intervention'] for r in results]),
+            "acc_control": get_mean_var_ci([r['acc_control'] for r in results]),
+            'correct->change->correct': get_mean_var_ci([r['correct->change->correct'] for r in results]),
+            'correct(baseline+control)/correct(baseline):': get_mean_var_ci(
+                [r['correct(baseline+control)/correct(baseline)'] for r in results]),
+            'correct+control->change->correct': get_mean_var_ci(
+                [r['correct+control->change->correct'] for r in results]),
+        }
+    else:
+        final_result = {
+            key: get_mean_var_ci([r[key] for r in results]) for key in results[0].keys()
+        }
     logger.info(final_result)
 
     return final_result
@@ -118,7 +132,10 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
 @click.option('--do-not-lower-case', type=bool, is_flag=True, default=False)
 @click.option('--runs-per-trial', type=int, default=1)
+@click.option('--evaluate-on', type=str, default='eoi')
 def finetune(**kwargs):
+    evaluate_on = kwargs.pop('evaluate_on')
+    print("evaluate on", evaluate_on)
     runs_per_trial = kwargs.pop('runs_per_trial')
     num_hpopt_runs = kwargs.pop('hyperparam_opt_runs')
     # feature_files = get_baseline_intervention_control_from_baseline(kwargs.pop("baseline_features_file"))
@@ -186,7 +203,7 @@ def finetune(**kwargs):
     ax_client.create_experiment(
         name=f'{args.model_path}@{args.train_file}',
         parameters=hyper_params,
-        objective_name='Evaluation on Intervention',
+        objective_name=evaluate_on,
         minimize=False,
     )
     result = {
@@ -197,7 +214,8 @@ def finetune(**kwargs):
     # first, eval and save what is the performance before training
 
     result['pre_eval'] = train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files,
-                                                    run_nr='eval', keep_predictions=bool(keep_predictions), train=False)
+                                                    run_nr='eval', keep_predictions=bool(keep_predictions), train=False,
+                                                    evaluate_on=evaluate_on)
     click.echo(f"Results: {json.dumps(result['pre_eval'], indent=4)}")
     # run hyperparam optimisation
     with tempfile.TemporaryDirectory() as tempdir:
@@ -209,8 +227,10 @@ def finetune(**kwargs):
             args = Args(**single_step_args)
             args.predictions_folder = str(predictions_folder)
             trial_result = train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr=i,
-                                                      keep_predictions=bool(keep_predictions), num_runs=runs_per_trial)
-            mean = trial_result['overall'][0]
+                                                      keep_predictions=bool(keep_predictions), num_runs=runs_per_trial,
+                                                      evaluate_on=evaluate_on)
+            mean = trial_result['overall' if evaluate_on == 'eoi' else 'exact'][0]
+            click.echo(f"Result: {mean}")
             click.echo(f"Results: {json.dumps(trial_result, indent=4)}")
             result["trials"].append(trial_result)
             result['tried_params'][i].append(parameters)
