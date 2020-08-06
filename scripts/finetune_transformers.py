@@ -16,7 +16,7 @@ from scripts.train_transformers import do_train
 from scripts.utils_transformers import load_examples, Args, get_model, get_tokenizer, set_seed, \
     debug_features_examples_dataset, load_or_convert
 from scripts.utils import write_json, get_baseline_intervention_control_from_baseline
-from stresstest.eval_utils import align, evaluate_intervention, get_mean_var_ci_bernoulli, get_mean_var_ci
+from stresstest.eval_utils import align, evaluate_intervention, get_mean_var_ci_bernoulli, get_mean_var_ci, EMRelaxed
 from stresstest.util import load_json
 
 
@@ -24,6 +24,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
                                baseline_dataset, intervention_dataset, control_dataset, baseline_gold_path,
                                intervention_gold_path, control_gold_path, run_nr=0, keep_predictions=False,
                                train=True, num_runs=1, evaluate_on='eoi'):
+    results = []
     for i in range(num_runs):
         set_seed(args)
         # load model
@@ -31,11 +32,9 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
         tokenizer = get_tokenizer(args.model_path, do_lower_case=args.do_lower_case)
         model.to(args.device)
         # train
-        results = []
+
         if train:
             step, loss = do_train(args, train_dataset, model, tokenizer)
-            print(20*"====")
-            print(torch.random.get_rng_state())
 
         if keep_predictions:
             args.eval_file = baseline_gold_path
@@ -73,9 +72,15 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
                 'correct+control->change->correct': len(correct_baseline_control_intervention),
             })
         elif evaluate_on == 'baseline':
-            results.append(squad_evaluate(baseline_dataset[1], baseline_predictions))
+            metric_results = EMRelaxed(max_length=args.max_answer_length)(aligned_baseline, baseline_predictions)
+            results.append({"EMRelaxed": get_mean_var_ci_bernoulli(metric_results)[0]})
         elif evaluate_on == 'intervention':
-            results.append(squad_evaluate(intervention_dataset[1], intervention_predictions))
+            metric_results = EMRelaxed(max_length=args.max_answer_length)(aligned_baseline, baseline_predictions)
+            results.append({"EMRelaxed": get_mean_var_ci_bernoulli(metric_results)[0]})
+
+    if num_runs == 1:
+        return results[0]
+
     if evaluate_on == 'eoi':
         final_result = {
             "overall": get_mean_var_ci([r['overall'] for r in results]),
@@ -110,7 +115,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option("--overwrite-output-dir", is_flag=True, type=bool, default=False)
 @click.option("--max-grad-norm", type=float, default=1.0)
 @click.option("--fp16", type=bool, default=False)
-@click.option("--max-answer-length", type=int, default=30)
+@click.option("--max-answer-length", type=int, default=5)
 @click.option("--verbose-logging", is_flag=True, type=bool, default=False)
 @click.option("--null-score-diff-threshold", type=float, default=0.0)
 @click.option("--seed", type=int, default=42)
@@ -233,7 +238,9 @@ def finetune(**kwargs):
             trial_result = train_and_eval_single_step(args, train_dataset, *aligneds, *features, *gold_files, run_nr=i,
                                                       keep_predictions=bool(keep_predictions), num_runs=runs_per_trial,
                                                       evaluate_on=evaluate_on)
-            mean = trial_result['overall' if evaluate_on == 'eoi' else 'exact'][0]
+            mean = trial_result['overall' if evaluate_on == 'eoi' else 'EMRelaxed']
+            if runs_per_trial > 1:
+                mean, var, ci = mean
             click.echo(f"Result: {mean}")
             click.echo(f"Results: {json.dumps(trial_result, indent=4)}")
             result["trials"].append(trial_result)
