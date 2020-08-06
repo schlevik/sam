@@ -27,8 +27,9 @@ from stresstest.util import do_import, only
 @click.option('--keep-answer-candidates', is_flag=True, default=False)
 @click.option('--split', type=str, default=None)
 @click.option('--combine', is_flag=True, type=bool, default=False)
+@click.option('--multiplier', type=int, default=1)
 def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_workers,
-                      modifier_type, mask_q, mask_p, keep_answer_candidates, split, combine):
+                      modifier_type, mask_q, mask_p, keep_answer_candidates, split, combine, multiplier):
     if seed:
         random.seed(seed)
     uuid4 = lambda: uuid.UUID(int=random.getrandbits(128)).hex
@@ -53,7 +54,7 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
         split_name = "-"
 
     num_modifiers = cfg['num_modifiers']
-    reasoning_map = {do_import(k, relative_import="stresstest.reasoning"): v for k, v in
+    reasoning_map = {do_import(k, relative_import="stresstest.reasoning"): multiplier * v for k, v in
                      cfg['reasoning_map'].items()}
     total = sum(t * num_modifiers for t in reasoning_map.values())
 
