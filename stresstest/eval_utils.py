@@ -93,15 +93,15 @@ class F1(EvalMetric):
             logger.debug(f"F1: {f1}")
             overall_f1.append(f1)
         if overall_f1:
-            logger.debug(f'Mean EM: {sum(overall_f1) / len(overall_f1)}')
+            logger.debug(f'Mean F1: {sum(overall_f1) / len(overall_f1)}')
         else:
             logger.warning(f"Evaluating on empty gold!")
         return overall_f1
 
 
 class EMRelaxed(EM):
-    def __init__(self):
-        super().__init__(relaxed=True)
+    def __init__(self, max_length=3):
+        super().__init__(relaxed=True, max_length=max_length)
 
 
 def get_mean_var_ci(sample, alpha=0.025):
