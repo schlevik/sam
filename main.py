@@ -23,19 +23,20 @@ class Cli:
     @staticmethod
     @click.group(cls=MyGroup)
     @click.option('--debug', default=False, is_flag=True)
+    @click.option('--info', default=False, is_flag=True)
     @click.option('--notify', default=None, type=str)
     @click.pass_context
-    def cli(ctx, debug, notify):
+    def cli(ctx, debug, info, notify):
         Cli.notify = notify
         Cli.ctx = ctx
-        if not debug:
+        if not (debug or info):
             logger.remove(0)
             logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True, level='WARNING')
         else:
             logger.remove()
-            logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True)
-            logger.add("./logs/debug.log", level='DEBUG', rotation='50MB', compression="zip")
+            logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True, level='DEBUG' if debug else 'INFO')
             logger.debug('Set up logging.')
+        logger.add("./logs/debug.log", level='DEBUG', rotation='50MB', compression="zip")
 
     def __call__(self, *args, **kwargs):
         for f in glob.glob('scripts/*.py'):
