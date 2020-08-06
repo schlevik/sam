@@ -231,6 +231,7 @@ def finetune(**kwargs):
         predictions_folder = keep_predictions
         for i in trange(num_hpopt_runs):
             parameters, trial_index = ax_client.get_next_trial()
+            logger.info(f"Trying parameters: {parameters}")
             single_step_args = deepcopy(kwargs)
             single_step_args.update(parameters)
             args = Args(**single_step_args)
