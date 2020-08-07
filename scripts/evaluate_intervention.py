@@ -126,7 +126,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 'right->keep->wrong': len(correct_keep_wrong),
                 'right->change->wrong': len(correct_change_wrong),
                 'wrong->change->right': len(wrong_change_right),
-                'wrong->keep->right': len(wrong_keep_right)
+                'wrong->keep->right': len(wrong_keep_right),
+                'consistency': len(correct_change_correct)/len(aligned_baseline)
             }
         }
         if control:
@@ -134,7 +135,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             result[model_name]['behaviour'].update({
                 'correct_control': sum(results_control),
                 'correct_baseline_control': len(correct_baseline_control),
-                'right+control->change->right': len(correct_baseline_control_intervention)
+                'right+control->change->right': len(correct_baseline_control_intervention),
+                'consistency+control': len(correct_baseline_control_intervention)/len(aligned_baseline)
             })
         click.echo(f"Overall result: {printable_result}.")
         click.echo()
