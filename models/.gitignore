@@ -1,3 +1,16 @@
 /albert-squad
 /bidaf-squad.tar.gz
 /bert-base-squad
+/roberta-base-squad1
+/albert-base-v2-squad1
+/albert-xxlarge-v2-squad1
+/bert-large-uncased-squad1
+/roberta-large-squad1
+/albert-large-v2-squad1
+/albert-xlarge-v2-squad1
+/bert-base-uncased-squad1
+/t5-small-squad1
+/t5-base-squad1
+/bert-baseline-rb
+/bert-mask-q-baseline-rb
+/bert-mask-p-baseline-rb
