@@ -20,7 +20,7 @@ from stresstest.util import load_json
 def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, aligned_intervention, aligned_control,
                                baseline_dataset, intervention_dataset, control_dataset, original_dev_dataset,
                                baseline_gold_path, intervention_gold_path, control_gold_path,
-                               run_nr=0, train=True, num_runs=1, evaluate_on='eoi'):
+                               run_nr=0, train=True, num_runs=1, evaluate_on='eoi', original_ans_length=30):
     results = []
     for i in range(num_runs):
         set_seed(args)
@@ -79,8 +79,12 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
         else:
             raise NotImplementedError()
         if original_dev_dataset is not None:
+            # there is surely a better way to do this
+            ans_length = args.max_answer_length
+            args.max_answer_length = original_ans_length
             original_dev_result = evaluate(args, model, tokenizer, *original_dev_dataset, f'original-dev-{run_nr}',
                                            return_raw=False)
+            args.max_answer_length = ans_length
             result['original'] = original_dev_result['exact']
         results.append(result)
     if num_runs == 1:
@@ -120,7 +124,7 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option("--overwrite-output-dir", is_flag=True, type=bool, default=False)
 @click.option("--max-grad-norm", type=float, default=1.0)
 @click.option("--fp16", type=bool, default=False)
-@click.option("--max-answer-length", type=int, default=5)
+@click.option("--max-answer-length", type=int, default=10)
 @click.option("--verbose-logging", is_flag=True, type=bool, default=False)
 @click.option("--null-score-diff-threshold", type=float, default=0.0)
 @click.option("--seed", type=int, default=42)
@@ -148,9 +152,10 @@ def train_and_eval_single_step(args: Args, train_dataset, aligned_baseline, alig
 @click.option('--runs-per-trial', type=int, default=1)
 @click.option('--evaluate-on', type=str, default='eoi')
 @click.option('--original-dev-dataset', type=str, default=None)
+@click.option('--original-ans-length', type=int, default=30)
 @click.option('--optimize-consistency', is_flag=True, default=False)
 def finetune(optimize_consistency, evaluate_on, original_dev_dataset, runs_per_trial, hyperparam_opt_runs, out_file,
-             mute, baseline_gold_file, hyperparams, keep_predictions, **kwargs):
+             mute, baseline_gold_file, hyperparams, keep_predictions, original_ans_length, **kwargs):
     gold_files = get_baseline_intervention_control_from_baseline(baseline_gold_file)
 
     golds = tuple(
@@ -218,7 +223,7 @@ def finetune(optimize_consistency, evaluate_on, original_dev_dataset, runs_per_t
     result = {"trials": [], "tried_params": defaultdict(list), "best_params": ...,
               'pre_eval': train_and_eval_single_step(args, train_dataset, *aligneds, *features, original_dev_dataset,
                                                      *gold_files, run_nr='eval', train=False,
-                                                     evaluate_on=evaluate_on)}
+                                                     evaluate_on=evaluate_on, original_ans_length=original_ans_length)}
     # first, eval and save what is the performance before training
 
     click.echo(f"Results: {json.dumps(result['pre_eval'], indent=4)}")
@@ -233,7 +238,7 @@ def finetune(optimize_consistency, evaluate_on, original_dev_dataset, runs_per_t
         args.predictions_folder = str(predictions_folder)
         trial_result = train_and_eval_single_step(args, train_dataset, *aligneds, *features, original_dev_dataset,
                                                   *gold_files, run_nr=i, num_runs=runs_per_trial,
-                                                  evaluate_on=evaluate_on)
+                                                  evaluate_on=evaluate_on, original_ans_length=original_ans_length)
         #
         if optimize_consistency:
             assert evaluate_on == 'eoi'
