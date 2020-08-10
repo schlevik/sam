@@ -4,7 +4,7 @@ from typing import List, Optional, Callable
 from loguru import logger
 from overrides import overrides
 
-from stresstest.classes import Event, World, EventPlan, YouIdiotException
+from stresstest.classes import Event, World, EventPlan, YouIdiotException, Choices
 from stresstest.generator import StoryGenerator
 
 
@@ -13,11 +13,11 @@ class PlannedModifierGenerator(StoryGenerator, ABC):
     world: World
     sentences: List[Event]
 
-    def __init__(self, config, get_world: Callable[[], World], event_plan: EventPlan, modifier_type, *args, **kwargs):
+    def __init__(self, config, get_world: Callable[[], World], event_plan: EventPlan, modifier_types, *args, **kwargs):
         super().__init__(config, get_world, *args, **kwargs)
         self.same_actors_map = defaultdict(lambda: None)
         self.event_plan = event_plan
-        self.modifier_type = modifier_type
+        self.modifier_type: Choices[str] = Choices(modifier_types).random()
         self.ordered_attribute_map = defaultdict(dict)
 
     def _init_order_map(self, order_attr):

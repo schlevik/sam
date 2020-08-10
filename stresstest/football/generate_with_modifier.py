@@ -44,9 +44,9 @@ class PlannedFootballModifierGenerator(FootballGenerator, PlannedModifierGenerat
             self,
             config,
             event_plan,
-            modifier_type,
+            modifier_types,
             get_world=FootballWorld,
             team_names: str = 'stresstest/football/resources/team-names.json'
     ):
         super().__init__(config=config, get_world=get_world, team_names=team_names, event_plan=event_plan,
-                         modifier_type=modifier_type)
+                         modifier_types=modifier_types)

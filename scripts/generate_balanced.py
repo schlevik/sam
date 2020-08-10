@@ -21,7 +21,7 @@ from stresstest.util import do_import, only
 @click.option("--do-save", is_flag=True, default=False)
 @click.option("--domain", type=Domain(), default='football')
 @click.option("--num-workers", type=int, default=8)
-@click.option("--modifier-type", type=str, default='RB')
+@click.option("--modifier-types", type=str, default='VP-neg-impl,RB,MD,VP-pol-rev,VB-neg-impl,VB-pol-rev')
 @click.option('--mask-q', is_flag=True, default=False)
 @click.option('--mask-p', is_flag=True, default=False)
 @click.option('--keep-answer-candidates', is_flag=True, default=False)
@@ -29,13 +29,13 @@ from stresstest.util import do_import, only
 @click.option('--combine', is_flag=True, type=bool, default=False)
 @click.option('--multiplier', type=int, default=1)
 def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_workers,
-                      modifier_type, mask_q, mask_p, keep_answer_candidates, split, combine, multiplier):
+                      modifier_types, mask_q, mask_p, keep_answer_candidates, split, combine, multiplier):
     if seed:
         random.seed(seed)
     uuid4 = lambda: uuid.UUID(int=random.getrandbits(128)).hex
 
     cfg = Config(config)
-
+    modifier_types = modifier_types.split(',')
     modify_event_type = cfg['modify_event_type']
     if split:
         n = cfg['split'][split][modify_event_type]
@@ -48,17 +48,17 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
             click.echo(f"And question templates with index i where `i mod {div} == {rest}`")
             domain.templates_modifier['question_templates'], _ = \
                 filter_question_templates(lambda i, _: i % div == rest, domain.templates_modifier['question_templates'])
-        split_name = f"-{split}-"
+        split_name = f"-{split}"
 
     else:
-        split_name = "-"
+        split_name = ""
 
     num_modifiers = cfg['num_modifiers']
     reasoning_map = {do_import(k, relative_import="stresstest.reasoning"): multiplier * v for k, v in
                      cfg['reasoning_map'].items()}
     total = sum(t * num_modifiers for t in reasoning_map.values())
 
-    file_name = f"{{}}{split_name}{modifier_type.lower()}.json"
+    file_name = f"{{}}{split_name}.json"
     if not combine:
         click.echo(
             f"Generating from '{click.style(config, fg='green')}': {click.style(str(total), fg='green', bold=True)} "
@@ -80,7 +80,7 @@ def generate_balanced(config, out_path, seed, do_print, do_save, domain, num_wor
         config=cfg,
         bundle=domain,
         reasonings=reasoning_map,
-        modifier_type=modifier_type,
+        modifier_types=modifier_types,
         max_modifiers=num_modifiers,
         use_mod_distance=False,
         mute=False,

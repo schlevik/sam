@@ -11,10 +11,7 @@ def get_predictions_folder(sam_path, dataset_name):
 
 @click.command()
 @click.argument('command', type=str)
-@click.option('--sam', default='RB')
 @click.option('--dataset-name', default='squad1')
-# @click.option('--model-name', default='bert-base-uncased')
-# @click.option('--model-type', default='bert')
 @click.option("--train-file", default="train-v1.1.json")
 @click.option("--eval-file", default="dev-v1.1.json")
 @click.option("--batch-size", default=None)
@@ -22,18 +19,16 @@ def get_predictions_folder(sam_path, dataset_name):
 @click.option("--notify", type=str, default='viktor.schlegel@manchester.ac.uk')
 @click.option("model_names", '--model-name', type=str, multiple=True, default='bert-base-uncased')
 @click.option("model_types", '--model-type', type=str, multiple=True, default='bert')
-def generate_dvc(command, sam, dataset_name,
-                 # model_name, model_type,
+def generate_dvc(command, dataset_name,
                  train_file, eval_file, batch_size, extra_args,
                  notify, model_names, model_types):
     model_name = model_names[0]
     model_type = model_types[0]
-    sam_path = sam.lower()
-    sam_dataset_path = f"data/football/{sam_path}"
-    baseline_file = f"{sam_dataset_path}/full/baseline-{sam_path}.json"
-    intervention_file = f"{sam_dataset_path}/full/intervention-{sam_path}.json"
-    control_file = f"{sam_dataset_path}/full/control-{sam_path}.json"
-    predictions_folder = get_predictions_folder(sam_path, dataset_name)
+    root_data_path = 'data/football'
+    baseline_file = f"{root_data_path}/full/baseline.json"
+    intervention_file = f"{root_data_path}/full/intervention.json"
+    control_file = f"{root_data_path}/full/control.json"
+    predictions_folder = get_predictions_folder(root_data_path, dataset_name)
     model_folder = f"{model_name}-{dataset_name}"
     model_path = f"models/{model_folder}"
     train_path = f"data/datasets/{dataset_name}/{train_file}"
@@ -64,7 +59,7 @@ def generate_dvc(command, sam, dataset_name,
                f" {models_str} "
                f"--out-folder {predictions_folder} --max-answer-length 10 {extra_args}")
 
-        stage_name = f"predict-transformers-{dataset_name}-on-{sam_path}"
+        stage_name = f"predict-transformers-{dataset_name}"
         deps_str = " ".join(f"-d models/{mp}-{dataset_name}" for mp in model_names)
         outs_str = ' '.join(
             f"-o {get_output_predictions_file_name(baseline_file, predictions_folder, f'{mp}-{dataset_name}')} "
@@ -90,20 +85,20 @@ def generate_dvc(command, sam, dataset_name,
     #     f"-o {get_output_predictions_file_name(filter_file, predictions_folder, mp)}" for mp in model_names)
     # dvc_cmd = f"dvc run -n {stage_name} {deps_str} -d {filter_file} {outs_str} {cmd}"
     elif command == 'evaluate':
-        eoi_metric_file = f"{dataset_name}-{sam_path}.json"
+        eoi_metric_file = f"{dataset_name}.json"
         eoi_metric_path = f"metrics/{eoi_metric_file}"
         cmd = (f"python main.py evaluate-intervention --baseline-file {baseline_file} "
                f"--predictions-folder {predictions_folder} --control --output {eoi_metric_path}")
 
-        stage_name = f"evaluate-intervention-{dataset_name}-{sam_path}"
+        stage_name = f"evaluate-intervention-{dataset_name}"
 
         dvc_cmd = (f"dvc run -n {stage_name} -d {baseline_file} -d {intervention_file} -d {control_file} "
                    f"-d scripts/evaluate_intervention.py -d {predictions_folder} -M {eoi_metric_path} {cmd}")
     elif command == "generate":
         # conf_name = f'conf/{dataset_name}.json'
         cmd = (f"python main.py generate-balanced --config conf/evaluate.json --seed 56 "
-               f"--num-workers 8 --do-save --out-path {sam_dataset_path} --modifier-type {sam}")
-        stage_name = f"generate-{sam_path}-evaluation"
+               f"--num-workers 8 --do-save --out-path {root_data_path}/full --multiplier 35")
+        stage_name = f"generate-sam"
         dvc_cmd = (f"dvc run -n {stage_name} -d scripts/generate_balanced.py "
                    f"-d conf/evaluate.json -o {baseline_file} -o {intervention_file} -o {control_file} {cmd}")
     # elif command == 'filter':
@@ -145,8 +140,8 @@ def generate_dvc(command, sam, dataset_name,
                 mask = f"-mask-{masking}"
             else:
                 mask = ''
-            train_file = f"{sam_dataset_path}/split{mask}/train/combined-train-{sam_path}.json"
-            model_folder = f"models/bert{mask}-baseline-{sam_path}"
+            train_file = f"{root_data_path}/split{mask}/train/combined-train.json"
+            model_folder = f"models/bert{mask}-baseline"
             cmd = ("python main.py --debug --notify 'viktor.schlegel@manchester.ac.uk' train "
                    f" {train_file} "
                    "--model-path bert-base-uncased --model-type bert "
@@ -155,7 +150,7 @@ def generate_dvc(command, sam, dataset_name,
                    "--num-train-epochs 15 --overwrite-output-dir "
                    "--save-steps 0 --per-gpu-eval-batch-size 64 --gradient-accumulation-steps 3 --learning-rate 5e-5")
             cmds.append(cmd)
-            stage_name = f"train-bert{mask}-baseline-on-{sam_path}"
+            stage_name = f"train-bert{mask}-baseline"
             dvc_cmd = (
                 f"dvc run -n {stage_name} -d {train_file} -o {model_folder} "
                 f"{cmd}"
@@ -172,16 +167,16 @@ def generate_dvc(command, sam, dataset_name,
                 mask = f"-mask-{masking}"
             else:
                 mask = ''
-            out_path = f"{sam_dataset_path}/split{mask}/test/"
+            out_path = f"{root_data_path}/split{mask}/test/"
             predictions_folder = f'{out_path}predictions/'
-            baseline_file = f"{out_path}baseline-test-{sam_path}.json"
-            intervention_file = f"{out_path}intervention-test-{sam_path}.json"
-            control_file = f"{out_path}control-test-{sam_path}.json"
+            baseline_file = f"{out_path}baseline-test.json"
+            intervention_file = f"{out_path}intervention-test.json"
+            control_file = f"{out_path}control-test.json"
             if masking:
                 mask = f"-mask-{masking}"
             else:
                 mask = ''
-                stage_name = f"predict-random-baselines-on-{sam_path}"
+                stage_name = f"predict-random-baselines"
                 cmd = (
                     f"python main.py predict {baseline_file} {control_file} {intervention_file} "
                     f"--output-folder {predictions_folder} "
@@ -201,14 +196,14 @@ def generate_dvc(command, sam, dataset_name,
                     f"dvc run -n {stage_name} -d {baseline_file} -d {intervention_file} -d {control_file} {outs} {cmd}"
                 )
                 dvc_cmds.append(dvc_cmd)
-            model_name = f"bert{mask}-baseline-{sam_path}"
-            model_folder = f"models/bert{mask}-baseline-{sam_path}"
+            model_name = f"bert{mask}-baseline"
+            model_folder = f"models/bert{mask}-baseline"
             cmd = (f"python main.py --debug --notify {notify} "
                    f"predictions {baseline_file} {intervention_file} {control_file} "
                    f"--model-path {model_folder} --model-type bert "
                    f"--out-folder {predictions_folder} --max-answer-length 10 --per-gpu-eval-batch-size 64")
             cmds.append(cmd)
-            stage_name = f"predict-bert{mask}-baseline-on-{sam_path}"
+            stage_name = f"predict-bert{mask}-baseline"
             outs = " ".join(
                 f"-o {get_output_predictions_file_name(f, predictions_folder, model_name)}"
                 for f in [baseline_file, intervention_file, control_file]
@@ -246,11 +241,11 @@ def generate_dvc(command, sam, dataset_name,
                 mask = ''
                 mask_opt = ''
             for split, multiplier, seed in [("train", 100, 56), ("test", 20, 38676)]:
-                out_path = f"{sam_dataset_path}/split{mask}/{split}/"
-                baseline_file = f"{out_path}baseline-{split}-{sam_path}.json"
-                intervention_file = f"{out_path}intervention-{split}-{sam_path}.json"
-                control_file = f"{out_path}control-{split}-{sam_path}.json"
-                combined_file = f"{out_path}combined-{split}-{sam_path}.json"
+                out_path = f"{root_data_path}/split{mask}/{split}/"
+                baseline_file = f"{out_path}baseline-{split}.json"
+                intervention_file = f"{out_path}intervention-{split}json"
+                control_file = f"{out_path}control-{split}.json"
+                combined_file = f"{out_path}combined-{split}.json"
                 if split == 'train':
                     combine = '--combine'
                     outs = f"-o {combined_file}"
@@ -259,11 +254,11 @@ def generate_dvc(command, sam, dataset_name,
                     outs = f' -o {baseline_file} -o {intervention_file} -o {control_file} '
                 cmd = (f"python main.py generate-balanced --config conf/finetune.json "
                        f"--seed {seed} --num-workers 8 --do-save --out-path {out_path} "
-                       f"--modifier-type {sam} --multiplier {multiplier} --split {split} "
+                       f"--multiplier {multiplier} --split {split} "
                        f"{combine} {mask_opt}")
                 cmds.append(cmd)
 
-                stage_name = f"generate-{sam_path}-{split}{mask}"
+                stage_name = f"generate-{split}{mask}"
                 dvc_cmd = (f"dvc run -n {stage_name} -d scripts/generate_balanced.py "
                            f"-d conf/finetune.json {outs} "
                            f"{cmd}")

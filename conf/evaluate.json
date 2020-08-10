@@ -1,16 +1,16 @@
 {
   "num_modifiers": 3,
   "reasoning_map": {
-    "retrieval": 200,
-    "retrieval_reverse": 200,
-    "retrieval_two": 50,
-    "retrieval_two_reverse": 50,
-    "bridge": 133,
-    "bridge_reverse": 133,
-    "comparison": 42,
-    "comparison_reverse": 42,
-    "argmax": 75,
-    "argmin": 75
+    "retrieval": 10,
+    "retrieval_reverse": 10,
+    "retrieval_two": 2,
+    "retrieval_two_reverse": 2,
+    "bridge": 2,
+    "bridge_reverse": 2,
+    "comparison": 1,
+    "comparison_reverse": 1,
+    "argmax": 5,
+    "argmin": 5
   },
   "world": {
     "num_sentences": 6,
