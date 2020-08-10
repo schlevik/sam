@@ -147,6 +147,9 @@ def showcase_all(out_file, given_bundle: Bundle = None, do_x_repetitions=12):
         f.write('\n'.join(lines))
 
 
+MODIFIER_TYPES = ['VP-neg-impl', 'RB', 'MD', 'VP-pol-rev', 'VB-neg-impl', 'VB-pol-rev']
+
+
 def showcase(given_bundle=None, n=0, do_print=True):
     test_bundle = only(given_bundle, n, 'goal') if given_bundle else only(bundle, n, 'goal')
     templates = test_bundle.templates_modifier
@@ -154,7 +157,7 @@ def showcase(given_bundle=None, n=0, do_print=True):
         test_bundle, cfg={"world.num_sentences": 2}, do_print=False, do_realise=False
     )
     sentences = []
-    for f in ['VP-neg-impl', 'RB', 'MD', 'VP-pol-rev', 'VB-neg-impl', 'VB-pol-rev']:
+    for f in MODIFIER_TYPES:
         events[0].features = [f]
         generator.modifier_type = f
         realizer = Realizer(**templates, unique_sentences=False)
@@ -169,7 +172,7 @@ def showcase(given_bundle=None, n=0, do_print=True):
     return sentences
 
 
-def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_type='RB', max_sents=5, max_modifier=3,
+def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_types=None, max_sents=5, max_modifier=3,
                             config=None, per_modify_distance_per_reasoning=1, reasonings=None, num_workers=1):
     config = config or {"world.num_sentences": max_sents, 'unique_actors': True, 'world.num_players': 4 * max_sents}
     reasonings = reasonings or [retrieval, retrieval_two, retrieval_reverse, retrieval_two_reverse, bridge,
@@ -177,7 +180,8 @@ def interactive_env_aligned(bundle=bundle, modify_event_type='goal', modifier_ty
     reasoning_map = {
         r: per_modify_distance_per_reasoning for r in reasonings
     }
-    return generate_and_realise(bundle, config, modify_event_type, modifier_type,
+    modifier_types = None or MODIFIER_TYPES
+    return generate_and_realise(bundle, config, modify_event_type, modifier_types,
                                 reasoning_map, max_modifiers=max_modifier, num_workers=num_workers)
 
 

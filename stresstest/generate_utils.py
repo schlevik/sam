@@ -16,13 +16,13 @@ from stresstest.football.generate_with_modifier import PlannedFootballModifierGe
 from stresstest.realize import Realizer
 
 
-def generate_and_realise(bundle, config, modify_event_type, modifier_type,
+def generate_and_realise(bundle, config, modify_event_type, modifier_types,
                          reasonings: Dict[Reasoning, int],
                          max_modifiers, use_mod_distance=False, mute=False, num_workers=8,
                          deterministic=True):
     # TODO: do parallel
     result = generate_balanced(
-        modify_event_type, config, bundle, reasonings, modifier_type,
+        modify_event_type, config, bundle, reasonings, modifier_types,
         max_modifiers, use_mod_distance, mute, num_workers=num_workers
     )
 
@@ -36,34 +36,34 @@ def generate_and_realise(bundle, config, modify_event_type, modifier_type,
     if num_workers > 1:
         realized = Parallel(num_workers)(
             (delayed(_do_realize)
-             (config, event_plan, events, modifier_type,
+             (config, event_plan, events, modifier_types,
               template_choices, templates, world, seed)
              ) for (event_plan, events, template_choices, world), seed in
             zip(tqdm(result, desc='Realising...', disable=mute), seeds))
     else:
         realized = [
             _do_realize(
-                config, event_plan, events, modifier_type,
+                config, event_plan, events, modifier_types,
                 template_choices, templates, world, seed
             ) for (event_plan, events, template_choices, world), seed in
             zip(tqdm(result, desc='Realising...', disable=mute), seeds)]
     return [(*z1, *z2) for z1, z2 in zip(result, realized)]
 
 
-def _do_realize(config, event_plan, events, modifier_type, template_choices, templates, world, seed=None):
+def _do_realize(config, event_plan, events, modifier_types, template_choices, templates, world, seed=None):
     if seed:
         random.seed(seed)
     realizer = Realizer(**templates, validate=False)
     modified_story, visits = realizer.realise_with_sentence_choices(events, world, template_choices)
     choices = realizer.context.choices
-    indices_to_remove = [i for i, e in enumerate(events) if modifier_type in e.features]
+    indices_to_remove = [i for i, e in enumerate(events) if any(mt in e.features for mt in modifier_types)]
     baseline_events = deepcopy(events)
     for event in baseline_events:
         event.features = []
     realizer = Realizer(**templates, unique_sentences=True)
     baseline_story, baseline_visits = realizer.realise_with_choices(baseline_events, world, choices, template_choices)
     generator = partial(PlannedFootballModifierGenerator, config=config,
-                        modifier_type=modifier_type)
+                        modifier_types=modifier_types)
     generator_instance: PlannedFootballModifierGenerator = generator(event_plan=event_plan)
     # this is for single span extraction only atm
     qs = generator_instance.generate_questions_from_plan(event_plan, baseline_events)[0]
@@ -86,7 +86,7 @@ def _do_realize(config, event_plan, events, modifier_type, template_choices, tem
 
 
 def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reasoning, int],
-                      modifier_type, max_modifiers, use_mod_distance, mute, num_workers):
+                      modifier_types, max_modifiers, use_mod_distance, mute, num_workers):
     attr = attrgetter('modification_distance' if use_mod_distance else 'num_modifications')
     result = []
     max_sents = config.get("world.num_sentences")
@@ -114,7 +114,7 @@ def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reason
                     stories_and_worlds = Parallel(num_workers)(
                         delayed(_do_generate)(
                             PlannedFootballModifierGenerator, config=config,
-                            modifier_type=modifier_type, ep=ep, mute=True, seed=seed)
+                            modifier_types=modifier_types, ep=ep, mute=True, seed=seed)
                         for ep, seed in
                         zip(eps, tqdm(seeds, position=1, leave=False, disable=mute, desc=f"{reasoning.name}, "
                                                                                          f"#{num_modifiers} mod")))
@@ -122,7 +122,7 @@ def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reason
                     stories_and_worlds = [
                         _do_generate(
                             PlannedFootballModifierGenerator, config=config,
-                            modifier_type=modifier_type, ep=ep, mute=False, seed=seed)
+                            modifier_types=modifier_types, ep=ep, mute=False, seed=seed)
                         for ep, seed in
                         zip(eps, tqdm(seeds, position=1, leave=False, disable=mute, desc=f"{reasoning.name}, "
                                                                                          f"#{num_modifiers} mod"))
@@ -146,10 +146,10 @@ def generate_balanced(modify_event_type, config, bundle, reasonings: Dict[Reason
     return result
 
 
-def _do_generate(generator_class, config, modifier_type, ep, mute, seed=None):
+def _do_generate(generator_class, config, modifier_types, ep, mute, seed=None):
     if seed:
         random.seed(seed)
     if mute:
         logger.remove()
-    generator_instance = generator_class(config=config, modifier_type=modifier_type, event_plan=ep)
+    generator_instance = generator_class(config=config, modifier_types=modifier_types, event_plan=ep)
     return generator_instance.generate_story(return_world=True)

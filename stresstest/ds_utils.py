@@ -4,7 +4,7 @@ from typing import List, Tuple
 from loguru import logger
 
 from stresstest.baseline_utils import mask_passage, mask_question
-from stresstest.classes import EventPlan
+from stresstest.classes import EventPlan, Event
 
 
 def squad(dataset):
@@ -141,8 +141,11 @@ def to_squad(uuid, event_plans, all_events, template_choices, baseline_stories, 
     return baseline, modified, control
 
 
-def format_qas(passages: List[str], event_plan: EventPlan, events, qs, story_id, template_choices, mask_q,
+def format_qas(passages: List[str], event_plan: EventPlan, events:List[Event], qs, story_id, template_choices, mask_q,
                answer_token_offsets):
+    modifier_type = [e.features[0] for e in events if e.features]
+    assert all(modifier_type[0] == m for m in modifier_type)
+    modifier_type = modifier_type[0]
     qas = []
     for i, q in enumerate(qs):
         qa = {
@@ -151,6 +154,7 @@ def format_qas(passages: List[str], event_plan: EventPlan, events, qs, story_id,
             "answer": q.answer,
             "reasoning": event_plan.reasoning_type.name,
             "num_modifications": event_plan.num_modifications,
+            "modifier_type": modifier_type,
             'type': q.type,
             'target': q.target,
             'evidence': q.evidence,
