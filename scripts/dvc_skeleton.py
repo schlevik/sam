@@ -243,7 +243,7 @@ def generate_dvc(command, dataset_name,
             for split, multiplier, seed in [("train", 100, 56), ("test", 20, 38676)]:
                 out_path = f"{root_data_path}/split{mask}/{split}/"
                 baseline_file = f"{out_path}baseline-{split}.json"
-                intervention_file = f"{out_path}intervention-{split}json"
+                intervention_file = f"{out_path}intervention-{split}.json"
                 control_file = f"{out_path}control-{split}.json"
                 combined_file = f"{out_path}combined-{split}.json"
                 if split == 'train':
