@@ -136,220 +136,219 @@ train-t5-base-on-squad1:
   outs:
   - path: models/t5-base-squad1
     md5: e63973c51d64d43a671729b68588a281.dir
-generate-rb-train:
+generate-train:
   cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
-    8 --do-save --out-path data/football/rb/split/train/ --modifier-type RB --multiplier
-    100 --split train --combine
+    8 --do-save --out-path data/football/split/train/ --multiplier 100 --split train
+    --combine
   deps:
   - path: conf/finetune.json
     md5: 0ff738ae9e4a22177eb61662d82f8698
   - path: scripts/generate_balanced.py
-    md5: 2cd1a4900362201fe96d703fee363c37
+    md5: c9ae2d226352dd1c934cff644698a2d7
   outs:
-  - path: data/football/rb/split/train/combined-train-rb.json
-    md5: 16f9beeca9bff9a98f5053d8ec70775b
-train-bert-baseline-on-rb:
-  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/rb/split/train/combined-train-rb.json
-    --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-baseline-rb
+  - path: data/football/split/train/combined-train.json
+    md5: 70d3af4b992c9ecf2bd01bd3403b15c0
+generate-train-mask-q:
+  cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
+    8 --do-save --out-path data/football/split-mask-q/train/ --multiplier 100 --split
+    train --combine --mask-q
+  deps:
+  - path: conf/finetune.json
+    md5: 0ff738ae9e4a22177eb61662d82f8698
+  - path: scripts/generate_balanced.py
+    md5: c9ae2d226352dd1c934cff644698a2d7
+  outs:
+  - path: data/football/split-mask-q/train/combined-train.json
+    md5: 29fd16f574d0363a8f457f9e873a1c27
+generate-train-mask-p:
+  cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
+    8 --do-save --out-path data/football/split-mask-p/train/ --multiplier 100 --split
+    train --combine --mask-p --keep-answer-candidates
+  deps:
+  - path: conf/finetune.json
+    md5: 0ff738ae9e4a22177eb61662d82f8698
+  - path: scripts/generate_balanced.py
+    md5: c9ae2d226352dd1c934cff644698a2d7
+  outs:
+  - path: data/football/split-mask-p/train/combined-train.json
+    md5: f1dd5ed6cc05287d05b77e04fe99d805
+generate-test-mask-q:
+  cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676 --num-workers
+    8 --do-save --out-path data/football/split-mask-q/test/ --multiplier 20 --split
+    test --mask-q
+  deps:
+  - path: conf/finetune.json
+    md5: 0ff738ae9e4a22177eb61662d82f8698
+  - path: scripts/generate_balanced.py
+    md5: c9ae2d226352dd1c934cff644698a2d7
+  outs:
+  - path: data/football/split-mask-q/test/baseline-test.json
+    md5: 63d660205ba99e2c9330e7d1e63e15b1
+  - path: data/football/split-mask-q/test/control-test.json
+    md5: 875aed3a9069ff649c418d95e4d7b57d
+  - path: data/football/split-mask-q/test/intervention-test.json
+    md5: 2fe124d70a610917c2f6ad6c26b6f9ff
+generate-test-mask-p:
+  cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676 --num-workers
+    8 --do-save --out-path data/football/split-mask-p/test/ --multiplier 20 --split
+    test --mask-p --keep-answer-candidates
+  deps:
+  - path: conf/finetune.json
+    md5: 0ff738ae9e4a22177eb61662d82f8698
+  - path: scripts/generate_balanced.py
+    md5: c9ae2d226352dd1c934cff644698a2d7
+  outs:
+  - path: data/football/split-mask-p/test/baseline-test.json
+    md5: ed9e5c7fc588a0f4726e82c12edcf95f
+  - path: data/football/split-mask-p/test/control-test.json
+    md5: 24b3f1207449f5ad6a5403ad69bd5f6e
+  - path: data/football/split-mask-p/test/intervention-test.json
+    md5: 0546a3f31510080ed9795210a5799ff7
+train-bert-baseline:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/split/train/combined-train.json
+    --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-baseline
     --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 10 --debug-features
     --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
     64 --gradient-accumulation-steps 3 --learning-rate 5e-5
   deps:
-  - path: data/football/rb/split/train/combined-train-rb.json
-    md5: 16f9beeca9bff9a98f5053d8ec70775b
+  - path: data/football/split/train/combined-train.json
+    md5: 70d3af4b992c9ecf2bd01bd3403b15c0
   outs:
-  - path: models/bert-baseline-rb
-    md5: 4e5cab882893e749640b520d84d07ceb.dir
-generate-rb-test:
-  cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676 --num-workers
-    8 --do-save --out-path data/football/rb/split/test/ --modifier-type RB --multiplier
-    20 --split test
-  deps:
-  - path: conf/finetune.json
-    md5: 0ff738ae9e4a22177eb61662d82f8698
-  - path: scripts/generate_balanced.py
-    md5: 2cd1a4900362201fe96d703fee363c37
-  outs:
-  - path: data/football/rb/split/test/baseline-test-rb.json
-    md5: 48bd291f808fe8c610b9d4dc40ebca19
-  - path: data/football/rb/split/test/control-test-rb.json
-    md5: 55361642c194ccf4d1025961fe835be0
-  - path: data/football/rb/split/test/intervention-test-rb.json
-    md5: a1ea08b1edc09745f574fbac0b6de6ee
-predict-bert-baseline-on-rb:
-  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
-    data/football/rb/split/test/baseline-test-rb.json data/football/rb/split/test/intervention-test-rb.json
-    data/football/rb/split/test/control-test-rb.json --model-path models/bert-baseline-rb
-    --model-type bert --out-folder data/football/rb/split/test/predictions/ --max-answer-length
-    10 --per-gpu-eval-batch-size 64
-  deps:
-  - path: data/football/rb/split/test/baseline-test-rb.json
-    md5: 48bd291f808fe8c610b9d4dc40ebca19
-  - path: data/football/rb/split/test/control-test-rb.json
-    md5: 55361642c194ccf4d1025961fe835be0
-  - path: data/football/rb/split/test/intervention-test-rb.json
-    md5: a1ea08b1edc09745f574fbac0b6de6ee
-  - path: models/bert-baseline-rb
-    md5: 4e5cab882893e749640b520d84d07ceb.dir
-  outs:
-  - path: data/football/rb/split/test/predictions/baseline-test-rb-bert-baseline-rb.json
-    md5: 800d7bdcfd9c5168c963ed51df19d094
-  - path: data/football/rb/split/test/predictions/control-test-rb-bert-baseline-rb.json
-    md5: c19d38629ec93c002f295f3f1f30e2fa
-  - path: data/football/rb/split/test/predictions/intervention-test-rb-bert-baseline-rb.json
-    md5: a8744326d1320b03b36b35258357b953
-generate-rb-train-mask-q:
-  cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
-    8 --do-save --out-path data/football/rb/split-mask-q/train/ --modifier-type RB
-    --multiplier 100 --split train --combine --mask-q
-  deps:
-  - path: conf/finetune.json
-    md5: 0ff738ae9e4a22177eb61662d82f8698
-  - path: scripts/generate_balanced.py
-    md5: 2cd1a4900362201fe96d703fee363c37
-  outs:
-  - path: data/football/rb/split-mask-q/train/combined-train-rb.json
-    md5: 637eff020574950eeace7f2f3062600a
-train-bert-mask-q-baseline-on-rb:
-  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/rb/split-mask-q/train/combined-train-rb.json
-    --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-q-baseline-rb
-    --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 5 --debug-features
+  - path: models/bert-baseline
+    md5: 3c0dfec47e611a376084aa9f7541f5ad.dir
+train-bert-mask-q-baseline:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/split-mask-q/train/combined-train.json
+    --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-q-baseline
+    --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 10 --debug-features
     --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
     64 --gradient-accumulation-steps 3 --learning-rate 5e-5
   deps:
-  - path: data/football/rb/split-mask-q/train/combined-train-rb.json
-    md5: 637eff020574950eeace7f2f3062600a
+  - path: data/football/split-mask-q/train/combined-train.json
+    md5: 29fd16f574d0363a8f457f9e873a1c27
   outs:
-  - path: models/bert-mask-q-baseline-rb
-    md5: 2784ad58fc9330f007a2e1225ff941fd.dir
-generate-rb-test-mask-q:
-  cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676 --num-workers
-    8 --do-save --out-path data/football/rb/split-mask-q/test/ --modifier-type RB
-    --multiplier 20 --split test --mask-q
+  - path: models/bert-mask-q-baseline
+    md5: ab6a3d3cbca3bc6e0c56da8b6e0d35e1.dir
+train-bert-mask-p-baseline:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/split-mask-p/train/combined-train.json
+    --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-p-baseline
+    --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 10 --debug-features
+    --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
+    64 --gradient-accumulation-steps 3 --learning-rate 5e-5
   deps:
-  - path: conf/finetune.json
-    md5: 0ff738ae9e4a22177eb61662d82f8698
-  - path: scripts/generate_balanced.py
-    md5: 2cd1a4900362201fe96d703fee363c37
+  - path: data/football/split-mask-p/train/combined-train.json
+    md5: f1dd5ed6cc05287d05b77e04fe99d805
   outs:
-  - path: data/football/rb/split-mask-q/test/baseline-test-rb.json
-    md5: aa8e7b9cffb07b8551313cd21c67f4c6
-  - path: data/football/rb/split-mask-q/test/control-test-rb.json
-    md5: b0a9c72e7a1242487ea2117dbcc7b613
-  - path: data/football/rb/split-mask-q/test/intervention-test-rb.json
-    md5: 8d9e8d452c9af213c704fa8b73942ecd
-predict-bert-mask-q-baseline-on-rb:
-  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
-    data/football/rb/split-mask-q/test/baseline-test-rb.json data/football/rb/split-mask-q/test/intervention-test-rb.json
-    data/football/rb/split-mask-q/test/control-test-rb.json --model-path models/bert-mask-q-baseline-rb
-    --model-type bert --out-folder data/football/rb/split-mask-q/test/predictions/
-    --max-answer-length 10 --per-gpu-eval-batch-size 64
-  deps:
-  - path: data/football/rb/split-mask-q/test/baseline-test-rb.json
-    md5: aa8e7b9cffb07b8551313cd21c67f4c6
-  - path: data/football/rb/split-mask-q/test/control-test-rb.json
-    md5: b0a9c72e7a1242487ea2117dbcc7b613
-  - path: data/football/rb/split-mask-q/test/intervention-test-rb.json
-    md5: 8d9e8d452c9af213c704fa8b73942ecd
-  - path: models/bert-mask-q-baseline-rb
-    md5: 2784ad58fc9330f007a2e1225ff941fd.dir
-  outs:
-  - path: data/football/rb/split-mask-q/test/predictions/baseline-test-rb-bert-mask-q-baseline-rb.json
-    md5: 641907cb8f6a86815aca66f5bd70c001
-  - path: data/football/rb/split-mask-q/test/predictions/control-test-rb-bert-mask-q-baseline-rb.json
-    md5: 633fe44d6dbfc27bbc1c3732707888d7
-  - path: data/football/rb/split-mask-q/test/predictions/intervention-test-rb-bert-mask-q-baseline-rb.json
-    md5: 8f784eed09f15d599da51f57522fc786
-predict-random-baselines-on-rb:
-  cmd: python main.py predict data/football/rb/split/test/baseline-test-rb.json data/football/rb/split/test/control-test-rb.json
-    data/football/rb/split/test/intervention-test-rb.json --output-folder data/football/rb/split/test/predictions/
+  - path: models/bert-mask-p-baseline
+    md5: 416506bd1b6cd5414dfd6a494469e9c6.dir
+predict-random-baselines:
+  cmd: python main.py predict data/football/split/test/baseline-test.json data/football/split/test/control-test.json
+    data/football/split/test/intervention-test.json --output-folder data/football/split/test/predictions/
     --model random-baseline --cls RandomBaseline --model educated-baseline --cls EducatedBaseline
     --model informed-baseline --cls InformedBaseline
   deps:
-  - path: data/football/rb/split/test/baseline-test-rb.json
-    md5: 48bd291f808fe8c610b9d4dc40ebca19
-  - path: data/football/rb/split/test/control-test-rb.json
-    md5: 55361642c194ccf4d1025961fe835be0
-  - path: data/football/rb/split/test/intervention-test-rb.json
-    md5: a1ea08b1edc09745f574fbac0b6de6ee
+  - path: data/football/split/test/baseline-test.json
+    md5: dd4270113e8c4df1d87952704174b327
+  - path: data/football/split/test/control-test.json
+    md5: 21b540d35dc9a921efad2a96ef7fff72
+  - path: data/football/split/test/intervention-test.json
+    md5: 397e7a8e463ddf1d144193a8689c2875
   outs:
-  - path: data/football/rb/split/test/predictions/baseline-test-rb-educated-baseline.json
-    md5: ad05a08a01ebe4e901932255e6ab2c19
-  - path: data/football/rb/split/test/predictions/baseline-test-rb-informed-baseline.json
-    md5: e5d944ba856b94e7d28c4a11cf7d406d
-  - path: data/football/rb/split/test/predictions/baseline-test-rb-random-baseline.json
-    md5: 10ada451e49865c35fb3530ac59c4a6c
-  - path: data/football/rb/split/test/predictions/control-test-rb-educated-baseline.json
-    md5: 4cdb9f14515bb097352e94b4b348ff3e
-  - path: data/football/rb/split/test/predictions/control-test-rb-informed-baseline.json
-    md5: ce4754a34b784fd7f81266f07f746f6f
-  - path: data/football/rb/split/test/predictions/control-test-rb-random-baseline.json
-    md5: 38d34467cc7796eea26bc769da5476ac
-  - path: data/football/rb/split/test/predictions/intervention-test-rb-educated-baseline.json
-    md5: f28ecdb561fa59704ce2e95636302200
-  - path: data/football/rb/split/test/predictions/intervention-test-rb-informed-baseline.json
-    md5: 5f41ad32b2418281bd493ae071da90f3
-  - path: data/football/rb/split/test/predictions/intervention-test-rb-random-baseline.json
-    md5: 664149b0a11707771e1ce0e6440b3293
-generate-rb-train-mask-p:
-  cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
-    8 --do-save --out-path data/football/rb/split-mask-p/train/ --modifier-type RB
-    --multiplier 100 --split train --combine --mask-p --keep-answer-candidates
-  deps:
-  - path: conf/finetune.json
-    md5: 0ff738ae9e4a22177eb61662d82f8698
-  - path: scripts/generate_balanced.py
-    md5: 2cd1a4900362201fe96d703fee363c37
-  outs:
-  - path: data/football/rb/split-mask-p/train/combined-train-rb.json
-    md5: ee8faf6ffc25be632c1ae51e7234a0b2
-train-bert-mask-p-baseline-on-rb:
-  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/rb/split-mask-p/train/combined-train-rb.json
-    --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-p-baseline-rb
-    --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 5 --debug-features
-    --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
-    64 --gradient-accumulation-steps 3 --learning-rate 5e-5
-  deps:
-  - path: data/football/rb/split-mask-p/train/combined-train-rb.json
-    md5: ee8faf6ffc25be632c1ae51e7234a0b2
-  outs:
-  - path: models/bert-mask-p-baseline-rb
-    md5: 3fe17931f0a7343afdc9ec552ba788a0.dir
-generate-rb-test-mask-p:
-  cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676 --num-workers
-    8 --do-save --out-path data/football/rb/split-mask-p/test/ --modifier-type RB
-    --multiplier 20 --split test --mask-p --keep-answer-candidates
-  deps:
-  - path: conf/finetune.json
-    md5: 0ff738ae9e4a22177eb61662d82f8698
-  - path: scripts/generate_balanced.py
-    md5: 2cd1a4900362201fe96d703fee363c37
-  outs:
-  - path: data/football/rb/split-mask-p/test/baseline-test-rb.json
-    md5: 04718bb800b142b58f4fa647a6ed6fbc
-  - path: data/football/rb/split-mask-p/test/control-test-rb.json
-    md5: 27219ee590125e57eb660c52cbca83e5
-  - path: data/football/rb/split-mask-p/test/intervention-test-rb.json
-    md5: 20e27af09d50cfc0bdbdbab495a0ad63
-predict-bert-mask-p-baseline-on-rb:
+  - path: data/football/split/test/predictions/baseline-test-educated-baseline.json
+    md5: 12c8c9005320ad4e849b468292a95b4c
+  - path: data/football/split/test/predictions/baseline-test-informed-baseline.json
+    md5: eb4ebd14e97115a8c71781862235f0a8
+  - path: data/football/split/test/predictions/baseline-test-random-baseline.json
+    md5: 6eef993984684bc2ecd5d68221918877
+  - path: data/football/split/test/predictions/control-test-educated-baseline.json
+    md5: 8603a8dba61c00493336e51569d235fd
+  - path: data/football/split/test/predictions/control-test-informed-baseline.json
+    md5: 0db12b23a7fadd8fcba4d003614abc0a
+  - path: data/football/split/test/predictions/control-test-random-baseline.json
+    md5: 2c629242cf401eb6231909ed99d9b7d9
+  - path: data/football/split/test/predictions/intervention-test-educated-baseline.json
+    md5: b7bd21be9eca161c6652d2661ce23057
+  - path: data/football/split/test/predictions/intervention-test-informed-baseline.json
+    md5: d3deb12ffdcaca070073b8fa7f0bf319
+  - path: data/football/split/test/predictions/intervention-test-random-baseline.json
+    md5: 312e2f4f92307d65cab7563cc10c3b4e
+predict-bert-baseline:
   cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
-    data/football/rb/split-mask-p/test/baseline-test-rb.json data/football/rb/split-mask-p/test/intervention-test-rb.json
-    data/football/rb/split-mask-p/test/control-test-rb.json --model-path models/bert-mask-p-baseline-rb
-    --model-type bert --out-folder data/football/rb/split-mask-p/test/predictions/
-    --max-answer-length 10 --per-gpu-eval-batch-size 64
+    data/football/split/test/baseline-test.json data/football/split/test/intervention-test.json
+    data/football/split/test/control-test.json --model-path models/bert-baseline --model-type
+    bert --out-folder data/football/split/test/predictions/ --max-answer-length 10
+    --per-gpu-eval-batch-size 64
   deps:
-  - path: data/football/rb/split-mask-p/test/baseline-test-rb.json
-    md5: 04718bb800b142b58f4fa647a6ed6fbc
-  - path: data/football/rb/split-mask-p/test/control-test-rb.json
-    md5: 27219ee590125e57eb660c52cbca83e5
-  - path: data/football/rb/split-mask-p/test/intervention-test-rb.json
-    md5: 20e27af09d50cfc0bdbdbab495a0ad63
-  - path: models/bert-mask-p-baseline-rb
-    md5: 3fe17931f0a7343afdc9ec552ba788a0.dir
+  - path: data/football/split/test/baseline-test.json
+    md5: dd4270113e8c4df1d87952704174b327
+  - path: data/football/split/test/control-test.json
+    md5: 21b540d35dc9a921efad2a96ef7fff72
+  - path: data/football/split/test/intervention-test.json
+    md5: 397e7a8e463ddf1d144193a8689c2875
+  - path: models/bert-baseline
+    md5: 3c0dfec47e611a376084aa9f7541f5ad.dir
   outs:
-  - path: data/football/rb/split-mask-p/test/predictions/baseline-test-rb-bert-mask-p-baseline-rb.json
-    md5: 1f67f373bb9bd1b0d9a583f2f015ddad
-  - path: data/football/rb/split-mask-p/test/predictions/control-test-rb-bert-mask-p-baseline-rb.json
-    md5: 9df6dcc6fcbe1e76daff042f76cf9874
-  - path: data/football/rb/split-mask-p/test/predictions/intervention-test-rb-bert-mask-p-baseline-rb.json
-    md5: ba5ac50cf521e8b7ee0c1cfd5deaa31b
+  - path: data/football/split/test/predictions/baseline-test-bert-baseline.json
+    md5: a6fde403333da209b7a8342b1188afe0
+  - path: data/football/split/test/predictions/control-test-bert-baseline.json
+    md5: 8e3c0a8475665bbfa92466e1a7dfcc4d
+  - path: data/football/split/test/predictions/intervention-test-bert-baseline.json
+    md5: 1583304f8e292495282d9ab2cb3edd27
+predict-bert-mask-q-baseline:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+    data/football/split-mask-q/test/baseline-test.json data/football/split-mask-q/test/intervention-test.json
+    data/football/split-mask-q/test/control-test.json --model-path models/bert-mask-q-baseline
+    --model-type bert --out-folder data/football/split-mask-q/test/predictions/ --max-answer-length
+    10 --per-gpu-eval-batch-size 64
+  deps:
+  - path: data/football/split-mask-q/test/baseline-test.json
+    md5: 63d660205ba99e2c9330e7d1e63e15b1
+  - path: data/football/split-mask-q/test/control-test.json
+    md5: 875aed3a9069ff649c418d95e4d7b57d
+  - path: data/football/split-mask-q/test/intervention-test.json
+    md5: 2fe124d70a610917c2f6ad6c26b6f9ff
+  - path: models/bert-mask-q-baseline
+    md5: ab6a3d3cbca3bc6e0c56da8b6e0d35e1.dir
+  outs:
+  - path: data/football/split-mask-q/test/predictions/baseline-test-bert-mask-q-baseline.json
+    md5: 8a33f7f81d61410632a2545f2e881122
+  - path: data/football/split-mask-q/test/predictions/control-test-bert-mask-q-baseline.json
+    md5: a4aaf4058cefc9ccf3d5ca637f3537e0
+  - path: data/football/split-mask-q/test/predictions/intervention-test-bert-mask-q-baseline.json
+    md5: bcd09ddaacc23e212c5d798a813305b9
+predict-bert-mask-p-baseline:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+    data/football/split-mask-p/test/baseline-test.json data/football/split-mask-p/test/intervention-test.json
+    data/football/split-mask-p/test/control-test.json --model-path models/bert-mask-p-baseline
+    --model-type bert --out-folder data/football/split-mask-p/test/predictions/ --max-answer-length
+    10 --per-gpu-eval-batch-size 64
+  deps:
+  - path: data/football/split-mask-p/test/baseline-test.json
+    md5: ed9e5c7fc588a0f4726e82c12edcf95f
+  - path: data/football/split-mask-p/test/control-test.json
+    md5: 24b3f1207449f5ad6a5403ad69bd5f6e
+  - path: data/football/split-mask-p/test/intervention-test.json
+    md5: 0546a3f31510080ed9795210a5799ff7
+  - path: models/bert-mask-p-baseline
+    md5: 416506bd1b6cd5414dfd6a494469e9c6.dir
+  outs:
+  - path: data/football/split-mask-p/test/predictions/baseline-test-bert-mask-p-baseline.json
+    md5: 38d30b07469e2b4341fc42bc74679d9b
+  - path: data/football/split-mask-p/test/predictions/control-test-bert-mask-p-baseline.json
+    md5: 0df0efc58caf5525d47b9592c2f6c341
+  - path: data/football/split-mask-p/test/predictions/intervention-test-bert-mask-p-baseline.json
+    md5: c0ed0f855aebf5cf097a8c1f79c0a354
+generate-test:
+  cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676 --num-workers
+    8 --do-save --out-path data/football/split/test/ --multiplier 20 --split test
+  deps:
+  - path: conf/finetune.json
+    md5: 0ff738ae9e4a22177eb61662d82f8698
+  - path: scripts/generate_balanced.py
+    md5: c9ae2d226352dd1c934cff644698a2d7
+  outs:
+  - path: data/football/split/test/baseline-test.json
+    md5: dd4270113e8c4df1d87952704174b327
+  - path: data/football/split/test/control-test.json
+    md5: 21b540d35dc9a921efad2a96ef7fff72
+  - path: data/football/split/test/intervention-test.json
+    md5: 397e7a8e463ddf1d144193a8689c2875

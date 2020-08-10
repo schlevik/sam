@@ -3,8 +3,8 @@ stages:
     cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/datasets/squad1/train-v1.1.json
       --model-path roberta-base --model-type roberta --eval-file data/datasets/squad1/dev-v1.1.json
       --save-model-folder models/roberta-base-squad1 --do-eval-after-training --num-workers
-      8 --fp16 --per-gpu-train-batch-size 8 --save-steps 0 --max-answer-length
-      30 --debug-features
+      8 --fp16 --per-gpu-train-batch-size 8 --save-steps 0 --max-answer-length 30
+      --debug-features
     deps:
     - data/datasets/squad1/dev-v1.1.json
     - data/datasets/squad1/train-v1.1.json
@@ -107,158 +107,157 @@ stages:
     - data/datasets/squad1/train-v1.1.json
     outs:
     - models/t5-base-squad1
-  generate-rb-train:
+  generate-train:
     cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
-      8 --do-save --out-path data/football/rb/split/train/ --modifier-type RB --multiplier
-      100 --split train --combine
+      8 --do-save --out-path data/football/split/train/ --multiplier 100 --split train
+      --combine
     deps:
     - conf/finetune.json
     - scripts/generate_balanced.py
     outs:
-    - data/football/rb/split/train/combined-train-rb.json
-  train-bert-baseline-on-rb:
-    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/rb/split/train/combined-train-rb.json
-      --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-baseline-rb
+    - data/football/split/train/combined-train.json
+  generate-train-mask-q:
+    cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
+      8 --do-save --out-path data/football/split-mask-q/train/ --multiplier 100 --split
+      train --combine --mask-q
+    deps:
+    - conf/finetune.json
+    - scripts/generate_balanced.py
+    outs:
+    - data/football/split-mask-q/train/combined-train.json
+  generate-train-mask-p:
+    cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
+      8 --do-save --out-path data/football/split-mask-p/train/ --multiplier 100 --split
+      train --combine --mask-p --keep-answer-candidates
+    deps:
+    - conf/finetune.json
+    - scripts/generate_balanced.py
+    outs:
+    - data/football/split-mask-p/train/combined-train.json
+  generate-test-mask-q:
+    cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676
+      --num-workers 8 --do-save --out-path data/football/split-mask-q/test/ --multiplier
+      20 --split test --mask-q
+    deps:
+    - conf/finetune.json
+    - scripts/generate_balanced.py
+    outs:
+    - data/football/split-mask-q/test/baseline-test.json
+    - data/football/split-mask-q/test/control-test.json
+    - data/football/split-mask-q/test/intervention-test.json
+  generate-test-mask-p:
+    cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676
+      --num-workers 8 --do-save --out-path data/football/split-mask-p/test/ --multiplier
+      20 --split test --mask-p --keep-answer-candidates
+    deps:
+    - conf/finetune.json
+    - scripts/generate_balanced.py
+    outs:
+    - data/football/split-mask-p/test/baseline-test.json
+    - data/football/split-mask-p/test/control-test.json
+    - data/football/split-mask-p/test/intervention-test.json
+  train-bert-baseline:
+    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/split/train/combined-train.json
+      --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-baseline
       --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 10 --debug-features
       --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
       64 --gradient-accumulation-steps 3 --learning-rate 5e-5
     deps:
-    - data/football/rb/split/train/combined-train-rb.json
+    - data/football/split/train/combined-train.json
     outs:
-    - models/bert-baseline-rb
-  generate-rb-test:
-    cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676
-      --num-workers 8 --do-save --out-path data/football/rb/split/test/ --modifier-type
-      RB --multiplier 20 --split test
+    - models/bert-baseline
+  train-bert-mask-q-baseline:
+    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/split-mask-q/train/combined-train.json
+      --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-q-baseline
+      --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 10 --debug-features
+      --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
+      64 --gradient-accumulation-steps 3 --learning-rate 5e-5
     deps:
-    - conf/finetune.json
-    - scripts/generate_balanced.py
+    - data/football/split-mask-q/train/combined-train.json
     outs:
-    - data/football/rb/split/test/baseline-test-rb.json
-    - data/football/rb/split/test/control-test-rb.json
-    - data/football/rb/split/test/intervention-test-rb.json
-  predict-bert-baseline-on-rb:
+    - models/bert-mask-q-baseline
+  train-bert-mask-p-baseline:
+    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/split-mask-p/train/combined-train.json
+      --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-p-baseline
+      --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 10 --debug-features
+      --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
+      64 --gradient-accumulation-steps 3 --learning-rate 5e-5
+    deps:
+    - data/football/split-mask-p/train/combined-train.json
+    outs:
+    - models/bert-mask-p-baseline
+  predict-random-baselines:
+    cmd: python main.py predict data/football/split/test/baseline-test.json data/football/split/test/control-test.json
+      data/football/split/test/intervention-test.json --output-folder data/football/split/test/predictions/
+      --model random-baseline --cls RandomBaseline --model educated-baseline --cls
+      EducatedBaseline --model informed-baseline --cls InformedBaseline
+    deps:
+    - data/football/split/test/baseline-test.json
+    - data/football/split/test/control-test.json
+    - data/football/split/test/intervention-test.json
+    outs:
+    - data/football/split/test/predictions/baseline-test-educated-baseline.json
+    - data/football/split/test/predictions/baseline-test-informed-baseline.json
+    - data/football/split/test/predictions/baseline-test-random-baseline.json
+    - data/football/split/test/predictions/control-test-educated-baseline.json
+    - data/football/split/test/predictions/control-test-informed-baseline.json
+    - data/football/split/test/predictions/control-test-random-baseline.json
+    - data/football/split/test/predictions/intervention-test-educated-baseline.json
+    - data/football/split/test/predictions/intervention-test-informed-baseline.json
+    - data/football/split/test/predictions/intervention-test-random-baseline.json
+  predict-bert-baseline:
     cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
-      data/football/rb/split/test/baseline-test-rb.json data/football/rb/split/test/intervention-test-rb.json
-      data/football/rb/split/test/control-test-rb.json --model-path models/bert-baseline-rb
-      --model-type bert --out-folder data/football/rb/split/test/predictions/ --max-answer-length
+      data/football/split/test/baseline-test.json data/football/split/test/intervention-test.json
+      data/football/split/test/control-test.json --model-path models/bert-baseline
+      --model-type bert --out-folder data/football/split/test/predictions/ --max-answer-length
       10 --per-gpu-eval-batch-size 64
     deps:
-    - data/football/rb/split/test/baseline-test-rb.json
-    - data/football/rb/split/test/control-test-rb.json
-    - data/football/rb/split/test/intervention-test-rb.json
-    - models/bert-baseline-rb
+    - data/football/split/test/baseline-test.json
+    - data/football/split/test/control-test.json
+    - data/football/split/test/intervention-test.json
+    - models/bert-baseline
     outs:
-    - data/football/rb/split/test/predictions/baseline-test-rb-bert-baseline-rb.json
-    - data/football/rb/split/test/predictions/control-test-rb-bert-baseline-rb.json
-    - data/football/rb/split/test/predictions/intervention-test-rb-bert-baseline-rb.json
-  generate-rb-train-mask-q:
-    cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
-      8 --do-save --out-path data/football/rb/split-mask-q/train/ --modifier-type
-      RB --multiplier 100 --split train --combine --mask-q
-    deps:
-    - conf/finetune.json
-    - scripts/generate_balanced.py
-    outs:
-    - data/football/rb/split-mask-q/train/combined-train-rb.json
-  train-bert-mask-q-baseline-on-rb:
-    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/rb/split-mask-q/train/combined-train-rb.json
-      --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-q-baseline-rb
-      --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 5 --debug-features
-      --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
-      64 --gradient-accumulation-steps 3 --learning-rate 5e-5
-    deps:
-    - data/football/rb/split-mask-q/train/combined-train-rb.json
-    outs:
-    - models/bert-mask-q-baseline-rb
-  generate-rb-test-mask-q:
-    cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676
-      --num-workers 8 --do-save --out-path data/football/rb/split-mask-q/test/ --modifier-type
-      RB --multiplier 20 --split test --mask-q
-    deps:
-    - conf/finetune.json
-    - scripts/generate_balanced.py
-    outs:
-    - data/football/rb/split-mask-q/test/baseline-test-rb.json
-    - data/football/rb/split-mask-q/test/control-test-rb.json
-    - data/football/rb/split-mask-q/test/intervention-test-rb.json
-  predict-bert-mask-q-baseline-on-rb:
+    - data/football/split/test/predictions/baseline-test-bert-baseline.json
+    - data/football/split/test/predictions/control-test-bert-baseline.json
+    - data/football/split/test/predictions/intervention-test-bert-baseline.json
+  predict-bert-mask-q-baseline:
     cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
-      data/football/rb/split-mask-q/test/baseline-test-rb.json data/football/rb/split-mask-q/test/intervention-test-rb.json
-      data/football/rb/split-mask-q/test/control-test-rb.json --model-path models/bert-mask-q-baseline-rb
-      --model-type bert --out-folder data/football/rb/split-mask-q/test/predictions/
+      data/football/split-mask-q/test/baseline-test.json data/football/split-mask-q/test/intervention-test.json
+      data/football/split-mask-q/test/control-test.json --model-path models/bert-mask-q-baseline
+      --model-type bert --out-folder data/football/split-mask-q/test/predictions/
       --max-answer-length 10 --per-gpu-eval-batch-size 64
     deps:
-    - data/football/rb/split-mask-q/test/baseline-test-rb.json
-    - data/football/rb/split-mask-q/test/control-test-rb.json
-    - data/football/rb/split-mask-q/test/intervention-test-rb.json
-    - models/bert-mask-q-baseline-rb
+    - data/football/split-mask-q/test/baseline-test.json
+    - data/football/split-mask-q/test/control-test.json
+    - data/football/split-mask-q/test/intervention-test.json
+    - models/bert-mask-q-baseline
     outs:
-    - data/football/rb/split-mask-q/test/predictions/baseline-test-rb-bert-mask-q-baseline-rb.json
-    - data/football/rb/split-mask-q/test/predictions/control-test-rb-bert-mask-q-baseline-rb.json
-    - data/football/rb/split-mask-q/test/predictions/intervention-test-rb-bert-mask-q-baseline-rb.json
-  predict-random-baselines-on-rb:
-    cmd: python main.py predict data/football/rb/split/test/baseline-test-rb.json
-      data/football/rb/split/test/control-test-rb.json data/football/rb/split/test/intervention-test-rb.json
-      --output-folder data/football/rb/split/test/predictions/ --model random-baseline
-      --cls RandomBaseline --model educated-baseline --cls EducatedBaseline --model
-      informed-baseline --cls InformedBaseline
-    deps:
-    - data/football/rb/split/test/baseline-test-rb.json
-    - data/football/rb/split/test/control-test-rb.json
-    - data/football/rb/split/test/intervention-test-rb.json
-    outs:
-    - data/football/rb/split/test/predictions/baseline-test-rb-educated-baseline.json
-    - data/football/rb/split/test/predictions/baseline-test-rb-informed-baseline.json
-    - data/football/rb/split/test/predictions/baseline-test-rb-random-baseline.json
-    - data/football/rb/split/test/predictions/control-test-rb-educated-baseline.json
-    - data/football/rb/split/test/predictions/control-test-rb-informed-baseline.json
-    - data/football/rb/split/test/predictions/control-test-rb-random-baseline.json
-    - data/football/rb/split/test/predictions/intervention-test-rb-educated-baseline.json
-    - data/football/rb/split/test/predictions/intervention-test-rb-informed-baseline.json
-    - data/football/rb/split/test/predictions/intervention-test-rb-random-baseline.json
-  generate-rb-train-mask-p:
-    cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
-      8 --do-save --out-path data/football/rb/split-mask-p/train/ --modifier-type
-      RB --multiplier 100 --split train --combine --mask-p --keep-answer-candidates
-    deps:
-    - conf/finetune.json
-    - scripts/generate_balanced.py
-    outs:
-    - data/football/rb/split-mask-p/train/combined-train-rb.json
-  train-bert-mask-p-baseline-on-rb:
-    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/football/rb/split-mask-p/train/combined-train-rb.json
-      --model-path bert-base-uncased --model-type bert --save-model-folder models/bert-mask-p-baseline-rb
-      --num-workers 8 --per-gpu-train-batch-size 24 --max-answer-length 5 --debug-features
-      --num-train-epochs 15 --overwrite-output-dir --save-steps 0 --per-gpu-eval-batch-size
-      64 --gradient-accumulation-steps 3 --learning-rate 5e-5
-    deps:
-    - data/football/rb/split-mask-p/train/combined-train-rb.json
-    outs:
-    - models/bert-mask-p-baseline-rb
-  generate-rb-test-mask-p:
-    cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676
-      --num-workers 8 --do-save --out-path data/football/rb/split-mask-p/test/ --modifier-type
-      RB --multiplier 20 --split test --mask-p --keep-answer-candidates
-    deps:
-    - conf/finetune.json
-    - scripts/generate_balanced.py
-    outs:
-    - data/football/rb/split-mask-p/test/baseline-test-rb.json
-    - data/football/rb/split-mask-p/test/control-test-rb.json
-    - data/football/rb/split-mask-p/test/intervention-test-rb.json
-  predict-bert-mask-p-baseline-on-rb:
+    - data/football/split-mask-q/test/predictions/baseline-test-bert-mask-q-baseline.json
+    - data/football/split-mask-q/test/predictions/control-test-bert-mask-q-baseline.json
+    - data/football/split-mask-q/test/predictions/intervention-test-bert-mask-q-baseline.json
+  predict-bert-mask-p-baseline:
     cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
-      data/football/rb/split-mask-p/test/baseline-test-rb.json data/football/rb/split-mask-p/test/intervention-test-rb.json
-      data/football/rb/split-mask-p/test/control-test-rb.json --model-path models/bert-mask-p-baseline-rb
-      --model-type bert --out-folder data/football/rb/split-mask-p/test/predictions/
+      data/football/split-mask-p/test/baseline-test.json data/football/split-mask-p/test/intervention-test.json
+      data/football/split-mask-p/test/control-test.json --model-path models/bert-mask-p-baseline
+      --model-type bert --out-folder data/football/split-mask-p/test/predictions/
       --max-answer-length 10 --per-gpu-eval-batch-size 64
     deps:
-    - data/football/rb/split-mask-p/test/baseline-test-rb.json
-    - data/football/rb/split-mask-p/test/control-test-rb.json
-    - data/football/rb/split-mask-p/test/intervention-test-rb.json
-    - models/bert-mask-p-baseline-rb
+    - data/football/split-mask-p/test/baseline-test.json
+    - data/football/split-mask-p/test/control-test.json
+    - data/football/split-mask-p/test/intervention-test.json
+    - models/bert-mask-p-baseline
     outs:
-    - data/football/rb/split-mask-p/test/predictions/baseline-test-rb-bert-mask-p-baseline-rb.json
-    - data/football/rb/split-mask-p/test/predictions/control-test-rb-bert-mask-p-baseline-rb.json
-    - data/football/rb/split-mask-p/test/predictions/intervention-test-rb-bert-mask-p-baseline-rb.json
+    - data/football/split-mask-p/test/predictions/baseline-test-bert-mask-p-baseline.json
+    - data/football/split-mask-p/test/predictions/control-test-bert-mask-p-baseline.json
+    - data/football/split-mask-p/test/predictions/intervention-test-bert-mask-p-baseline.json
+  generate-test:
+    cmd: python main.py generate-balanced --config conf/finetune.json --seed 38676
+      --num-workers 8 --do-save --out-path data/football/split/test/ --multiplier
+      20 --split test
+    deps:
+    - conf/finetune.json
+    - scripts/generate_balanced.py
+    outs:
+    - data/football/split/test/baseline-test.json
+    - data/football/split/test/control-test.json
+    - data/football/split/test/intervention-test.json
