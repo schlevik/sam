@@ -1,0 +1,41 @@
+{
+    "data/football/split-mask-q/test/baseline-test.json": {
+        "n": 2400,
+        "bert-mask-q-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.2025 +/- 0.0161",
+                    "mean": 0.2025,
+                    "variance": null,
+                    "95ci": 0.016077567063360776
+                }
+            }
+        }
+    },
+    "data/football/split-mask-q/test/intervention-test.json": {
+        "n": 2400,
+        "bert-mask-q-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.2750 +/- 0.0179",
+                    "mean": 0.275,
+                    "variance": null,
+                    "95ci": 0.017863963403734195
+                }
+            }
+        }
+    },
+    "data/football/split-mask-q/test/control-test.json": {
+        "n": 2400,
+        "bert-mask-q-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.2071 +/- 0.0162",
+                    "mean": 0.20708333333333334,
+                    "variance": null,
+                    "95ci": 0.01621170964968996
+                }
+            }
+        }
+    }
+}

@@ -352,3 +352,169 @@ generate-test:
     md5: 21b540d35dc9a921efad2a96ef7fff72
   - path: data/football/split/test/intervention-test.json
     md5: 397e7a8e463ddf1d144193a8689c2875
+evaluate-baselines:
+  cmd: python main.py evaluate data/football/split/test/baseline-test.json data/football/split/test/intervention-test.json
+    data/football/split/test/control-test.json --prediction-folder data/football/split/test/predictions/
+    --output metrics/football/baselines/baselines.json --metric EMRelaxed
+  deps:
+  - path: data/football/split/test/baseline-test.json
+    md5: dd4270113e8c4df1d87952704174b327
+  - path: data/football/split/test/control-test.json
+    md5: 21b540d35dc9a921efad2a96ef7fff72
+  - path: data/football/split/test/intervention-test.json
+    md5: 397e7a8e463ddf1d144193a8689c2875
+  - path: data/football/split/test/predictions/
+    md5: 072d2611626c3e01213ff6ba3d039788.dir
+  outs:
+  - path: metrics/football/baselines/baselines.json
+    md5: b0c8bd67ea5f0f779bb1865dacc65d59
+evaluate-baselines-mask-q:
+  cmd: python main.py evaluate data/football/split-mask-q/test/baseline-test.json
+    data/football/split-mask-q/test/intervention-test.json data/football/split-mask-q/test/control-test.json
+    --prediction-folder data/football/split-mask-q/test/predictions/ --output metrics/football/baselines/baselines-mask-q.json
+    --metric EMRelaxed
+  deps:
+  - path: data/football/split-mask-q/test/baseline-test.json
+    md5: 63d660205ba99e2c9330e7d1e63e15b1
+  - path: data/football/split-mask-q/test/control-test.json
+    md5: 875aed3a9069ff649c418d95e4d7b57d
+  - path: data/football/split-mask-q/test/intervention-test.json
+    md5: 2fe124d70a610917c2f6ad6c26b6f9ff
+  - path: data/football/split-mask-q/test/predictions/
+    md5: 4ae9030dbe18f6cdd06a867436ae9782.dir
+  outs:
+  - path: metrics/football/baselines/baselines-mask-q.json
+    md5: 15c9726d2e5851da82c6fa27817da8b1
+evaluate-baselines-mask-p:
+  cmd: python main.py evaluate data/football/split-mask-p/test/baseline-test.json
+    data/football/split-mask-p/test/intervention-test.json data/football/split-mask-p/test/control-test.json
+    --prediction-folder data/football/split-mask-p/test/predictions/ --output metrics/football/baselines/baselines-mask-p.json
+    --metric EMRelaxed
+  deps:
+  - path: data/football/split-mask-p/test/baseline-test.json
+    md5: ed9e5c7fc588a0f4726e82c12edcf95f
+  - path: data/football/split-mask-p/test/control-test.json
+    md5: 24b3f1207449f5ad6a5403ad69bd5f6e
+  - path: data/football/split-mask-p/test/intervention-test.json
+    md5: 0546a3f31510080ed9795210a5799ff7
+  - path: data/football/split-mask-p/test/predictions/
+    md5: a4c9eba45c0552fa7186ccb253c5a6d8.dir
+  outs:
+  - path: metrics/football/baselines/baselines-mask-p.json
+    md5: 5f9c76465f7d8408229420b2b8b5b55b
+generate-sam:
+  cmd: python main.py generate-balanced --config conf/evaluate.json --seed 56 --num-workers
+    8 --do-save --out-path data/football/full --multiplier 35
+  deps:
+  - path: conf/evaluate.json
+    md5: 114d721cda0d768406fbcaff0446b3e7
+  - path: scripts/generate_balanced.py
+    md5: c9ae2d226352dd1c934cff644698a2d7
+  outs:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+predict-transformers-squad1:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+    data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
+    --model-path models/albert-base-v2-squad1 --model-type albert --model-path models/albert-large-v2-squad1
+    --model-type albert --model-path models/albert-xlarge-v2-squad1 --model-type albert
+    --model-path models/albert-xxlarge-v2-squad1 --model-type albert --model-path
+    models/bert-base-uncased-squad1 --model-type bert --model-path models/bert-large-uncased-squad1
+    --model-type bert --model-path models/roberta-base-squad1 --model-type roberta
+    --model-path models/roberta-large-squad1 --model-type roberta --out-folder data/football/full/predictions/squad1
+    --max-answer-length 10 --per-gpu-eval-batch-size 32
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/albert-base-v2-squad1
+    md5: ace9c8af69f8e73d97deac6a76c1d2a1.dir
+  - path: models/albert-large-v2-squad1
+    md5: d125f85b6cd80c44f1b1b8034c39740c.dir
+  - path: models/albert-xlarge-v2-squad1
+    md5: c4db834be68c60375f5d72336b905502.dir
+  - path: models/albert-xxlarge-v2-squad1
+    md5: ab4909936dc0ca044d631f0bf6408068.dir
+  - path: models/bert-base-uncased-squad1
+    md5: 0bc609c29bbd02bef8fce079fa320f6a.dir
+  - path: models/bert-large-uncased-squad1
+    md5: 6ed53ddb2075786fffd3ea6530c8c506.dir
+  - path: models/roberta-base-squad1
+    md5: 223be1b1d0dba22ed9985bc1e200295e.dir
+  - path: models/roberta-large-squad1
+    md5: ec9a2c9e6e83cfc2dfa906623949fe06.dir
+  outs:
+  - path: data/football/full/predictions/squad1/baseline-albert-base-v2-squad1.json
+    md5: e158ad4fb549375131335fcaa2d0eb18
+  - path: data/football/full/predictions/squad1/baseline-albert-large-v2-squad1.json
+    md5: 19d710a53c99b68c8891277426a4bac3
+  - path: data/football/full/predictions/squad1/baseline-albert-xlarge-v2-squad1.json
+    md5: 366e29bcc35a4ff84b51bf584b4be34b
+  - path: data/football/full/predictions/squad1/baseline-albert-xxlarge-v2-squad1.json
+    md5: c6b740379a9db8caf48da224eab47920
+  - path: data/football/full/predictions/squad1/baseline-bert-base-uncased-squad1.json
+    md5: 54e767a12d0a1c50c6486608a3cca5fe
+  - path: data/football/full/predictions/squad1/baseline-bert-large-uncased-squad1.json
+    md5: 6bf7f3c15ab8ae40bf4583c8ed4ecf28
+  - path: data/football/full/predictions/squad1/baseline-roberta-base-squad1.json
+    md5: b9803c701277a7dfecdd17bad48f574e
+  - path: data/football/full/predictions/squad1/baseline-roberta-large-squad1.json
+    md5: e883e398dbebd40462bf41fa67db5935
+  - path: data/football/full/predictions/squad1/control-albert-base-v2-squad1.json
+    md5: af0a7c43532de7fb920d4a1b87a8c39b
+  - path: data/football/full/predictions/squad1/control-albert-large-v2-squad1.json
+    md5: 28e310115caeaac9804aaa7fd4f104f6
+  - path: data/football/full/predictions/squad1/control-albert-xlarge-v2-squad1.json
+    md5: 477c6da293a9d519e13d912a83dff32b
+  - path: data/football/full/predictions/squad1/control-albert-xxlarge-v2-squad1.json
+    md5: c5c2a265663c2c87ece267d57e184616
+  - path: data/football/full/predictions/squad1/control-bert-base-uncased-squad1.json
+    md5: 0cca8244457bf6573d97b22ca77b885b
+  - path: data/football/full/predictions/squad1/control-bert-large-uncased-squad1.json
+    md5: 20a4fe315988f2a609dc802c5edabef3
+  - path: data/football/full/predictions/squad1/control-roberta-base-squad1.json
+    md5: a0a40d84976ce6c6ad8bf99d3d4a5ac4
+  - path: data/football/full/predictions/squad1/control-roberta-large-squad1.json
+    md5: 1f93d9d6b8242d3cea5fe7f91f34d9b8
+  - path: data/football/full/predictions/squad1/intervention-albert-base-v2-squad1.json
+    md5: 343f4622912bd3d798392dca0a56feed
+  - path: data/football/full/predictions/squad1/intervention-albert-large-v2-squad1.json
+    md5: a1819890f9f9755212b81ecd29abce38
+  - path: data/football/full/predictions/squad1/intervention-albert-xlarge-v2-squad1.json
+    md5: aba453b34fbc334a729dd68b78bc1979
+  - path: data/football/full/predictions/squad1/intervention-albert-xxlarge-v2-squad1.json
+    md5: 9eb3dff6e5259e6ae48b1d0f4cabac13
+  - path: data/football/full/predictions/squad1/intervention-bert-base-uncased-squad1.json
+    md5: 68374c3364c34bc5b0ad4800b755f32b
+  - path: data/football/full/predictions/squad1/intervention-bert-large-uncased-squad1.json
+    md5: 43bb40626d7ca76ecadd1ce9cfb8804d
+  - path: data/football/full/predictions/squad1/intervention-roberta-base-squad1.json
+    md5: da5155f0bae478c4c9ea8b4edb9be69a
+  - path: data/football/full/predictions/squad1/intervention-roberta-large-squad1.json
+    md5: 99990190e03f5516f336850256f4ee17
+evaluate-intervention-squad1:
+  cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
+    --predictions-folder data/football/full/predictions/squad1 --control --output
+    metrics/football/squad1/eoi.json --split-reasoning --split-num-modifier --split-sam
+    --do-save
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: data/football/full/predictions/squad1
+    md5: 4ea763a9e53e62a4c34a6ed84b2c5c46.dir
+  - path: scripts/evaluate_intervention.py
+    md5: c01752a097e1435ea7e7f2a662fa61a0
+  outs:
+  - path: metrics/football/squad1/eoi.json
+    md5: 14ded837dc81a744f003f5bf9728dd71

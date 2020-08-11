@@ -1,0 +1,131 @@
+{
+    "data/football/split/test/baseline-test.json": {
+        "n": 2400,
+        "bert-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.8121 +/- 0.0156",
+                    "mean": 0.8120833333333334,
+                    "variance": null,
+                    "95ci": 0.01562879227574876
+                }
+            }
+        },
+        "educated-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.1379 +/- 0.0138",
+                    "mean": 0.13791666666666666,
+                    "variance": null,
+                    "95ci": 0.013795119619847723
+                }
+            }
+        },
+        "informed-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.1354 +/- 0.0137",
+                    "mean": 0.13541666666666666,
+                    "variance": null,
+                    "95ci": 0.013689322642593427
+                }
+            }
+        },
+        "random-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.0638 +/- 0.0098",
+                    "mean": 0.06375,
+                    "variance": null,
+                    "95ci": 0.009774138305599575
+                }
+            }
+        }
+    },
+    "data/football/split/test/intervention-test.json": {
+        "n": 2400,
+        "bert-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.7921 +/- 0.0162",
+                    "mean": 0.7920833333333334,
+                    "variance": null,
+                    "95ci": 0.016235757638275006
+                }
+            }
+        },
+        "educated-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.1267 +/- 0.0133",
+                    "mean": 0.12666666666666668,
+                    "variance": null,
+                    "95ci": 0.013306494518973644
+                }
+            }
+        },
+        "informed-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.1462 +/- 0.0141",
+                    "mean": 0.14625,
+                    "variance": null,
+                    "95ci": 0.014136951429373434
+                }
+            }
+        },
+        "random-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.0529 +/- 0.0090",
+                    "mean": 0.05291666666666667,
+                    "variance": null,
+                    "95ci": 0.008956386090162145
+                }
+            }
+        }
+    },
+    "data/football/split/test/control-test.json": {
+        "n": 2400,
+        "bert-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.7650 +/- 0.0170",
+                    "mean": 0.765,
+                    "variance": null,
+                    "95ci": 0.01696317407761938
+                }
+            }
+        },
+        "educated-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.2200 +/- 0.0166",
+                    "mean": 0.22,
+                    "variance": null,
+                    "95ci": 0.016572999296434854
+                }
+            }
+        },
+        "informed-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.2637 +/- 0.0176",
+                    "mean": 0.26375,
+                    "variance": null,
+                    "95ci": 0.017629961269386152
+                }
+            }
+        },
+        "random-baseline": {
+            "full": {
+                "EMRelaxed": {
+                    "human_readable": "0.0821 +/- 0.0110",
+                    "mean": 0.08208333333333333,
+                    "variance": null,
+                    "95ci": 0.010981750944577498
+                }
+            }
+        }
+    }
+}

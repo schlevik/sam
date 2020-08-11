@@ -261,3 +261,112 @@ stages:
     - data/football/split/test/baseline-test.json
     - data/football/split/test/control-test.json
     - data/football/split/test/intervention-test.json
+  evaluate-baselines:
+    cmd: python main.py evaluate data/football/split/test/baseline-test.json data/football/split/test/intervention-test.json
+      data/football/split/test/control-test.json --prediction-folder data/football/split/test/predictions/
+      --output metrics/football/baselines/baselines.json --metric EMRelaxed
+    deps:
+    - data/football/split/test/baseline-test.json
+    - data/football/split/test/control-test.json
+    - data/football/split/test/intervention-test.json
+    - data/football/split/test/predictions/
+    metrics:
+    - metrics/football/baselines/baselines.json:
+        cache: false
+  evaluate-baselines-mask-q:
+    cmd: python main.py evaluate data/football/split-mask-q/test/baseline-test.json
+      data/football/split-mask-q/test/intervention-test.json data/football/split-mask-q/test/control-test.json
+      --prediction-folder data/football/split-mask-q/test/predictions/ --output metrics/football/baselines/baselines-mask-q.json
+      --metric EMRelaxed
+    deps:
+    - data/football/split-mask-q/test/baseline-test.json
+    - data/football/split-mask-q/test/control-test.json
+    - data/football/split-mask-q/test/intervention-test.json
+    - data/football/split-mask-q/test/predictions/
+    metrics:
+    - metrics/football/baselines/baselines-mask-q.json:
+        cache: false
+  evaluate-baselines-mask-p:
+    cmd: python main.py evaluate data/football/split-mask-p/test/baseline-test.json
+      data/football/split-mask-p/test/intervention-test.json data/football/split-mask-p/test/control-test.json
+      --prediction-folder data/football/split-mask-p/test/predictions/ --output metrics/football/baselines/baselines-mask-p.json
+      --metric EMRelaxed
+    deps:
+    - data/football/split-mask-p/test/baseline-test.json
+    - data/football/split-mask-p/test/control-test.json
+    - data/football/split-mask-p/test/intervention-test.json
+    - data/football/split-mask-p/test/predictions/
+    metrics:
+    - metrics/football/baselines/baselines-mask-p.json:
+        cache: false
+  generate-sam:
+    cmd: python main.py generate-balanced --config conf/evaluate.json --seed 56 --num-workers
+      8 --do-save --out-path data/football/full --multiplier 35
+    deps:
+    - conf/evaluate.json
+    - scripts/generate_balanced.py
+    outs:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+  predict-transformers-squad1:
+    cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+      data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
+      --model-path models/albert-base-v2-squad1 --model-type albert --model-path models/albert-large-v2-squad1
+      --model-type albert --model-path models/albert-xlarge-v2-squad1 --model-type
+      albert --model-path models/albert-xxlarge-v2-squad1 --model-type albert --model-path
+      models/bert-base-uncased-squad1 --model-type bert --model-path models/bert-large-uncased-squad1
+      --model-type bert --model-path models/roberta-base-squad1 --model-type roberta
+      --model-path models/roberta-large-squad1 --model-type roberta --out-folder data/football/full/predictions/squad1
+      --max-answer-length 10 --per-gpu-eval-batch-size 32
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/albert-base-v2-squad1
+    - models/albert-large-v2-squad1
+    - models/albert-xlarge-v2-squad1
+    - models/albert-xxlarge-v2-squad1
+    - models/bert-base-uncased-squad1
+    - models/bert-large-uncased-squad1
+    - models/roberta-base-squad1
+    - models/roberta-large-squad1
+    outs:
+    - data/football/full/predictions/squad1/baseline-albert-base-v2-squad1.json
+    - data/football/full/predictions/squad1/baseline-albert-large-v2-squad1.json
+    - data/football/full/predictions/squad1/baseline-albert-xlarge-v2-squad1.json
+    - data/football/full/predictions/squad1/baseline-albert-xxlarge-v2-squad1.json
+    - data/football/full/predictions/squad1/baseline-bert-base-uncased-squad1.json
+    - data/football/full/predictions/squad1/baseline-bert-large-uncased-squad1.json
+    - data/football/full/predictions/squad1/baseline-roberta-base-squad1.json
+    - data/football/full/predictions/squad1/baseline-roberta-large-squad1.json
+    - data/football/full/predictions/squad1/control-albert-base-v2-squad1.json
+    - data/football/full/predictions/squad1/control-albert-large-v2-squad1.json
+    - data/football/full/predictions/squad1/control-albert-xlarge-v2-squad1.json
+    - data/football/full/predictions/squad1/control-albert-xxlarge-v2-squad1.json
+    - data/football/full/predictions/squad1/control-bert-base-uncased-squad1.json
+    - data/football/full/predictions/squad1/control-bert-large-uncased-squad1.json
+    - data/football/full/predictions/squad1/control-roberta-base-squad1.json
+    - data/football/full/predictions/squad1/control-roberta-large-squad1.json
+    - data/football/full/predictions/squad1/intervention-albert-base-v2-squad1.json
+    - data/football/full/predictions/squad1/intervention-albert-large-v2-squad1.json
+    - data/football/full/predictions/squad1/intervention-albert-xlarge-v2-squad1.json
+    - data/football/full/predictions/squad1/intervention-albert-xxlarge-v2-squad1.json
+    - data/football/full/predictions/squad1/intervention-bert-base-uncased-squad1.json
+    - data/football/full/predictions/squad1/intervention-bert-large-uncased-squad1.json
+    - data/football/full/predictions/squad1/intervention-roberta-base-squad1.json
+    - data/football/full/predictions/squad1/intervention-roberta-large-squad1.json
+  evaluate-intervention-squad1:
+    cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
+      --predictions-folder data/football/full/predictions/squad1 --control --output
+      metrics/football/squad1/eoi.json --split-reasoning --split-num-modifier --split-sam
+      --do-save
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - data/football/full/predictions/squad1
+    - scripts/evaluate_intervention.py
+    metrics:
+    - metrics/football/squad1/eoi.json:
+        cache: false
