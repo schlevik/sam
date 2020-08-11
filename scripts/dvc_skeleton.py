@@ -5,9 +5,6 @@ import click
 from scripts.utils import get_output_predictions_file_name
 
 
-def get_predictions_folder(sam_path, dataset_name):
-    return f"data/football/{sam_path}/predictions/{dataset_name}"
-
 
 @click.command()
 @click.argument('command', type=str)
@@ -28,7 +25,7 @@ def generate_dvc(command, dataset_name,
     baseline_file = f"{root_data_path}/full/baseline.json"
     intervention_file = f"{root_data_path}/full/intervention.json"
     control_file = f"{root_data_path}/full/control.json"
-    predictions_folder = get_predictions_folder(root_data_path, dataset_name)
+    predictions_folder = f"{root_data_path}/full/predictions/{dataset_name}"
     model_folder = f"{model_name}-{dataset_name}"
     model_path = f"models/{model_folder}"
     train_path = f"data/datasets/{dataset_name}/{train_file}"
@@ -52,6 +49,9 @@ def generate_dvc(command, dataset_name,
             f"{cmd}"
         )
     elif command == 'predict-transformers':
+        model_names = ("albert-base-v2", "albert-large-v2", "albert-xlarge-v2", "albert-xxlarge-v2",
+                       'bert-base-uncased', 'bert-large-uncased', 'roberta-base', 'roberta-large')
+        model_types = ["albert"] * 4 + ["bert"] * 2 + ["roberta"] * 2
         models_str = " ".join(f"--model-path models/{mp}-{dataset_name} --model-type {mt}" for mp, mt in
                               zip(model_names, model_types))
         cmd = (f"python main.py --debug --notify {notify} "
@@ -67,23 +67,9 @@ def generate_dvc(command, dataset_name,
             f"-o {get_output_predictions_file_name(control_file, predictions_folder, f'{mp}-{dataset_name}')}"
             for mp in model_names
         )
-        dvc_cmd = (f"dvc run -n {stage_name} {deps_str} -d {model_path} -d {baseline_file} "
+        dvc_cmd = (f"dvc run -n {stage_name} {deps_str} -d {baseline_file} "
                    f"-d {intervention_file} -d {control_file}  {outs_str} {cmd}")
-    # elif command == 'predict-transformers-filter':
-    #     predictions_folder = get_predictions_folder(sam_path, 'filter')
-    #     assert len(model_names) == len(model_types)
-    #     models_str = " ".join(f"--model-path models/{mp}-{dataset_name} --model-type {mt}" for mp, mt in
-    #                           zip(model_names, model_types))
-    #     cmd = (f"python main.py --debug --notify {notify} "
-    #            f"predictions {filter_file} "
-    #            f"{models_str} "
-    #            f"--out-folder {predictions_folder} --max-answer-length 10 {extra_args}")
 
-    # stage_name = f"filter-transformers-{dataset_name}"
-    # deps_str = " ".join(f"-d models/{mp}-{dataset_name}" for mp in model_names)
-    # outs_str = ' '.join(
-    #     f"-o {get_output_predictions_file_name(filter_file, predictions_folder, mp)}" for mp in model_names)
-    # dvc_cmd = f"dvc run -n {stage_name} {deps_str} -d {filter_file} {outs_str} {cmd}"
     elif command == 'evaluate':
         eoi_metric_file = f"{dataset_name}.json"
         eoi_metric_path = f"metrics/{eoi_metric_file}"
@@ -101,14 +87,7 @@ def generate_dvc(command, dataset_name,
         stage_name = f"generate-sam"
         dvc_cmd = (f"dvc run -n {stage_name} -d scripts/generate_balanced.py "
                    f"-d conf/evaluate.json -o {baseline_file} -o {intervention_file} -o {control_file} {cmd}")
-    # elif command == 'filter':
-    #     predictions_folder = get_predictions_folder(sam_path, 'filter')
-    #     stage_name = f'filter-{dataset_name}'
-    #     metric_file = f'metrics/{dataset_name}-filter.json'
-    #     cmd = (f"python main.py evaluate {filter_file} --prediction-folder {predictions_folder} "
-    #            f"--output -M {metric_file} --metric EM,F1 --split-reasoning")
-    #     dvc_cmd = (f"dvc run -n {stage_name} -d {filter_file} -d {predictions_folder}"
-    #                f"-M {metric_file} {cmd}")
+
     elif command == 'predict-allennlp':
         stage_name = f"predict-{model_name}-on-{dataset_name}"
         model_path = os.path.join(model_path, "model.tar.gz")
@@ -265,6 +244,31 @@ def generate_dvc(command, dataset_name,
                 dvc_cmds.append(dvc_cmd)
         cmd = "\n".join(cmds)
         dvc_cmd = "\n".join(dvc_cmds)
+    elif command == 'evaluate-baselines':
+        cmds = []
+        dvc_cmds = []
+        for masking in [None, 'q', 'p']:
+            split = 'test'
+            mask = f"-mask-{masking}" if masking else ''
+            out_path = f"{root_data_path}/split{mask}/{split}/"
+            baseline_file = f"{out_path}baseline-{split}.json"
+            predictions_folder = f'{out_path}predictions/'
+            intervention_file = f"{out_path}intervention-{split}.json"''
+            control_file = f"{out_path}control-{split}.json"
+            metric = f"metrics/football/baselines/baselines{mask}.json"
+            cmd = (f"python main.py evaluate {baseline_file} "
+                   f"{intervention_file} {control_file} --prediction-folder {predictions_folder} "
+                   f"--output {metric} --metric EMRelaxed")
+            stage_name = f"evaluate-baselines{mask}"
+            dvc_cmd = (
+                (f"dvc run -n {stage_name} -d {baseline_file} -d {intervention_file} -d {control_file} "
+                 f"-d {predictions_folder} -M {metric} "
+                 f"'{cmd}'")
+            )
+            cmds.append(cmd)
+            dvc_cmds.append(dvc_cmd)
+        cmd = "\n\n".join(cmds)
+        dvc_cmd = "\n\n".join(dvc_cmds)
     else:
         raise NotImplementedError()
 

@@ -3,6 +3,8 @@ from itertools import chain, islice
 import ujson as json
 from typing import Dict, Any, List, Generator, Iterable, TypeVar, Union
 
+from loguru import logger
+
 from stresstest.classes import Entry, Bundle
 
 
@@ -31,12 +33,16 @@ def sample_iter(sample: Union[List[Dict[str, Any]], Dict]) -> Generator[Entry, N
         sample = sample['data']
     for datum in sample:
         datum_id = datum['title']
-        datum = datum['paragraphs'][0]
-        passage = datum['context']
-        for qa in datum['qas']:
-            qa['passage_sents'] = datum.get('passage_sents', None)
-            yield Entry(datum_id, passage, qa['id'], qa['question'], qa.get('answer') or qa['answers'][0]['text'], qa)
-
+        for datum in datum['paragraphs']:
+            passage = datum['context']
+            for qa in datum['qas']:
+                qa['passage_sents'] = datum.get('passage_sents', None)
+                if not datum_id:
+                    datum_id = qa['id']
+                if qa['answers']:
+                    yield Entry(datum_id, passage, qa['id'], qa['question'], qa.get('answer') or qa['answers'][0]['text'], qa)
+                else:
+                    logger.info(f"{qa['id']} has no answer!")
 
 def do_import(class_string: str, relative_import: str = ""):
     try:
