@@ -179,7 +179,8 @@ def evaluate(args: Args, model, tokenizer, dataset, examples, features, suffix="
         # Compute predictions
         file_name = os.path.basename(out_file)
         output_prediction_file = os.path.join(predictions_folder, file_name)
-        output_nbest_file = os.path.join(predictions_folder, f"nbest-{file_name}")
+        # output_nbest_file = os.path.join(predictions_folder, f"nbest-{file_name}")
+        output_nbest_file = None
 
         if v2:
             output_null_log_odds_file = os.path.join(predictions_folder, f"null-odds-{file_name}")
