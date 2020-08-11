@@ -21,6 +21,10 @@ def num_modifier_key(d):
     return d.qa['num_modifications']
 
 
+def sam_key(d):
+    return d.qa['modifier_type']
+
+
 def color_map(baseline, intervention, other=None):
     other = other or ['almost', 'nearly']
     if any(d in baseline for d in string.digits):
@@ -50,8 +54,9 @@ def color_map(baseline, intervention, other=None):
 @click.option("--control", is_flag=True, default=False)
 @click.option("--split-reasoning", is_flag=True, default=False)
 @click.option("--split-num-modifier", is_flag=True, default=False)
+@click.option("--split-sam", is_flag=True, default=False)
 def evaluate_intervention(predictions_folder, baseline_file, output, do_print, do_save, control,
-                          split_reasoning, split_num_modifier):
+                          split_reasoning, split_num_modifier, split_sam):
     gold = load_json(baseline_file)
     intervention_basename = os.path.basename(baseline_file).replace(BASELINE, INTERVENTION)
     intervention_file = baseline_file.replace(os.path.basename(baseline_file), intervention_basename)
@@ -127,7 +132,7 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 'right->change->wrong': len(correct_change_wrong),
                 'wrong->change->right': len(wrong_change_right),
                 'wrong->keep->right': len(wrong_keep_right),
-                'consistency': len(correct_change_correct)/len(aligned_baseline)
+                'consistency': len(correct_change_correct) / len(aligned_baseline)
             }
         }
         if control:
@@ -136,7 +141,7 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 'correct_control': sum(results_control),
                 'correct_baseline_control': len(correct_baseline_control),
                 'right+control->change->right': len(correct_baseline_control_intervention),
-                'consistency+control': len(correct_baseline_control_intervention)/len(aligned_baseline)
+                'consistency+control': len(correct_baseline_control_intervention) / len(aligned_baseline)
             })
         click.echo(f"Overall result: {printable_result}.")
         click.echo()
@@ -154,13 +159,20 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             result[model_name]['by_num_modifier'] = dict()
             for num_mod, gold_split in groupby(sorted(aligned_baseline, key=num_modifier_key), key=num_modifier_key):
                 ab, ai, ac = align(gold_split, gold_intervention, gold_control)
-                res = eval_intervention(
-                    ab, ai, ac, predictions, predictions_intervention,
-                    predictions_control)[0]
+                res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
                 mean, var, ci = get_mean_var_ci_bernoulli(res)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
                 result[model_name]['by_num_modifier'][num_mod] = res
                 click.echo(f'{model_name}: {num_mod}: {pr}')
+        if split_sam:
+            result[model_name]['by_sam'] = dict()
+            for sam, gold_split in groupby(sorted(aligned_baseline, key=sam_key), key=sam_key):
+                ab, ai, ac = align(gold_split, gold_intervention, gold_control)
+                res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
+                mean, var, ci = get_mean_var_ci_bernoulli(res)
+                pr = f'{mean:.4f} +/- {ci:.4f}'
+                result[model_name]['by_sam'][sam] = res
+                click.echo(f'{model_name}: {sam}: {pr}')
     click.echo(f"Result: {result}")
     if do_save:
         write_json(result, output)
