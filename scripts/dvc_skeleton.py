@@ -71,10 +71,11 @@ def generate_dvc(command, dataset_name,
                    f"-d {intervention_file} -d {control_file}  {outs_str} {cmd}")
 
     elif command == 'evaluate':
-        eoi_metric_file = f"{dataset_name}.json"
-        eoi_metric_path = f"metrics/{eoi_metric_file}"
+        eoi_metric_file = f"eoi.json"
+        eoi_metric_path = f"metrics/football/{dataset_name}/{eoi_metric_file}"
         cmd = (f"python main.py evaluate-intervention --baseline-file {baseline_file} "
-               f"--predictions-folder {predictions_folder} --control --output {eoi_metric_path}")
+               f"--predictions-folder {predictions_folder} --control --output {eoi_metric_path} "
+               f"--split-reasoning --split-num-modifier --split-sam --do-save")
 
         stage_name = f"evaluate-intervention-{dataset_name}"
 

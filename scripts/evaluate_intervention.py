@@ -153,7 +153,12 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
                 mean, var, ci = get_mean_var_ci_bernoulli(res)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
-                result[model_name]['by_reasoning'][reasoning] = res
+                result[model_name]['by_reasoning'][reasoning] = {
+                    'mean': mean,
+                    "var": var,
+                    '95ci': ci,
+                    "printable_result": pr,
+                }
                 click.echo(f'{reasoning}: {pr}')
         if split_num_modifier:
             result[model_name]['by_num_modifier'] = dict()
@@ -162,7 +167,12 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
                 mean, var, ci = get_mean_var_ci_bernoulli(res)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
-                result[model_name]['by_num_modifier'][num_mod] = res
+                result[model_name]['by_num_modifier'][num_mod] = {
+                    'mean': mean,
+                    "var": var,
+                    '95ci': ci,
+                    "printable_result": pr,
+                }
                 click.echo(f'{model_name}: {num_mod}: {pr}')
         if split_sam:
             result[model_name]['by_sam'] = dict()
@@ -171,7 +181,12 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
                 mean, var, ci = get_mean_var_ci_bernoulli(res)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
-                result[model_name]['by_sam'][sam] = res
+                result[model_name]['by_sam'][sam] = {
+                    'mean': mean,
+                    "var": var,
+                    '95ci': ci,
+                    "printable_result": pr,
+                }
                 click.echo(f'{model_name}: {sam}: {pr}')
     click.echo(f"Result: {result}")
     if do_save:
