@@ -195,7 +195,7 @@ def evaluate_intervention(aligned_baseline, aligned_intervention, aligned_contro
         results_control = []
         correct_baseline_control = []
         correct_baseline_control_intervention = []
-    assert len(correct_before_intervention) > len(correct_change_correct)
+    assert len(correct_before_intervention) >= len(correct_change_correct), f"{len(correct_before_intervention)} > {len(correct_change_correct)}"
     assert len(correct_before_intervention) == len(correct_keep_wrong) + len(correct_change_wrong) + len(
         correct_change_correct)
     assert sum(results_intervention) == len(correct_change_correct) + len(wrong_change_right) + len(
