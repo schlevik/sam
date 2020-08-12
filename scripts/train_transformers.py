@@ -66,7 +66,7 @@ def train(**kwargs):
     # do_lower_case = not kwargs.pop('do_not_lower_case')
     # kwargs['logging_steps'] = [int(i) for i in kwargs['logging_steps'].split(',')] if kwargs['logging_steps'] else []
     args = Args(**kwargs)
-    args.local_rank = int(os.environ.get('LOCAL_RANK'), -1)
+    args.local_rank = int(os.environ.get('LOCAL_RANK', -1))
     logger.debug(args)
     if (
             os.path.exists(args.save_model_folder)
