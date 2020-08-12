@@ -136,7 +136,7 @@ def train(**kwargs):
             apex.amp.register_half_function(torch, "einsum")
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
-    train_dataset, *_ = load_or_convert(args, tokenizer)
+    train_dataset = load_or_convert(args, tokenizer, dataset_only=True)
     # train_dataset, e, f = load_examples(args.train_file)
     logger.info("loaded dataset")
     global_step, tr_loss = do_train(args, train_dataset, model, tokenizer)

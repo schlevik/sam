@@ -75,8 +75,9 @@ def get_model(model_name_or_path):
 @click.option('--max-query-length', type=int, default=64)
 @click.option('--num-workers', type=int, default=1)
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
+@click.option('--dataset-only', type=bool, is_flag=True, default=False)
 def cache_examples(in_files, out_folder, model_path, do_not_lower_case, evaluate, v2, max_seq_length, doc_stride,
-                   max_query_length, num_workers, debug_features):
+                   max_query_length, num_workers, debug_features, dataset_only):
     do_lower_case = not do_not_lower_case
     tokenizer = get_tokenizer(model_path, do_lower_case)
 
@@ -91,8 +92,10 @@ def cache_examples(in_files, out_folder, model_path, do_not_lower_case, evaluate
         click.echo(f"Saving features into cached file {click.style(out_file, fg='blue')}")
         if os.path.dirname(out_file).replace(".", ""):
             os.makedirs(os.path.dirname(out_file), exist_ok=True)
-        torch.save({"features": features, "dataset": dataset, "examples": examples}, out_file)
-
+        if not dataset_only:
+            torch.save({"features": features, "dataset": dataset, "examples": examples}, out_file)
+        else:
+            torch.save({"dataset": dataset}, out_file)
 
 def convert_to_features(in_file, evaluate, doc_stride, max_query_length, max_seq_length,
                         num_workers, tokenizer, debug_features=False, v2=False):
@@ -138,14 +141,17 @@ def debug_features_examples_dataset(dataset, examples, features, tokenizer):
         logger.info(f"Max answer length: {max_answer_length}")
 
 
-def load_examples(location):
+def load_examples(location, dataset_only=False):
     features_and_dataset = torch.load(location)
-    features, dataset, examples = (
-        features_and_dataset["features"],
-        features_and_dataset["dataset"],
-        features_and_dataset["examples"],
-    )
-    return dataset, examples, features
+    if not dataset_only:
+        features, dataset, examples = (
+            features_and_dataset["features"],
+            features_and_dataset["dataset"],
+            features_and_dataset["examples"],
+        )
+        return dataset, examples, features
+    else:
+        return features_and_dataset['dataset']
 
 
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_QUESTION_ANSWERING_MAPPING.keys())
@@ -202,18 +208,25 @@ class Args:
         return not self.do_not_lower_case
 
 
-def load_or_convert(args: Args, tokenizer, evaluate=False):
+def load_or_convert(args: Args, tokenizer, evaluate=False, dataset_only=False):
     attr = "eval_file" if evaluate else "train_file"
     file = getattr(args, attr)
+    if dataset_only and evaluate:
+        raise ValueError("You don't want that!")
     if file.endswith('bin'):
         click.echo("Loading train features from cache...")
-        train_dataset, e, f = load_examples(file)
+        if dataset_only:
+            return load_examples(file, dataset_only=True)
+        else:
+            train_dataset, e, f = load_examples(file)
     elif file.endswith('json'):
         click.echo("Converting features on the fly...")
         train_dataset, e, f = convert_to_features(file, evaluate=evaluate, tokenizer=tokenizer, v2=args.v2,
                                                   doc_stride=args.doc_stride, max_query_length=args.max_query_length,
                                                   max_seq_length=args.max_seq_length,
                                                   num_workers=args.num_workers, debug_features=args.debug_features)
+        if dataset_only:
+            return train_dataset
     else:
         raise NotImplementedError(f"Unknown file extension for evaluation file: {file}")
     return train_dataset, e, f
