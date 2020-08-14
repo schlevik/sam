@@ -518,3 +518,103 @@ evaluate-intervention-squad1:
   outs:
   - path: metrics/football/squad1/eoi.json
     md5: 14ded837dc81a744f003f5bf9728dd71
+train-bert-base-uncased-on-hotpotqa:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/datasets/hotpotqa/train.json
+    --model-path bert-base-uncased --model-type bert --eval-file data/datasets/hotpotqa/dev.json
+    --save-model-folder models/bert-base-uncased-hotpotqa --do-eval-after-training
+    --num-workers 32 --per-gpu-train-batch-size 32 --max-answer-length 30 --gradient-accumulation-steps
+    8 --fp16 --debug-features --save-steps 0
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/bert-base-uncased-hotpotqa
+    md5: e200ee62d23a26dfd5200fe4045d44fc.dir
+train-bert-large-uncased-on-hotpotqa:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/datasets/hotpotqa/train.json
+    --model-path bert-large-uncased --model-type bert --eval-file data/datasets/hotpotqa/dev.json
+    --save-model-folder models/bert-large-uncased-hotpotqa --do-eval-after-training
+    --num-workers 32 --per-gpu-train-batch-size 4 --max-answer-length 30 --gradient-accumulation-steps
+    64 --fp16 --debug-features --save-steps 0 --num-train-epochs 2
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/bert-large-uncased-hotpotqa
+    md5: 60a68459537a8b5e2d8e2b3c1dd623d6.dir
+train-roberta-base-on-hotpotqa:
+  cmd: MODEL=roberta-base CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/hotpotqa/
+    SAVE_TO=models/roberta-base-hotpotqa BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=roberta
+    bash scripts/cache_and_train_hotpotqa.sh
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/roberta-base-hotpotqa
+    md5: 101b79aac16eaa652452f3550b08d70d.dir
+train-roberta-large-on-hotpotqa:
+  cmd: MODEL=roberta-large CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/hotpotqa/
+    SAVE_TO=models/roberta-large-hotpotqa BATCH_SIZE=6 ACC_STEPS=43 MODEL_TYPE=roberta
+    bash scripts/cache_and_train_hotpotqa.sh
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/roberta-large-hotpotqa
+    md5: 68dbefcbb69ac7e74159c2ea41fa813e.dir
+train-albert-base-v2-on-hotpotqa:
+  cmd: MODEL=albert-base-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/hotpotqa/
+    SAVE_TO=models/albert-base-v2-hotpotqa BATCH_SIZE=24 ACC_STEPS=11 MODEL_TYPE=albert
+    bash scripts/cache_and_train_hotpotqa.sh
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/albert-base-v2-hotpotqa
+    md5: 2ae1ea2cdaf75439b389eb27f22018c3.dir
+train-albert-large-v2-on-hotpotqa:
+  cmd: MODEL=albert-large-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/hotpotqa/
+    SAVE_TO=models/albert-large-v2-hotpotqa BATCH_SIZE=8 ACC_STEPS=32 MODEL_TYPE=albert
+    bash scripts/cache_and_train_hotpotqa.sh
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/albert-large-v2-hotpotqa
+    md5: 4392311d0a463c69363bd9fc4a827d42.dir
+train-albert-xlarge-v2-on-hotpotqa:
+  cmd: MODEL=albert-xlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/hotpotqa/
+    SAVE_TO=models/albert-xlarge-v2-hotpotqa BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=albert
+    bash scripts/cache_and_train_hotpotqa.sh
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/albert-xlarge-v2-hotpotqa
+    md5: b7288bd0db98c1e5b48205bdb40f0765.dir
+train-albert-xxlarge-v2-on-hotpotqa:
+  cmd: MODEL=albert-xxlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/hotpotqa/
+    SAVE_TO=models/albert-xxlarge-v2-hotpotqa BATCH_SIZE=2 ACC_STEPS=128 MODEL_TYPE=albert
+    bash scripts/cache_and_train_hotpotqa.sh
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/albert-xxlarge-v2-hotpotqa
+    md5: ce2cdfd7fb87ef93ea9d737adf3b3668.dir

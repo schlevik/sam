@@ -14,3 +14,11 @@
 /bert-baseline
 /bert-mask-q-baseline
 /bert-mask-p-baseline
+/bert-base-uncased-hotpotqa
+/bert-large-uncased-hotpotqa
+/roberta-base-hotpotqa
+/roberta-large-hotpotqa
+/albert-base-v2-hotpotqa
+/albert-large-v2-hotpotqa
+/albert-xlarge-v2-hotpotqa
+/albert-xxlarge-v2-hotpotqa
