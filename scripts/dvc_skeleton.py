@@ -2,23 +2,20 @@ import os
 
 import click
 
-from scripts.utils import get_output_predictions_file_name
-
-
-
 @click.command()
 @click.argument('command', type=str)
-@click.option('--dataset-name', default='squad1')
+@click.option('--dataset-name', '--dataset', default='squad1')
 @click.option("--train-file", default="train-v1.1.json")
-@click.option("--eval-file", default="dev-v1.1.json")
+@click.option("--eval-file", '--dev-file', default="dev-v1.1.json")
 @click.option("--batch-size", default=None)
 @click.option("--extra-args", default="--fp16 --save-steps 0 --debug-features")
 @click.option("--notify", type=str, default='viktor.schlegel@manchester.ac.uk')
 @click.option("model_names", '--model-name', type=str, multiple=True, default='bert-base-uncased')
 @click.option("model_types", '--model-type', type=str, multiple=True, default='bert')
+@click.option('--gradient-accumulation-steps', type=int, default=2)
 def generate_dvc(command, dataset_name,
                  train_file, eval_file, batch_size, extra_args,
-                 notify, model_names, model_types):
+                 notify, model_names, model_types, gradient_accumulation_steps):
     model_name = model_names[0]
     model_type = model_types[0]
     root_data_path = 'data/football'
@@ -44,6 +41,36 @@ def generate_dvc(command, dataset_name,
             f"--max-answer-length 30 {extra_args}"
         )
         stage_name = f"train-{model_name}-on-{dataset_name}"
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
+            f"{cmd}"
+        )
+    elif command == 'train-transformers-hotpotqa':
+        train_path = f"data/datasets/hotpotqa/train.json"
+        eval_path = f"data/datasets/hotpotqa/dev.json"
+        model_folder = f"{model_name}-hotpotqa"
+        model_path = f"models/{model_folder}"
+        cmd = (
+            f"MODEL={model_name} CACHE_LOCATION=~/localscratch/hotpotqa/ SAVE_TO={model_path} "
+            f"BATCH_SIZE={batch_size} ACC_STEPS={gradient_accumulation_steps} MODEL_TYPE={model_type} "
+            f"bash scripts/cache_and_train_hotpotqa.sh"
+        )
+        stage_name = f"train-{model_name}-on-hotpotqa"
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
+            f"{cmd}"
+        )
+    elif command == 'train-transformers-wikihop':
+        train_path = f"data/datasets/wikihop/train.json"
+        eval_path = f"data/datasets/wikihop/dev.json"
+        model_folder = f"{model_name}-wikihop"
+        model_path = f"models/{model_folder}"
+        cmd = (
+            f"MODEL={model_name} CACHE_LOCATION=~/localscratch/wikihop/ SAVE_TO={model_path} "
+            f"BATCH_SIZE={batch_size} ACC_STEPS={gradient_accumulation_steps} MODEL_TYPE={model_type} "
+            f"bash scripts/cache_and_train_wikihop.sh"
+        )
+        stage_name = f"train-{model_name}-on-wikihop"
         dvc_cmd = (
             f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
             f"{cmd}"
@@ -277,3 +304,6 @@ def generate_dvc(command, dataset_name,
     click.echo(cmd)
     click.secho("DVC command:", fg='green', bold=True)
     click.echo(dvc_cmd)
+
+
+from scripts.utils import get_output_predictions_file_name
