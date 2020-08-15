@@ -76,14 +76,14 @@ def generate_dvc(command, dataset_name,
             f"{cmd}"
         )
     elif command == 'train-transformers-searchqa':
-        train_path = f"data/datasets/searcqa/train.json"
+        train_path = f"data/datasets/searchqa/train.json"
         eval_path = f"data/datasets/searchqa/dev.json"
         model_folder = f"{model_name}-searchqa"
         model_path = f"models/{model_folder}"
         cmd = (
             f"MODEL={model_name} CACHE_LOCATION=~/localscratch/searchqa/ SAVE_TO={model_path} "
             f"BATCH_SIZE={batch_size} ACC_STEPS={gradient_accumulation_steps} MODEL_TYPE={model_type} "
-            f"bash scripts/cache_and_train_wikihop.sh"
+            f"bash scripts/cache_and_train_searchqa.sh"
         )
         stage_name = f"train-{model_name}-on-searchqa"
         dvc_cmd = (
