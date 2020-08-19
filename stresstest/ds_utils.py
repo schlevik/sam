@@ -1,16 +1,13 @@
 import re
 import string
-from copy import deepcopy
 from dataclasses import asdict
 from typing import List, Tuple
 
 from loguru import logger
-# from transformers.data.metrics.squad_metrics import normalize_answer
 from tqdm import tqdm
 
 from stresstest.baseline_utils import mask_passage, mask_question
 from stresstest.classes import EventPlan, Event
-from stresstest.util import load_json
 
 
 def squad(dataset):
@@ -369,27 +366,28 @@ def filter_newsqa(d):
     num_qas_before_filtering = sum(len(d['qas']) for d in paragraphs)
     paragraphs_filtered = []
     for i, p in enumerate(paragraphs):
-        context = " ".join(p['context'].split())
+        context = p['context']
         new_p = {'context': context, 'qas': []}
         for qa in p['qas']:
             answers = qa['answers']
             if answers:
                 assert len(answers) == 1
                 answer = answers[0]
-                answer_text = " ".join(answer['text'].split())
+                answer_text = answer['text']
                 assert answer_text in context
-                #if answer_text in context:
+                # if answer_text in context:
                 # for answer in answers:
                 #     # should be the same as HQA only comes with 1 answer
                 #     assert answer['text'] == answer_text
-                p['qas'][0]['answers'] = [{"text": answer_text, 'answer_start': i} for i in
-                                          find_all(context, answer_text)]
-                assert p['qas'][0]['answers']
-                #paragraphs_filtered.append(p)
+                qa['answers'] = [{"text": answer_text, 'answer_start': i} for i in find_all(context, answer_text)]
+                assert qa['answers']
+                text = qa['answers'][0]['text']
+                start = qa['answers'][0]['answer_start']
+                assert text == new_p['context'][start:start + len(text)]
+                # paragraphs_filtered.append(p)
                 new_p['qas'].append(qa)
         if new_p['qas']:
             paragraphs_filtered.append(new_p)
-
     d['data'][0]['paragraphs'] = paragraphs_filtered
 
     logger.info(f"Discarded {num_qas_before_filtering - sum(len(d['qas']) for d in d['data'][0]['paragraphs'])} "
