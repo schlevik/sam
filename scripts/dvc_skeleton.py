@@ -75,6 +75,21 @@ def generate_dvc(command, dataset_name,
             f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
             f"{cmd}"
         )
+    elif command == 'train-transformers-newsqa':
+        train_path = f"data/datasets/newsqa/train.json"
+        eval_path = f"data/datasets/newsqa/dev.json"
+        model_folder = f"{model_name}-newsqa"
+        model_path = f"models/{model_folder}"
+        cmd = (
+            f"MODEL={model_name} CACHE_LOCATION=~/localscratch/newsqa/ SAVE_TO={model_path} "
+            f"BATCH_SIZE={batch_size} ACC_STEPS={gradient_accumulation_steps} MODEL_TYPE={model_type} "
+            f"bash scripts/cache_and_train_newsqa.sh"
+        )
+        stage_name = f"train-{model_name}-on-newsqa"
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
+            f"{cmd}"
+        )
     elif command == 'train-transformers-searchqa':
         train_path = f"data/datasets/searchqa/train.json"
         eval_path = f"data/datasets/searchqa/dev.json"
@@ -86,6 +101,21 @@ def generate_dvc(command, dataset_name,
             f"bash scripts/cache_and_train_searchqa.sh"
         )
         stage_name = f"train-{model_name}-on-searchqa"
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
+            f"{cmd}"
+        )
+    elif command == 'train-transformers-drop':
+        train_path = f"data/datasets/drop/train.json"
+        eval_path = f"data/datasets/drop/dev.json"
+        model_folder = f"{model_name}-drop"
+        model_path = f"models/{model_folder}"
+        cmd = (
+            f"MODEL={model_name} CACHE_LOCATION=~/localscratch/drop/ SAVE_TO={model_path} "
+            f"BATCH_SIZE={batch_size} ACC_STEPS={gradient_accumulation_steps} MODEL_TYPE={model_type} "
+            f"bash scripts/cache_and_train_drop.sh"
+        )
+        stage_name = f"train-{model_name}-on-drop"
         dvc_cmd = (
             f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
             f"{cmd}"

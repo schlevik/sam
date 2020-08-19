@@ -1,10 +1,16 @@
+import re
+import string
+from copy import deepcopy
 from dataclasses import asdict
 from typing import List, Tuple
 
 from loguru import logger
+# from transformers.data.metrics.squad_metrics import normalize_answer
+from tqdm import tqdm
 
 from stresstest.baseline_utils import mask_passage, mask_question
 from stresstest.classes import EventPlan, Event
+from stresstest.util import load_json
 
 
 def squad(dataset):
@@ -141,7 +147,7 @@ def to_squad(uuid, event_plans, all_events, template_choices, baseline_stories, 
     return baseline, modified, control
 
 
-def format_qas(passages: List[str], event_plan: EventPlan, events:List[Event], qs, story_id, template_choices, mask_q,
+def format_qas(passages: List[str], event_plan: EventPlan, events: List[Event], qs, story_id, template_choices, mask_q,
                answer_token_offsets):
     modifier_type = [e.features[0] for e in events if e.features]
     assert all(modifier_type[0] == m for m in modifier_type)
@@ -171,3 +177,221 @@ def format_qas(passages: List[str], event_plan: EventPlan, events:List[Event], q
         assert qa['answers']
         qas.append(qa)
     return qas
+
+
+def find_all(haystack, needle):
+    """Yields all the positions of the pattern p in the string s."""
+    i = haystack.find(needle)
+    while i != -1:
+        yield i
+        i = haystack.find(needle, i + 1)
+
+
+def find_all_relaxed(haystack, needle):
+    """Yields all the positions of the pattern p in the string s."""
+    needle = needle.lower()
+    if '-' not in needle:
+        haystack = haystack.replace('-', ' ')
+    haystack = haystack.lower()
+    for i in range(len(haystack)):
+        if haystack[i:i + len(needle)] == needle:
+            yield i, i + len(needle)
+    # while i != -1:
+    #     yield i
+    #     i = haystack.find(needle, i + 1)
+
+
+def filter_hotpotqa(d):
+    paragraphs = d['data'][0]['paragraphs']
+    paragraphs_filtered = []
+    for p in paragraphs:
+        answers = p['qas'][0]['answers']
+        if answers:
+            # normalize context whitespace
+            context = " ".join(p['context'].split())
+            p['context'] = context
+            answer_text = answers[0]['text']
+            # answer should be in context...
+            if answer_text in context:
+                for answer in answers:
+                    # should be the same as HQA only comes with 1 answer
+                    assert answer['text'] == answer_text
+                p['qas'][0]['answers'] = [{"text": answer_text, 'answer_start': i} for i in
+                                          find_all(context, answer_text)]
+                assert p['qas'][0]['answers']
+                paragraphs_filtered.append(p)
+    d['data'][0]['paragraphs'] = paragraphs_filtered
+    logger.info(f"Discarded {len(paragraphs) - len(paragraphs_filtered)} examples...")
+    return d
+
+
+def filter_wikihop(d):
+    paragraphs = d['data'][0]['paragraphs']
+    paragraphs_filtered = []
+    for p in paragraphs:
+        answers = p['qas'][0]['answers']
+        if answers:
+            # normalize context whitespace
+            # context = " ".join(p['context'].split())
+            context = p['context']
+
+            p['context'] = context
+            # context = context.lower()
+            # answer_text = answers[0]['text']
+            p['qas'][0]['question'] = " ".join(p['qas'][0]['question'].split("_"))
+            # answer should be in context...
+            new_answers = []
+            for answer in answers:
+                start = answer['answer_start']
+                text = answer['text']
+                answer_in_context = context[start:start + len(text)]
+
+                if answer_in_context.lower() == text:
+                    new_answers.append({"text": answer_in_context, 'answer_start': start})
+
+            if new_answers:
+                p['qas'][0]['answers'] = new_answers
+                paragraphs_filtered.append(p)
+            # assert answer_text in context
+            # if answer_text in context:
+            #     for answer in answers:
+            #         # should be the same as Wikihop only comes with 1 answer
+            #         assert answer['text'] == answer_text
+            #
+            #     assert p['qas'][0]['answers']
+            #     paragraphs_filtered.append(p)
+    d['data'][0]['paragraphs'] = paragraphs_filtered
+    logger.info(f"Discarded {len(paragraphs) - len(paragraphs_filtered)} examples...")
+    return d
+
+
+def filter_drop(d):
+    paragraphs = d['data'][0]['paragraphs']
+    num_qas_before_filtering = sum(len(d['qas']) for d in paragraphs)
+    paragraphs_filtered = []
+    for i, p in enumerate(paragraphs):
+        context = " ".join(p['context'].split())
+        new_p = {'context': context, 'qas': []}
+        for qa in p['qas']:
+            answers = qa['answers']
+            if answers:
+                new_answers = []
+                for answer in answers:
+                    text = " ".join(answer['text'].split())
+                    new_answers.extend(
+                        [{"text": context[s:e], 'answer_start': s} for s, e in find_all_relaxed(context, text)])
+                new_answers = [dict(y) for y in set(tuple(ans.items()) for ans in new_answers)]
+                for answer in new_answers:
+                    text = answer['text']
+                    start = answer['answer_start']
+                    assert text == context[start:start + len(text)]
+                if new_answers:
+                    qa['answers'] = new_answers
+                    new_p['qas'].append(qa)
+        if new_p['qas']:
+            paragraphs_filtered.append(new_p)
+
+    d['data'][0]['paragraphs'] = paragraphs_filtered
+
+    logger.info(f"Discarded {num_qas_before_filtering - sum(len(d['qas']) for d in d['data'][0]['paragraphs'])} "
+                f"of {num_qas_before_filtering} examples...")
+    return d
+
+
+regex = re.compile(r"^\b(a|an|the)\b", re.UNICODE)
+
+
+def normalize_answer(s, do_remove_punc=True):
+    """Lower text and remove punctuation, articles and extra whitespace."""
+    s = s.replace('\\', '')
+
+    def remove_articles(text):
+        return re.sub(regex, " ", text)
+
+    def white_space_fix(text):
+        return " ".join(text.split())
+        # return text
+
+    def remove_punc(text):
+        exclude = set(string.punctuation)
+        return "".join(ch for ch in text if ch not in exclude)
+        # return text
+
+    def lower(text):
+        return text.lower()
+
+    if do_remove_punc:
+        return white_space_fix(remove_articles(remove_punc(lower(s))))
+    else:
+        return white_space_fix(remove_articles(lower(s)))
+
+
+def filter_searchqa(d, max_c=0):
+    delim = '[title]'
+    paragraphs = d['data'][0]['paragraphs']
+    paragraphs_filtered = []
+    no_ans = 0
+    for i, p in enumerate(tqdm(paragraphs)):
+        answers = p['qas'][0]['answers']
+        if answers:
+            context = p['context']
+            assert delim in context, p
+            if max_c:
+                context = context[:list(find_all(context, delim))[:max_c + 1][-1]]
+            p['context'] = context
+            assert len(p['qas']) == 1
+            assert all(p['qas'][0]['answers'][0]['text'] == ans['text'] for ans in p['qas'][0]['answers']), '\n'.join(
+                str(a) for a in p['qas'][0]['answers'])
+            answer_text = normalize_answer(answers[0]['text'])
+            if answer_text not in p['context'].lower():
+                answer_text = normalize_answer(answers[0]['text'], do_remove_punc=False)
+            # assert answer_text in p['context'].lower(), i
+            # assert answer_text in context, f"{i}"
+            # if answer_text in context:
+            p['qas'][0]['answers'] = [{"text": context[i:i + len(answer_text)], 'answer_start': i} for i in
+                                      find_all(context.lower(), answer_text)]
+            if p['qas'][0]['answers']:
+                for answer in p['qas'][0]['answers']:
+                    assert p['context'][answer['answer_start']:answer['answer_start'] + len(answer['text'])] == answer[
+                        'text']
+                paragraphs_filtered.append(p)
+        else:
+            no_ans += 1
+
+    d['data'][0]['paragraphs'] = paragraphs_filtered
+    logger.info(f"Discarded {len(paragraphs) - len(paragraphs_filtered)} of {len(paragraphs)} examples... "
+                f"({no_ans} had no answer)")
+    return d
+
+
+def filter_newsqa(d):
+    paragraphs = d['data'][0]['paragraphs']
+    num_qas_before_filtering = sum(len(d['qas']) for d in paragraphs)
+    paragraphs_filtered = []
+    for i, p in enumerate(paragraphs):
+        context = " ".join(p['context'].split())
+        new_p = {'context': context, 'qas': []}
+        for qa in p['qas']:
+            answers = qa['answers']
+            if answers:
+                assert len(answers) == 1
+                answer = answers[0]
+                answer_text = " ".join(answer['text'].split())
+                assert answer_text in context
+                #if answer_text in context:
+                # for answer in answers:
+                #     # should be the same as HQA only comes with 1 answer
+                #     assert answer['text'] == answer_text
+                p['qas'][0]['answers'] = [{"text": answer_text, 'answer_start': i} for i in
+                                          find_all(context, answer_text)]
+                assert p['qas'][0]['answers']
+                #paragraphs_filtered.append(p)
+                new_p['qas'].append(qa)
+        if new_p['qas']:
+            paragraphs_filtered.append(new_p)
+
+    d['data'][0]['paragraphs'] = paragraphs_filtered
+
+    logger.info(f"Discarded {num_qas_before_filtering - sum(len(d['qas']) for d in d['data'][0]['paragraphs'])} "
+                f"of {num_qas_before_filtering} examples...")
+    return d
