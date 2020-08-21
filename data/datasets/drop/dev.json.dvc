@@ -1,0 +1,8 @@
+md5: 50da2e60ca14f80a2eb4a94f2a5db23d
+frozen: true
+deps:
+- etag: '"18d17b-5ad10fdcd33d6"'
+  path: https://tinyurl.com/y2hporju
+outs:
+- md5: 3e298f54e456bc762f066b14519f9dca
+  path: dev.json

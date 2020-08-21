@@ -618,3 +618,512 @@ train-albert-xxlarge-v2-on-hotpotqa:
   outs:
   - path: models/albert-xxlarge-v2-hotpotqa
     md5: ce2cdfd7fb87ef93ea9d737adf3b3668.dir
+train-bert-base-uncased-on-wikihop:
+  cmd: MODEL=bert-base-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/wikihop/
+    SAVE_TO=models/bert-base-uncased-wikihop BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=bert
+    bash scripts/cache_and_train_wikihop.sh
+  deps:
+  - path: data/datasets/wikihop/dev.json
+    md5: e56f5a06c026098b1ef5e90038208cc5
+  - path: data/datasets/wikihop/train.json
+    md5: bc510716cc7e83ffb5e161210fc2b20e
+  outs:
+  - path: models/bert-base-uncased-wikihop
+    md5: 2b773338b69ef3eefb6af84a9491d68d.dir
+train-bert-base-uncased-on-searchqa:
+  cmd: MODEL=bert-base-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/searchqa/
+    SAVE_TO=models/bert-base-uncased-searchqa BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=bert
+    bash scripts/cache_and_train_searchqa.sh
+  deps:
+  - path: data/datasets/searchqa/dev.json
+    md5: 185bb12a2f719e2bb3b9e689292cbeb1
+  - path: data/datasets/searchqa/train.json
+    md5: b1274b21922e7fe86c5edf07e3a6b8ee
+  outs:
+  - path: models/bert-base-uncased-searchqa
+    md5: 9cbf89bbd9c5ca6fbaf1dad91ea6a36d.dir
+train-bert-large-uncased-on-searchqa:
+  cmd: MODEL=bert-large-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/searchqa/
+    SAVE_TO=models/bert-large-uncased-searchqa BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=bert
+    bash scripts/cache_and_train_searchqa.sh
+  deps:
+  - path: data/datasets/searchqa/dev.json
+    md5: 185bb12a2f719e2bb3b9e689292cbeb1
+  - path: data/datasets/searchqa/train.json
+    md5: b1274b21922e7fe86c5edf07e3a6b8ee
+  outs:
+  - path: models/bert-large-uncased-searchqa
+    md5: 28177cd94a8470c8441bfb2faed5820d.dir
+train-bert-base-uncased-on-drop:
+  cmd: MODEL=bert-base-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/bert-base-uncased-drop BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=bert
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/bert-base-uncased-drop
+    md5: b37f239ee319283b0f32b5e4a6485898.dir
+train-bert-large-uncased-on-drop:
+  cmd: MODEL=bert-large-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/bert-large-uncased-drop BATCH_SIZE=4 ACC_STEPS=32 MODEL_TYPE=bert
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/bert-large-uncased-drop
+    md5: 8d81af4892de9bddfc161f5cfb9fb7bc.dir
+train-roberta-base-on-drop:
+  cmd: MODEL=roberta-base CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/roberta-base-drop BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=roberta
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/roberta-base-drop
+    md5: 270d20c3dc4c1a0903035a279409ef4f.dir
+train-roberta-large-on-drop:
+  cmd: MODEL=roberta-large CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/roberta-large-drop BATCH_SIZE=6 ACC_STEPS=43 MODEL_TYPE=roberta
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/roberta-large-drop
+    md5: 359b46e4b553a65cd22becac7d5e80b4.dir
+train-albert-base-v2-on-drop:
+  cmd: MODEL=albert-base-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/albert-base-v2-drop BATCH_SIZE=24 ACC_STEPS=11 MODEL_TYPE=albert
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/albert-base-v2-drop
+    md5: 28c9fd6dcb807fdcb1a88f3c451da775.dir
+train-albert-large-v2-on-drop:
+  cmd: MODEL=albert-large-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/albert-large-v2-drop BATCH_SIZE=8 ACC_STEPS=32 MODEL_TYPE=albert
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/albert-large-v2-drop
+    md5: 527955ad5d75625afe3af6c1ec79a33a.dir
+train-albert-xlarge-v2-on-drop:
+  cmd: MODEL=albert-xlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/albert-xlarge-v2-drop BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=albert
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/albert-xlarge-v2-drop
+    md5: 2ec356a9c4d4ba6e616352d7333b94b9.dir
+train-albert-xxlarge-v2-on-drop:
+  cmd: MODEL=albert-xxlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/drop/
+    SAVE_TO=models/albert-xxlarge-v2-drop BATCH_SIZE=2 ACC_STEPS=128 MODEL_TYPE=albert
+    bash scripts/cache_and_train_drop.sh
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/albert-xxlarge-v2-drop
+    md5: 9980cee95f2ffdf9643b57d1c79ac1cd.dir
+train-bert-base-uncased-on-newsqa:
+  cmd: MODEL=bert-base-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/bert-base-uncased-newsqa BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=bert-base-uncased
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/bert-base-uncased-newsqa
+    md5: 687f96d67cb7cd1002352ac5e5c9adfa.dir
+train-bert-large-uncased-on-newsqa:
+  cmd: MODEL=bert-large-uncased CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/bert-large-uncased-newsqa BATCH_SIZE=4 ACC_STEPS=32 MODEL_TYPE=bert
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/bert-large-uncased-newsqa
+    md5: 4cad1c3a171155520f87b54d943b0415.dir
+train-roberta-base-on-newsqa:
+  cmd: MODEL=roberta-base CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/roberta-base-newsqa BATCH_SIZE=32 ACC_STEPS=8 MODEL_TYPE=roberta
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/roberta-base-newsqa
+    md5: 56b309d79b2d11a409ca179805cf2e94.dir
+train-roberta-large-on-newsqa:
+  cmd: MODEL=roberta-large CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/roberta-large-newsqa BATCH_SIZE=6 ACC_STEPS=43 MODEL_TYPE=roberta
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/roberta-large-newsqa
+    md5: c22c8420db80eb2dc216b342558b881d.dir
+train-albert-base-v2-on-newsqa:
+  cmd: MODEL=albert-base-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/albert-base-v2-newsqa BATCH_SIZE=24 ACC_STEPS=11 MODEL_TYPE=albert
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/albert-base-v2-newsqa
+    md5: 7f96f4fe041e25155bc9f2dee538fc31.dir
+train-albert-large-v2-on-newsqa:
+  cmd: MODEL=albert-large-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/albert-large-v2-newsqa BATCH_SIZE=8 ACC_STEPS=32 MODEL_TYPE=albert
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/albert-large-v2-newsqa
+    md5: 8b4d7cc393df2fa2366cec68e1cdf869.dir
+train-albert-xlarge-v2-on-newsqa:
+  cmd: MODEL=albert-xlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/albert-xlarge-v2-newsqa BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=albert
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/albert-xlarge-v2-newsqa
+    md5: afaa11bf6c549eda29b8c7dfc1541f8e.dir
+predict-transformers-hotpotqa:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+    data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
+    --model-path models/albert-base-v2-hotpotqa --model-type albert --model-path models/albert-large-v2-hotpotqa
+    --model-type albert --model-path models/albert-xlarge-v2-hotpotqa --model-type
+    albert --model-path models/albert-xxlarge-v2-hotpotqa --model-type albert --model-path
+    models/bert-base-uncased-hotpotqa --model-type bert --model-path models/bert-large-uncased-hotpotqa
+    --model-type bert --model-path models/roberta-base-hotpotqa --model-type roberta
+    --model-path models/roberta-large-hotpotqa --model-type roberta --out-folder data/football/full/predictions/hotpotqa
+    --max-answer-length 10
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/albert-base-v2-hotpotqa
+    md5: 2ae1ea2cdaf75439b389eb27f22018c3.dir
+  - path: models/albert-large-v2-hotpotqa
+    md5: 4392311d0a463c69363bd9fc4a827d42.dir
+  - path: models/albert-xlarge-v2-hotpotqa
+    md5: b7288bd0db98c1e5b48205bdb40f0765.dir
+  - path: models/albert-xxlarge-v2-hotpotqa
+    md5: ce2cdfd7fb87ef93ea9d737adf3b3668.dir
+  - path: models/bert-base-uncased-hotpotqa
+    md5: e200ee62d23a26dfd5200fe4045d44fc.dir
+  - path: models/bert-large-uncased-hotpotqa
+    md5: 60a68459537a8b5e2d8e2b3c1dd623d6.dir
+  - path: models/roberta-base-hotpotqa
+    md5: 101b79aac16eaa652452f3550b08d70d.dir
+  - path: models/roberta-large-hotpotqa
+    md5: 68dbefcbb69ac7e74159c2ea41fa813e.dir
+  outs:
+  - path: data/football/full/predictions/hotpotqa/baseline-albert-base-v2-hotpotqa.json
+    md5: 3d43129a80dd0bbce841e30e10ae10b4
+  - path: data/football/full/predictions/hotpotqa/baseline-albert-large-v2-hotpotqa.json
+    md5: 2f3f6683c312bc4ad2b09c283ad03771
+  - path: data/football/full/predictions/hotpotqa/baseline-albert-xlarge-v2-hotpotqa.json
+    md5: 8487611cd199c67a1ce9e044f383a780
+  - path: data/football/full/predictions/hotpotqa/baseline-albert-xxlarge-v2-hotpotqa.json
+    md5: ba2d39c3e1425020710ed076ee9c2176
+  - path: data/football/full/predictions/hotpotqa/baseline-bert-base-uncased-hotpotqa.json
+    md5: 4886cdc62251865e3ba96c45ae1f885b
+  - path: data/football/full/predictions/hotpotqa/baseline-bert-large-uncased-hotpotqa.json
+    md5: d2efcec25932001bb8b496a50af22dc8
+  - path: data/football/full/predictions/hotpotqa/baseline-roberta-base-hotpotqa.json
+    md5: 9e97e3a3d34f13eff9aeb2c038dc9f9c
+  - path: data/football/full/predictions/hotpotqa/baseline-roberta-large-hotpotqa.json
+    md5: 644110ec0a68f02271ef21a7a8b43685
+  - path: data/football/full/predictions/hotpotqa/control-albert-base-v2-hotpotqa.json
+    md5: f72f01378f9b98961eb57eabccf45294
+  - path: data/football/full/predictions/hotpotqa/control-albert-large-v2-hotpotqa.json
+    md5: c876903408e616357fc8959b163b868e
+  - path: data/football/full/predictions/hotpotqa/control-albert-xlarge-v2-hotpotqa.json
+    md5: da4b68905533bb7bea75a513cda79a02
+  - path: data/football/full/predictions/hotpotqa/control-albert-xxlarge-v2-hotpotqa.json
+    md5: e388d624c6df9c0d2fdd595a83073049
+  - path: data/football/full/predictions/hotpotqa/control-bert-base-uncased-hotpotqa.json
+    md5: 2585e8896a577318768039f1f719bb84
+  - path: data/football/full/predictions/hotpotqa/control-bert-large-uncased-hotpotqa.json
+    md5: ea28b3368efbfc0b6a5e60b761cd364a
+  - path: data/football/full/predictions/hotpotqa/control-roberta-base-hotpotqa.json
+    md5: 33e22c7233053105803ea043d423070e
+  - path: data/football/full/predictions/hotpotqa/control-roberta-large-hotpotqa.json
+    md5: 39077ca8b02868289c389f25db0c3ab3
+  - path: data/football/full/predictions/hotpotqa/intervention-albert-base-v2-hotpotqa.json
+    md5: 778ce56bb7152ca701803d9a1c518d89
+  - path: data/football/full/predictions/hotpotqa/intervention-albert-large-v2-hotpotqa.json
+    md5: 02662de1598c6f92285cdc9c9a87a97e
+  - path: data/football/full/predictions/hotpotqa/intervention-albert-xlarge-v2-hotpotqa.json
+    md5: ba7a8a08863fd17bfb237e90b56a7a4b
+  - path: data/football/full/predictions/hotpotqa/intervention-albert-xxlarge-v2-hotpotqa.json
+    md5: 594552a61f5cdce8d331d2bd74c6b90b
+  - path: data/football/full/predictions/hotpotqa/intervention-bert-base-uncased-hotpotqa.json
+    md5: e6675176c8f0b7dac847c1b15c2671bb
+  - path: data/football/full/predictions/hotpotqa/intervention-bert-large-uncased-hotpotqa.json
+    md5: c6c80af77ba4f5f85a63237f86ab7f56
+  - path: data/football/full/predictions/hotpotqa/intervention-roberta-base-hotpotqa.json
+    md5: 21696657dd0e59be91d4453360734a19
+  - path: data/football/full/predictions/hotpotqa/intervention-roberta-large-hotpotqa.json
+    md5: c11584ee9012e605b9ebc412892812a0
+predict-transformers-drop:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+    data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
+    --model-path models/albert-base-v2-drop --model-type albert --model-path models/albert-large-v2-drop
+    --model-type albert --model-path models/albert-xlarge-v2-drop --model-type albert
+    --model-path models/albert-xxlarge-v2-drop --model-type albert --model-path models/bert-base-uncased-drop
+    --model-type bert --model-path models/bert-large-uncased-drop --model-type bert
+    --model-path models/roberta-base-drop --model-type roberta --model-path models/roberta-large-drop
+    --model-type roberta --out-folder data/football/full/predictions/drop --max-answer-length
+    10 --num-workers 8
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/albert-base-v2-drop
+    md5: 28c9fd6dcb807fdcb1a88f3c451da775.dir
+  - path: models/albert-large-v2-drop
+    md5: 527955ad5d75625afe3af6c1ec79a33a.dir
+  - path: models/albert-xlarge-v2-drop
+    md5: 2ec356a9c4d4ba6e616352d7333b94b9.dir
+  - path: models/albert-xxlarge-v2-drop
+    md5: 9980cee95f2ffdf9643b57d1c79ac1cd.dir
+  - path: models/bert-base-uncased-drop
+    md5: b37f239ee319283b0f32b5e4a6485898.dir
+  - path: models/bert-large-uncased-drop
+    md5: 8d81af4892de9bddfc161f5cfb9fb7bc.dir
+  - path: models/roberta-base-drop
+    md5: 270d20c3dc4c1a0903035a279409ef4f.dir
+  - path: models/roberta-large-drop
+    md5: 359b46e4b553a65cd22becac7d5e80b4.dir
+  outs:
+  - path: data/football/full/predictions/drop/baseline-albert-base-v2-drop.json
+    md5: 1c5280f7d3b82c0cac16e72d26ddb271
+  - path: data/football/full/predictions/drop/baseline-albert-large-v2-drop.json
+    md5: 7647e6396677720cc67eb1d0320d2450
+  - path: data/football/full/predictions/drop/baseline-albert-xlarge-v2-drop.json
+    md5: 1dc49a6f0f005c1cbc4f3824ca6fbe1a
+  - path: data/football/full/predictions/drop/baseline-albert-xxlarge-v2-drop.json
+    md5: a4cdb767fc7757065ac7f9fbea8d52a5
+  - path: data/football/full/predictions/drop/baseline-bert-base-uncased-drop.json
+    md5: 37ac625cf74c557a54f02361247e906c
+  - path: data/football/full/predictions/drop/baseline-bert-large-uncased-drop.json
+    md5: d6c6e60dc1c2a5f687fa26c4a7e25d4b
+  - path: data/football/full/predictions/drop/baseline-roberta-base-drop.json
+    md5: f6783b08f2c22cd569970aa27896c513
+  - path: data/football/full/predictions/drop/baseline-roberta-large-drop.json
+    md5: 475df8852c7a7f6a4deb03f0d728b932
+  - path: data/football/full/predictions/drop/control-albert-base-v2-drop.json
+    md5: 72ff57759b0d7f7ced306280c5a6d90c
+  - path: data/football/full/predictions/drop/control-albert-large-v2-drop.json
+    md5: 9ca002cbebbc34ef3fc019a65059327e
+  - path: data/football/full/predictions/drop/control-albert-xlarge-v2-drop.json
+    md5: 7421223e03b8b6df588baba487b22531
+  - path: data/football/full/predictions/drop/control-albert-xxlarge-v2-drop.json
+    md5: 8d082e7e5a6c6acfce2a36c021bba712
+  - path: data/football/full/predictions/drop/control-bert-base-uncased-drop.json
+    md5: 8c471513a1312694129cae316c5c4c25
+  - path: data/football/full/predictions/drop/control-bert-large-uncased-drop.json
+    md5: ac5c0fa4175eb2e189c33e3e7847f849
+  - path: data/football/full/predictions/drop/control-roberta-base-drop.json
+    md5: 5db6c518729063a79da1379cdfce862b
+  - path: data/football/full/predictions/drop/control-roberta-large-drop.json
+    md5: 40e384acd9c856e6e6b3643cf4a2b369
+  - path: data/football/full/predictions/drop/intervention-albert-base-v2-drop.json
+    md5: ecbbca349a7e28e2d6fe69f800aec9a3
+  - path: data/football/full/predictions/drop/intervention-albert-large-v2-drop.json
+    md5: d9e4d73023c751cbb33b5b85dcac2d54
+  - path: data/football/full/predictions/drop/intervention-albert-xlarge-v2-drop.json
+    md5: 8b3574a7ddfacd51c287b8032609dc22
+  - path: data/football/full/predictions/drop/intervention-albert-xxlarge-v2-drop.json
+    md5: 2f60a22314c600ad1191175c2b413378
+  - path: data/football/full/predictions/drop/intervention-bert-base-uncased-drop.json
+    md5: 5a9a65a6b8ac2787ffab8cafbf1bd26a
+  - path: data/football/full/predictions/drop/intervention-bert-large-uncased-drop.json
+    md5: 740c77ade1d75c38f16f98a91022c4c6
+  - path: data/football/full/predictions/drop/intervention-roberta-base-drop.json
+    md5: fd390207d5b1dee950dfbc30fc5bd052
+  - path: data/football/full/predictions/drop/intervention-roberta-large-drop.json
+    md5: 6b72eb9805144367774f3e3e22c3519f
+predict-transformers-newsqa:
+  cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk predictions
+    data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
+    --model-path models/albert-base-v2-newsqa --model-type albert --model-path models/albert-large-v2-newsqa
+    --model-type albert --model-path models/albert-xlarge-v2-newsqa --model-type albert
+    --model-path models/bert-base-uncased-newsqa --model-type bert --model-path models/bert-large-uncased-newsqa
+    --model-type bert --model-path models/roberta-base-newsqa --model-type roberta
+    --model-path models/roberta-large-newsqa --model-type roberta --out-folder data/football/full/predictions/newsqa
+    --max-answer-length 10 --num-workers 8
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/albert-base-v2-newsqa
+    md5: 7f96f4fe041e25155bc9f2dee538fc31.dir
+  - path: models/albert-large-v2-newsqa
+    md5: 8b4d7cc393df2fa2366cec68e1cdf869.dir
+  - path: models/albert-xlarge-v2-newsqa
+    md5: afaa11bf6c549eda29b8c7dfc1541f8e.dir
+  - path: models/bert-base-uncased-newsqa
+    md5: 687f96d67cb7cd1002352ac5e5c9adfa.dir
+  - path: models/bert-large-uncased-newsqa
+    md5: 4cad1c3a171155520f87b54d943b0415.dir
+  - path: models/roberta-base-newsqa
+    md5: 56b309d79b2d11a409ca179805cf2e94.dir
+  - path: models/roberta-large-newsqa
+    md5: c22c8420db80eb2dc216b342558b881d.dir
+  outs:
+  - path: data/football/full/predictions/newsqa/baseline-albert-base-v2-newsqa.json
+    md5: 3561a04a96c65ece82a5a90085afeb01
+  - path: data/football/full/predictions/newsqa/baseline-albert-large-v2-newsqa.json
+    md5: 63905936c1ace9d0a99bfb4b8857ee41
+  - path: data/football/full/predictions/newsqa/baseline-albert-xlarge-v2-newsqa.json
+    md5: 89f3f59c32eee1a85a405d1ab76027b5
+  - path: data/football/full/predictions/newsqa/baseline-bert-base-uncased-newsqa.json
+    md5: 92b48977f9947377a3d21a4754186813
+  - path: data/football/full/predictions/newsqa/baseline-bert-large-uncased-newsqa.json
+    md5: 410d7b3106195096efacfa6d49e33432
+  - path: data/football/full/predictions/newsqa/baseline-roberta-base-newsqa.json
+    md5: 561f9fed778dd388634480e4bc663ccb
+  - path: data/football/full/predictions/newsqa/baseline-roberta-large-newsqa.json
+    md5: 0dc263bb3c8616c7b4ad5ce38a63cc47
+  - path: data/football/full/predictions/newsqa/control-albert-base-v2-newsqa.json
+    md5: ab247972d769f72477f907dd8bb3fe59
+  - path: data/football/full/predictions/newsqa/control-albert-large-v2-newsqa.json
+    md5: 16e771450783ec686885b021e05b2e78
+  - path: data/football/full/predictions/newsqa/control-albert-xlarge-v2-newsqa.json
+    md5: a831986fd59629be5953ecd9cefcefc7
+  - path: data/football/full/predictions/newsqa/control-bert-base-uncased-newsqa.json
+    md5: bc9338319b9391820f5b73ec98b3cd74
+  - path: data/football/full/predictions/newsqa/control-bert-large-uncased-newsqa.json
+    md5: d11c25480fbe9df7a87ba1cfc8cd97a0
+  - path: data/football/full/predictions/newsqa/control-roberta-base-newsqa.json
+    md5: 945aa822625408654b23989184967996
+  - path: data/football/full/predictions/newsqa/control-roberta-large-newsqa.json
+    md5: 71a5cbc30ef07ce900502120826bb64f
+  - path: data/football/full/predictions/newsqa/intervention-albert-base-v2-newsqa.json
+    md5: 546c6804010ddad03551fde88390b764
+  - path: data/football/full/predictions/newsqa/intervention-albert-large-v2-newsqa.json
+    md5: c56f509488b0aab12623f77afa689cf0
+  - path: data/football/full/predictions/newsqa/intervention-albert-xlarge-v2-newsqa.json
+    md5: 284681f91d4c6d70efc853b0a85bd212
+  - path: data/football/full/predictions/newsqa/intervention-bert-base-uncased-newsqa.json
+    md5: 855524d1b1c2152881bf72ad53df9eba
+  - path: data/football/full/predictions/newsqa/intervention-bert-large-uncased-newsqa.json
+    md5: f59a9ba635d535589bcaac8e61c573fc
+  - path: data/football/full/predictions/newsqa/intervention-roberta-base-newsqa.json
+    md5: a56507c87ba4bf35d21b91058c7706b4
+  - path: data/football/full/predictions/newsqa/intervention-roberta-large-newsqa.json
+    md5: 86243078cd2d0b0a604a3fb574a2a6d2
+evaluate-intervention-hotpotqa:
+  cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
+    --predictions-folder data/football/full/predictions/hotpotqa --control --output
+    metrics/football/hotpotqa/eoi.json --split-reasoning --split-num-modifier --split-sam
+    --do-save
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: data/football/full/predictions/hotpotqa
+    md5: 157089d8dfe8edc99a066e5a63184ccf.dir
+  - path: scripts/evaluate_intervention.py
+    md5: c01752a097e1435ea7e7f2a662fa61a0
+  outs:
+  - path: metrics/football/hotpotqa/eoi.json
+    md5: 85b2298105db6a736d981324e1f7235d
+evaluate-intervention-drop:
+  cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
+    --predictions-folder data/football/full/predictions/drop --control --output metrics/football/drop/eoi.json
+    --split-reasoning --split-num-modifier --split-sam --do-save
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: data/football/full/predictions/drop
+    md5: 4fabc3f7573eed9c636766b36f045283.dir
+  - path: scripts/evaluate_intervention.py
+    md5: c01752a097e1435ea7e7f2a662fa61a0
+  outs:
+  - path: metrics/football/drop/eoi.json
+    md5: 603a68bab7a6862f644ef30e87c8e58f
+evaluate-intervention-newsqa:
+  cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
+    --predictions-folder data/football/full/predictions/newsqa --control --output
+    metrics/football/newsqa/eoi.json --split-reasoning --split-num-modifier --split-sam
+    --do-save
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: data/football/full/predictions/newsqa
+    md5: 3085b4207c72457ae3f9092cffcc525e.dir
+  - path: scripts/evaluate_intervention.py
+    md5: c01752a097e1435ea7e7f2a662fa61a0
+  outs:
+  - path: metrics/football/newsqa/eoi.json
+    md5: 6d23a60717e9f2c4d3fb0e1ba092c33d

@@ -1,0 +1,8 @@
+md5: 1e1d42474dfde92826f8aab117e74d25
+frozen: true
+deps:
+- etag: '"ca0d93-5ad1176f5b188"'
+  path: https://tinyurl.com/yxktma9m
+outs:
+- md5: 633ef4403ee8b9d2084d45057defe3f0
+  path: train.json

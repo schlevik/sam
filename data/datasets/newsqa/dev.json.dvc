@@ -1,0 +1,8 @@
+md5: 8afc5833bfb89e6d8aa4ee3c926c4062
+frozen: true
+deps:
+- etag: '"3708c7-5ad38b8b00f50"'
+  path: https://tinyurl.com/y49lr3gx
+outs:
+- md5: 7873ebbb523bff6ad89649fe3d0409d6
+  path: dev.json
