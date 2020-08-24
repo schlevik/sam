@@ -19,3 +19,6 @@
 /baseline-roberta-large-newsqa.json
 /intervention-roberta-large-newsqa.json
 /control-roberta-large-newsqa.json
+/baseline-albert-xxlarge-v2-newsqa.json
+/control-albert-xxlarge-v2-newsqa.json
+/intervention-albert-xxlarge-v2-newsqa.json

@@ -708,6 +708,7 @@ stages:
       data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
       --model-path models/albert-base-v2-newsqa --model-type albert --model-path models/albert-large-v2-newsqa
       --model-type albert --model-path models/albert-xlarge-v2-newsqa --model-type
+      albert --model-path models/albert-xxlarge-v2-newsqa --model-type
       albert --model-path models/bert-base-uncased-newsqa --model-type bert --model-path
       models/bert-large-uncased-newsqa --model-type bert --model-path models/roberta-base-newsqa
       --model-type roberta --model-path models/roberta-large-newsqa --model-type roberta
@@ -720,6 +721,7 @@ stages:
     - models/albert-base-v2-newsqa
     - models/albert-large-v2-newsqa
     - models/albert-xlarge-v2-newsqa
+    - models/albert-xxlarge-v2-newsqa
     - models/bert-base-uncased-newsqa
     - models/bert-large-uncased-newsqa
     - models/roberta-base-newsqa
@@ -728,6 +730,7 @@ stages:
     - data/football/full/predictions/newsqa/baseline-albert-base-v2-newsqa.json
     - data/football/full/predictions/newsqa/baseline-albert-large-v2-newsqa.json
     - data/football/full/predictions/newsqa/baseline-albert-xlarge-v2-newsqa.json
+    - data/football/full/predictions/newsqa/baseline-albert-xxlarge-v2-newsqa.json
     - data/football/full/predictions/newsqa/baseline-bert-base-uncased-newsqa.json
     - data/football/full/predictions/newsqa/baseline-bert-large-uncased-newsqa.json
     - data/football/full/predictions/newsqa/baseline-roberta-base-newsqa.json
@@ -735,6 +738,7 @@ stages:
     - data/football/full/predictions/newsqa/control-albert-base-v2-newsqa.json
     - data/football/full/predictions/newsqa/control-albert-large-v2-newsqa.json
     - data/football/full/predictions/newsqa/control-albert-xlarge-v2-newsqa.json
+    - data/football/full/predictions/newsqa/control-albert-xxlarge-v2-newsqa.json
     - data/football/full/predictions/newsqa/control-bert-base-uncased-newsqa.json
     - data/football/full/predictions/newsqa/control-bert-large-uncased-newsqa.json
     - data/football/full/predictions/newsqa/control-roberta-base-newsqa.json
@@ -742,6 +746,7 @@ stages:
     - data/football/full/predictions/newsqa/intervention-albert-base-v2-newsqa.json
     - data/football/full/predictions/newsqa/intervention-albert-large-v2-newsqa.json
     - data/football/full/predictions/newsqa/intervention-albert-xlarge-v2-newsqa.json
+    - data/football/full/predictions/newsqa/intervention-albert-xxlarge-v2-newsqa.json
     - data/football/full/predictions/newsqa/intervention-bert-base-uncased-newsqa.json
     - data/football/full/predictions/newsqa/intervention-bert-large-uncased-newsqa.json
     - data/football/full/predictions/newsqa/intervention-roberta-base-newsqa.json
@@ -788,3 +793,12 @@ stages:
     metrics:
     - metrics/football/newsqa/eoi.json:
         cache: false
+  train-albert-xxlarge-v2-on-newsqa:
+    cmd: MODEL=albert-xxlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+      SAVE_TO=models/albert-xxlarge-v2-newsqa BATCH_SIZE=2 ACC_STEPS=128 MODEL_TYPE=albert
+      bash scripts/cache_and_train_newsqa.sh
+    deps:
+    - data/datasets/newsqa/dev.json
+    - data/datasets/newsqa/train.json
+    outs:
+    - models/albert-xxlarge-v2-newsqa
