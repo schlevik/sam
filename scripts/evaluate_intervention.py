@@ -98,8 +98,7 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
             wrong_change_right, wrong_keep_right, correct_baseline_control, correct_baseline_control_intervention
         ) = eval_intervention(aligned_baseline, aligned_intervention, aligned_control, predictions,
-                              predictions_intervention,
-                              predictions_control)
+                              predictions_intervention, predictions_control)
         click.echo(f"Got {sum(results_baseline)} correct for baseline.")
         click.echo(f"Got {sum(results_intervention)} correct for intervention.")
         click.echo(f"Out of {sum(results_baseline)} correct baseline results, got {len(correct_change_correct)} "
@@ -115,7 +114,13 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
 
         mean, var, ci = get_mean_var_ci_bernoulli(overall_result)
         printable_result = f'{mean:.4f} +/- {ci:.4f}'
-
+        if "bert" in model_name:
+            dev_results = load_json(f"models/{model_name}/dev_results.json")
+            original_dev_em = dev_results['exact']
+            original_dev_f1 = dev_results['f1']
+        else:
+            original_dev_em = None
+            original_dev_f1 = None
         result[model_name] = {
             'evaluation_on_intervention': {
                 'human_readable': printable_result,
@@ -123,6 +128,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 '95ci': ci,
                 'control': control
             },
+            'original_dev_em': original_dev_f1,
+            'original_dev_f1': original_dev_f1,
             'n': len(aligned_baseline),
             'behaviour': {
                 'correct_baseline': sum(results_baseline),
