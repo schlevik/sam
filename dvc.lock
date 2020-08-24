@@ -1003,7 +1003,8 @@ predict-transformers-newsqa:
     data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
     --model-path models/albert-base-v2-newsqa --model-type albert --model-path models/albert-large-v2-newsqa
     --model-type albert --model-path models/albert-xlarge-v2-newsqa --model-type albert
-    --model-path models/bert-base-uncased-newsqa --model-type bert --model-path models/bert-large-uncased-newsqa
+    --model-path models/albert-xxlarge-v2-newsqa --model-type albert --model-path
+    models/bert-base-uncased-newsqa --model-type bert --model-path models/bert-large-uncased-newsqa
     --model-type bert --model-path models/roberta-base-newsqa --model-type roberta
     --model-path models/roberta-large-newsqa --model-type roberta --out-folder data/football/full/predictions/newsqa
     --max-answer-length 10 --num-workers 8
@@ -1020,6 +1021,8 @@ predict-transformers-newsqa:
     md5: 8b4d7cc393df2fa2366cec68e1cdf869.dir
   - path: models/albert-xlarge-v2-newsqa
     md5: afaa11bf6c549eda29b8c7dfc1541f8e.dir
+  - path: models/albert-xxlarge-v2-newsqa
+    md5: e13862cd95b24d49bcef2a2b18bdeffc.dir
   - path: models/bert-base-uncased-newsqa
     md5: 687f96d67cb7cd1002352ac5e5c9adfa.dir
   - path: models/bert-large-uncased-newsqa
@@ -1035,6 +1038,8 @@ predict-transformers-newsqa:
     md5: 63905936c1ace9d0a99bfb4b8857ee41
   - path: data/football/full/predictions/newsqa/baseline-albert-xlarge-v2-newsqa.json
     md5: 89f3f59c32eee1a85a405d1ab76027b5
+  - path: data/football/full/predictions/newsqa/baseline-albert-xxlarge-v2-newsqa.json
+    md5: 6eed3029a2a06412bfa06fc667d6b087
   - path: data/football/full/predictions/newsqa/baseline-bert-base-uncased-newsqa.json
     md5: 92b48977f9947377a3d21a4754186813
   - path: data/football/full/predictions/newsqa/baseline-bert-large-uncased-newsqa.json
@@ -1049,6 +1054,8 @@ predict-transformers-newsqa:
     md5: 16e771450783ec686885b021e05b2e78
   - path: data/football/full/predictions/newsqa/control-albert-xlarge-v2-newsqa.json
     md5: a831986fd59629be5953ecd9cefcefc7
+  - path: data/football/full/predictions/newsqa/control-albert-xxlarge-v2-newsqa.json
+    md5: d55a3b647fce7a2a30b24b2b9c4d1135
   - path: data/football/full/predictions/newsqa/control-bert-base-uncased-newsqa.json
     md5: bc9338319b9391820f5b73ec98b3cd74
   - path: data/football/full/predictions/newsqa/control-bert-large-uncased-newsqa.json
@@ -1063,6 +1070,8 @@ predict-transformers-newsqa:
     md5: c56f509488b0aab12623f77afa689cf0
   - path: data/football/full/predictions/newsqa/intervention-albert-xlarge-v2-newsqa.json
     md5: 284681f91d4c6d70efc853b0a85bd212
+  - path: data/football/full/predictions/newsqa/intervention-albert-xxlarge-v2-newsqa.json
+    md5: bf92c586854f85b28d6e55979a0c3a62
   - path: data/football/full/predictions/newsqa/intervention-bert-base-uncased-newsqa.json
     md5: 855524d1b1c2152881bf72ad53df9eba
   - path: data/football/full/predictions/newsqa/intervention-bert-large-uncased-newsqa.json
@@ -1121,9 +1130,21 @@ evaluate-intervention-newsqa:
   - path: data/football/full/intervention.json
     md5: 5897df44e42021090e3b9b89b44c6e90
   - path: data/football/full/predictions/newsqa
-    md5: 3085b4207c72457ae3f9092cffcc525e.dir
+    md5: c3d847a884c60e6493026cb33a5f77af.dir
   - path: scripts/evaluate_intervention.py
     md5: c01752a097e1435ea7e7f2a662fa61a0
   outs:
   - path: metrics/football/newsqa/eoi.json
-    md5: 6d23a60717e9f2c4d3fb0e1ba092c33d
+    md5: 2a39375d0227c39b6bee0580fbafafb3
+train-albert-xxlarge-v2-on-newsqa:
+  cmd: MODEL=albert-xxlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
+    SAVE_TO=models/albert-xxlarge-v2-newsqa BATCH_SIZE=2 ACC_STEPS=128 MODEL_TYPE=albert
+    bash scripts/cache_and_train_newsqa.sh
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/albert-xxlarge-v2-newsqa
+    md5: e13862cd95b24d49bcef2a2b18bdeffc.dir
