@@ -87,7 +87,7 @@
   },
 
   "trainer": {
-    "num_epochs": 20,
+    "num_epochs": std.parseInt(std.extVar("MULT")) * 20,
     "grad_norm": 5.0,
     "patience": 10,
     "validation_metric": "+em",
