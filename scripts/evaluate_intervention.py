@@ -115,7 +115,7 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
         mean, var, ci = get_mean_var_ci_bernoulli(overall_result)
         printable_result = f'{mean:.4f} +/- {ci:.4f}'
         if "bert" in model_name:
-            dev_results = load_json(f"models/{model_name}/dev_results.json")
+            dev_results = load_json(f"models/{model_name}/dev-results.json")
             original_dev_em = dev_results['exact']
             original_dev_f1 = dev_results['f1']
         else:
@@ -128,7 +128,7 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
                 '95ci': ci,
                 'control': control
             },
-            'original_dev_em': original_dev_f1,
+            'original_dev_em': original_dev_em,
             'original_dev_f1': original_dev_f1,
             'n': len(aligned_baseline),
             'behaviour': {

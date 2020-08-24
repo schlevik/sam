@@ -708,12 +708,11 @@ stages:
       data/football/full/baseline.json data/football/full/intervention.json data/football/full/control.json
       --model-path models/albert-base-v2-newsqa --model-type albert --model-path models/albert-large-v2-newsqa
       --model-type albert --model-path models/albert-xlarge-v2-newsqa --model-type
-      albert --model-path models/albert-xxlarge-v2-newsqa --model-type
-      albert --model-path models/bert-base-uncased-newsqa --model-type bert --model-path
-      models/bert-large-uncased-newsqa --model-type bert --model-path models/roberta-base-newsqa
-      --model-type roberta --model-path models/roberta-large-newsqa --model-type roberta
-      --out-folder data/football/full/predictions/newsqa --max-answer-length 10 --num-workers
-      8
+      albert --model-path models/albert-xxlarge-v2-newsqa --model-type albert --model-path
+      models/bert-base-uncased-newsqa --model-type bert --model-path models/bert-large-uncased-newsqa
+      --model-type bert --model-path models/roberta-base-newsqa --model-type roberta
+      --model-path models/roberta-large-newsqa --model-type roberta --out-folder data/football/full/predictions/newsqa
+      --max-answer-length 10 --num-workers 8
     deps:
     - data/football/full/baseline.json
     - data/football/full/control.json
@@ -802,3 +801,19 @@ stages:
     - data/datasets/newsqa/train.json
     outs:
     - models/albert-xxlarge-v2-newsqa
+  train-bidaf-on-drop:
+    cmd: TRAIN_SET=data/datasets/drop/train.json EVAL_SET=data/datasets/drop/dev.json
+      CUDA=0 MULT=2 allennlp train conf/bidaf.jsonnet -s models/bidaf-drop
+    deps:
+    - data/datasets/drop/dev.json
+    - data/datasets/drop/train.json
+    outs:
+    - models/bidaf-drop
+  train-bidaf-on-squad1:
+    cmd: TRAIN_SET=data/datasets/squad1/train-v1.1.json EVAL_SET=data/datasets/squad1/dev-v1.1.json
+      CUDA=0 MULT=1 allennlp train conf/bidaf.jsonnet -s models/bidaf-squad1
+    deps:
+    - data/datasets/squad1/dev-v1.1.json
+    - data/datasets/squad1/train-v1.1.json
+    outs:
+    - models/bidaf-squad1

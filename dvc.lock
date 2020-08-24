@@ -514,10 +514,10 @@ evaluate-intervention-squad1:
   - path: data/football/full/predictions/squad1
     md5: 4ea763a9e53e62a4c34a6ed84b2c5c46.dir
   - path: scripts/evaluate_intervention.py
-    md5: c01752a097e1435ea7e7f2a662fa61a0
+    md5: 1e8fff91ff33e9ef028bd8555afe7385
   outs:
   - path: metrics/football/squad1/eoi.json
-    md5: 14ded837dc81a744f003f5bf9728dd71
+    md5: 870d404439af1f9d69f7a489a0643578
 train-bert-base-uncased-on-hotpotqa:
   cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/datasets/hotpotqa/train.json
     --model-path bert-base-uncased --model-type bert --eval-file data/datasets/hotpotqa/dev.json
@@ -1095,10 +1095,10 @@ evaluate-intervention-hotpotqa:
   - path: data/football/full/predictions/hotpotqa
     md5: 157089d8dfe8edc99a066e5a63184ccf.dir
   - path: scripts/evaluate_intervention.py
-    md5: c01752a097e1435ea7e7f2a662fa61a0
+    md5: 1e8fff91ff33e9ef028bd8555afe7385
   outs:
   - path: metrics/football/hotpotqa/eoi.json
-    md5: 85b2298105db6a736d981324e1f7235d
+    md5: bbd6d3cb57259e590307dcc62e103ce9
 evaluate-intervention-drop:
   cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
     --predictions-folder data/football/full/predictions/drop --control --output metrics/football/drop/eoi.json
@@ -1113,10 +1113,10 @@ evaluate-intervention-drop:
   - path: data/football/full/predictions/drop
     md5: 4fabc3f7573eed9c636766b36f045283.dir
   - path: scripts/evaluate_intervention.py
-    md5: c01752a097e1435ea7e7f2a662fa61a0
+    md5: 1e8fff91ff33e9ef028bd8555afe7385
   outs:
   - path: metrics/football/drop/eoi.json
-    md5: 603a68bab7a6862f644ef30e87c8e58f
+    md5: 9f464597a9c64e1f0eb06987ef1f7aa0
 evaluate-intervention-newsqa:
   cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
     --predictions-folder data/football/full/predictions/newsqa --control --output
@@ -1132,10 +1132,10 @@ evaluate-intervention-newsqa:
   - path: data/football/full/predictions/newsqa
     md5: c3d847a884c60e6493026cb33a5f77af.dir
   - path: scripts/evaluate_intervention.py
-    md5: c01752a097e1435ea7e7f2a662fa61a0
+    md5: 1e8fff91ff33e9ef028bd8555afe7385
   outs:
   - path: metrics/football/newsqa/eoi.json
-    md5: 2a39375d0227c39b6bee0580fbafafb3
+    md5: 281a06b86bcacc2110844566d153a9fd
 train-albert-xxlarge-v2-on-newsqa:
   cmd: MODEL=albert-xxlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
     SAVE_TO=models/albert-xxlarge-v2-newsqa BATCH_SIZE=2 ACC_STEPS=128 MODEL_TYPE=albert
@@ -1148,3 +1148,25 @@ train-albert-xxlarge-v2-on-newsqa:
   outs:
   - path: models/albert-xxlarge-v2-newsqa
     md5: e13862cd95b24d49bcef2a2b18bdeffc.dir
+train-bidaf-on-drop:
+  cmd: TRAIN_SET=data/datasets/drop/train.json EVAL_SET=data/datasets/drop/dev.json
+    CUDA=0 MULT=2 allennlp train conf/bidaf.jsonnet -s models/bidaf-drop
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/bidaf-drop
+    md5: 44b15ce647757f90ce2ac1c2336243e5.dir
+train-bidaf-on-squad1:
+  cmd: TRAIN_SET=data/datasets/squad1/train-v1.1.json EVAL_SET=data/datasets/squad1/dev-v1.1.json
+    CUDA=0 MULT=1 allennlp train conf/bidaf.jsonnet -s models/bidaf-squad1
+  deps:
+  - path: data/datasets/squad1/dev-v1.1.json
+    md5: 3e85deb501d4e538b6bc56f786231552
+  - path: data/datasets/squad1/train-v1.1.json
+    md5: 981b29407e0affa3b1b156f72073b945
+  outs:
+  - path: models/bidaf-squad1
+    md5: 6920de5c12d07ca5f2eb28767297541c.dir

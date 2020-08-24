@@ -6,6 +6,8 @@
             "95ci": 0.032799142921295765,
             "control": true
         },
+        "original_dev_em": 82.81929990539263,
+        "original_dev_f1": 90.30052926255152,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 724,
@@ -149,6 +151,8 @@
             "95ci": 0.028026884525829188,
             "control": true
         },
+        "original_dev_em": 85.43046357615894,
+        "original_dev_f1": 92.06227676461889,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 1129,
@@ -292,6 +296,8 @@
             "95ci": 0.022776021211386943,
             "control": true
         },
+        "original_dev_em": 87.13339640491958,
+        "original_dev_f1": 93.47923657338278,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 1618,
@@ -435,6 +441,8 @@
             "95ci": 0.0234116971910861,
             "control": true
         },
+        "original_dev_em": 88.17407757805108,
+        "original_dev_f1": 94.44764956977501,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 1903,
@@ -578,6 +586,8 @@
             "95ci": 0.032438845779677566,
             "control": true
         },
+        "original_dev_em": 76.3197729422895,
+        "original_dev_f1": 84.92661763572866,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 820,
@@ -721,6 +731,8 @@
             "95ci": 0.02798366248070193,
             "control": true
         },
+        "original_dev_em": 81.8543046357616,
+        "original_dev_f1": 89.38648391586,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 958,
@@ -864,6 +876,8 @@
             "95ci": 0.027329903941446895,
             "control": true
         },
+        "original_dev_em": 82.40302743614002,
+        "original_dev_f1": 89.89245615675384,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 772,
@@ -1007,6 +1021,8 @@
             "95ci": 0.029172625044329242,
             "control": true
         },
+        "original_dev_em": 86.41438032166509,
+        "original_dev_f1": 93.31421914129011,
         "n": 4200,
         "behaviour": {
             "correct_baseline": 1047,
