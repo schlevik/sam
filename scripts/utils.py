@@ -6,14 +6,16 @@ import click
 from loguru import logger
 
 from stresstest import implemented_domains
+from stresstest.ds_utils import filter_newsqa
 from stresstest.eval_utils import EvalMetric
 from stresstest.textmetrics import Distance
-from stresstest.util import do_import
+from stresstest.util import do_import, load_json
 
 BASELINE = 'baseline'
 INTERVENTION = 'intervention'
 CONTROL = 'control'
-COMBINED='combined'
+COMBINED = 'combined'
+
 
 class Domain(click.ParamType):
     def convert(self, value, param, ctx):
@@ -130,3 +132,20 @@ def get_baseline_intervention_control_from_baseline(baseline_file):
     return (
         baseline_file, baseline_file.replace(BASELINE, INTERVENTION), baseline_file.replace(BASELINE, CONTROL)
     )
+
+
+@click.command()
+@click.argument('in-file', type=str, default='data/datasets/newsqa/train.json')
+@click.argument('out-file', type=str, default='data/datasets/newsqa/train-fixed.json')
+def fix_newsqa_for_bidaf(in_file, out_file):
+    data = load_json(in_file)
+    for i, p in enumerate(data['data'][0]['paragraphs']):
+        new_qas = []
+        for qa in p['qas']:
+            answers = qa['answers']
+            answer_text = answers[0]['text']
+            if answer_text:
+                new_qas.append(qa)
+        p['qas'] = new_qas
+
+    write_json(data, out_file, pretty=False)
