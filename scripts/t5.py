@@ -1,22 +1,28 @@
 # adapted from
 # https://colab.research.google.com/github/patil-suraj/exploring-T5/blob/master/T5_on_TPU.ipynb#scrollTo=v7TUzb-T-YtF
+import glob
 import json
 import logging
 import os
+import shutil
+import string
 import timeit
 from dataclasses import dataclass, field
 import random
+from itertools import chain, islice
 from typing import Dict, List, Optional, Tuple
 
 import click
+import wandb
 from joblib import Parallel, delayed
 from tqdm import tqdm
 import torch
 from torch.utils.data import TensorDataset
 
 from transformers import T5ForConditionalGeneration, T5Tokenizer, SquadV1Processor, SquadExample, HfArgumentParser, \
-    TrainingArguments
+    TrainingArguments, WEIGHTS_NAME
 from transformers import Trainer, set_seed
+from transformers.trainer_utils import is_wandb_available
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +32,7 @@ from transformers.data.metrics.squad_metrics import squad_evaluate
 from scripts.utils import write_json, get_output_predictions_file_name
 from scripts.utils_transformers import get_tokenizer
 from stresstest.classes import YouIdiotException
-from stresstest.util import batch, sample_iter, load_json
+from stresstest.util import batch
 
 
 def add_eos_to_example(example: SquadExample):
@@ -140,6 +146,10 @@ class DataTrainingArguments:
     )
     debug: bool = field(
         default=...
+    )
+    eval_all_checkpoints: bool = field(
+        default=False,
+        metadata={"help": "Whether to evaluate all checkpoints."}
     )
 
 
@@ -305,57 +315,79 @@ def main():
     if training_args.do_eval and training_args.local_rank in [-1, 0]:
         if training_args.do_train:
             model_path = os.path.basename(training_args.output_dir)
-            model = T5ForConditionalGeneration.from_pretrained(training_args.output_dir)
-            tokenizer = T5Tokenizer.from_pretrained(training_args.output_dir)
         else:
             model_path = os.path.basename(model_args.model_name_or_path)
-        answers = []
-        # Note that DistributedSampler samples randomly
-        device = torch.device("cuda" if torch.cuda.is_available() and not training_args.no_cuda else "cpu")
-        # n_gpu = 0 if training_args.no_cuda else torch.cuda.device_count()
+        checkpoints = [training_args.output_dir]
+        if data_args.eval_all_checkpoints and training_args.do_train:
+            logger.info("Loading checkpoints saved during training for evaluation")
+            checkpoints = list(
+                os.path.dirname(c)
+                for c in sorted(glob.glob(training_args.output_dir + "/**/" + WEIGHTS_NAME, recursive=True))
+            )
+            # logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce model loading logs
 
-        # eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
-        eval_sampler = torch.utils.data.SequentialSampler(eval_dataset)
-        eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler,
-                                                      batch_size=training_args.per_device_eval_batch_size,
-                                                      collate_fn=collate_eval)
-        model.to(device)
-        # multi-gpu evaluate
-        # if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
-        #    model = torch.nn.DataParallel(model)
+        logger.info(f"Evaluate the following checkpoints: {checkpoints}")
+        results = {}
 
-        # Eval!
-        click.echo(f"Generating predictions for model {click.style(model_path, fg='blue')}, "
-                   f"running on {click.style(str(device), fg='green')}")
-        click.echo("  Num examples = %d" % len(eval_dataset))
-        click.echo("  Batch size = %d" % training_args.eval_batch_size)
-
-        start_time = timeit.default_timer()
-        results = []
-        for batch in tqdm(eval_dataloader):
-            for k, v in batch.items():
-                if isinstance(v, torch.Tensor):
-                    batch[k] = v.to(training_args.device)
-            with torch.no_grad():
-                outs = model.generate(input_ids=batch['input_ids'],
-                                      attention_mask=batch['attention_mask'],
-                                      max_length=16,
-                                      early_stopping=True)
-            outs = [tokenizer.decode(ids) for ids in outs]
-            answers.extend(outs)
-            logger.debug(outs)
-            results.extend(outs)
-        eval_time = timeit.default_timer() - start_time
-        logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(eval_dataset)} sec per example)")
-        predictions = dict()
-        for result, example in zip(results, examples):
-            if predictions.get(example.qas_id):
-                raise YouIdiotException()
-            predictions[example.qas_id] = result
-        if training_args.do_train:
+        logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)
+        for checkpoint in checkpoints:
+            # Reload the model
+            global_step = checkpoint.split("-")[-1]
+            if not all(s in string.digits for s in global_step):
+                global_step = ''
+            model = T5ForConditionalGeneration.from_pretrained(checkpoint)
+            device = torch.device("cuda" if torch.cuda.is_available() and not training_args.no_cuda else "cpu")
+            model.to(device)
+            model_str = f'{model_path}-{global_step}' if global_step else model_path
+            # Note that DistributedSampler samples randomly
+            click.echo(f"Generating predictions for model {click.style(model_str, fg='blue')}, "
+                       f"running on {click.style(str(training_args.device), fg='green')}")
+            predictions = generate_predictions(eval_dataset, examples, model, tokenizer, training_args)
             final_metric = squad_evaluate(examples, predictions)
-            logger.info(final_metric)
-            write_json(final_metric, os.path.join(training_args.output_dir, 'dev-results.json'))
+
+            if is_wandb_available():
+                if training_args.do_train:
+                    step = int(global_step) if global_step else trainer.global_step
+                else:
+                    step = 0
+                wandb.log(final_metric, step=step)
+            print(f"GLOBAL STEP: {global_step}")
+            result = dict(
+                (k + ("_{}".format(global_step) if global_step else '_final'), v) for k, v in final_metric.items())
+
+            logger.info(f"Result for {model_str}: {result}")
+            results.update(result)
+
+        # sort results by best
+        checkpoint_scores = {
+            c.split('_')[-1]: v for c, v in
+            results.items() if any(c.endswith(digit) for digit in string.digits) and c.startswith('exact')
+        }
+        sorted_checkpoint_scores = {k: v for k, v in
+                                    sorted(checkpoint_scores.items(), key=lambda k_v: k_v[1], reverse=True)}
+        best_cp = next((c for c, v in sorted_checkpoint_scores.items() if v > results['exact_final']), None)
+
+        if best_cp:
+            click.echo(f"Best checkpoint is: {best_cp}")
+            # copy over best results
+            best_cp_folder = f'checkpoint-{best_cp}'
+
+            click.echo(f"Copying over files: from {os.path.join(training_args.output_dir, best_cp_folder)} "
+                       f"to {training_args.output_dir}")
+            files_to_copy = glob.glob(os.path.join(training_args.output_dir, best_cp_folder, '*'))
+            for file in files_to_copy:
+                shutil.copy(file, training_args.output_dir)
+        else:
+            click.echo("best checkpoint is the last step...")
+        # remove 'kek'points
+        folders_to_remove = [p for p in glob.glob(os.path.join(training_args.output_dir, '*')) if os.path.isdir(p)]
+        click.echo('Folders to remove: ')
+        for folder in folders_to_remove:
+            click.echo(f"Removing {folder}")
+            shutil.rmtree(folder)
+        if training_args.do_train:
+            logger.info(results)
+            write_json(results, os.path.join(training_args.output_dir, 'dev-results.json'))
         else:
             write_json(predictions, get_output_predictions_file_name(
                 data_args.eval_file_path,
@@ -363,7 +395,43 @@ def main():
                 os.path.basename(os.path.normpath(model_args.model_name_or_path))
             ))
 
-    return results
+
+def generate_predictions(eval_dataset, examples, model, tokenizer, training_args):
+    # n_gpu = 0 if training_args.no_cuda else torch.cuda.device_count()
+    # eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
+    answers = []
+    eval_sampler = torch.utils.data.SequentialSampler(eval_dataset)
+    eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler,
+                                                  batch_size=training_args.per_device_eval_batch_size,
+                                                  collate_fn=collate_eval)
+    # multi-gpu evaluate
+    # if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
+    #    model = torch.nn.DataParallel(model)
+    # Eval!
+
+    start_time = timeit.default_timer()
+    results = []
+    for batch in tqdm(eval_dataloader):
+        for k, v in batch.items():
+            if isinstance(v, torch.Tensor):
+                batch[k] = v.to(training_args.device)
+        with torch.no_grad():
+            outs = model.generate(input_ids=batch['input_ids'],
+                                  attention_mask=batch['attention_mask'],
+                                  max_length=16,
+                                  early_stopping=True)
+        outs = [tokenizer.decode(ids) for ids in outs]
+        answers.extend(outs)
+        logger.debug(outs)
+        results.extend(outs)
+    eval_time = timeit.default_timer() - start_time
+    logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(eval_dataset)} sec per example)")
+    predictions = dict()
+    for result, example in zip(results, examples):
+        if predictions.get(example.qas_id):
+            logger.warning("Duplicate entry detected...")
+        predictions[example.qas_id] = result
+    return predictions
 
 
 if __name__ == "__main__":
