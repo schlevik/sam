@@ -869,6 +869,296 @@
             }
         }
     },
+    "bidaf-drop": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.1750 +/- 0.1178",
+            "mean": 0.175,
+            "95ci": 0.11775086169936448,
+            "control": true
+        },
+        "original_dev_em": 0.5078361286774811,
+        "original_dev_f1": 0.5684442278137021,
+        "n": 4200,
+        "behaviour": {
+            "correct_baseline": 287,
+            "correct_intervention": 233,
+            "right->change->right": 7,
+            "right->keep->wrong": 192,
+            "right->change->wrong": 88,
+            "wrong->change->right": 30,
+            "wrong->keep->right": 196,
+            "consistency": 0.0016666666666666668,
+            "correct_control": 377,
+            "correct_baseline_control": 40,
+            "right+control->change->right": 7,
+            "consistency+control": 0.0016666666666666668
+        },
+        "by_reasoning": {
+            "argmax": {
+                "mean": 0.16666666666666666,
+                "var": null,
+                "95ci": 0.16666666666666666,
+                "printable_result": "0.1667 +/- 0.1667"
+            },
+            "argmin": {
+                "mean": 0.16666666666666666,
+                "var": null,
+                "95ci": 0.16666666666666666,
+                "printable_result": "0.1667 +/- 0.1667"
+            },
+            "bridge": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "bridge-reverse": {
+                "mean": 0,
+                "var": null,
+                "95ci": 0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "comparison": {
+                "mean": 0.3333333333333333,
+                "var": null,
+                "95ci": 0.3333333333333333,
+                "printable_result": "0.3333 +/- 0.3333"
+            },
+            "comparison-reverse": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "retrieval": {
+                "mean": 0.2,
+                "var": null,
+                "95ci": 0.2,
+                "printable_result": "0.2000 +/- 0.2000"
+            },
+            "retrieval-reverse": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "retrieval-two": {
+                "mean": 0,
+                "var": null,
+                "95ci": 0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "retrieval-two-reverse": {
+                "mean": 1.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "1.0000 +/- 0.0000"
+            }
+        },
+        "by_num_modifier": {
+            "1": {
+                "mean": 0.19047619047619047,
+                "var": null,
+                "95ci": 0.16794752389205012,
+                "printable_result": "0.1905 +/- 0.1679"
+            },
+            "2": {
+                "mean": 0.1111111111111111,
+                "var": null,
+                "95ci": 0.1111111111111111,
+                "printable_result": "0.1111 +/- 0.1111"
+            },
+            "3": {
+                "mean": 0.2,
+                "var": null,
+                "95ci": 0.2,
+                "printable_result": "0.2000 +/- 0.2000"
+            }
+        },
+        "by_sam": {
+            "MD": {
+                "mean": 0.125,
+                "var": null,
+                "95ci": 0.125,
+                "printable_result": "0.1250 +/- 0.1250"
+            },
+            "RB": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "VB-neg-impl": {
+                "mean": 0.2,
+                "var": null,
+                "95ci": 0.2,
+                "printable_result": "0.2000 +/- 0.2000"
+            },
+            "VB-pol-rev": {
+                "mean": 0.2727272727272727,
+                "var": null,
+                "95ci": 0.26318715177035906,
+                "printable_result": "0.2727 +/- 0.2632"
+            },
+            "VP-neg-impl": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "VP-pol-rev": {
+                "mean": 0.25,
+                "var": null,
+                "95ci": 0.25,
+                "printable_result": "0.2500 +/- 0.2500"
+            }
+        }
+    },
+    "bidaf-elmo-drop": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.1333 +/- 0.0650",
+            "mean": 0.13333333333333333,
+            "95ci": 0.06502028314809224,
+            "control": true
+        },
+        "original_dev_em": 0.5215837228485011,
+        "original_dev_f1": 0.573165143506799,
+        "n": 4200,
+        "behaviour": {
+            "correct_baseline": 531,
+            "correct_intervention": 433,
+            "right->change->right": 16,
+            "right->keep->wrong": 405,
+            "right->change->wrong": 110,
+            "wrong->change->right": 37,
+            "wrong->keep->right": 380,
+            "consistency": 0.0038095238095238095,
+            "correct_control": 766,
+            "correct_baseline_control": 105,
+            "right+control->change->right": 14,
+            "consistency+control": 0.0033333333333333335
+        },
+        "by_reasoning": {
+            "argmax": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "argmin": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "bridge": {
+                "mean": 0.14285714285714285,
+                "var": null,
+                "95ci": 0.14285714285714285,
+                "printable_result": "0.1429 +/- 0.1429"
+            },
+            "bridge-reverse": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "comparison": {
+                "mean": 0.42857142857142855,
+                "var": null,
+                "95ci": 0.3665993191241656,
+                "printable_result": "0.4286 +/- 0.3666"
+            },
+            "comparison-reverse": {
+                "mean": 0.08333333333333333,
+                "var": null,
+                "95ci": 0.08333333333333333,
+                "printable_result": "0.0833 +/- 0.0833"
+            },
+            "retrieval": {
+                "mean": 0.16666666666666666,
+                "var": null,
+                "95ci": 0.16666666666666666,
+                "printable_result": "0.1667 +/- 0.1667"
+            },
+            "retrieval-reverse": {
+                "mean": 0.12903225806451613,
+                "var": null,
+                "95ci": 0.11800962437686878,
+                "printable_result": "0.1290 +/- 0.1180"
+            },
+            "retrieval-two": {
+                "mean": 0.3333333333333333,
+                "var": null,
+                "95ci": 0.3333333333333333,
+                "printable_result": "0.3333 +/- 0.3333"
+            },
+            "retrieval-two-reverse": {
+                "mean": 0.5,
+                "var": null,
+                "95ci": 0.5,
+                "printable_result": "0.5000 +/- 0.5000"
+            }
+        },
+        "by_num_modifier": {
+            "1": {
+                "mean": 0.13636363636363635,
+                "var": null,
+                "95ci": 0.10139966023592016,
+                "printable_result": "0.1364 +/- 0.1014"
+            },
+            "2": {
+                "mean": 0.125,
+                "var": null,
+                "95ci": 0.125,
+                "printable_result": "0.1250 +/- 0.1250"
+            },
+            "3": {
+                "mean": 0.13513513513513514,
+                "var": null,
+                "95ci": 0.11015532502460666,
+                "printable_result": "0.1351 +/- 0.1102"
+            }
+        },
+        "by_sam": {
+            "MD": {
+                "mean": 0.07142857142857142,
+                "var": null,
+                "95ci": 0.07142857142857142,
+                "printable_result": "0.0714 +/- 0.0714"
+            },
+            "RB": {
+                "mean": 0.058823529411764705,
+                "var": null,
+                "95ci": 0.058823529411764705,
+                "printable_result": "0.0588 +/- 0.0588"
+            },
+            "VB-neg-impl": {
+                "mean": 0.14285714285714285,
+                "var": null,
+                "95ci": 0.14285714285714285,
+                "printable_result": "0.1429 +/- 0.1429"
+            },
+            "VB-pol-rev": {
+                "mean": 0.19047619047619047,
+                "var": null,
+                "95ci": 0.16794752389205012,
+                "printable_result": "0.1905 +/- 0.1679"
+            },
+            "VP-neg-impl": {
+                "mean": 0.05555555555555555,
+                "var": null,
+                "95ci": 0.05555555555555555,
+                "printable_result": "0.0556 +/- 0.0556"
+            },
+            "VP-pol-rev": {
+                "mean": 0.23809523809523808,
+                "var": null,
+                "95ci": 0.18216466623706065,
+                "printable_result": "0.2381 +/- 0.1822"
+            }
+        }
+    },
     "roberta-base-drop": {
         "evaluation_on_intervention": {
             "human_readable": "0.1952 +/- 0.0347",

@@ -22,3 +22,9 @@
 /baseline-roberta-large-drop.json
 /intervention-roberta-large-drop.json
 /control-roberta-large-drop.json
+/baseline-bidaf-drop.json
+/control-bidaf-drop.json
+/intervention-bidaf-drop.json
+/baseline-bidaf-elmo-drop.json
+/control-bidaf-elmo-drop.json
+/intervention-bidaf-elmo-drop.json

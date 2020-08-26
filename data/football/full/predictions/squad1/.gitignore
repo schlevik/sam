@@ -22,3 +22,9 @@
 /baseline-roberta-large-squad1.json
 /intervention-roberta-large-squad1.json
 /control-roberta-large-squad1.json
+/baseline-bidaf-squad1.json
+/control-bidaf-squad1.json
+/intervention-bidaf-squad1.json
+/baseline-bidaf-elmo-squad1.json
+/control-bidaf-elmo-squad1.json
+/intervention-bidaf-elmo-squad1.json

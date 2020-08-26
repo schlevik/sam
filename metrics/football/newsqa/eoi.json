@@ -869,6 +869,296 @@
             }
         }
     },
+    "bidaf-elmo-newsqa": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.0522 +/- 0.0287",
+            "mean": 0.05217391304347826,
+            "95ci": 0.028739235212161016,
+            "control": true
+        },
+        "original_dev_em": 0.42777898907661405,
+        "original_dev_f1": 0.5740942955017091,
+        "n": 4200,
+        "behaviour": {
+            "correct_baseline": 489,
+            "correct_intervention": 542,
+            "right->change->right": 15,
+            "right->keep->wrong": 402,
+            "right->change->wrong": 72,
+            "wrong->change->right": 39,
+            "wrong->keep->right": 488,
+            "consistency": 0.0035714285714285713,
+            "correct_control": 1050,
+            "correct_baseline_control": 230,
+            "right+control->change->right": 12,
+            "consistency+control": 0.002857142857142857
+        },
+        "by_reasoning": {
+            "argmax": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "argmin": {
+                "mean": 0.05,
+                "var": null,
+                "95ci": 0.05,
+                "printable_result": "0.0500 +/- 0.0500"
+            },
+            "bridge": {
+                "mean": 0.07142857142857142,
+                "var": null,
+                "95ci": 0.07142857142857142,
+                "printable_result": "0.0714 +/- 0.0714"
+            },
+            "bridge-reverse": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "comparison": {
+                "mean": 1.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "1.0000 +/- 0.0000"
+            },
+            "comparison-reverse": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "retrieval": {
+                "mean": 0.04424778761061947,
+                "var": null,
+                "95ci": 0.03791641828937935,
+                "printable_result": "0.0442 +/- 0.0379"
+            },
+            "retrieval-reverse": {
+                "mean": 0.06976744186046512,
+                "var": null,
+                "95ci": 0.06976744186046512,
+                "printable_result": "0.0698 +/- 0.0698"
+            },
+            "retrieval-two": {
+                "mean": 0.5,
+                "var": null,
+                "95ci": 0.5,
+                "printable_result": "0.5000 +/- 0.5000"
+            },
+            "retrieval-two-reverse": {
+                "mean": 0,
+                "var": null,
+                "95ci": 0,
+                "printable_result": "0.0000 +/- 0.0000"
+            }
+        },
+        "by_num_modifier": {
+            "1": {
+                "mean": 0.07207207207207207,
+                "var": null,
+                "95ci": 0.048109099586281845,
+                "printable_result": "0.0721 +/- 0.0481"
+            },
+            "2": {
+                "mean": 0.045454545454545456,
+                "var": null,
+                "95ci": 0.045454545454545456,
+                "printable_result": "0.0455 +/- 0.0455"
+            },
+            "3": {
+                "mean": 0.018867924528301886,
+                "var": null,
+                "95ci": 0.018867924528301886,
+                "printable_result": "0.0189 +/- 0.0189"
+            }
+        },
+        "by_sam": {
+            "MD": {
+                "mean": 0.0425531914893617,
+                "var": null,
+                "95ci": 0.0425531914893617,
+                "printable_result": "0.0426 +/- 0.0426"
+            },
+            "RB": {
+                "mean": 0.027777777777777776,
+                "var": null,
+                "95ci": 0.027777777777777776,
+                "printable_result": "0.0278 +/- 0.0278"
+            },
+            "VB-neg-impl": {
+                "mean": 0.034482758620689655,
+                "var": null,
+                "95ci": 0.034482758620689655,
+                "printable_result": "0.0345 +/- 0.0345"
+            },
+            "VB-pol-rev": {
+                "mean": 0.09090909090909091,
+                "var": null,
+                "95ci": 0.08494328797853037,
+                "printable_result": "0.0909 +/- 0.0849"
+            },
+            "VP-neg-impl": {
+                "mean": 0.07142857142857142,
+                "var": null,
+                "95ci": 0.07142857142857142,
+                "printable_result": "0.0714 +/- 0.0714"
+            },
+            "VP-pol-rev": {
+                "mean": 0.03125,
+                "var": null,
+                "95ci": 0.03125,
+                "printable_result": "0.0312 +/- 0.0312"
+            }
+        }
+    },
+    "bidaf-newsqa": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.1289 +/- 0.0471",
+            "mean": 0.12886597938144329,
+            "95ci": 0.047147519930069604,
+            "control": true
+        },
+        "original_dev_em": 0.399677493665054,
+        "original_dev_f1": 0.5430668454898401,
+        "n": 4200,
+        "behaviour": {
+            "correct_baseline": 472,
+            "correct_intervention": 520,
+            "right->change->right": 26,
+            "right->keep->wrong": 323,
+            "right->change->wrong": 123,
+            "wrong->change->right": 67,
+            "wrong->keep->right": 427,
+            "consistency": 0.006190476190476191,
+            "correct_control": 868,
+            "correct_baseline_control": 194,
+            "right+control->change->right": 25,
+            "consistency+control": 0.005952380952380952
+        },
+        "by_reasoning": {
+            "argmax": {
+                "mean": 0.07692307692307693,
+                "var": null,
+                "95ci": 0.07692307692307693,
+                "printable_result": "0.0769 +/- 0.0769"
+            },
+            "argmin": {
+                "mean": 0.15384615384615385,
+                "var": null,
+                "95ci": 0.15384615384615385,
+                "printable_result": "0.1538 +/- 0.1538"
+            },
+            "bridge": {
+                "mean": 0.2,
+                "var": null,
+                "95ci": 0.2,
+                "printable_result": "0.2000 +/- 0.2000"
+            },
+            "bridge-reverse": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "comparison": {
+                "mean": 0,
+                "var": null,
+                "95ci": 0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "comparison-reverse": {
+                "mean": 0,
+                "var": null,
+                "95ci": 0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "retrieval": {
+                "mean": 0.09649122807017543,
+                "var": null,
+                "95ci": 0.0542008090113747,
+                "printable_result": "0.0965 +/- 0.0542"
+            },
+            "retrieval-reverse": {
+                "mean": 0.2608695652173913,
+                "var": null,
+                "95ci": 0.17945535522247374,
+                "printable_result": "0.2609 +/- 0.1795"
+            },
+            "retrieval-two": {
+                "mean": 0.3333333333333333,
+                "var": null,
+                "95ci": 0.3333333333333333,
+                "printable_result": "0.3333 +/- 0.3333"
+            },
+            "retrieval-two-reverse": {
+                "mean": 0.5,
+                "var": null,
+                "95ci": 0.5,
+                "printable_result": "0.5000 +/- 0.5000"
+            }
+        },
+        "by_num_modifier": {
+            "1": {
+                "mean": 0.14772727272727273,
+                "var": null,
+                "95ci": 0.07413552896494943,
+                "printable_result": "0.1477 +/- 0.0741"
+            },
+            "2": {
+                "mean": 0.11764705882352941,
+                "var": null,
+                "95ci": 0.08842492679670651,
+                "printable_result": "0.1176 +/- 0.0884"
+            },
+            "3": {
+                "mean": 0.10909090909090909,
+                "var": null,
+                "95ci": 0.08239061070283077,
+                "printable_result": "0.1091 +/- 0.0824"
+            }
+        },
+        "by_sam": {
+            "MD": {
+                "mean": 0.13333333333333333,
+                "var": null,
+                "95ci": 0.12164181136559626,
+                "printable_result": "0.1333 +/- 0.1216"
+            },
+            "RB": {
+                "mean": 0.06060606060606061,
+                "var": null,
+                "95ci": 0.06060606060606061,
+                "printable_result": "0.0606 +/- 0.0606"
+            },
+            "VB-neg-impl": {
+                "mean": 0.06060606060606061,
+                "var": null,
+                "95ci": 0.06060606060606061,
+                "printable_result": "0.0606 +/- 0.0606"
+            },
+            "VB-pol-rev": {
+                "mean": 0.16129032258064516,
+                "var": null,
+                "95ci": 0.12947240832631227,
+                "printable_result": "0.1613 +/- 0.1295"
+            },
+            "VP-neg-impl": {
+                "mean": 0.22857142857142856,
+                "var": null,
+                "95ci": 0.13911466045191448,
+                "printable_result": "0.2286 +/- 0.1391"
+            },
+            "VP-pol-rev": {
+                "mean": 0.125,
+                "var": null,
+                "95ci": 0.11458615188383096,
+                "printable_result": "0.1250 +/- 0.1146"
+            }
+        }
+    },
     "roberta-base-newsqa": {
         "evaluation_on_intervention": {
             "human_readable": "0.1414 +/- 0.0307",

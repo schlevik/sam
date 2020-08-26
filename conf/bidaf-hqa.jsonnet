@@ -1,16 +1,16 @@
-// Configuration for an Elmo-augmented machine comprehension model based on:
-//   Seo, Min Joon et al. "Bidirectional Attention Flow for Machine Comprehension."
+// Configuration for the a machine comprehension model based on:
+//   Seo, Min Joon et al. “Bidirectional Attention Flow for Machine Comprehension.”
 //   ArXiv/1611.01603 (2016)
 {
   "dataset_reader": {
     "type": "squad",
+    #"cache_directory": "~/localscratch",
+    #"max_instances": 100,
+    "passage_length_limit": 1750,
     "token_indexers": {
       "tokens": {
         "type": "single_id",
         "lowercase_tokens": true
-      },
-      "elmo": {
-        "type": "elmo_characters"
       },
       "token_characters": {
         "type": "characters",
@@ -28,41 +28,34 @@
   "model": {
     "type": "bidaf",
     "text_field_embedder": {
-        "token_embedders": {
-            "tokens": {
-                "type": "embedding",
-                "pretrained_file": "https://allennlp.s3.amazonaws.com/datasets/glove/glove.6B.100d.txt.gz",
-                "embedding_dim": 100,
-                "trainable": false
-            },
-            "elmo":{
-                "type": "elmo_token_embedder",
-                "options_file": "https://allennlp.s3.amazonaws.com/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json",
-                "weight_file": "https://allennlp.s3.amazonaws.com/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5",
-                "do_layer_norm": false,
-                "dropout": 0.0
-            },
-            "token_characters": {
-                "type": "character_encoding",
-                "embedding": {
-                "num_embeddings": 262,
-                "embedding_dim": 16
-                },
-                "encoder": {
-                "type": "cnn",
-                "embedding_dim": 16,
-                "num_filters": 100,
-                "ngram_filter_sizes": [5]
-                },
-                "dropout": 0.2
-            }
+      "token_embedders": {
+        "tokens": {
+          "type": "embedding",
+          "pretrained_file": "https://allennlp.s3.amazonaws.com/datasets/glove/glove.6B.100d.txt.gz",
+          "embedding_dim": 100,
+          "trainable": false
+        },
+        "token_characters": {
+          "type": "character_encoding",
+          "embedding": {
+            "num_embeddings": 262,
+            "embedding_dim": 16
+          },
+          "encoder": {
+            "type": "cnn",
+            "embedding_dim": 16,
+            "num_filters": 100,
+            "ngram_filter_sizes": [5]
+          },
+          "dropout": 0.2
         }
+      }
     },
     "num_highway_layers": 2,
     "phrase_layer": {
       "type": "lstm",
       "bidirectional": true,
-      "input_size": 1224,
+      "input_size": 200,
       "hidden_size": 100,
       "num_layers": 1
     },
@@ -92,15 +85,16 @@
   "data_loader": {
     "batch_sampler": {
       "type": "bucket",
-      "batch_size": 40
+      "batch_size": 16
     }
   },
+
   "trainer": {
-    "num_epochs": std.parseInt(std.extVar("MULT")) * 20,
+    "num_epochs": std.parseInt(std.extVar("MULT")) * 15,
     "grad_norm": 5.0,
     "patience": 10,
     "validation_metric": "+em",
-    "cuda_device": 0,
+    #"cuda_device": std.parseInt(std.extVar("CUDA")),
     "learning_rate_scheduler": {
       "type": "reduce_on_plateau",
       "factor": 0.5,
@@ -111,5 +105,8 @@
       "type": "adam",
       "betas": [0.9, 0.9]
     }
+  },
+  "distributed": {
+    "cuda_devices": [0, 1, 2, 3],
   }
 }

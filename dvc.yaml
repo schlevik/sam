@@ -817,3 +817,203 @@ stages:
     - data/datasets/squad1/train-v1.1.json
     outs:
     - models/bidaf-squad1
+  train-bidaf-on-hotpotqa:
+    cmd: TRAIN_SET=data/datasets/hotpotqa/train.json EVAL_SET=data/datasets/hotpotqa/dev.json
+      CUDA=0 MULT=1 allennlp train conf/bidaf-hqa.jsonnet -s models/bidaf-hotpotqa
+    deps:
+    - data/datasets/hotpotqa/dev.json
+    - data/datasets/hotpotqa/train.json
+    outs:
+    - models/bidaf-hotpotqa
+  fix-newsqa-for-bidaf:
+    cmd: python main.py fix-newsqa-for-bidaf
+    deps:
+    - data/datasets/newsqa/train.json
+    outs:
+    - data/datasets/newsqa/train-fixed.json
+  train-bidaf-elmo-on-squad1:
+    cmd: TRAIN_SET=data/datasets/squad1/train-v1.1.json EVAL_SET=data/datasets/squad1/dev-v1.1.json
+      CUDA=0 MULT=1 allennlp train conf/bidaf-elmo.jsonnet -s models/bidaf-elmo-squad1
+    deps:
+    - data/datasets/squad1/dev-v1.1.json
+    - data/datasets/squad1/train-v1.1.json
+    outs:
+    - models/bidaf-elmo-squad1
+  train-bidaf-elmo-on-drop:
+    cmd: TRAIN_SET=data/datasets/drop/train.json EVAL_SET=data/datasets/drop/dev.json
+      CUDA=0 MULT=2 allennlp train conf/bidaf-elmo-drop.jsonnet -s models/bidaf-elmo-drop
+    deps:
+    - data/datasets/drop/dev.json
+    - data/datasets/drop/train.json
+    outs:
+    - models/bidaf-elmo-drop
+  train-bidaf-on-newsqa:
+    cmd: TRAIN_SET=data/datasets/newsqa/train-fixed.json EVAL_SET=data/datasets/newsqa/dev.json
+      CUDA=0 MULT=1 allennlp train conf/bidaf.jsonnet -s models/bidaf-newsqa
+    deps:
+    - data/datasets/newsqa/dev.json
+    - data/datasets/newsqa/train-fixed.json
+    outs:
+    - models/bidaf-newsqa
+  train-bidaf-elmo-on-newsqa:
+    cmd: TRAIN_SET=data/datasets/newsqa/train-fixed.json EVAL_SET=data/datasets/newsqa/dev.json
+      CUDA=0 MULT=1 allennlp train conf/bidaf-elmo-newsqa.jsonnet -s models/bidaf-elmo-newsqa
+    deps:
+    - data/datasets/newsqa/dev.json
+    - data/datasets/newsqa/train-fixed.json
+    outs:
+    - models/bidaf-elmo-newsqa
+  predict-bidaf-on-squad1:
+    cmd: mkdir -p data/football/full/predictions/squad1 &&allennlp predict models/bidaf-squad1/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/squad1/baseline-bidaf-squad1.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/baseline.json data/football/full/predictions/squad1/baseline-bidaf-squad1.json
+      && allennlp predict models/bidaf-squad1/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/squad1/intervention-bidaf-squad1.json
+      --cuda-device 0 --use-dataset-reader --silent &&python main.py convert-allennlp
+      data/football/full/intervention.json data/football/full/predictions/squad1/intervention-bidaf-squad1.json
+      &&allennlp predict models/bidaf-squad1/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/squad1/control-bidaf-squad1.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/control.json data/football/full/predictions/squad1/control-bidaf-squad1.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-squad1/model.tar.gz
+    outs:
+    - data/football/full/predictions/squad1/baseline-bidaf-squad1.json
+    - data/football/full/predictions/squad1/control-bidaf-squad1.json
+    - data/football/full/predictions/squad1/intervention-bidaf-squad1.json
+  predict-bidaf-on-hotpotqa:
+    cmd: mkdir -p data/football/full/predictions/hotpotqa &&allennlp predict models/bidaf-hotpotqa/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/hotpotqa/baseline-bidaf-hotpotqa.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/baseline.json data/football/full/predictions/hotpotqa/baseline-bidaf-hotpotqa.json
+      && allennlp predict models/bidaf-hotpotqa/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/hotpotqa/intervention-bidaf-hotpotqa.json
+      --cuda-device 0 --use-dataset-reader --silent &&python main.py convert-allennlp
+      data/football/full/intervention.json data/football/full/predictions/hotpotqa/intervention-bidaf-hotpotqa.json
+      &&allennlp predict models/bidaf-hotpotqa/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/hotpotqa/control-bidaf-hotpotqa.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/control.json data/football/full/predictions/hotpotqa/control-bidaf-hotpotqa.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-hotpotqa/model.tar.gz
+    outs:
+    - data/football/full/predictions/hotpotqa/baseline-bidaf-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/control-bidaf-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/intervention-bidaf-hotpotqa.json
+  predict-bidaf-on-newsqa:
+    cmd: mkdir -p data/football/full/predictions/newsqa &&allennlp predict models/bidaf-newsqa/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/newsqa/baseline-bidaf-newsqa.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/baseline.json data/football/full/predictions/newsqa/baseline-bidaf-newsqa.json
+      && allennlp predict models/bidaf-newsqa/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/newsqa/intervention-bidaf-newsqa.json
+      --cuda-device 0 --use-dataset-reader --silent &&python main.py convert-allennlp
+      data/football/full/intervention.json data/football/full/predictions/newsqa/intervention-bidaf-newsqa.json
+      &&allennlp predict models/bidaf-newsqa/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/newsqa/control-bidaf-newsqa.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/control.json data/football/full/predictions/newsqa/control-bidaf-newsqa.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-newsqa/model.tar.gz
+    outs:
+    - data/football/full/predictions/newsqa/baseline-bidaf-newsqa.json
+    - data/football/full/predictions/newsqa/control-bidaf-newsqa.json
+    - data/football/full/predictions/newsqa/intervention-bidaf-newsqa.json
+  predict-bidaf-on-drop:
+    cmd: mkdir -p data/football/full/predictions/drop &&allennlp predict models/bidaf-drop/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/drop/baseline-bidaf-drop.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/baseline.json data/football/full/predictions/drop/baseline-bidaf-drop.json
+      && allennlp predict models/bidaf-drop/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/drop/intervention-bidaf-drop.json
+      --cuda-device 0 --use-dataset-reader --silent &&python main.py convert-allennlp
+      data/football/full/intervention.json data/football/full/predictions/drop/intervention-bidaf-drop.json
+      &&allennlp predict models/bidaf-drop/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/drop/control-bidaf-drop.json --cuda-device
+      0 --use-dataset-reader --silent && python main.py convert-allennlp data/football/full/control.json
+      data/football/full/predictions/drop/control-bidaf-drop.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-drop/model.tar.gz
+    outs:
+    - data/football/full/predictions/drop/baseline-bidaf-drop.json
+    - data/football/full/predictions/drop/control-bidaf-drop.json
+    - data/football/full/predictions/drop/intervention-bidaf-drop.json
+  predict-bidaf-elmo-on-newsqa:
+    cmd: mkdir -p data/football/full/predictions/newsqa &&allennlp predict models/bidaf-elmo-newsqa/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/newsqa/baseline-bidaf-elmo-newsqa.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/baseline.json data/football/full/predictions/newsqa/baseline-bidaf-elmo-newsqa.json
+      && allennlp predict models/bidaf-elmo-newsqa/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/newsqa/intervention-bidaf-elmo-newsqa.json
+      --cuda-device 0 --use-dataset-reader --silent &&python main.py convert-allennlp
+      data/football/full/intervention.json data/football/full/predictions/newsqa/intervention-bidaf-elmo-newsqa.json
+      &&allennlp predict models/bidaf-elmo-newsqa/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/newsqa/control-bidaf-elmo-newsqa.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/control.json data/football/full/predictions/newsqa/control-bidaf-elmo-newsqa.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-elmo-newsqa/model.tar.gz
+    outs:
+    - data/football/full/predictions/newsqa/baseline-bidaf-elmo-newsqa.json
+    - data/football/full/predictions/newsqa/control-bidaf-elmo-newsqa.json
+    - data/football/full/predictions/newsqa/intervention-bidaf-elmo-newsqa.json
+  predict-bidaf-elmo-on-squad1:
+    cmd: mkdir -p data/football/full/predictions/squad1 &&allennlp predict models/bidaf-elmo-squad1/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/squad1/baseline-bidaf-elmo-squad1.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/baseline.json data/football/full/predictions/squad1/baseline-bidaf-elmo-squad1.json
+      && allennlp predict models/bidaf-elmo-squad1/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/squad1/intervention-bidaf-elmo-squad1.json
+      --cuda-device 0 --use-dataset-reader --silent &&python main.py convert-allennlp
+      data/football/full/intervention.json data/football/full/predictions/squad1/intervention-bidaf-elmo-squad1.json
+      &&allennlp predict models/bidaf-elmo-squad1/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/squad1/control-bidaf-elmo-squad1.json
+      --cuda-device 0 --use-dataset-reader --silent && python main.py convert-allennlp
+      data/football/full/control.json data/football/full/predictions/squad1/control-bidaf-elmo-squad1.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-elmo-squad1/model.tar.gz
+    outs:
+    - data/football/full/predictions/squad1/baseline-bidaf-elmo-squad1.json
+    - data/football/full/predictions/squad1/control-bidaf-elmo-squad1.json
+    - data/football/full/predictions/squad1/intervention-bidaf-elmo-squad1.json
+  predict-bidaf-elmo-on-drop:
+    cmd: mkdir -p data/football/full/predictions/drop &&allennlp predict models/bidaf-elmo-drop/model.tar.gz
+      data/football/full/baseline.json --output-file data/football/full/predictions/drop/baseline-bidaf-elmo-drop.json
+      --cuda-device 0 --use-dataset-reader --batch-size 80 --silent && python main.py
+      convert-allennlp data/football/full/baseline.json data/football/full/predictions/drop/baseline-bidaf-elmo-drop.json
+      && allennlp predict models/bidaf-elmo-drop/model.tar.gz data/football/full/intervention.json
+      --output-file data/football/full/predictions/drop/intervention-bidaf-elmo-drop.json
+      --cuda-device 0 --use-dataset-reader --batch-size 80 --silent &&python main.py
+      convert-allennlp data/football/full/intervention.json data/football/full/predictions/drop/intervention-bidaf-elmo-drop.json
+      &&allennlp predict models/bidaf-elmo-drop/model.tar.gz data/football/full/control.json
+      --output-file data/football/full/predictions/drop/control-bidaf-elmo-drop.json
+      --cuda-device 0 --use-dataset-reader --batch-size 80 --silent && python main.py
+      convert-allennlp data/football/full/control.json data/football/full/predictions/drop/control-bidaf-elmo-drop.json
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/bidaf-elmo-drop/model.tar.gz
+    outs:
+    - data/football/full/predictions/drop/baseline-bidaf-elmo-drop.json
+    - data/football/full/predictions/drop/control-bidaf-elmo-drop.json
+    - data/football/full/predictions/drop/intervention-bidaf-elmo-drop.json

@@ -869,6 +869,151 @@
             }
         }
     },
+    "bidaf-hotpotqa": {
+        "evaluation_on_intervention": {
+            "human_readable": "0.0388 +/- 0.0333",
+            "mean": 0.03875968992248062,
+            "95ci": 0.033308829410321664,
+            "control": true
+        },
+        "original_dev_em": 0.44615799188613803,
+        "original_dev_f1": 0.579092741012573,
+        "n": 4200,
+        "behaviour": {
+            "correct_baseline": 428,
+            "correct_intervention": 374,
+            "right->change->right": 5,
+            "right->keep->wrong": 367,
+            "right->change->wrong": 56,
+            "wrong->change->right": 18,
+            "wrong->keep->right": 351,
+            "consistency": 0.0011904761904761906,
+            "correct_control": 746,
+            "correct_baseline_control": 129,
+            "right+control->change->right": 5,
+            "consistency+control": 0.0011904761904761906
+        },
+        "by_reasoning": {
+            "argmax": {
+                "mean": 0.25,
+                "var": null,
+                "95ci": 0.25,
+                "printable_result": "0.2500 +/- 0.2500"
+            },
+            "argmin": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "bridge": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "bridge-reverse": {
+                "mean": 0.25,
+                "var": null,
+                "95ci": 0.25,
+                "printable_result": "0.2500 +/- 0.2500"
+            },
+            "comparison": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "comparison-reverse": {
+                "mean": 0.041666666666666664,
+                "var": null,
+                "95ci": 0.041666666666666664,
+                "printable_result": "0.0417 +/- 0.0417"
+            },
+            "retrieval": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "retrieval-reverse": {
+                "mean": 0.045454545454545456,
+                "var": null,
+                "95ci": 0.045454545454545456,
+                "printable_result": "0.0455 +/- 0.0455"
+            },
+            "retrieval-two": {
+                "mean": 0.3333333333333333,
+                "var": null,
+                "95ci": 0.3333333333333333,
+                "printable_result": "0.3333 +/- 0.3333"
+            },
+            "retrieval-two-reverse": {
+                "mean": 0,
+                "var": null,
+                "95ci": 0,
+                "printable_result": "0.0000 +/- 0.0000"
+            }
+        },
+        "by_num_modifier": {
+            "1": {
+                "mean": 0.03225806451612903,
+                "var": null,
+                "95ci": 0.03225806451612903,
+                "printable_result": "0.0323 +/- 0.0323"
+            },
+            "2": {
+                "mean": 0.03333333333333333,
+                "var": null,
+                "95ci": 0.03333333333333333,
+                "printable_result": "0.0333 +/- 0.0333"
+            },
+            "3": {
+                "mean": 0.05405405405405406,
+                "var": null,
+                "95ci": 0.05405405405405406,
+                "printable_result": "0.0541 +/- 0.0541"
+            }
+        },
+        "by_sam": {
+            "MD": {
+                "mean": 0.1111111111111111,
+                "var": null,
+                "95ci": 0.1111111111111111,
+                "printable_result": "0.1111 +/- 0.1111"
+            },
+            "RB": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "VB-neg-impl": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            },
+            "VB-pol-rev": {
+                "mean": 0.09523809523809523,
+                "var": null,
+                "95ci": 0.09523809523809523,
+                "printable_result": "0.0952 +/- 0.0952"
+            },
+            "VP-neg-impl": {
+                "mean": 0.03333333333333333,
+                "var": null,
+                "95ci": 0.03333333333333333,
+                "printable_result": "0.0333 +/- 0.0333"
+            },
+            "VP-pol-rev": {
+                "mean": 0.0,
+                "var": null,
+                "95ci": 0.0,
+                "printable_result": "0.0000 +/- 0.0000"
+            }
+        }
+    },
     "roberta-base-hotpotqa": {
         "evaluation_on_intervention": {
             "human_readable": "0.1697 +/- 0.0352",

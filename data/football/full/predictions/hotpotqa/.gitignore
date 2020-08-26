@@ -22,3 +22,6 @@
 /baseline-roberta-large-hotpotqa.json
 /intervention-roberta-large-hotpotqa.json
 /control-roberta-large-hotpotqa.json
+/baseline-bidaf-hotpotqa.json
+/control-bidaf-hotpotqa.json
+/intervention-bidaf-hotpotqa.json

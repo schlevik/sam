@@ -4,6 +4,7 @@
 {
   "dataset_reader": {
     "type": "squad",
+    "passage_length_limit": 1500,
     "token_indexers": {
       "tokens": {
         "type": "single_id",
@@ -92,7 +93,7 @@
   "data_loader": {
     "batch_sampler": {
       "type": "bucket",
-      "batch_size": 40
+      "batch_size": 16
     }
   },
   "trainer": {
@@ -111,5 +112,8 @@
       "type": "adam",
       "betas": [0.9, 0.9]
     }
+  },
+  "distributed": {
+    "cuda_devices": [0, 1, 2, 3],
   }
 }

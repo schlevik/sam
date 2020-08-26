@@ -4,6 +4,8 @@
 {
   "dataset_reader": {
     "type": "squad",
+    "passage_length_limit": 1500,
+    "cache_directory": "/mnt/iusers01/gb01/z07959vs/localscratch/",
     "token_indexers": {
       "tokens": {
         "type": "single_id",
@@ -92,11 +94,12 @@
   "data_loader": {
     "batch_sampler": {
       "type": "bucket",
-      "batch_size": 40
+      "batch_size": 20,
     }
   },
   "trainer": {
-    "num_epochs": std.parseInt(std.extVar("MULT")) * 20,
+    "num_gradient_accumulation_steps": 2,
+    "num_epochs": std.parseInt(std.extVar("MULT")) * 15,
     "grad_norm": 5.0,
     "patience": 10,
     "validation_metric": "+em",
@@ -110,6 +113,10 @@
     "optimizer": {
       "type": "adam",
       "betas": [0.9, 0.9]
-    }
-  }
+    },
+  },
+  #"distributed": {
+  #  "cuda_devices": [0, 1],
+  #}
+
 }

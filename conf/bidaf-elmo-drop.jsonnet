@@ -4,6 +4,7 @@
 {
   "dataset_reader": {
     "type": "squad",
+    "passage_length_limit": 750,
     "token_indexers": {
       "tokens": {
         "type": "single_id",

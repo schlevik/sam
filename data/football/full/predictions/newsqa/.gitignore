@@ -22,3 +22,9 @@
 /baseline-albert-xxlarge-v2-newsqa.json
 /control-albert-xxlarge-v2-newsqa.json
 /intervention-albert-xxlarge-v2-newsqa.json
+/baseline-bidaf-newsqa.json
+/control-bidaf-newsqa.json
+/intervention-bidaf-newsqa.json
+/baseline-bidaf-elmo-newsqa.json
+/control-bidaf-elmo-newsqa.json
+/intervention-bidaf-elmo-newsqa.json
