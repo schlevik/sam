@@ -1,3 +1,4 @@
+import logging
 import os
 import warnings
 from functools import partial
@@ -14,9 +15,7 @@ from transformers import Trainer, PreTrainedModel, TrainingArguments, DataCollat
 from transformers.trainer import get_tpu_sampler
 from transformers.trainer_utils import is_wandb_available, PREFIX_CHECKPOINT_DIR
 
-from scripts.t5_minimal_model_parallel2 import logger
-from scripts.t5_minimal_model_parallel3 import logger
-
+logger = logging.getLogger(__name__)
 
 if is_apex_available():
     from apex import amp
