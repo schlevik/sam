@@ -24,6 +24,8 @@ from transformers import T5ForConditionalGeneration, T5Tokenizer, SquadV1Process
 from transformers import Trainer, set_seed
 from transformers.trainer_utils import is_wandb_available
 
+from scripts.t5utils import T5ForConditionalGeneration4WayParallel, T5ForConditionalGeneration2WayParallel, MyTrainer
+
 logger = logging.getLogger(__name__)
 
 # process the examples in input and target text format and the eos token at the end
@@ -151,6 +153,10 @@ class DataTrainingArguments:
         default=False,
         metadata={"help": "Whether to evaluate all checkpoints."}
     )
+    model_parallel: int = field(
+        default=None,
+        metadata={"help": "Accepts strictly 0 2 and 4 as values and will employ no, double or 4 way model parallelism."}
+    )
 
 
 def get_dataset(in_file, tokenizer, args: DataTrainingArguments, evaluate=False):
@@ -266,10 +272,23 @@ def main():
         # Make sure only the first process in distributed training will download model & vocab
         torch.distributed.barrier()
     tokenizer = get_tokenizer(model_args.model_name_or_path, do_lower_case=False)
-    model = T5ForConditionalGeneration.from_pretrained(
-        model_args.model_name_or_path,
-        cache_dir=model_args.cache_dir,
-    )
+    if data_args.model_parallel == 4:
+        model = T5ForConditionalGeneration4WayParallel.from_pretrained(
+            model_args.model_name_or_path,
+            cache_dir=model_args.cache_dir,
+        )
+    elif data_args.model_parallel == 2:
+        model = T5ForConditionalGeneration2WayParallel.from_pretrained(
+            model_args.model_name_or_path,
+            cache_dir=model_args.cache_dir,
+        )
+    elif data_args.model_parallel is None:
+        model = T5ForConditionalGeneration.from_pretrained(
+            model_args.model_name_or_path,
+            cache_dir=model_args.cache_dir,
+        )
+    else:
+        raise ValueError(f"Can only have no, 2way or 4way model parallelism! (expected: {data_args.model_parallel})")
     if training_args.local_rank == 0:
         # Make sure only the first process in distributed training will download model & vocab
         torch.distributed.barrier()
@@ -293,14 +312,24 @@ def main():
         else:
             train_dataset = torch.load('features.bin')
         # Initialize our Trainer
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
-            data_collator=collate_training,
-            prediction_loss_only=True
-        )
+        if data_args.model_parallel:
+            trainer = MyTrainer(
+                model=model,
+                args=training_args,
+                train_dataset=train_dataset,
+                eval_dataset=eval_dataset,
+                data_collator=collate_training,
+                prediction_loss_only=True
+            )
+        else:
+            trainer = Trainer(
+                model=model,
+                args=training_args,
+                train_dataset=train_dataset,
+                eval_dataset=eval_dataset,
+                data_collator=collate_training,
+                prediction_loss_only=True
+            )
         trainer.train(
             model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
         )
@@ -311,7 +340,6 @@ def main():
             tokenizer.save_pretrained(training_args.output_dir)
 
     # Evaluation
-    results = {}
     if training_args.do_eval and training_args.local_rank in [-1, 0]:
         if training_args.do_train:
             model_path = os.path.basename(training_args.output_dir)
@@ -335,6 +363,7 @@ def main():
             global_step = checkpoint.split("-")[-1]
             if not all(s in string.digits for s in global_step):
                 global_step = ''
+            # no model parallelism here (didnt check model.generate)
             model = T5ForConditionalGeneration.from_pretrained(checkpoint)
             device = torch.device("cuda" if torch.cuda.is_available() and not training_args.no_cuda else "cpu")
             model.to(device)
@@ -350,6 +379,7 @@ def main():
                     step = int(global_step) if global_step else trainer.global_step
                 else:
                     step = 0
+                # for now WANDB cannot 'log back in time'
                 wandb.log(final_metric, step=step)
             print(f"GLOBAL STEP: {global_step}")
             result = dict(
