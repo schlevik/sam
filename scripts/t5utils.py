@@ -1,19 +1,27 @@
 import logging
 import os
+import random
+import timeit
 import warnings
+from dataclasses import dataclass, field
 from functools import partial
-from typing import Optional, Callable, Dict, Tuple, Union, Any
+from typing import Optional, Callable, Dict, Tuple, Union, Any, List
 
+import click
 import torch
+from joblib import Parallel, delayed
 from packaging import version
 from torch import nn
 from torch.nn import CrossEntropyLoss
-from torch.utils.data import Dataset, DataLoader, RandomSampler, DistributedSampler
+from torch.utils.data import Dataset, DataLoader, RandomSampler, DistributedSampler, TensorDataset
 from tqdm import trange, tqdm
 from transformers import Trainer, PreTrainedModel, TrainingArguments, DataCollator, EvalPrediction, set_seed, \
-    is_torch_tpu_available, is_apex_available, T5ForConditionalGeneration
+    is_torch_tpu_available, is_apex_available, T5ForConditionalGeneration, SquadV1Processor, T5Tokenizer, SquadExample
 from transformers.trainer import get_tpu_sampler
 from transformers.trainer_utils import is_wandb_available, PREFIX_CHECKPOINT_DIR
+
+from scripts.utils import write_json, get_output_predictions_file_name
+from stresstest.util import batch
 
 logger = logging.getLogger(__name__)
 
@@ -1029,3 +1037,238 @@ class T5ForConditionalGeneration2WayParallel(T5ForConditionalGeneration):
             decoder_outputs = (loss,) + decoder_outputs
 
         return decoder_outputs + encoder_outputs
+
+
+@dataclass
+class DataTrainingArguments:
+    """
+    Arguments pertaining to what data we are going to input our model for training and eval.
+    """
+    # predictions_folder: str = field(
+    #     default=None,
+    #     metadata={"help": "Path to the folder to save the predictions."},
+    # )
+    train_file_path: Optional[str] = field(
+        default='train_data.pt',
+        metadata={"help": "Path for cached train dataset"},
+    )
+    eval_file_path: Optional[str] = field(
+        default='valid_data.pt',
+        metadata={"help": "Path for cached valid dataset"},
+    )
+    max_len: Optional[int] = field(
+        default=512,
+        metadata={"help": "Max input length for the source text"},
+    )
+    target_max_len: Optional[int] = field(
+        default=32,
+        metadata={"help": "Max input length for the target text"},
+    )
+    num_workers: int = field(
+        default=8,
+        metadata={"help": "Number of workers to pre-process the dataset."},
+    )
+    debug: bool = field(
+        default=...
+    )
+    eval_all_checkpoints: bool = field(
+        default=False,
+        metadata={"help": "Whether to evaluate all checkpoints."}
+    )
+    model_parallel: int = field(
+        default=None,
+        metadata={"help": "Accepts strictly 0 2 and 4 as values and will employ no, double or 4 way model parallelism."}
+    )
+
+
+def get_dataset(in_file, tokenizer, args: DataTrainingArguments, evaluate=False):
+    processor = SquadV1Processor()
+    data_dir = os.path.dirname(in_file)
+    file_name = os.path.basename(in_file)
+    if evaluate:
+        examples = processor.get_dev_examples(data_dir, filename=file_name)
+    else:
+        examples = processor.get_train_examples(data_dir, filename=file_name)
+    processed_examples = [add_eos_to_example(e) for e in examples]
+    # TODO: something parallel?
+    if args.num_workers > 1:
+        features = Parallel(args.num_workers)(
+            delayed(convert_to_features)(e, tokenizer, args.target_max_len, args.max_len) for e in
+            batch(tqdm(processed_examples), batch_size=10)
+        )
+    else:
+        features = [convert_to_features(e, tokenizer, args.target_max_len, args.max_len) for e in
+                    batch(tqdm(processed_examples), batch_size=10)]
+    # flatten batched list
+    features = [f for fs in features for f in fs]
+    all_input_ids = torch.tensor([f[0] for f in features], dtype=torch.long)
+    all_attention_masks = torch.tensor([f[1] for f in features], dtype=torch.long)
+    all_target_ids = torch.tensor([f[2] for f in features], dtype=torch.long)
+    all_target_attention_mask = torch.tensor([f[3] for f in features], dtype=torch.long)
+    n = random.randint(0, len(features))
+    logger.info("Random Question")
+    logger.info(examples[n].question_text)
+    logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in all_input_ids[n] if e))
+    logger.info("Its Answer")
+    logger.info(examples[n].answer_text)
+    logger.info(" ".join(f"[{tokenizer.decode(e.item())}]" for e in all_target_ids[n] if e))
+    dataset = TensorDataset(
+        all_input_ids,
+        all_attention_masks,
+        all_target_ids,
+        all_target_attention_mask,
+    )
+    # if debug_features:
+    #    debug_features_examples_dataset(dataset, examples, features, tokenizer)
+    # return dataset, examples, features
+    return dataset, examples
+
+
+@dataclass
+class ModelArguments:
+    """
+    Arguments pertaining to which model/config/tokenizer we are going to fine-tune from.
+    """
+
+    model_name_or_path: str = field(
+        metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+    )
+    tokenizer_name: Optional[str] = field(
+        default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
+    )
+    cache_dir: Optional[str] = field(
+        default=None, metadata={"help": "Where do you want to store the pretrained models downloaded from s3"}
+    )
+    do_lower_case: Optional[str] = field(
+        default=True, metadata={"help": "Whether to lowercase. (Not sure if it does anything for t5)."}
+    )
+
+
+def collate_eval(batch):
+    input_ids = torch.stack([example[0] for example in batch])
+
+    attention_mask = torch.stack([example[1] for example in batch])
+    return {
+        "input_ids": input_ids,
+        "attention_mask": attention_mask
+    }
+
+
+def collate_training(batch: List) -> Dict[str, torch.Tensor]:
+    """
+    Take a list of samples from a Dataset and collate them into a batch.
+    Returns:
+        A dictionary of tensors
+    """
+    # input_ids = torch.stack([example['input_ids'] for example in batch])
+    # lm_labels = torch.stack([example['target_ids'] for example in batch])
+    # lm_labels[lm_labels[:, :] == 0] = -100
+    # attention_mask = torch.stack([example['attention_mask'] for example in batch])
+    # decoder_attention_mask = torch.stack([example['target_attention_mask'] for example in batch])
+    input_ids = torch.stack([example[0] for example in batch])
+    lm_labels = torch.stack([example[2] for example in batch])
+    lm_labels[lm_labels[:, :] == 0] = -100
+
+    attention_mask = torch.stack([example[1] for example in batch])
+    decoder_attention_mask = torch.stack([example[3] for example in batch])
+    return {
+        'input_ids': input_ids,
+        'attention_mask': attention_mask,
+        'lm_labels': lm_labels,
+        'decoder_attention_mask': decoder_attention_mask
+    }
+
+
+def convert_to_features(example_batch, tokenizer: T5Tokenizer, max_ans_length, max_context_length):
+    inputs = [e['input_text'] for e in example_batch]
+    targets = [e['target_text'] for e in example_batch]
+    input_encodings = tokenizer.batch_encode_plus(inputs, truncation=True, pad_to_max_length=True,
+                                                  max_length=max_context_length)
+    target_encodings = tokenizer.batch_encode_plus(targets, truncation=True, pad_to_max_length=True,
+                                                   max_length=max_ans_length)
+
+    return [*zip(input_encodings['input_ids'], input_encodings['attention_mask'], target_encodings['input_ids'],
+                 target_encodings['attention_mask'])]
+
+
+def add_eos_to_example(example: SquadExample):
+    output = dict()
+    output['input_text'] = 'question: %s  context: %s </s>' % (example.question_text, example.context_text)
+    output['target_text'] = '%s </s>' % example.answer_text
+    return output
+
+
+def generate_predictions(eval_dataset, examples, model, tokenizer, training_args):
+    # n_gpu = 0 if training_args.no_cuda else torch.cuda.device_count()
+    # eval_batch_size = training_args.per_gpu_eval_batch_size * max(1, n_gpu)
+    answers = []
+    eval_sampler = torch.utils.data.SequentialSampler(eval_dataset)
+    eval_dataloader = torch.utils.data.DataLoader(eval_dataset, sampler=eval_sampler,
+                                                  batch_size=training_args.per_device_eval_batch_size,
+                                                  collate_fn=collate_eval)
+    # multi-gpu evaluate
+    # if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
+    #    model = torch.nn.DataParallel(model)
+    # Eval!
+
+    start_time = timeit.default_timer()
+    results = []
+    for batch in tqdm(eval_dataloader):
+        for k, v in batch.items():
+            if isinstance(v, torch.Tensor):
+                batch[k] = v.to(training_args.device)
+        with torch.no_grad():
+            outs = model.generate(input_ids=batch['input_ids'],
+                                  attention_mask=batch['attention_mask'],
+                                  max_length=16,
+                                  early_stopping=True)
+        outs = [tokenizer.decode(ids) for ids in outs]
+        answers.extend(outs)
+        logger.debug(outs)
+        results.extend(outs)
+    eval_time = timeit.default_timer() - start_time
+    logger.info(f"Evaluation done in total {eval_time} secs ({eval_time / len(eval_dataset)} sec per example)")
+    predictions = dict()
+    for result, example in zip(results, examples):
+        if predictions.get(example.qas_id):
+            logger.warning("Duplicate entry detected...")
+        predictions[example.qas_id] = result
+    return predictions
+
+
+@click.command()
+@click.argument("in-files", nargs=-1)
+@click.option('--out-folder', type=str, required=True)
+@click.option("model_paths", '--model-path', type=str, multiple=True)
+@click.option('--no-cuda', type=bool, is_flag=True, default=None)
+@click.option('--per-gpu-eval-batch-size', type=int, default=8)
+@click.option('--max-answer-length', type=int, default=16)
+@click.option('--max-seq-length', type=int, default=512)
+@click.option('--num-workers', type=int, default=4)
+@click.option('--debug-features', type=bool, is_flag=True, default=False)
+def t5_predictions(in_files, out_folder, model_paths, no_cuda, per_gpu_eval_batch_size, num_workers,
+                   debug_features, max_seq_length, max_answer_length):
+    data_args = DataTrainingArguments(
+        max_len=max_seq_length,
+        target_max_len=max_answer_length,
+        debug=debug_features,
+        num_workers=num_workers
+    )
+    training_args = TrainingArguments(
+        no_cuda=no_cuda,
+        output_dir=out_folder,
+        per_gpu_eval_batch_size=per_gpu_eval_batch_size,
+
+    )
+    logger.info(data_args)
+    logger.info(training_args)
+    for model_path in model_paths:
+        tokenizer = T5Tokenizer.from_pretrained(model_path)
+        model = T5ForConditionalGeneration.from_pretrained(model_path)
+        for in_file in in_files:
+            eval_dataset, examples = get_dataset(in_file, tokenizer, data_args, evaluate=True)
+            predictions = generate_predictions(eval_dataset, examples, model, tokenizer, training_args)
+            write_json(
+                predictions,
+                get_output_predictions_file_name(in_file, out_folder, os.path.basename(os.path.normpath(model_path)))
+            )
