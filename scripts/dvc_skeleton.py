@@ -2,13 +2,15 @@ import os
 
 import click
 
+DEFAULT_EXTRA_ARGS="--fp16 --save-steps 0 --debug-features"
+
 @click.command()
 @click.argument('command', type=str)
 @click.option('--dataset-name', '--dataset', default='squad1')
 @click.option("--train-file", default="train-v1.1.json")
 @click.option("--eval-file", '--dev-file', default="dev-v1.1.json")
 @click.option("--batch-size", default=None)
-@click.option("--extra-args", default="--fp16 --save-steps 0 --debug-features")
+@click.option("--extra-args", default=DEFAULT_EXTRA_ARGS)
 @click.option("--notify", type=str, default='viktor.schlegel@manchester.ac.uk')
 @click.option("model_names", '--model-name', type=str, multiple=True, default='bert-base-uncased')
 @click.option("model_types", '--model-type', type=str, multiple=True, default='bert')
@@ -126,6 +128,8 @@ def generate_dvc(command, dataset_name,
         model_types = ["albert"] * 4 + ["bert"] * 2 + ["roberta"] * 2
         models_str = " ".join(f"--model-path models/{mp}-{dataset_name} --model-type {mt}" for mp, mt in
                               zip(model_names, model_types))
+        if extra_args == DEFAULT_EXTRA_ARGS:
+            extra_args = ''
         cmd = (f"python main.py --debug --notify {notify} "
                f"predictions {baseline_file} {intervention_file} {control_file} "
                f" {models_str} "
@@ -166,12 +170,12 @@ def generate_dvc(command, dataset_name,
         model_path = os.path.join(model_path, "model.tar.gz")
         cmd = (
             f"mkdir -p {predictions_folder} &&"
-            f"allennlp predict {model_path} {baseline_file} --output-file {baseline_predictions} "
+            f"allennlp predict {model_path} {baseline_file} --output-file {baseline_predictions} --cuda-device 0 "
             f"--use-dataset-reader --silent && python main.py convert-allennlp {baseline_file} {baseline_predictions} "
-            f"&& allennlp predict {model_path} {intervention_file} --output-file {intervention_predictions} "
+            f"&& allennlp predict {model_path} {intervention_file} --output-file {intervention_predictions} --cuda-device 0 "
             f"--use-dataset-reader --silent &&"
             f"python main.py convert-allennlp {intervention_file} {intervention_predictions} &&"
-            f"allennlp predict {model_path} {control_file} --output-file {control_predictions} "
+            f"allennlp predict {model_path} {control_file} --output-file {control_predictions} --cuda-device 0 "
             f"--use-dataset-reader --silent && python main.py convert-allennlp {control_file} {control_predictions}"
         )
 
@@ -180,8 +184,8 @@ def generate_dvc(command, dataset_name,
                    f"-o {intervention_predictions}  '{cmd}'")
 
     elif command == 'train-allennlp':
-        cmd = f"TRAIN_SET={train_path} EVAL_SET={eval_path} CUDA=0 " \
-              f"allennlp train conf/{model_name}.jsonnet -s {model_folder}"
+        cmd = f"TRAIN_SET={train_path} EVAL_SET={eval_path} CUDA=0 MULT={extra_args} " \
+              f"allennlp train conf/{model_name}.jsonnet -s {model_path}"
         stage_name = f"train-{model_name}-on-{dataset_name}"
         dvc_cmd = f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} {cmd}"
     elif command == 'train-baselines':

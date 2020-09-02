@@ -1,6 +1,7 @@
 import re
 import string
 from dataclasses import asdict
+from itertools import count
 from typing import List, Tuple
 
 from loguru import logger
@@ -177,7 +178,7 @@ def format_qas(passages: List[str], event_plan: EventPlan, events: List[Event], 
 
 
 def find_all(haystack, needle):
-    """Yields all the positions of the pattern p in the string s."""
+    """Yields all the positions of the pattern needle in the string haystack."""
     i = haystack.find(needle)
     while i != -1:
         yield i
@@ -361,7 +362,7 @@ def filter_searchqa(d, max_c=0):
     return d
 
 
-def filter_newsqa(d):
+def filter_newsqa(d, skip_empty=False):
     paragraphs = d['data'][0]['paragraphs']
     num_qas_before_filtering = sum(len(d['qas']) for d in paragraphs)
     paragraphs_filtered = []
@@ -374,6 +375,9 @@ def filter_newsqa(d):
                 assert len(answers) == 1
                 answer = answers[0]
                 answer_text = answer['text']
+                if skip_empty and not answer_text:
+                    # skip empty answer
+                    continue
                 assert answer_text in context
                 # if answer_text in context:
                 # for answer in answers:
@@ -393,3 +397,66 @@ def filter_newsqa(d):
     logger.info(f"Discarded {num_qas_before_filtering - sum(len(d['qas']) for d in d['data'][0]['paragraphs'])} "
                 f"of {num_qas_before_filtering} examples...")
     return d
+
+
+def filter_generic(d, predicate):
+    documents = d['data']
+    try:
+        num_qas_before_filtering = sum(len(p['qas']) for doc in documents for p in doc['paragraphs'])
+    except:
+        num_qas_before_filtering = sum(len(p['qas']) for doc in documents for _, p in doc['paragraphs'])
+    for document in documents:
+        paragraphs = document['paragraphs']
+        paragraphs_filtered = []
+        for p in enumerate(paragraphs):
+            if isinstance(p, tuple):
+                p = p[1]
+            if predicate(p):
+                paragraphs_filtered.append(p)
+        document['paragraphs'] = paragraphs_filtered
+    try:
+        logger.info(
+            f"Discarded {num_qas_before_filtering - sum(len(p['qas']) for doc in documents for p in doc['paragraphs'])} "
+            f"of {num_qas_before_filtering} examples...")
+    except:
+        logger.info(
+            f"Discarded {num_qas_before_filtering - sum(len(p['qas']) for doc in documents for _, p in doc['paragraphs'])} "
+            f"of {num_qas_before_filtering} examples...")
+    d['data'] = documents
+    return d
+
+
+def export_brat_format(d, highlights=None) -> List[Tuple[str, str]]:
+    texts = []
+    annotations = []
+    for document in d['data']:
+        paragraphs = document['paragraphs']
+        for p in enumerate(paragraphs):
+            if isinstance(p, tuple):
+                p = p[1]
+            text = ["Paragraph:"]
+            text.append("")
+            text.append(p['context'])
+            text.append("")
+            all_answer_texts = []
+            for qa in p['qas']:
+                text.append("Question")
+                text.append(qa['question'])
+                text.append("Answer(s):")
+                answer_texts = set(a['text'] for a in qa['answers'])
+                all_answer_texts.extend(answer_texts)
+                text.append(", ".join(answer_texts))
+                text.append("")
+            final_text = "\n".join(text)
+            texts.append(final_text)
+            annotation = []
+            i = count(1)
+            for answer_text in set(all_answer_texts):
+                for start in find_all(final_text, answer_text):
+                    annotation.append(f"T{next(i)}\tAnswer {start} {start + len(answer_text)}\t{answer_text}")
+            for category, keywords in highlights.items():
+                for keyword in keywords:
+                    for start in find_all(final_text, keyword):
+                        annotation.append(f"T{next(i)}\t{category} {start} {start + len(keyword)}\t{keyword}")
+            annotations.append('\n'.join(annotation))
+    return list(zip(texts, annotations))
