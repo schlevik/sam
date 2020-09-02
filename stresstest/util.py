@@ -84,3 +84,7 @@ def only(sents_or_bundle, n, action='test'):
         raise NotImplementedError
         # sents_or_bundle[action] = [sents_or_bundle[action][n]]
     return sents_or_bundle
+
+
+def to_brat():
+    ...

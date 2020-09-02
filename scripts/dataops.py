@@ -9,6 +9,7 @@ from itertools import accumulate
 import click
 
 from scripts.utils import FormatParam, write_json, match_prediction_to_gold
+from stresstest.ds_utils import filter_generic, export_brat_format
 from stresstest.util import load_json, sample_iter
 from stresstest.eval_utils import align as do_align
 
@@ -104,6 +105,50 @@ def convert_allennlp(gold_file, prediction_file):
     for pred, entry in zip(contents.splitlines(), sample_iter(load_json(gold_file))):
         results[entry.qa_id] = json.loads(pred)['best_span_str']
         write_json(results, prediction_file)
+
+
+@click.command()
+@click.argument('in-files', nargs=-1)
+@click.option("--out-folder", type=str, default='data/brat-data')
+@click.option('--subsample', type=int, default=0)
+@click.option('--seed', type=int, default=56)
+@click.option('--coannotate', type=float, default=0.2)
+def export_brat(in_files, out_folder, subsample, seed, coannotate):
+    random.seed(seed)
+    for in_file in in_files:
+        d = load_json(in_file)
+        total_paragraphs = sum(len(doc['paragraphs']) for doc in d['data'])
+        fd = filter_generic(d, modifier_in_context)
+        ds_name = os.path.basename(os.path.dirname(in_file))
+        res = export_brat_format(fd, {"Modifier": ["almost", "nearly", "all but", "Almost", "Nearly", "All but"]})
+        click.echo(f"{click.style(str(len(res)), fg='green')} occurrences (out of {total_paragraphs}) "
+                   f"for dataset {click.style(ds_name, fg='blue')}.")
+        if subsample:
+            res = random.sample(res, subsample)
+        out_path = os.path.join(out_folder, ds_name)
+        os.makedirs(out_path, exist_ok=True)
+        if coannotate:
+            res_co = set(random.sample(range(len(res)), int(len(res) * coannotate)))
+            out_path_co = os.path.join(out_folder, f"{ds_name}-coannotate")
+            os.makedirs(out_path_co, exist_ok=True)
+        else:
+            res_co = set()
+            out_path_co = None
+        for i, (text, ann) in enumerate(res):
+            with open(os.path.join(out_path, f"{i:03}.txt"), "w+") as f:
+                f.write(text)
+            with open(os.path.join(out_path, f"{i:03}.ann"), "w+") as f:
+                f.write(ann)
+            if i in res_co:
+                with open(os.path.join(out_path_co, f"{i:03}.txt"), "w+") as f:
+                    f.write(text)
+                with open(os.path.join(out_path_co, f"{i:03}.ann"), "w+") as f:
+                    f.write(ann)
+
+
+def modifier_in_context(p):
+    words = ['almost', 'nearly', 'all but']
+    return any(w in p['context'].lower() for w in words)
 
 
 def to_squad_fmt(flat_ds):
