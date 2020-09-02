@@ -147,26 +147,45 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             }
         }
         if control:
+            correct_baseline_control_ids = [d.qa_id for d, *_ in correct_baseline_control]
+            assert len(correct_baseline_control_ids) == len(set(correct_baseline_control_ids))
+            correct_baseline_control_ids = set(correct_baseline_control_ids)
+            correct_baseline_control_keep_wrong = [
+                x for x in correct_keep_wrong if x[0].qa_id in correct_baseline_control_ids
+            ]
+            correct_baseline_control_change_wrong = [
+                x for x in correct_change_wrong if x[0].qa_id in correct_baseline_control_ids
+            ]
             click.echo(f"Got {sum(results_control)} correct for control.")
             result[model_name]['behaviour'].update({
                 'correct_control': sum(results_control),
                 'correct_baseline_control': len(correct_baseline_control),
                 'right+control->change->right': len(correct_baseline_control_intervention),
+                'right+control->keep->wrong': len(correct_baseline_control_keep_wrong),
+                'right+control->change->wrong': len(correct_baseline_control_change_wrong),
                 'consistency+control': len(correct_baseline_control_intervention) / len(aligned_baseline)
             })
         click.echo(f"Overall result: {printable_result}.")
+        click.echo(result[model_name]['behaviour'])
         click.echo()
 
         if split_reasoning:
             result[model_name]['by_reasoning'] = dict()
             for reasoning, gold_split in groupby(sorted(aligned_baseline, key=reasoning_key), key=reasoning_key):
                 ab, ai, ac = align(gold_split, gold_intervention, gold_control)
-                res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
-                mean, var, ci = get_mean_var_ci_bernoulli(res)
+                (
+                    overall_result, results_baseline, results_intervention, results_control,
+                    correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+                    wrong_change_right, wrong_keep_right, correct_baseline_control,
+                    correct_baseline_control_intervention
+                ) = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)
+                mean, var, ci = get_mean_var_ci_bernoulli(overall_result)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
                 result[model_name]['by_reasoning'][reasoning] = {
                     'mean': mean,
                     "var": var,
+                    'n': len(correct_baseline_control),
+                    'tp': len(correct_baseline_control_intervention),
                     '95ci': ci,
                     "printable_result": pr,
                 }
@@ -175,11 +194,18 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             result[model_name]['by_num_modifier'] = dict()
             for num_mod, gold_split in groupby(sorted(aligned_baseline, key=num_modifier_key), key=num_modifier_key):
                 ab, ai, ac = align(gold_split, gold_intervention, gold_control)
-                res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
-                mean, var, ci = get_mean_var_ci_bernoulli(res)
+                (
+                    overall_result, results_baseline, results_intervention, results_control,
+                    correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+                    wrong_change_right, wrong_keep_right, correct_baseline_control,
+                    correct_baseline_control_intervention
+                ) = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)
+                mean, var, ci = get_mean_var_ci_bernoulli(overall_result)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
                 result[model_name]['by_num_modifier'][num_mod] = {
                     'mean': mean,
+                    'n': len(correct_baseline_control),
+                    'tp': len(correct_baseline_control_intervention),
                     "var": var,
                     '95ci': ci,
                     "printable_result": pr,
@@ -189,12 +215,19 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
             result[model_name]['by_sam'] = dict()
             for sam, gold_split in groupby(sorted(aligned_baseline, key=sam_key), key=sam_key):
                 ab, ai, ac = align(gold_split, gold_intervention, gold_control)
-                res = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)[0]
-                mean, var, ci = get_mean_var_ci_bernoulli(res)
+                (
+                    overall_result, results_baseline, results_intervention, results_control,
+                    correct_before_intervention, correct_change_correct, correct_keep_wrong, correct_change_wrong,
+                    wrong_change_right, wrong_keep_right, correct_baseline_control,
+                    correct_baseline_control_intervention
+                ) = eval_intervention(ab, ai, ac, predictions, predictions_intervention, predictions_control)
+                mean, var, ci = get_mean_var_ci_bernoulli(overall_result)
                 pr = f'{mean:.4f} +/- {ci:.4f}'
                 result[model_name]['by_sam'][sam] = {
                     'mean': mean,
                     "var": var,
+                    'n': len(correct_baseline_control),
+                    'tp': len(correct_baseline_control_intervention),
                     '95ci': ci,
                     "printable_result": pr,
                 }
