@@ -1267,10 +1267,10 @@ def t5_predictions(in_files, out_folder, model_paths, no_cuda, per_gpu_eval_batc
         model = T5ForConditionalGeneration.from_pretrained(model_path)
         for in_file in in_files:
             eval_dataset, examples = get_dataset(in_file, tokenizer, data_args, evaluate=True)
-            predictions = generate_predictions(eval_dataset, examples, model, tokenizer, training_args)
             model.to(training_args.device)
-            if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
-                model = DataParallel(model)
+            #if training_args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
+            #    model = DataParallel(model)
+            predictions = generate_predictions(eval_dataset, examples, model, tokenizer, training_args)
             write_json(
                 predictions,
                 get_output_predictions_file_name(in_file, out_folder, os.path.basename(os.path.normpath(model_path)))
