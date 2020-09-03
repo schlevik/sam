@@ -48,3 +48,13 @@
 /bidaf-elmo-drop
 /bidaf-newsqa
 /bidaf-elmo-newsqa
+/t5-large-newsqa
+/t5-large-squad1
+/t5-large-hotpotqa
+/t5-small-newsqa
+/t5-small-drop
+/t5-small-hotpotqa
+/t5-base-drop
+/t5-base-newsqa
+/t5-base-hotpotqa
+/t5-large-drop
