@@ -25,3 +25,12 @@
 /baseline-bidaf-hotpotqa.json
 /control-bidaf-hotpotqa.json
 /intervention-bidaf-hotpotqa.json
+/baseline-t5-small-hotpotqa.json
+/intervention-t5-small-hotpotqa.json
+/control-t5-small-hotpotqa.json
+/baseline-t5-base-hotpotqa.json
+/intervention-t5-base-hotpotqa.json
+/control-t5-base-hotpotqa.json
+/baseline-t5-large-hotpotqa.json
+/intervention-t5-large-hotpotqa.json
+/control-t5-large-hotpotqa.json

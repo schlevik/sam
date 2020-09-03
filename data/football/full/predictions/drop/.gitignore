@@ -28,3 +28,12 @@
 /baseline-bidaf-elmo-drop.json
 /control-bidaf-elmo-drop.json
 /intervention-bidaf-elmo-drop.json
+/baseline-t5-small-drop.json
+/intervention-t5-small-drop.json
+/control-t5-small-drop.json
+/baseline-t5-base-drop.json
+/intervention-t5-base-drop.json
+/control-t5-base-drop.json
+/baseline-t5-large-drop.json
+/intervention-t5-large-drop.json
+/control-t5-large-drop.json

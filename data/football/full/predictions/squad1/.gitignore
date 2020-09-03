@@ -28,3 +28,12 @@
 /baseline-bidaf-elmo-squad1.json
 /control-bidaf-elmo-squad1.json
 /intervention-bidaf-elmo-squad1.json
+/baseline-t5-small-squad1.json
+/intervention-t5-small-squad1.json
+/control-t5-small-squad1.json
+/baseline-t5-base-squad1.json
+/intervention-t5-base-squad1.json
+/control-t5-base-squad1.json
+/baseline-t5-large-squad1.json
+/intervention-t5-large-squad1.json
+/control-t5-large-squad1.json
