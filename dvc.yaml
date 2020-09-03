@@ -88,20 +88,23 @@ stages:
     outs:
     - models/bert-base-uncased-squad1
   train-t5-small-on-squad1:
-    cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-small --output_dir
-      models/t5-small-squad1 --train_file data/datasets/squad1/train-v1.1.json --eval_file
-      data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
-      8 --gradient_accumulation_steps 32 --fp16
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-squad1 python scripts/t5.py --model_name_or_path
+      t5-small --output_dir models/t5-small-squad1 --train_file data/datasets/squad1/train-v1.1.json
+      --eval_file data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 32 --gradient_accumulation_steps 32 --fp16 --eval_all_checkpoints
+      --learning_rate 0.001
     deps:
     - data/datasets/squad1/dev-v1.1.json
     - data/datasets/squad1/train-v1.1.json
     outs:
     - models/t5-small-squad1
   train-t5-base-on-squad1:
-    cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-base --output_dir
-      models/t5-base-squad1 --train_file data/datasets/squad1/train-v1.1.json --eval_file
-      data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
-      8 --gradient_accumulation_steps 32 --fp16
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-base-on-squad1-no-fp16 python scripts/t5.py
+      --model_name_or_path t5-base --output_dir models/t5-base-squad1 --train_file
+      data/datasets/squad1/train-v1.1.json --eval_file data/datasets/squad1/dev-v1.1.json
+      --do_train --do_eval --num_workers 8 --per_device_train_batch_size 6 --gradient_accumulation_steps
+      170 --eval_all_checkpoints --logging_steps 10 --save_steps 74 --learning_rate
+      0.001
     deps:
     - data/datasets/squad1/dev-v1.1.json
     - data/datasets/squad1/train-v1.1.json
@@ -1017,3 +1020,186 @@ stages:
     - data/football/full/predictions/drop/baseline-bidaf-elmo-drop.json
     - data/football/full/predictions/drop/control-bidaf-elmo-drop.json
     - data/football/full/predictions/drop/intervention-bidaf-elmo-drop.json
+  train-t5-large-on-newsqa:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-large-on-newsqa python scripts/t5.py --model_name_or_path
+      t5-large --output_dir models/t5-large-newsqa --train_file data/datasets/newsqa/train.json
+      --eval_file data/datasets/newsqa/dev.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 2 --gradient_accumulation_steps 512 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+      --max_len 1024 --model_parallel 2
+    deps:
+    - data/datasets/newsqa/dev.json
+    - data/datasets/newsqa/train.json
+    outs:
+    - models/t5-large-newsqa
+  train-t5-large-on-squad1:
+    cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-large --output_dir
+      models/t5-large-squad1 --train_file data/datasets/squad1/train-v1.1.json --eval_file
+      data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
+      1 --gradient_accumulation_steps 1024 --save_steps 80 --logging_steps 20 --learning_rate
+      1e-4
+    deps:
+    - data/datasets/squad1/dev-v1.1.json
+    - data/datasets/squad1/train-v1.1.json
+    outs:
+    - models/t5-large-squad1
+  train-t5-large-on-hotpotqa:
+    cmd: PYTHONPATH='.' WANDB_NAME=dvc-t5-large-on-hotpotqa python scripts/t5.py --model_name_or_path
+      t5-large --output_dir models/t5-large-hotpotqa --train_file data/datasets/hotpotqa/train.json
+      --eval_file data/datasets/hotpotqa/dev.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 1 --gradient_accumulation_steps 1024 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+      --max_len 2048 --model_parallel 4
+    deps:
+    - data/datasets/hotpotqa/dev.json
+    - data/datasets/hotpotqa/train.json
+    outs:
+    - models/t5-large-hotpotqa
+  train-t5-small-on-newsqa:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-newsqa python scripts/t5.py --model_name_or_path
+      t5-small --output_dir models/t5-small-newsqa --train_file data/datasets/newsqa/train.json
+      --eval_file data/datasets/newsqa/dev.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 8 --gradient_accumulation_steps 128 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 4 --eval_all_checkpoints
+      --max_len 1024 --fp16
+    deps:
+    - data/datasets/newsqa/dev.json
+    - data/datasets/newsqa/train.json
+    outs:
+    - models/t5-small-newsqa
+  train-t5-small-on-drop:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-drop python scripts/t5.py --model_name_or_path
+      t5-small --output_dir models/t5-small-drop --train_file data/datasets/drop/train.json
+      --eval_file data/datasets/drop/dev.json --do_train --do_eval --num_workers 8
+      --per_device_train_batch_size 32 --gradient_accumulation_steps 32 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 12 --eval_all_checkpoints
+      --fp16
+    deps:
+    - data/datasets/drop/dev.json
+    - data/datasets/drop/train.json
+    outs:
+    - models/t5-small-drop
+  train-t5-small-on-hotpotqa:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-hotpotqa python scripts/t5.py --model_name_or_path
+      t5-small --output_dir models/t5-small-hotpotqa --train_file data/datasets/hotpotqa/train.json
+      --eval_file data/datasets/hotpotqa/dev.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 4 --gradient_accumulation_steps 256 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+      --max_len 2048 --fp16
+    deps:
+    - data/datasets/hotpotqa/dev.json
+    - data/datasets/hotpotqa/train.json
+    outs:
+    - models/t5-small-hotpotqa
+  train-t5-base-on-drop:
+    cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-base --output_dir
+      models/t5-base-drop --train_file data/datasets/drop/train.json --eval_file data/datasets/drop/dev.json
+      --do_train --do_eval --num_workers 8 --per_device_train_batch_size 6 --gradient_accumulation_steps
+      170 --save_steps 74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs
+      12 --eval_all_checkpoints
+    deps:
+    - data/datasets/drop/dev.json
+    - data/datasets/drop/train.json
+    outs:
+    - models/t5-base-drop
+  train-t5-base-on-newsqa:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-base-on-newsqa python scripts/t5.py --model_name_or_path
+      t5-base --output_dir models/t5-base-newsqa --train_file data/datasets/newsqa/train.json
+      --eval_file data/datasets/newsqa/dev.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 3 --gradient_accumulation_steps 340 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 4 --eval_all_checkpoints
+      --max_len 1024
+    deps:
+    - data/datasets/newsqa/dev.json
+    - data/datasets/newsqa/train.json
+    outs:
+    - models/t5-base-newsqa
+  train-t5-base-on-hotpotqa:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-base-on-hotpotqa python scripts/t5.py --model_name_or_path
+      t5-base --output_dir models/t5-base-hotpotqa --train_file data/datasets/hotpotqa/train.json
+      --eval_file data/datasets/hotpotqa/dev.json --do_train --do_eval --num_workers
+      8 --per_device_train_batch_size 1 --gradient_accumulation_steps 1024 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+      --max_len 2048
+    deps:
+    - data/datasets/hotpotqa/dev.json
+    - data/datasets/hotpotqa/train.json
+    outs:
+    - models/t5-base-hotpotqa
+  train-t5-large-on-drop:
+    cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-large-on-drop python scripts/t5.py --model_name_or_path
+      t5-large --output_dir models/t5-large-drop --train_file data/datasets/drop/train.json
+      --eval_file data/datasets/drop/dev.json --do_train --do_eval --num_workers 8
+      --per_device_train_batch_size 1 --gradient_accumulation_steps 1024 --save_steps
+      74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 12
+    deps:
+    - data/datasets/drop/dev.json
+    - data/datasets/drop/train.json
+    outs:
+    - models/t5-large-drop
+  predict-t5-squad1:
+    cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+      data/football/full/control.json --model-path models/t5-small-squad1 --model-path
+      models/t5-base-squad1 --model-path models/t5-large-squad1 --out-folder data/football/full/predictions/squad1
+      --max-answer-length 10
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/t5-base-squad1
+    - models/t5-large-squad1
+    - models/t5-small-squad1
+    outs:
+    - data/football/full/predictions/squad1/baseline-t5-base-squad1.json
+    - data/football/full/predictions/squad1/baseline-t5-large-squad1.json
+    - data/football/full/predictions/squad1/baseline-t5-small-squad1.json
+    - data/football/full/predictions/squad1/control-t5-base-squad1.json
+    - data/football/full/predictions/squad1/control-t5-large-squad1.json
+    - data/football/full/predictions/squad1/control-t5-small-squad1.json
+    - data/football/full/predictions/squad1/intervention-t5-base-squad1.json
+    - data/football/full/predictions/squad1/intervention-t5-large-squad1.json
+    - data/football/full/predictions/squad1/intervention-t5-small-squad1.json
+  predict-t5-hotpotqa:
+    cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+      data/football/full/control.json --model-path models/t5-small-hotpotqa --model-path
+      models/t5-base-hotpotqa --model-path models/t5-large-hotpotqa --out-folder data/football/full/predictions/hotpotqa
+      --max-answer-length 10
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/t5-base-hotpotqa
+    - models/t5-large-hotpotqa
+    - models/t5-small-hotpotqa
+    outs:
+    - data/football/full/predictions/hotpotqa/baseline-t5-base-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/baseline-t5-large-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/baseline-t5-small-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/control-t5-base-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/control-t5-large-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/control-t5-small-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/intervention-t5-base-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/intervention-t5-large-hotpotqa.json
+    - data/football/full/predictions/hotpotqa/intervention-t5-small-hotpotqa.json
+  predict-t5-drop:
+    cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+      data/football/full/control.json --model-path models/t5-small-drop --model-path
+      models/t5-base-drop --model-path models/t5-large-drop --out-folder data/football/full/predictions/drop
+      --max-answer-length 10
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/t5-base-drop
+    - models/t5-large-drop
+    - models/t5-small-drop
+    outs:
+    - data/football/full/predictions/drop/baseline-t5-base-drop.json
+    - data/football/full/predictions/drop/baseline-t5-large-drop.json
+    - data/football/full/predictions/drop/baseline-t5-small-drop.json
+    - data/football/full/predictions/drop/control-t5-base-drop.json
+    - data/football/full/predictions/drop/control-t5-large-drop.json
+    - data/football/full/predictions/drop/control-t5-small-drop.json
+    - data/football/full/predictions/drop/intervention-t5-base-drop.json
+    - data/football/full/predictions/drop/intervention-t5-large-drop.json
+    - data/football/full/predictions/drop/intervention-t5-small-drop.json

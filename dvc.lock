@@ -111,10 +111,11 @@ train-bert-base-uncased-on-squad1:
   - path: models/bert-base-uncased-squad1
     md5: 0bc609c29bbd02bef8fce079fa320f6a.dir
 train-t5-small-on-squad1:
-  cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-small --output_dir
-    models/t5-small-squad1 --train_file data/datasets/squad1/train-v1.1.json --eval_file
-    data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
-    8 --gradient_accumulation_steps 32 --fp16
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-squad1 python scripts/t5.py --model_name_or_path
+    t5-small --output_dir models/t5-small-squad1 --train_file data/datasets/squad1/train-v1.1.json
+    --eval_file data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers
+    8 --per_device_train_batch_size 32 --gradient_accumulation_steps 32 --fp16 --eval_all_checkpoints
+    --learning_rate 0.001
   deps:
   - path: data/datasets/squad1/dev-v1.1.json
     md5: 3e85deb501d4e538b6bc56f786231552
@@ -122,12 +123,13 @@ train-t5-small-on-squad1:
     md5: 981b29407e0affa3b1b156f72073b945
   outs:
   - path: models/t5-small-squad1
-    md5: fa98a47de4001ccfac343c46fa102cf0.dir
+    md5: 8c1715252272ed2d3b9cef486fdbcba0.dir
 train-t5-base-on-squad1:
-  cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-base --output_dir
-    models/t5-base-squad1 --train_file data/datasets/squad1/train-v1.1.json --eval_file
-    data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
-    8 --gradient_accumulation_steps 32 --fp16
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-base-on-squad1-no-fp16 python scripts/t5.py
+    --model_name_or_path t5-base --output_dir models/t5-base-squad1 --train_file data/datasets/squad1/train-v1.1.json
+    --eval_file data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers
+    8 --per_device_train_batch_size 6 --gradient_accumulation_steps 170 --eval_all_checkpoints
+    --logging_steps 10 --save_steps 74 --learning_rate 0.001
   deps:
   - path: data/datasets/squad1/dev-v1.1.json
     md5: 3e85deb501d4e538b6bc56f786231552
@@ -135,7 +137,7 @@ train-t5-base-on-squad1:
     md5: 981b29407e0affa3b1b156f72073b945
   outs:
   - path: models/t5-base-squad1
-    md5: e63973c51d64d43a671729b68588a281.dir
+    md5: b339808496d3c739ae93dcf1e4aef5ea.dir
 generate-train:
   cmd: python main.py generate-balanced --config conf/finetune.json --seed 56 --num-workers
     8 --do-save --out-path data/football/split/train/ --multiplier 100 --split train
@@ -512,12 +514,12 @@ evaluate-intervention-squad1:
   - path: data/football/full/intervention.json
     md5: 5897df44e42021090e3b9b89b44c6e90
   - path: data/football/full/predictions/squad1
-    md5: ebb29b1eff51c3a1577f9520436aaef9.dir
+    md5: 67a27ceb012f1159c34dbc487d25b5d4.dir
   - path: scripts/evaluate_intervention.py
-    md5: 30a92ce96ad619889ccf8e5d9022dd9c
+    md5: 1286bebe5e85f7d524dc738d83c31de1
   outs:
   - path: metrics/football/squad1/eoi.json
-    md5: e34a455d605d050ef94167b0e99fbebe
+    md5: fee60c0fbdc6b54836024e60d2028322
 train-bert-base-uncased-on-hotpotqa:
   cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/datasets/hotpotqa/train.json
     --model-path bert-base-uncased --model-type bert --eval-file data/datasets/hotpotqa/dev.json
@@ -1093,12 +1095,12 @@ evaluate-intervention-hotpotqa:
   - path: data/football/full/intervention.json
     md5: 5897df44e42021090e3b9b89b44c6e90
   - path: data/football/full/predictions/hotpotqa
-    md5: dc9ef67f4760da877134a2b58ded4131.dir
+    md5: 0c82d0a238a9a8abb5a1b312ea54cd96.dir
   - path: scripts/evaluate_intervention.py
-    md5: 30a92ce96ad619889ccf8e5d9022dd9c
+    md5: 1286bebe5e85f7d524dc738d83c31de1
   outs:
   - path: metrics/football/hotpotqa/eoi.json
-    md5: a4cfa82830b6a043fcb0f82ec4a4398e
+    md5: 21e7c81536220e7095d8bf453b4361b6
 evaluate-intervention-drop:
   cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
     --predictions-folder data/football/full/predictions/drop --control --output metrics/football/drop/eoi.json
@@ -1111,12 +1113,12 @@ evaluate-intervention-drop:
   - path: data/football/full/intervention.json
     md5: 5897df44e42021090e3b9b89b44c6e90
   - path: data/football/full/predictions/drop
-    md5: 45ec6633b57166afb34a775b1b59792e.dir
+    md5: b2ac70062019d82278d2a7723507ab5b.dir
   - path: scripts/evaluate_intervention.py
-    md5: 30a92ce96ad619889ccf8e5d9022dd9c
+    md5: 1286bebe5e85f7d524dc738d83c31de1
   outs:
   - path: metrics/football/drop/eoi.json
-    md5: 1249874274133796ce1df7a45a61d086
+    md5: 3af1794bf59e4f4da6b7ecde0046051e
 evaluate-intervention-newsqa:
   cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
     --predictions-folder data/football/full/predictions/newsqa --control --output
@@ -1436,3 +1438,259 @@ predict-bidaf-elmo-on-drop:
     md5: 519f4e3d560794ce2c71593258d0ad27
   - path: data/football/full/predictions/drop/intervention-bidaf-elmo-drop.json
     md5: c91fb34dfa5cf377327027cf12fa8808
+train-t5-large-on-newsqa:
+  cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-large --output_dir
+    models/t5-large-newsqa --train_file data/datasets/newsqa/train.json --eval_file
+    data/datasets/newsqa/dev.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
+    1 --gradient_accumulation_steps 1024 --save_steps 60 --logging_steps 10 --learning_rate
+    1e-4
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/t5-large-newsqa
+    md5: 9bbb71c9dfae6d23412cc929727c3b22.dir
+train-t5-large-on-squad1:
+  cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-large --output_dir
+    models/t5-large-squad1 --train_file data/datasets/squad1/train-v1.1.json --eval_file
+    data/datasets/squad1/dev-v1.1.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
+    1 --gradient_accumulation_steps 1024 --save_steps 80 --logging_steps 20 --learning_rate
+    1e-4
+  deps:
+  - path: data/datasets/squad1/dev-v1.1.json
+    md5: 3e85deb501d4e538b6bc56f786231552
+  - path: data/datasets/squad1/train-v1.1.json
+    md5: 981b29407e0affa3b1b156f72073b945
+  outs:
+  - path: models/t5-large-squad1
+    md5: c67cf6564c58ce96e5b5e2f36c4775c2.dir
+train-t5-large-on-hotpotqa:
+  cmd: PYTHONPATH='.' WANDB_NAME=dvc-t5-large-on-hotpotqa python scripts/t5.py --model_name_or_path
+    t5-large --output_dir models/t5-large-hotpotqa --train_file data/datasets/hotpotqa/train.json
+    --eval_file data/datasets/hotpotqa/dev.json --do_train --do_eval --num_workers
+    8 --per_device_train_batch_size 1 --gradient_accumulation_steps 1024 --save_steps
+    74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+    --max_len 2048 --model_parallel 4
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/t5-large-hotpotqa
+    md5: 288b0e4a08fdc639cc859f0ae85c1f61.dir
+train-t5-small-on-newsqa:
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-newsqa python scripts/t5.py --model_name_or_path
+    t5-small --output_dir models/t5-small-newsqa --train_file data/datasets/newsqa/train.json
+    --eval_file data/datasets/newsqa/dev.json --do_train --do_eval --num_workers 8
+    --per_device_train_batch_size 8 --gradient_accumulation_steps 128 --save_steps
+    74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 4 --eval_all_checkpoints
+    --max_len 1024 --fp16
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/t5-small-newsqa
+    md5: da360dc60e303959c98ee8fe6e2eab14.dir
+train-t5-small-on-drop:
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-drop python scripts/t5.py --model_name_or_path
+    t5-small --output_dir models/t5-small-drop --train_file data/datasets/drop/train.json
+    --eval_file data/datasets/drop/dev.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
+    32 --gradient_accumulation_steps 32 --save_steps 74 --logging_steps 10 --learning_rate
+    0.001 --num_train_epochs 12 --eval_all_checkpoints --fp16
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/t5-small-drop
+    md5: 68690cb9c1e1fa9e0d4005c99aac66eb.dir
+train-t5-small-on-hotpotqa:
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-small-on-hotpotqa python scripts/t5.py --model_name_or_path
+    t5-small --output_dir models/t5-small-hotpotqa --train_file data/datasets/hotpotqa/train.json
+    --eval_file data/datasets/hotpotqa/dev.json --do_train --do_eval --num_workers
+    8 --per_device_train_batch_size 4 --gradient_accumulation_steps 256 --save_steps
+    74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+    --max_len 2048 --fp16
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/t5-small-hotpotqa
+    md5: a2abfb696ca893fe5e70a3960405c914.dir
+train-t5-base-on-drop:
+  cmd: PYTHONPATH=. python scripts/t5.py --model_name_or_path t5-base --output_dir
+    models/t5-base-drop --train_file data/datasets/drop/train.json --eval_file data/datasets/drop/dev.json
+    --do_train --do_eval --num_workers 8 --per_device_train_batch_size 6 --gradient_accumulation_steps
+    170 --save_steps 74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs
+    12 --eval_all_checkpoints
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/t5-base-drop
+    md5: 2d3d31e9b86e9b007f66e2f758371a7f.dir
+train-t5-base-on-newsqa:
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-base-on-newsqa python scripts/t5.py --model_name_or_path
+    t5-base --output_dir models/t5-base-newsqa --train_file data/datasets/newsqa/train.json
+    --eval_file data/datasets/newsqa/dev.json --do_train --do_eval --num_workers 8
+    --per_device_train_batch_size 3 --gradient_accumulation_steps 340 --save_steps
+    74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 4 --eval_all_checkpoints
+    --max_len 1024
+  deps:
+  - path: data/datasets/newsqa/dev.json
+    md5: 7873ebbb523bff6ad89649fe3d0409d6
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  outs:
+  - path: models/t5-base-newsqa
+    md5: 38bfdb653538d04004083e177341d2c3.dir
+train-t5-base-on-hotpotqa:
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-base-on-hotpotqa python scripts/t5.py --model_name_or_path
+    t5-base --output_dir models/t5-base-hotpotqa --train_file data/datasets/hotpotqa/train.json
+    --eval_file data/datasets/hotpotqa/dev.json --do_train --do_eval --num_workers
+    8 --per_device_train_batch_size 1 --gradient_accumulation_steps 1024 --save_steps
+    74 --logging_steps 10 --learning_rate 0.001 --num_train_epochs 3 --eval_all_checkpoints
+    --max_len 2048
+  deps:
+  - path: data/datasets/hotpotqa/dev.json
+    md5: ca01383e3746f3782d3212d046aa2225
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  outs:
+  - path: models/t5-base-hotpotqa
+    md5: dfe2e9fcf492088d405300cb71e1304d.dir
+train-t5-large-on-drop:
+  cmd: PYTHONPATH=. WANDB_NAME=dvc-t5-large-on-drop python scripts/t5.py --model_name_or_path
+    t5-large --output_dir models/t5-large-drop --train_file data/datasets/drop/train.json
+    --eval_file data/datasets/drop/dev.json --do_train --do_eval --num_workers 8 --per_device_train_batch_size
+    1 --gradient_accumulation_steps 1024 --save_steps 74 --logging_steps 10 --learning_rate
+    0.001 --num_train_epochs 12
+  deps:
+  - path: data/datasets/drop/dev.json
+    md5: 3e298f54e456bc762f066b14519f9dca
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  outs:
+  - path: models/t5-large-drop
+    md5: 980b003f1b76d5213143af4431c5cc65.dir
+predict-t5-squad1:
+  cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+    data/football/full/control.json --model-path models/t5-small-squad1 --model-path
+    models/t5-base-squad1 --model-path models/t5-large-squad1 --out-folder data/football/full/predictions/squad1
+    --max-answer-length 10
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/t5-base-squad1
+    md5: b339808496d3c739ae93dcf1e4aef5ea.dir
+  - path: models/t5-large-squad1
+    md5: c67cf6564c58ce96e5b5e2f36c4775c2.dir
+  - path: models/t5-small-squad1
+    md5: 8c1715252272ed2d3b9cef486fdbcba0.dir
+  outs:
+  - path: data/football/full/predictions/squad1/baseline-t5-base-squad1.json
+    md5: 4259935890126b1a9c6d136a931d588b
+  - path: data/football/full/predictions/squad1/baseline-t5-large-squad1.json
+    md5: 78d9bc84eb35cf88e6d10c7bbe66e174
+  - path: data/football/full/predictions/squad1/baseline-t5-small-squad1.json
+    md5: 0d77497f5eb577f9090cd14d5be7de83
+  - path: data/football/full/predictions/squad1/control-t5-base-squad1.json
+    md5: adb6c98100666fe6f753b35bfc4cc2f4
+  - path: data/football/full/predictions/squad1/control-t5-large-squad1.json
+    md5: 4e962a402d48895b13eaa3e724b2bf94
+  - path: data/football/full/predictions/squad1/control-t5-small-squad1.json
+    md5: 1b2c0bc3ac022ce07c0469709700c25e
+  - path: data/football/full/predictions/squad1/intervention-t5-base-squad1.json
+    md5: 33d4e551780989e02aedc86980a1d963
+  - path: data/football/full/predictions/squad1/intervention-t5-large-squad1.json
+    md5: 7fbefc801af889c2012de2314036744b
+  - path: data/football/full/predictions/squad1/intervention-t5-small-squad1.json
+    md5: 03a58f7e4d6803266eeaae9debac8648
+predict-t5-hotpotqa:
+  cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+    data/football/full/control.json --model-path models/t5-small-hotpotqa --model-path
+    models/t5-base-hotpotqa --model-path models/t5-large-hotpotqa --out-folder data/football/full/predictions/hotpotqa
+    --max-answer-length 10
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/t5-base-hotpotqa
+    md5: dfe2e9fcf492088d405300cb71e1304d.dir
+  - path: models/t5-large-hotpotqa
+    md5: 288b0e4a08fdc639cc859f0ae85c1f61.dir
+  - path: models/t5-small-hotpotqa
+    md5: a2abfb696ca893fe5e70a3960405c914.dir
+  outs:
+  - path: data/football/full/predictions/hotpotqa/baseline-t5-base-hotpotqa.json
+    md5: e28f4cc83bc8b12801017acb1093d21c
+  - path: data/football/full/predictions/hotpotqa/baseline-t5-large-hotpotqa.json
+    md5: 74166cbd0050b303c8edb6b239999420
+  - path: data/football/full/predictions/hotpotqa/baseline-t5-small-hotpotqa.json
+    md5: 947002bba1082a48b58e8cfcc1f9acb5
+  - path: data/football/full/predictions/hotpotqa/control-t5-base-hotpotqa.json
+    md5: f46e6c7c60c078d7c292d06e51c7f931
+  - path: data/football/full/predictions/hotpotqa/control-t5-large-hotpotqa.json
+    md5: a017d1dc1bb762ca46d62963032c19ee
+  - path: data/football/full/predictions/hotpotqa/control-t5-small-hotpotqa.json
+    md5: e89e9f3da65c77cae49ba00a3830d27d
+  - path: data/football/full/predictions/hotpotqa/intervention-t5-base-hotpotqa.json
+    md5: cb7a2c8ef4e22540d2ba0322643f8aaa
+  - path: data/football/full/predictions/hotpotqa/intervention-t5-large-hotpotqa.json
+    md5: 2b54a3d87f0d1413ff19f4abde46bdd7
+  - path: data/football/full/predictions/hotpotqa/intervention-t5-small-hotpotqa.json
+    md5: 1e46b7ac8c0c80eab017d58a5a071e5e
+predict-t5-drop:
+  cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+    data/football/full/control.json --model-path models/t5-small-drop --model-path
+    models/t5-base-drop --model-path models/t5-large-drop --out-folder data/football/full/predictions/drop
+    --max-answer-length 10
+  deps:
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  - path: data/football/full/control.json
+    md5: 528a2f3ed6dc0330b82d33fc99f78a90
+  - path: data/football/full/intervention.json
+    md5: 5897df44e42021090e3b9b89b44c6e90
+  - path: models/t5-base-drop
+    md5: 2d3d31e9b86e9b007f66e2f758371a7f.dir
+  - path: models/t5-large-drop
+    md5: 980b003f1b76d5213143af4431c5cc65.dir
+  - path: models/t5-small-drop
+    md5: 68690cb9c1e1fa9e0d4005c99aac66eb.dir
+  outs:
+  - path: data/football/full/predictions/drop/baseline-t5-base-drop.json
+    md5: 7a1eeeca1d02c06e75b47fbaa2943685
+  - path: data/football/full/predictions/drop/baseline-t5-large-drop.json
+    md5: a5cf69cdcad92cbb797791fc0a5fe371
+  - path: data/football/full/predictions/drop/baseline-t5-small-drop.json
+    md5: 2f6b5c4a8de396e49ec599689ec8ce62
+  - path: data/football/full/predictions/drop/control-t5-base-drop.json
+    md5: f75d5726cae6c1e9b87bb7d5dcc65f48
+  - path: data/football/full/predictions/drop/control-t5-large-drop.json
+    md5: 4985c74b073ef3b2c483823262da2eb1
+  - path: data/football/full/predictions/drop/control-t5-small-drop.json
+    md5: f02bbb2b24c69097fdc16735c1c7eba1
+  - path: data/football/full/predictions/drop/intervention-t5-base-drop.json
+    md5: cfbb5af29fe30774b3f6851422254764
+  - path: data/football/full/predictions/drop/intervention-t5-large-drop.json
+    md5: 3598ed31395727b0c4f3f9ddfd78ef38
+  - path: data/football/full/predictions/drop/intervention-t5-small-drop.json
+    md5: efdc728156442dae9ab9ac1052d165c6
