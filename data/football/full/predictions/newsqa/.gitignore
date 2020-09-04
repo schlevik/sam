@@ -28,3 +28,12 @@
 /baseline-bidaf-elmo-newsqa.json
 /control-bidaf-elmo-newsqa.json
 /intervention-bidaf-elmo-newsqa.json
+/baseline-t5-small-newsqa.json
+/intervention-t5-small-newsqa.json
+/control-t5-small-newsqa.json
+/baseline-t5-base-newsqa.json
+/intervention-t5-base-newsqa.json
+/control-t5-base-newsqa.json
+/baseline-t5-large-newsqa.json
+/intervention-t5-large-newsqa.json
+/control-t5-large-newsqa.json

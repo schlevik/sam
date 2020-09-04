@@ -1203,3 +1203,25 @@ stages:
     - data/football/full/predictions/drop/intervention-t5-base-drop.json
     - data/football/full/predictions/drop/intervention-t5-large-drop.json
     - data/football/full/predictions/drop/intervention-t5-small-drop.json
+  predict-t5-newsqa:
+    cmd: python main.py --debug t5-predictions data/football/full/baseline.json data/football/full/intervention.json
+      data/football/full/control.json --model-path models/t5-small-newsqa --model-path
+      models/t5-base-newsqa --model-path models/t5-large-newsqa --out-folder data/football/full/predictions/newsqa
+      --max-answer-length 10
+    deps:
+    - data/football/full/baseline.json
+    - data/football/full/control.json
+    - data/football/full/intervention.json
+    - models/t5-base-newsqa
+    - models/t5-large-newsqa
+    - models/t5-small-newsqa
+    outs:
+    - data/football/full/predictions/newsqa/baseline-t5-base-newsqa.json
+    - data/football/full/predictions/newsqa/baseline-t5-large-newsqa.json
+    - data/football/full/predictions/newsqa/baseline-t5-small-newsqa.json
+    - data/football/full/predictions/newsqa/control-t5-base-newsqa.json
+    - data/football/full/predictions/newsqa/control-t5-large-newsqa.json
+    - data/football/full/predictions/newsqa/control-t5-small-newsqa.json
+    - data/football/full/predictions/newsqa/intervention-t5-base-newsqa.json
+    - data/football/full/predictions/newsqa/intervention-t5-large-newsqa.json
+    - data/football/full/predictions/newsqa/intervention-t5-small-newsqa.json
