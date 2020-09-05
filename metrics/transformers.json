@@ -1,0 +1,15 @@
+{
+  "bidaf": 2582095,
+  "bidaf-elmo": 9238099,
+  "t5-small": 60506880,
+  "roberta-base": 124647170,
+  "t5-large": 737668608,
+  "bert-base": 109483778,
+  "roberta-large": 355361794,
+  "t5-base": 222903936,
+  "bert-large": 335143938,
+  "albert-large": 310437378,
+  "albert-base": 90741506,
+  "albert-xlarge":1223045634,
+  "albert-xxlarge": 2443594242
+}

@@ -1,9 +1,10 @@
+import random
 import re
 import string
 from dataclasses import asdict
 from itertools import count
 from typing import List, Tuple
-
+from copy import deepcopy
 from loguru import logger
 from tqdm import tqdm
 
@@ -396,6 +397,50 @@ def filter_newsqa(d, skip_empty=False):
 
     logger.info(f"Discarded {num_qas_before_filtering - sum(len(d['qas']) for d in d['data'][0]['paragraphs'])} "
                 f"of {num_qas_before_filtering} examples...")
+    return d
+
+
+def subsample(d, size=22500):
+    documents = d['data']
+    num_qas_before_filtering = sum(len(p['qas']) for doc in documents for p in doc['paragraphs'])
+    flat = []
+    new_documents = []
+    for document in documents:
+        paragraphs = document.pop('paragraphs')
+        document['paragraphs'] = []
+        for p in paragraphs:
+            qas = p.pop('qas')
+            p['qas'] = []
+            for qa in qas:
+                flat.append((document, p, qa))
+    # document['paragraphs'] = paragraphs_filtered
+    new_flat = random.sample(flat, size)
+    new_titles = dict()
+    new_contexts = dict()
+    for d, p, qa in new_flat:
+        if d['title'] not in new_titles:
+            new_documents.append(deepcopy(d))
+            new_titles[d['title']] = len(new_documents) - 1
+        doc = new_documents[new_titles[d['title']]]
+        if p['context'] not in new_contexts:
+            doc['paragraphs'].append(deepcopy(p))
+            new_contexts[p['context']] = len(doc['paragraphs']) - 1
+        p = doc['paragraphs'][new_contexts[p['context']]]
+        p['qas'].append(qa)
+
+    for document in documents:
+        paragraphs = document['paragraphs']
+        for p in paragraphs:
+            qas = p['qas']
+            for qa in qas:
+                for answer in qa['answers']:
+                    text = answer['text']
+                    start = answer['answer_start']
+                    assert text == p['context'][start:start + len(text)]
+    logger.info(
+        f"Discarded {num_qas_before_filtering - sum(len(p['qas']) for doc in new_documents for p in doc['paragraphs'])} "
+        f"of {num_qas_before_filtering} examples...")
+    d['data'] = new_documents
     return d
 
 

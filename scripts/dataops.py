@@ -2,6 +2,7 @@ import json
 import math
 import os
 import random
+import shutil
 import sys
 from collections import defaultdict
 from itertools import accumulate
@@ -9,7 +10,7 @@ from itertools import accumulate
 import click
 
 from scripts.utils import FormatParam, write_json, match_prediction_to_gold
-from stresstest.ds_utils import filter_generic, export_brat_format
+from stresstest.ds_utils import filter_generic, export_brat_format, subsample
 from stresstest.util import load_json, sample_iter
 from stresstest.eval_utils import align as do_align
 
@@ -53,14 +54,19 @@ def export(in_path, out_path, ds_format, split):
 @click.command()
 @click.argument('in-files', nargs=-1)
 @click.argument('out-file', nargs=1)
-def combine(in_files, out_file):
-    combined_dataset = []
+@click.option('--sub-sample', type=int, default=0)
+def combine(in_files, out_file, sub_sample):
+    combined_dataset = {'data': [], 'version': 0.1}
     if in_files:
         for in_file in in_files:
             click.echo(f"Reading in: {click.style(in_file, fg='green')}")
             ds = load_json(in_file)
-            combined_dataset.extend(ds)
+            if sub_sample:
+                ds = subsample(ds)
+            combined_dataset['data'].extend(ds['data'])
+        click.echo(f"New dataset has {sum(len(p['qas']) for doc in combined_dataset['data'] for p in doc['paragraphs'])} instances...")
         click.echo(f"Writing out: {click.style(out_file, fg='green')}")
+        os.makedirs(os.path.dirname(out_file), exist_ok=True)
         write_json(combined_dataset, out_file, pretty=False)
     else:
         click.echo(f"Nothing to write...")
@@ -118,7 +124,7 @@ def export_brat(in_files, out_folder, subsample, seed, coannotate):
     for in_file in in_files:
         d = load_json(in_file)
         total_paragraphs = sum(len(doc['paragraphs']) for doc in d['data'])
-        fd = filter_generic(d, modifier_in_context)
+        fd = filter_generic(d, lambda p: modifier_close_to_answer(p, 100))
         ds_name = os.path.basename(os.path.dirname(in_file))
         res = export_brat_format(fd, {"Modifier": ["almost", "nearly", "all but", "Almost", "Nearly", "All but"]})
         click.echo(f"{click.style(str(len(res)), fg='green')} occurrences (out of {total_paragraphs}) "
@@ -129,8 +135,11 @@ def export_brat(in_files, out_folder, subsample, seed, coannotate):
         os.makedirs(out_path, exist_ok=True)
         if coannotate:
             res_co = set(random.sample(range(len(res)), int(len(res) * coannotate)))
+            click.echo(f"for {ds_name} coannotating indices {res_co}.")
             out_path_co = os.path.join(out_folder, f"{ds_name}-coannotate")
+            shutil.rmtree(out_path_co, ignore_errors=True)
             os.makedirs(out_path_co, exist_ok=True)
+
         else:
             res_co = set()
             out_path_co = None
@@ -144,6 +153,18 @@ def export_brat(in_files, out_folder, subsample, seed, coannotate):
                     f.write(text)
                 with open(os.path.join(out_path_co, f"{i:03}.ann"), "w+") as f:
                     f.write(ann)
+
+
+def modifier_close_to_answer(p, thresh=100):
+    words = ['almost', 'nearly', 'all but']
+    ctx = p['context'].lower()
+    new_qas = []
+    for qa in p['qas']:
+        for w in words:
+            if w in ctx and any(abs(ctx.index(w) - a['answer_start']) <= thresh for a in qa['answers']):
+                new_qas.append(qa)
+    p['qas'] = new_qas
+    return len(new_qas) > 0
 
 
 def modifier_in_context(p):
