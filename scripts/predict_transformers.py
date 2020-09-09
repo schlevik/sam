@@ -89,6 +89,7 @@ def predictions(in_files, out_folder, model_paths, model_types, no_cuda, per_gpu
                                suffix=suffix,return_raw=False)
                 file_name = get_output_predictions_file_name(args.eval_file, out_path, suffix)
                 write_json(score, file_name)
+                args.predictions_folder = out_path
             else:
                 evaluate(args, model, tokenizer, dataset, examples, features,
                          suffix=os.path.basename(os.path.normpath(model_path)))
