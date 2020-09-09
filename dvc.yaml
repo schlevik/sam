@@ -1225,3 +1225,23 @@ stages:
     - data/football/full/predictions/newsqa/intervention-t5-base-newsqa.json
     - data/football/full/predictions/newsqa/intervention-t5-large-newsqa.json
     - data/football/full/predictions/newsqa/intervention-t5-small-newsqa.json
+  combine-datasets:
+    cmd: python main.py combine data/datasets/drop/train.json data/datasets/hotpotqa/train.json
+      data/datasets/newsqa/train.json data/datasets/squad1/train-v1.1.json data/datasets/combined/train.json
+      --sub-sample 22500
+    deps:
+    - data/datasets/drop/train.json
+    - data/datasets/hotpotqa/train.json
+    - data/datasets/newsqa/train.json
+    - data/datasets/squad1/train-v1.1.json
+    outs:
+    - data/datasets/combined/train.json
+  train-albert-xlarge-v2-on-combined:
+    cmd: MODEL=albert-xlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/combined/
+      SAVE_TO=models/albert-xlarge-v2-combined BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=albert
+      bash scripts/cache_and_train_combined.sh
+    deps:
+    - data/datasets/combined/train.json
+    - data/datasets/squad1/dev-v1.1.json
+    outs:
+    - models/albert-xlarge-v2-combined

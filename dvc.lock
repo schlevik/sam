@@ -1732,3 +1732,46 @@ predict-t5-newsqa:
     md5: c5a0ea4649590f7bb25a746294283035
   - path: data/football/full/predictions/newsqa/intervention-t5-small-newsqa.json
     md5: 264ab3a3db436f6b0e1359934d174ce4
+combine-datasets:
+  cmd: python main.py combine data/datasets/drop/train.json data/datasets/hotpotqa/train.json
+    data/datasets/newsqa/train.json data/datasets/squad1/train-v1.1.json data/datasets/combined/train.json
+    --sub-sample 22500
+  deps:
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  - path: data/datasets/squad1/train-v1.1.json
+    md5: 981b29407e0affa3b1b156f72073b945
+  outs:
+  - path: data/datasets/combined/train.json
+    md5: ca684dec3f1d4166f6645e4780a71f35
+train-albert-xlarge-v2-on-combined:
+  cmd: MODEL=albert-xlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/combined/
+    SAVE_TO=models/albert-xlarge-v2-combined BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=albert
+    bash scripts/cache_and_train_combined.sh
+  deps:
+  - path: data/datasets/combined/train.json
+    md5: ca684dec3f1d4166f6645e4780a71f35
+  - path: data/datasets/squad1/dev-v1.1.json
+    md5: 3e85deb501d4e538b6bc56f786231552
+  outs:
+  - path: models/albert-xlarge-v2-combined
+    md5: 8d073e6c26c38ebb63c030a6792f50ff.dir
+combine-datasets-full:
+  cmd: python main.py combine data/datasets/drop/train.json data/datasets/hotpotqa/train.json
+    data/datasets/newsqa/train.json data/datasets/squad1/train-v1.1.json data/datasets/combined/train-full.json
+  deps:
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  - path: data/datasets/squad1/train-v1.1.json
+    md5: 981b29407e0affa3b1b156f72073b945
+  outs:
+  - path: data/datasets/combined/train-full.json
+    md5: d94dffb07139ff5c00f465b6e283f6d5
