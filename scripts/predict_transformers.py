@@ -33,7 +33,7 @@ from transformers.data.metrics.squad_metrics import (
 from transformers.data.processors.squad import SquadResult
 
 from scripts.evaluate_intervention import print_examples
-from scripts.utils import get_output_predictions_file_name, get_baseline_intervention_control_from_baseline
+from scripts.utils import get_output_predictions_file_name, get_baseline_intervention_control_from_baseline, write_json
 from scripts.utils_transformers import to_list, _is_gpu_available, get_tokenizer, get_model, load_examples, Args, \
     debug_features_examples_dataset, convert_to_features, load_or_convert
 from stresstest.eval_utils import align, evaluate_intervention
@@ -64,8 +64,10 @@ except ImportError:
 @click.option('--max-query-length', type=int, default=64)
 @click.option('--num-workers', type=int, default=1)
 @click.option('--debug-features', type=bool, is_flag=True, default=False)
+@click.option('--do-evaluate', type=bool, is_flag=True, default=False)
 def predictions(in_files, out_folder, model_paths, model_types, no_cuda, per_gpu_eval_batch_size, do_not_lower_case,
-                lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold, **kwargs):
+                lang_id, v2, n_best_size, max_answer_length, verbose_logging, null_score_diff_threshold, do_evaluate,
+                **kwargs):
     assert len(model_paths) == len(model_types)
     for model_path, model_type in zip(model_paths, model_types):
         model = get_model(model_path)
@@ -79,8 +81,17 @@ def predictions(in_files, out_folder, model_paths, model_types, no_cuda, per_gpu
             args.eval_file = in_file
             logger.debug(args)
             dataset, examples, features = load_or_convert(args, tokenizer, evaluate=True)
-            evaluate(args, model, tokenizer, dataset, examples, features,
-                     suffix=os.path.basename(os.path.normpath(model_path)))
+            if do_evaluate:
+                out_path = args.predictions_folder
+                args.predictions_folder = None
+                suffix = os.path.basename(os.path.normpath(model_path))
+                score = evaluate(args, model, tokenizer, dataset, examples, features,
+                               suffix=suffix,return_raw=False)
+                file_name = get_output_predictions_file_name(args.eval_file, out_path, suffix)
+                write_json(score, file_name)
+            else:
+                evaluate(args, model, tokenizer, dataset, examples, features,
+                         suffix=os.path.basename(os.path.normpath(model_path)))
 
 
 def evaluate(args: Args, model, tokenizer, dataset, examples, features, suffix="", return_raw=False):
