@@ -122,7 +122,7 @@ def get_mean_var_ci_bernoulli(sample, alpha=0.05):
 def evaluate_intervention(aligned_baseline, aligned_intervention, aligned_control,
                           predictions_baseline, predictions_intervention, predictions_control):
     longest_answer = max(len(b.answer.split()) for b in aligned_baseline + aligned_intervention)
-    em = EM(relaxed=True, max_length=longest_answer)
+    em = EM(relaxed=True, max_length=longest_answer+2)
     results_baseline = em(aligned_baseline, predictions_baseline)
 
     # got it correct in first place
