@@ -1,0 +1,18 @@
+Paragraph:
+
+Wood has been an important construction material since humans began building shelters, houses and boats. Nearly all boats were made out of wood until the late 19th century, and wood remains in common use today in boat construction. Elm in particular was used for this purpose as it resisted decay as long as it was kept wet (it also served for water pipe before the advent of more modern plumbing).
+
+Question
+Until the late 19th century, what vessels were almost always wooden?
+Answer(s):
+boats
+
+Question
+What significant purpose has wood been used for as long as humans have built shelters?
+Answer(s):
+construction material
+
+Question
+Other than boats, what do people often build with wood?
+Answer(s):
+houses

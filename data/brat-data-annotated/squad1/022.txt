@@ -1,0 +1,18 @@
+Paragraph:
+
+The Kalahari Desert, an arid region shared with South Africa and Botswana, is one of Namibia's well-known geographical features. The Kalahari, while popularly known as a desert, has a variety of localised environments, including some verdant and technically non-desert areas. One of these, known as the Succulent Karoo, is home to over 5,000 species of plants, nearly half of them endemic; Approximately 10 percent of the world's succulents are found in the Karoo. The reason behind this high productivity and endemism may be the relatively stable nature of precipitation.
+
+Question
+How many plants species are found in Succulent Karoo?
+Answer(s):
+5,000
+
+Question
+How many plants are endemic to the Succulent Karoo?
+Answer(s):
+half
+
+Question
+How many of the worlds succulents are found in Karoo?
+Answer(s):
+10 percent

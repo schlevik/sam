@@ -1,0 +1,23 @@
+Paragraph:
+
+[aug] yes no [text] He was however forced to fall back across the Danube, and the Ottomans in turn led a massive counter-offensive which aimed to not only take back their recently captured possessions but also conquer Wallachia once and for all. The push was initially successful, managing to capture not only Giurgiu but also Bucharest and Târgovişte, in spite of meeting fierce opposition at Călugăreni . At this point the Ottoman command grew complacent and stopped pursuing the retreating Wallachian army, focusing instead on fortifying Târgovişte and Bucharest and considering their task all but done. Michael had to wait almost two months for aid from his allies to arrive, but when it did his counter-offensive took the Ottomans by surprise, managing to sweep through the Ottoman defences on three successive battlefields, at Târgovişte , Bucharest , and Giurgiu . The Battle of Giurgiu in particular was devastating for the Ottoman forces, which had to retreat across the Danube in disarray. The war between Wallachia and the Ottomans continued until late 1599, when Michael was unable to continue the war due to poor support from his allies. The turning point of the war was the Battle of Mezőkeresztes, which took place in the territory of Hungary on October 24-26, 1596. The combined Habsburg-Transylvanian force of 45-50,000 troops was defeated by the Ottoman army. The battle turned when Christian soldiers, thinking they had won the battle, stopped fighting in order to plunder the Ottoman camp. Despite this victory, the Ottomans realized for the first time the superiority of Western military equipment over Ottoman weapons. This battle was the first significant military encounter in Central-Europe between a large Christian army and the Ottoman Turkish Army after the Battle of Mohács. Nevertheless, Austrians recaptured Győr and Komarom in 1598.
+
+Question
+Which side won the Battle of Giurgiu?
+Answer(s):
+Wallachia
+
+Question
+Which side lost the Battle of Mezőkeresztes?
+Answer(s):
+Wallachia
+
+Question
+Which side won the battles at Târgovişte and Bucharest after Michael received aid from his allies?
+Answer(s):
+Wallachia
+
+Question
+What happened first, the war between Wallachia and Ottomans or the Battle of Mezőkeresztes?
+Answer(s):
+Wallachia

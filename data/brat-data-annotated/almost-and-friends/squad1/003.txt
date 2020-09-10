@@ -1,0 +1,8 @@
+Paragraph:
+
+Opponents of the Endangered Species Act argue that with over 2,000 endangered species listed, and only 28 delisted due to recovery, the success rate of 1% over nearly three decades proves that there needs to be serious reform in their methods to actually help the endangered animals and plants. Others argue that the ESA may encourage preemptive habitat destruction by landowners who fear losing the use of their land because of the presence of an endangered species; known colloquially as "Shoot, Shovel and Shut-Up." One example of such perverse incentives is the case of a forest owner who, in response to ESA listing of the red-cockaded woodpecker, increased harvesting and shortened the age at which he harvests his trees to ensure that they do not become old enough to become suitable habitat. While no studies have shown that the Act's negative effects, in total, exceed the positive effects, many economists believe that finding a way to reduce such perverse incentives would lead to more effective protection of endangered species.
+
+Question
+What is the success rate of the list and the Endangered Species Act initiatives?
+Answer(s):
+1%

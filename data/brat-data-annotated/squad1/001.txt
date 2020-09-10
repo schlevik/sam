@@ -1,0 +1,13 @@
+Paragraph:
+
+On 25 February 1757, Burke signed a contract with Robert Dodsley to write a "history of England from the time of Julius Caesar to the end of the reign of Queen Anne", its length being eighty quarto sheets (640 pages), nearly 400,000 words. It was to be submitted for publication by Christmas 1758. Burke completed the work to the year 1216 and stopped; it was not published until after Burke's death, being included in an 1812 collection of his works, entitled An Essay Towards an Abridgement of the English History. G. M. Young did not value Burke's history and claimed that it was "demonstrably a translation from the French". Lord Acton, on commenting on the story that Burke stopped his history because David Hume published his, said "it is ever to be regretted that the reverse did not occur".
+
+Question
+How many words long was Burke's history of England contracted to be?
+Answer(s):
+nearly 400,000
+
+Question
+How many pages long was Burke's history of England contracted to be?
+Answer(s):
+640 pages

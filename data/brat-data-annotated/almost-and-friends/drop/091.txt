@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The City of Charleston Police Department, with a total of 458 sworn officers, 117 civilians, and 27 reserve police officers, is South Carolina's largest police department. Their procedures on cracking down on drug use and gang violence in the city are used as models to other cities to do the same. According to the final 2005 FBI Crime Reports, Charleston crime level was worse than the national average in almost every major category. Greg Mullen, the former Deputy Chief of the Virginia Beach, Virginia Police Department, serves as the current Chief of the Charleston Police Department. The former Charleston police chief was Reuben Greenberg, who resigned August 12, 2005. Greenberg was credited with creating a polite police force that kept police brutality well in check, even as it developed a visible presence in community policing and a significant reduction in crime rates. Crime overall, declining since 1999, has continued to decline in Charleston and in most major cities across the country since then.
+
+Question
+Did Greg Mullen serve for the City of Charleston Police Department or the Virginia Beach Police Department first?
+Answer(s):
+Virginia Beach

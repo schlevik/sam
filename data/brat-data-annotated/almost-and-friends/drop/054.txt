@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] About 25,000,000 people in the worlds thirty richest countries will have lost their jobs between the end of 2007 and the end of 2010 as the economic downturn pushes most countries into recession. In April 2010, the U.S. unemployment rate was 9.9%, but the governments broader U-6 unemployment rate was 17.1%. In April 2012, the unemployment rate was 4.6% in Japan. In a 2012 news story, the Financial Post reported, "Nearly 75 million youth are unemployed around the world, an increase of more than 4 million since 2007. In the European Union, where a debt crisis followed the financial crisis, the youth unemployment rate rose to 18% last year from 12.5% in 2007, the ILO report shows." In March 2018, according to U.S. Unemployment Rate Statistics, the unemployment rate was 4,1%, so it is below to 4.5 to 5.0%, which is the norm, this means that there is still need of employees to work.
+
+Question
+Which country had a lower unemployment rate, the U.S. in 2010, or Japan in 2012?
+Answer(s):
+4.6% in Japan
+
+Question
+What year was was the unemployment  around world the largest: 2007 or 2012?
+Answer(s):
+2012
+
+Question
+What years will 25,000,000 million people lose their jobs
+Answer(s):
+2007

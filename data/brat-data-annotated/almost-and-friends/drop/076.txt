@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] For Fall 2018, Berkeleys acceptance rate for freshman was 15.1%. Total enrollment was 41,910 - 30,574 undergraduate and 11,336 graduate students - with women accounting for 52.7% of undergraduates and 46.2% of graduate and professional students. Of enrolled freshman, nearly 54% were women and approximately 60% self-identified as persons of color. Enrolled freshman had an average weighted secondary school GPA of 4.45 (unweighted GPA of 3.92) and had an average SAT score of 1435 (average ACT score of 32). The interquartile range for SAT scores was 1340-1530, with 660-750 for reading/writing and 670-750 for math. Berkeleys enrollment of National Merit Scholarship Program was third in the nation until 2002, when participation in the National Merit program was discontinued. For 2016-17, Berkeley ranked fifth in enrollment of recipients of the National Merit Scholarship Program (136 scholars). 33% of admitted students receive federal Pell grants.
+
+Question
+In Fall of 2018 were there more women or men enrolled as freshman?
+Answer(s):
+women
+
+Question
+Did Fall 2018's enrollment have more undergrad or graduate students?
+Answer(s):
+undergraduate

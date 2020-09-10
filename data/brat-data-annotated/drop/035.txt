@@ -1,0 +1,38 @@
+Paragraph:
+
+[aug] yes no [text] Game SummaryFollowing their second-half blowout win over the Saints, the Colts flew to LP Field for an AFC South duel with the Tennessee Titans. In the first quarter, Indianapolis drew first blood with RB Joseph Addai getting an 8-yard TD run. The Titans would respond with kicker Rob Bironas getting a 30-yard field goal. In the second quarter, the Colts increased their lead with QB Peyton Manning completing a 22-yard TD pass to TE Dallas Clark. Tennessee would answer with Bironas getting a 36-yard field goal. Indianapolis closed out the half with kicker Adam Vinatieri getting a 22-yard field goal. In the third quarter, Indianapolis kept pounding away as Vinatieri kicked a 39-yard field goal. The Titans replied with RB LenDale White getting a 3-yard TD run. Vinatieri helped the Colts respond with a 20-yard field goal. In the fourth quarter, Tennessee nearly pulled off a comeback, as QB Vince Young completed a 1-yard TD pass to WR Roydell Williams, however, Indianapolis held off the Titans long enough to pull out a win.
+
+Question
+which yard vhinatieri helped
+Answer(s):
+Vinatieri helped the Colts respond with a 20-yard field goal.
+
+Question
+Who kicked the longest field goal?
+Answer(s):
+Vinatieri
+
+Question
+How many yards were each of Vinatieri's field goals?
+Answer(s):
+20-yard
+
+Question
+Which player scored the shortest touchdown?
+Answer(s):
+Roydell Williams
+
+Question
+Who kicked the longest field goal?
+Answer(s):
+Vinatieri
+
+Question
+Who kicked the shortest field goal?
+Answer(s):
+Vinatieri
+
+Question
+Which kicker had more total yards, Vinatieri or Bironas?
+Answer(s):
+Vinatieri

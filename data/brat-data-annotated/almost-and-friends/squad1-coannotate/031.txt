@@ -1,0 +1,13 @@
+Paragraph:
+
+From the semi-finals onwards, the fate of the contestants is decided by public vote. During the contestant's performance as well as the recap at the end, a toll-free telephone number for each contestant is displayed on the screen. For a two-hour period after the episode ends (up to four hours for the finale) in each US time zone, viewers may call or send a text message to their preferred contestant's telephone number, and each call or text message is registered as a vote for that contestant. Viewers are allowed to vote as many times as they can within the two-hour voting window. However, the show reserves the right to discard votes by power dialers. One or more of the least popular contestants may be eliminated in successive weeks until a winner emerges. Over 110 million votes were cast in the first season, and by season ten the seasonal total had increased to nearly 750 million. Voting via text messaging was made available in the second season when AT&T Wireless joined as a sponsor of the show, and 7.5 million text messages were sent to American Idol that season. The number of text messages rapidly increased, reaching 178 million texts by season eight. Online voting was offered for the first time in season ten. The votes are counted and verified by Telescope Inc.
+
+Question
+In which season was online voting introduced?
+Answer(s):
+ten
+
+Question
+How many votes were cast by season ten for all contestants?
+Answer(s):
+nearly 750 million

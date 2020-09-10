@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Marriage rates began declining from almost 71 per 1,000 inhabitants in 1981 until 2002, only to increase slightly in 2003 to 61 per 1,000 and then fall again to 51 in 2004. Moreover, divorce rates have seen an increase from 191.2 per 1,000 marriages in 1991 to 239.5 per 1,000 marriages in 2004. As a result of these trends, the average Greek household is smaller and older than in previous generations.
+
+Question
+Were marriage rates higher in 1981 or 2002?
+Answer(s):
+1981
+
+Question
+Were marriage rates higher in 1981 or in 2002?
+Answer(s):
+1981

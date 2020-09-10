@@ -1,0 +1,8 @@
+Paragraph:
+
+Nearly all polychaetes have parapodia that function as limbs, while other major annelid groups lack them. Parapodia are unjointed paired extensions of the body wall, and their muscles are derived from the circular muscles of the body. They are often supported internally by one or more large, thick chetae. The parapodia of burrowing and tube-dwelling polychaetes are often just ridges whose tips bear hooked chetae. In active crawlers and swimmers the parapodia are often divided into large upper and lower paddles on a very short trunk, and the paddles are generally fringed with chetae and sometimes with cirri (fused bundles of cilia) and gills.
+
+Question
+What type of annelids have limb-like parapodia?
+Answer(s):
+polychaetes

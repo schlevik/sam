@@ -1,0 +1,13 @@
+Paragraph:
+
+In central portions of the U.S., tornadoes are more common than anywhere else on Earth and touch down most commonly in the spring and summer. Deadly and destructive hurricanes occur almost every year along the Atlantic seaboard and the Gulf of Mexico. The Appalachian region and the Midwest experience the worst floods, though virtually no area in the U.S. is immune to flooding. The Southwest has the worst droughts; one is thought to have lasted over 500 years and to have hurt Ancestral Pueblo peoples. The West is affected by large wildfires each year.
+
+Question
+During which seasons are tornados most common?
+Answer(s):
+spring and summer
+
+Question
+Which regions experience the worst flooding in the US?
+Answer(s):
+Appalachian region and the Midwest

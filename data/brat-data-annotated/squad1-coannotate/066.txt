@@ -1,0 +1,13 @@
+Paragraph:
+
+A sample rate of 44.1 kHz is almost always used, because this is also used for CD audio, the main source used for creating MP3 files. A greater variety of bit rates are used on the Internet. The rate of 128 kbit/s is commonly used, at a compression ratio of 11:1, offering adequate audio quality in a relatively small space. As Internet bandwidth availability and hard drive sizes have increased, higher bit rates up to 320 kbit/s are widespread.
+
+Question
+What sampling rate is used for CD audio?
+Answer(s):
+44.1 kHz
+
+Question
+What is the main source used for creating MP3 files?
+Answer(s):
+CD audio

@@ -1,0 +1,8 @@
+Paragraph:
+
+Antarctica is the coldest of Earth's continents. The coldest natural temperature ever recorded on Earth was −89.2 °C (−128.6 °F) at the Soviet (now Russian) Vostok Station in Antarctica on 21 July 1983. For comparison, this is 10.7 °C (20 °F) colder than subliming dry ice at one atmosphere of partial pressure, but since CO2 only makes up 0.039% of air, temperatures of less than −150 °C (−238 °F) would be needed to produce dry ice snow in Antarctica. Antarctica is a frozen desert with little precipitation; the South Pole itself receives less than 10 cm (4 in) per year, on average. Temperatures reach a minimum of between −80 °C (−112 °F) and −89.2 °C (−128.6 °F) in the interior in winter and reach a maximum of between 5 °C (41 °F) and 15 °C (59 °F) near the coast in summer. Sunburn is often a health issue as the snow surface reflects almost all of the ultraviolet light falling on it. Given the latitude, long periods of constant darkness or constant sunlight create climates unfamiliar to human beings in much of the rest of the world.
+
+Question
+What light caused condition is a serious problem for humans in Antarctica?
+Answer(s):
+Sunburn

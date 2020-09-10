@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Before Armenia even became an independent country, the United States was one of the 74 countries that responded by sending aid to the Armenians who had lost their homes and were living in temporary shelters. Through its aid, the U.S. managed to give permanent housing to about 30,000 victims and cleared displaced residents from over 100 buildings. Over the past 16 years, the U.S. has provided nearly $2 billion in assistance to Armenia, the highest per capita amount in the NIS. humanitarian aid originally accounted for up to 85% of this total, reflecting the economic paralysis caused by closed borders with Turkey and Azerbaijan related to the Nagorno-Karabakh conflict, destruction in northern Armenia left from the devastating 1988 earthquake and the closure of most of the country's factories. As conditions in Armenia have improved with the stabilization of the economy and increased energy production—including the restarting of the Armenian Nuclear Power Plant near the capital—U.S. assistance programs have progressed from humanitarian priorities to longer-term development goals. On May 25, 2017, the ANCA issued a statement against Donald Trump's budget, which would cut 69.6% of the aid to Armenia. The ANCA stated, "We are Troubled by Trump's Ill-Advised and Misguided Proposal to Cut Aid to Armenia".
+
+Question
+What did the US focus on first, humanitarian aid or longer-term development goals?
+Answer(s):
+humanitarian aid

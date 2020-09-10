@@ -1,0 +1,8 @@
+Paragraph:
+
+Over almost all of Oklahoma, winter is the driest season. Average monthly precipitation increases dramatically in the spring to a peak in May, the wettest month over most of the state, with its frequent and not uncommonly severe thunderstorm activity. Early June can still be wet, but most years see a marked decrease in rainfall during June and early July. Mid-summer (July and August) represents a secondary dry season over much of Oklahoma, with long stretches of hot weather with only sporadic thunderstorm activity not uncommon many years. Severe drought is common in the hottest summers, such as those of 1934, 1954, 1980 and 2011, all of which featured weeks on end of virtual rainlessness and high temperatures well over 100 °F (38 °C). Average precipitation rises again from September to mid-October, representing a secondary wetter season, then declines from late October through December.
+
+Question
+Which season is the most dry in Oklahoma?
+Answer(s):
+winter

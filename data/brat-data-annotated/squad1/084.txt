@@ -1,0 +1,13 @@
+Paragraph:
+
+The service's B-2A aircraft entered service in the 1990s, its B-1B aircraft in the 1980s and its current B-52H aircraft in the early 1960s. The B-52 Stratofortress airframe design is over 60 years old and the B-52H aircraft currently in the active inventory were all built between 1960 and 1962. The B-52H is scheduled to remain in service for another 30 years, which would keep the airframe in service for nearly 90 years, an unprecedented length of service for any aircraft. The B-21 is projected to replace the B-52 and parts of the B-1B force by the mid-2020s.
+
+Question
+How long is the B-52H scheduled to remain in service of the USAF? 
+Answer(s):
+30 years
+
+Question
+What aircraft is scheduled to replace the B-52 in the USAF?
+Answer(s):
+B-21

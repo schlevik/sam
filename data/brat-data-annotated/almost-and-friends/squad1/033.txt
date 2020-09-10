@@ -1,0 +1,13 @@
+Paragraph:
+
+Rapid increases in a number of commodity prices followed the collapse in the housing bubble. The price of oil nearly tripled from $50 to $147 from early 2007 to 2008, before plunging as the financial crisis began to take hold in late 2008. Experts debate the causes, with some attributing it to speculative flow of money from housing and other investments into commodities, some to monetary policy, and some to the increasing feeling of raw materials scarcity in a fast-growing world, leading to long positions taken on those markets, such as Chinese increasing presence in Africa. An increase in oil prices tends to divert a larger share of consumer spending into gasoline, which creates downward pressure on economic growth in oil importing countries, as wealth flows to oil-producing states. A pattern of spiking instability in the price of oil over the decade leading up to the price high of 2008 has been recently identified. The destabilizing effects of this price variance has been proposed as a contributory factor in the financial crisis.
+
+Question
+How much did the price of oil increase from early 2007 to 2008?
+Answer(s):
+nearly tripled from $50 to $147
+
+Question
+What did the price of oil began doing when the financial crisis began to take hold in late 2008?
+Answer(s):
+plunging

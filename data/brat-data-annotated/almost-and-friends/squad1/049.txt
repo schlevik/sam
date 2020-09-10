@@ -1,0 +1,8 @@
+Paragraph:
+
+Hydrogen gas forms explosive mixtures with air if it is 4–74% concentrated and with chlorine if it is 5–95% concentrated. The mixtures may be ignited by spark, heat or sunlight. The hydrogen autoignition temperature, the temperature of spontaneous ignition in air, is 500 °C (932 °F). Pure hydrogen-oxygen flames emit ultraviolet light and with high oxygen mix are nearly invisible to the naked eye, as illustrated by the faint plume of the Space Shuttle Main Engine compared to the highly visible plume of a Space Shuttle Solid Rocket Booster. The detection of a burning hydrogen leak may require a flame detector; such leaks can be very dangerous. Hydrogen flames in other conditions are blue, resembling blue natural gas flames. The destruction of the Hindenburg airship was an infamous example of hydrogen combustion; the cause is debated, but the visible orange flames were the result of a rich mixture of hydrogen to oxygen combined with carbon compounds from the airship skin.
+
+Question
+What kind of light do hydrogen-oxygen flames make?
+Answer(s):
+ultraviolet light

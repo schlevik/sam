@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Málaga, the chief seaport of Granada, was the main objective of the Castilian forces in 1487. Emir al-Zagal was slow to march to attempt to relieve the siege and was unable to harass the Christian armies safely because of the ongoing civil war; even after he left the city to come to the aid of Málaga, he was forced to leave troops in the Alhambra to defend against Boabdil and his followers. The first main city to be attacked, Vélez-Málaga, capitulated on 27 April 1487, with local supporters of Boabdil directly aiding the Christian besiegers. Málaga held out during an extended siege that lasted from 7 May 1487 until 18 August 1487; its commander preferred death to surrender, and the African garrison and Christian renegades fought tenaciously, fearing the consequences of defeat. Near the end, the notables of Málaga finally offered a surrender, but Ferdindad refused, as generous terms had already been offered twice. When the city finally fell, Ferdinand punished almost all the inhabitants for their stubborn resistance with slavery, while renegades were burned alive or pierced by reeds. The Jews of Malaga, however, were spared, as Castilian Jews ransomed them from slavery. Historian William Prescott considered the fall of Málaga the most important part of the war; as the chief port of Granada, Granada could not reasonably continue on as an independent state without it.
+
+Question
+In which ways did Ferdinand torture the inhabitants once the city fell?
+Answer(s):
+with slavery

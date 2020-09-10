@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] During the Cold War, the Danish navy was rebuilt and modernised, with the main assignment being to repel an invasion from the Warsaw Pact. Typical operations requiring training were minelaying , 2,000 GRT), were the world's largest minelayers at their time - each had a complement of 280 900 kg mines) and sting attacks with small but fast combat craft , 158 GRT) and Willemoes-class missile torpedo boats , 260 GRT) and a self-sustaining mobile missile battery equipped with targeting and guidance, capable of firing Harpoon missiles. The Danish intelligence capabilities were also expanded and the Danish submarines trained for very shallow water operations, while a special naval force - the Danish Frogman Corps was created. The naval bases in Frederikshavn and Korsør plus the fortresses at Langeland and Stevns were created through NATO funds in the 1950s. In case of war all Danish combat vessels were assigned to NATO's Allied Forces Baltic Approaches's naval command NAVBALTAP.
+
+Question
+Who fires the Harpoon missiles?
+Answer(s):
+self-sustaining mobile missile battery

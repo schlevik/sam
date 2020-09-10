@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Looking to muster their first winning streak of the season, the Washington Redskins took on the rival New York Giants on Monday Night Football. To add to the fanfare, Redskins owner Daniel Snyder hired Bruce Allen to be the new General Manager. However, the Redskins came out flat, and trailed 24-0 by halftime. With a chance to kick a field goal as the half ended to cut it to a 24-3 deficit, the Redskins tried one of the most ill-advised and ill-fated fake field goal attempts of all-time. Redskins P Hunter Smith sent the entire offensive line in motion, along with K Graham Gano. The first attempt was foiled by a Giants time-out. The second attempt was intercepted and almost taken back for a 31-0 lead. In the 2nd half, the Redskins finally got on the board, scoring on a touchdown pass to Fred Davis. However, it was too little, too late, as K Graham Gano missed the extra point. The Redskins would not score again until it was 38-6 Giants. RB Quinton Ganther scored on a 2-yard scamper, but the Redskins came up a foot short on the 2-point conversion, which sealed any slim chance there was of a comeback. When all was said and done, the Giants won 45-12. With the crushing loss, Washington fell to 4-10, losing 10 games or more for the third time in six seasons.
+
+Question
+Which gteam was leading at halftime?
+Answer(s):
+Giants

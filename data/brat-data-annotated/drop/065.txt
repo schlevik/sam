@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Starting lineups: HOUSTON - OFFENSE: QB Matt Schaub, LT Duane Brown, LG Wade Smith, C Chris Myers, RT Antoine Caldwell, RG Eric Winston, WR Andre Johnson, RB Arian Foster, FB Vonta Leach, TE Owen Daniels, WR Kevin Walter. The Texans began their season with a home game against the Indianapolis Colts, a division rival in which they had only beaten once ever. However, Houston got off to an early 13-0 lead after 30 and 49-yard field goals from Neil Rackers (who had recently replaced Kris Brown as the team's kicker) and a 22-yard touchdown pass from Matt Schaub, leading passer in the league a year ago, to Kevin Walter. As expected, the Colts wouldn't go down without a fight as Indy scored ten unanswered points to close out the half on a 14-yard touchdown pass from Peyton Manning to Reggie Wayne and a 20-yard field goal by Adam Vinatieri. With the momentum seemingly shifting to Indianapolis, Houston took nearly eight minutes off the third-quarter clock with a 15-play drive (13 rushes) out of the locker room, as Arian Foster scored from a yard out, his first of three touchdowns on the day. Going into the fourth with Houston leading 20-10, the Texans continued to run, and the Colts continued to pass, as Peyton Manning attempted 57 passes that day, completing 40, a career-high. However, it wouldn't be enough; even though the Colts scored two touchdowns on a 10-yard pass to Dallas Clark and a 73-yard pass to Austin Collie, the Texans would score two of their own: 25 and 8-yard runs from Arian Foster en route to a 34-24 Houston win at Reliant Stadium. Arian Foster finished with 231 rushing yards on 33 carries. Both were Houston records for a game, and the 231 yards was the second most rushing yards on opening week, only behind O.J. Simpson. Peyton Manning eventually went 40/57 for 433 yards and three touchdowns. Houston began the season 1-0 and won for only the second time against Indianapolis, against fifteen losses. The Colts, after going 0-4 in the 2010 preseason, lost their fifth game overall to start the 2010 year.
+
+Question
+What team scored the first points of the game, Houston or Colts?
+Answer(s):
+HOUSTON, Houston
+
+Question
+What team scored more points in thee game, Colts or Houston?
+Answer(s):
+HOUSTON, Houston

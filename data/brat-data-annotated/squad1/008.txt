@@ -1,0 +1,13 @@
+Paragraph:
+
+After the 1948 election, the state turned firmly Republican. Although registered Republicans were a minority in the state until 2015, starting in 1952, Oklahoma has been carried by Republican presidential candidates in all but one election (1964). This is not to say that every election has been a landslide for Republicans: Jimmy Carter lost the state by less than 1.5% in 1976, while Michael Dukakis and Bill Clinton both won 40% or more of the state's popular vote in 1988 and 1996 respectively. Al Gore in 2000, though, was the last Democrat to even win any counties in the state. Oklahoma was the only state where Barack Obama failed to carry any of its counties in both 2008 and 2012.
+
+Question
+When did registered Republicans become a majority in Oklahoma?
+Answer(s):
+2015
+
+Question
+What is the one election since 1952 where a Republican presidential candidate didn't win in Oklahoma?
+Answer(s):
+1964

@@ -1,0 +1,8 @@
+Paragraph:
+
+In 1900, after Galveston was struck by a devastating hurricane, efforts to make Houston into a viable deep-water port were accelerated. The following year, oil discovered at the Spindletop oil field near Beaumont prompted the development of the Texas petroleum industry. In 1902, President Theodore Roosevelt approved a $1 million improvement project for the Houston Ship Channel. By 1910 the city's population had reached 78,800, almost doubling from a decade before. African-Americans formed a large part of the city's population, numbering 23,929 people, or nearly one-third of the residents.
+
+Question
+In what year did Houston's population reach 78,000?
+Answer(s):
+1910

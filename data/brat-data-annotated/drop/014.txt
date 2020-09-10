@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] However, while James II was unpopular in England, he had widespread popular support in Ireland. The Irish were almost all Roman Catholics and had fought en masse for the Stuart dynasty in the Wars of the Three Kingdoms in the 1640s, in the hope of securing religious toleration and political self-government. They had been defeated by 1652 and were punished by the English Commonwealth regime with land confiscations and penal legislation. They were largely disappointed with the failure of King Charles II to completely reverse this situation in the Act of Settlement 1662. The majority of Irish people were "Jacobites" and supported James II due to his 1687 Declaration of Indulgence or, as it is also known, the Declaration for the Liberty of Conscience, that granted religious freedom to all denominations in England and Scotland and also due to James II's promise to the Irish Parliament of an eventual right to self-determination. James had given them some concrete concessions in the 1680s by appointing an Irish Catholic, Richard Talbot, 1st Earl of Tyrconnell as Lord Deputy of Ireland, and by re-admitting Catholics as Army officers and into other public offices. When James fled England in 1688 he looked to Ireland to muster support for a re-conquest of his Three Kingdoms. In 1689 he held what became known as the "Patriot Parliament" in Dublin, which reversed the confiscations of the 1650s and confirmed his support from most of the Irish landed gentry. Ironically, while Irish Catholics supported King James en masse, the Papal States had joined the League of Augsburg. Pope Innocent XI had lent William of Orange 150,000 Scudi for war purposes through his family's bank before his death in 1689.
+
+Question
+Where was James II better liked?
+Answer(s):
+Ireland
+
+Question
+What happened first, the Wars of the Three Kingdoms, or the defeat of the Roman Catholics?
+Answer(s):
+Wars of the Three Kingdoms
+
+Question
+What happened first, the Wars of the Three Kingdoms, or the Act of Settlement?
+Answer(s):
+Wars of the Three Kingdoms

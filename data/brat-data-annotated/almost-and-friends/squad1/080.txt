@@ -1,0 +1,18 @@
+Paragraph:
+
+The securitization markets supported by the shadow banking system started to close down in the spring of 2007 and nearly shut-down in the fall of 2008. More than a third of the private credit markets thus became unavailable as a source of funds. According to the Brookings Institution, the traditional banking system does not have the capital to close this gap as of June 2009: "It would take a number of years of strong profits to generate sufficient capital to support that additional lending volume." The authors also indicate that some forms of securitization are "likely to vanish forever, having been an artifact of excessively loose credit conditions."
+
+Question
+When did the securitization markets supported by the shadow banking systems start to close down?
+Answer(s):
+spring of 2007
+
+Question
+When did the securitization markets supported by the shadow banking system nearly shut-down completely?
+Answer(s):
+fall of 2008
+
+Question
+How much of the private credit markets become unavailable as a source of funds?
+Answer(s):
+More than a third

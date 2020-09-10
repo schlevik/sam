@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Southeastern Pennsylvania was assigned the area code 215 area code in 1947 when the North American Numbering Plan of the Bell System went into effect. The geographic area covered by the code was split nearly in half in 1994 when area code 610 was created, with the city and its northern suburbs retaining 215. area code overlay 267 was added to the 215 service area in 1997, and 484 was added to the 610 area in 1999. A plan in 2001 to introduce a third overlay code to both service areas (area code 445 to 215, area code 835 to 610) was delayed and later rescinded. Area code 445 was implemented as an overlay for area codes 215 and 267 starting on February 3, 2018.
+
+Question
+Which area code is older, 484 or 610?
+Answer(s):
+610

@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] The Buccaneers and Panthers met for the first time this season, with first place in the NFC South on the line. Carolina starting quarterback Jake Delhomme sat out the game with an elbow injury, and was replaced by David Carr. The Buccaneer offense started the game with an exhausting, 11-play, 71-yard drive, capped off by a 3-yard scramble by Jeff Garcia for a touchdown. With 3 minutes left in the first quarter, running back Carnell Williams blasted down the field for an 18-yard run, but his right leg buckled, seriously injuring his knee. As he was being carted off the field, nearly the entire Buccaneers team, along with several Panthers players, huddled around Williams in support. After the injury timeout, Earnest Graham salvaged the drive with a one-yard touchdown run. Tampa Bay extended their halftime lead to 17-0 after a Matt Bryant field goal, meanwhile, Carolina's offense was sputtering, blasted by the Buccaneers defense, who sacked Carr three times, and intercepeted him once. Carr completed only 19 of 41 pass attempts, and Carolina was facing their first shutout in five seasons. With 23 seconds left in regulation, Carolina finally got on the board with a touchdown pass to DeAngelo Williams. An onside kick was unsuccessful, and the Buccaneers won their third straight game. Through four games, the Buccaneers had not given up any points in the first quarter, and quarterback Jeff Garcia had not thrown an interception. After the game, the Buccaneers announced that running back Carnell Williams (torn patellar ligament) and left tackle Luke Petitgout (torn ACL) would both face season-ending surgery. On Wednesday, October 3, linebacker Barrett Ruud was named the NFC Defensive Player of Month for September with a league-leading 51 tackles, three forced fumbles, two fumble recoveries, and one interception.
+
+Question
+Which team became first place in the NFC South after this game?
+Answer(s):
+Buccaneers
+
+Question
+Which team was winning at halftime?
+Answer(s):
+Buccaneers

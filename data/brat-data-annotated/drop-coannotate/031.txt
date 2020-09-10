@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The Houston Texans joined the league at the 2002 NFL season, playing at the newly founded Reliant Stadium. With their opening game victory over the Dallas Cowboys that season, the team became the first expansion team to win its opening game since the Minnesota Vikings beat the Chicago Bears in 1961. While the team struggled in early seasons, results began to improve once native Houstonian Gary Kubiak became the head coach in 2006. The Texans finished with a .500 season (8-8) in both 2007 and 2008, and nearly qualified for the 2009-10 NFL playoffs with a 9-7 result in 2009. In 2010, the team started the season on a 4-2 record going into a Week 7 bye week, but promptly collapsed 2-8 in the second part of the season, finishing 6-10. In the 2011 NFL Draft, the Texans acquired Wisconsin Badgers football star defensive end J.J. Watt eleventh overall. The following season, former Dallas Cowboys head coach Wade Phillips was hired as the defensive coordinator of the Texans, and the improved defense led to the Texans finishing 10-6, winning their first AFC South title. The Texans then beat wild card Cincinnati Bengals 31-10 in the first round of the 2011-12 NFL playoffs, before a 20-13 defeat by the Ravens in the semifinals.
+
+Question
+During which season did the Texans have their first winning record?
+Answer(s):
+2009-10

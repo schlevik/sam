@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] In 2008, Goodrem focused on promoting music in Japan and the United States. She released "In This Life" on 23 January in Japan. She followed that up by releasing "Delta" on 20 February. The album peaked at number eight on the Japanese international chart and number 39 on the overall chart. The album sold almost 5,000 copies in its first week, 1,000 copies more than her previous album in Japan and overall sold over 30,000 copies in Japan. In the United States, Goodrem released "In This Life" on 15 April 2008. "In This Life" was released to US radio on 9 April. It was first released to the Triple A radio format, and then to the Adult Contemporary and Hot Adult Contemporary formats. On 17 June 2008, Goodrem appeared for the second time on any Billboard chart with the single, debuting at number 40 on the Adult Top 40 chart. The song later peaked at No. 21. According to Nielsen SoundScan, the track sold 7,000 digital downloads in the week ending on 24 June 2008. The song also charted at number 20 on the Hot Adult Top 40 Recurrents. The album was then released on 15 July 2008 in the United States and Canada under the label Mercury Records. It peaked at number 18 on the U.S. iTunes Store. It later debuted at number 116 on the US Billboard Album Chart and No. 1 on Billboards Top Heatseekers with sales of 6,000 copies. Overall the album sold over 21,000 copies in the United States.
+
+Question
+What charts did the album peak in the top ten?
+Answer(s):
+Japanese international chart

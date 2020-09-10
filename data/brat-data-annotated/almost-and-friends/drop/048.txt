@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Coming off their bye week, the Vikings were at home and met in an NFC North duel with the Detroit Lions, who hadn't won in the Metrodome since 1997. In the first quarter, the Vikings scored the period's only points as kicker Ryan Longwell nailed a 22-yard field goal. They increased their lead in the second quarter as running back Adrian Peterson scored on a 22-yard TD run. However, Lions kicker Jason Hanson kicked a 38-yard field goal late in the quarter. At the beginning of the second half, a fumble by the Lions on their first play from scrimmage was recovered at their 29-yard line by the Vikings. Peterson ran twice on the ensuing drive, scoring on a 1-yard TD run to make it a 17-3 lead. The Lions responded with a 15-play, 84-yard drive, capped off by an 8-yard TD pass from Lions QB Matthew Stafford to TE Will Heller. Nevertheless, the Vikings pulled away in the fourth quarter as Favre completed an 8-yard pass to TE Jeff Dugan and kicker Ryan Longwell nailed a 35-yard field goal. With the win, the Vikings moved to 8-1, and compiled a 4-0 record against their NFC North rivals. The Vikings accrued nearly 500 yards of total offense, including 303 yards in the first half alone. The Vikings also had 13 penalties, a season-high. Wide receiver Sidney Rice had a big day, catching seven passes for 201 yards, including a 56-yard reception in the opening seconds of the fourth quarter. Rice was named NFC Offensive Player of the Week for Week 10, the first time he has received this award. Favre and Peterson were voted FedEx Air and Ground Players of the Week.
+
+Question
+Who scored first?
+Answer(s):
+Vikings
+
+Question
+Who won the game?
+Answer(s):
+Vikings

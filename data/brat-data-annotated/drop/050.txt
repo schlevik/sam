@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Granada has a hot-summer Mediterranean climate (Csa) close to a cold semi-arid climate (BSk) Summers are hot and dry with daily temperatures averaging in the hottest month (July); however, temperatures reaching over are not uncommon in the summer months. Winters are cool and damp, with most of the rainfall concentrated from November through to January. The coldest month is January with daytime temperatures hovering at and dropping to around during the night. Frost is quite common as temperatures usually reach below-freezing in the early morning. Spring and autumn are unpredictable, with temperatures ranging from mild to warm. Early summer in 2017 confronted the city with two massive heat waves that broke long-standing record temperatures starting on June 13, 2017, with a new maximum high for the month at 40.6 °C (old record 40.0), which was topped three times within the span of four days at 40.9 °C on June 14, 41.3 (June 15) and, eventually, 41.5 (June 17). The first two days of this heat wave ranked Granada first in both Spain and Europe, making it the hottest place on the given days. The second extreme surge in temperatures followed roughly a month later when readings soared to 45.7 and 45.3 °C on July 12 and 13, respectively, surpassing the old July record by almost 3 degrees.
+
+Question
+Which month in 2017 had higher temperatures, June or July?
+Answer(s):
+July

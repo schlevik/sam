@@ -1,0 +1,13 @@
+Paragraph:
+
+The prevalence of phantom pain in upper limb amputees is nearly 82%, and in lower limb amputees is 54%. One study found that eight days after amputation, 72 percent of patients had phantom limb pain, and six months later, 65 percent reported it. Some amputees experience continuous pain that varies in intensity or quality; others experience several bouts a day, or it may occur only once every week or two. It is often described as shooting, crushing, burning or cramping. If the pain is continuous for a long period, parts of the intact body may become sensitized, so that touching them evokes pain in the phantom limb, or phantom limb pain may accompany urination or defecation.
+
+Question
+What percentage of people who've had upper limbs amputated feel phantom pain?
+Answer(s):
+nearly 82%
+
+Question
+What is the percentage of of phantom pain felt by lower limb amputees?
+Answer(s):
+54%

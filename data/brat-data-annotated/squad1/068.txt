@@ -1,0 +1,8 @@
+Paragraph:
+
+In 1991, several manufacturers announced specifications for what would become known as MUSE LaserDisc, representing a span of almost 15 years until the feats of this HD analog optical disc system would finally be duplicated digitally by HD DVD and Blu-ray Disc. Encoded using NHK's MUSE "Hi-Vision" analogue TV system, MUSE discs would operate like standard LaserDiscs but would contain high-definition 1,125-line (1,035 visible lines) (Sony HDVS) video with a 5:3 aspect ratio. The MUSE players were also capable of playing standard NTSC format discs and are superior in performance to non-MUSE players even with these NTSC discs. The MUSE-capable players had several noteworthy advantages over standard LaserDisc players, including a red laser with a much narrower wavelength than the lasers found in standard players. The red laser was capable of reading through disc defects such as scratches and even mild disc rot that would cause most other players to stop, stutter or drop-out. Crosstalk was not an issue with MUSE discs, and the narrow wavelength of the laser allowed for the virtual elimination of crosstalk with normal discs.
+
+Question
+How many years did it take Blu-ray and HD-DVD players to duplicate MUSE technology?
+Answer(s):
+almost 15 years

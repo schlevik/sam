@@ -1,0 +1,8 @@
+Paragraph:
+
+Amensalism is an interaction where an organism inflicts harm to another organism without any costs or benefits received by the other. A clear case of amensalism is where sheep or cattle trample grass. Whilst the presence of the grass causes negligible detrimental effects to the animal's hoof, the grass suffers from being crushed. Amensalism is often used to describe strongly asymmetrical competitive interactions, such as has been observed between the Spanish ibex and weevils of the genus Timarcha which feed upon the same type of shrub. Whilst the presence of the weevil has almost no influence on food availability, the presence of ibex has an enormous detrimental effect on weevil numbers, as they consume significant quantities of plant matter and incidentally ingest the weevils upon it.
+
+Question
+What does the Spanish ibex eat?
+Answer(s):
+shrub

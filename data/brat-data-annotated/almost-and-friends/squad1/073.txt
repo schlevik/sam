@@ -1,0 +1,13 @@
+Paragraph:
+
+Internet cafés that provide net access, office applications and multiplayer gaming are also a common sight in the country, while mobile internet on 3G and 4G- LTE cellphone networks and Wi-Fi connections can be found almost everywhere. 3G/4G mobile internet usage has been on a sharp increase in recent years, with a 340% increase between August 2011 and August 2012. The United Nations International Telecommunication Union ranks Greece among the top 30 countries with a highly developed information and communications infrastructure.
+
+Question
+In recent years, what usage has risen dramatically?
+Answer(s):
+3G/4G mobile internet
+
+Question
+How much did internet usage increase in one year?
+Answer(s):
+340%

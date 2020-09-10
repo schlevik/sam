@@ -1,0 +1,8 @@
+Paragraph:
+
+Southampton has always been a port, and the docks have long been a major employer in the city. In particular, it is a port for cruise ships; its heyday was the first half of the 20th century, and in particular the inter-war years, when it handled almost half the passenger traffic of the UK. Today it remains home to luxury cruise ships, as well as being the largest freight port on the Channel coast and fourth largest UK port by tonnage, with several container terminals. Unlike some other ports, such as Liverpool, London, and Bristol, where industry and docks have largely moved out of the city centres leaving room for redevelopment, Southampton retains much of its inner-city industry. Despite the still active and expanding docklands to the west of the city centre, further enhanced with the opening of a fourth cruise terminal in 2009, parts of the eastern docks have been redeveloped; the Ocean Village development, which included a local marina and small entertainment complex, is a good example. Southampton is home to the headquarters of both the Maritime and Coastguard Agency and the Marine Accident Investigation Branch of the Department for Transport in addition to cruise operator Carnival UK.
+
+Question
+About how much of UK's passenger traffic did Southampton handle during the inter-war period?
+Answer(s):
+half

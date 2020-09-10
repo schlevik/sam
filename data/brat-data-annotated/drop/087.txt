@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] The Japanese attempted to deny the Russians use of Port Arthur. During the night of 13-14 February, the Japanese attempted to block the entrance to Port Arthur by sinking several concrete-filled steamers in the deep water channel to the port, but they sank too deep to be effective. A similar attempt to block the harbour entrance during the night of 3-4 May also failed. In March, the charismatic Vice Admiral Makarov had taken command of the First Russian Pacific Squadron with the intention of breaking out of the Port Arthur blockade. On 12 April 1904, two Russian pre-dreadnought battleships, the flagship Petropavlovsk and the Pobeda, slipped out of port but struck Japanese mines off Port Arthur. The Petropavlovsk sank almost immediately, while the Pobeda had to be towed back to port for extensive repairs. Admiral Makarov, the single most effective Russian naval strategist of the war, perished on the battleship Petropavlovsk. On 15 April 1904, the Russian government made overtures threatening to seize the British war correspondents who were taking the ship Haimun into warzones to report for the London-based Times newspaper, citing concerns about the possibility of the British giving away Russian positions to the Japanese fleet. The Russians quickly learned, and soon employed, the Japanese tactic of offensive minelaying. On 15 May 1904, two Japanese battleships, the Yashima and the Hatsuse, were lured into a recently laid Russian minefield off Port Arthur, each striking at least two mines. The Hatsuse sank within minutes, taking 450 sailors with her, while the Yashima sank while under tow towards Korea for repairs. On 23 June 1904, a breakout attempt by the Russian squadron, now under the command of Admiral Wilgelm Vitgeft, failed. By the end of the month, Japanese artillery were firing shells into the harbour.
+
+Question
+Which ship sank first, the Petropavlovsk or the Hatsuse?
+Answer(s):
+The Petropavlovsk
+
+Question
+Which battleship didn't sink?
+Answer(s):
+Pobeda
+
+Question
+What happened second: Makarov had taken command or Petropavlovsk sank almost immediately?
+Answer(s):
+Petropavlovsk sank almost immediately

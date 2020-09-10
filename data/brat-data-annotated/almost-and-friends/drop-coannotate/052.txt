@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Between 1911 and 1912, over 1,000 Somalis from Mogadishu, the then capital of Italian Somaliland, served as combat units along with Eritrean and Italian soldiers in the Italo-Turkish War. Most of the troops stationed never returned home until they were transferred back to Italian Somaliland in preparation for the invasion of Ethiopia in 1935. The first disembarkation of Italian troops occurred on October 10. The Italian contingent of 20,000 troops was deemed sufficient to accomplish the conquest at the time. Tobruk, Derna and Khoms were easily conquered, but the same was not true for Benghazi. The first true setback for the Italian troops happened on October 23, when poor placement of the troops near Tripoli led them to be almost completely encircled by more mobile Arab cavalry, backed by some Turkish regular units. The attack was portrayed as a simple revolt by the Italian press, but it nearly annihilated much of the small Italian expeditionary corps. The corps was consequently enlarged to 100,000 men who had to face 20,000 Arabs and 8,000 Turks. The war turned into one of position. Even some of the earliest examples of utilisation in modern warfare of armoured cars and air power by the Italian forces had little effect on the initial outcome. However, the war was notable for the first military use of heavier-than-air craft. Capitano Carlo Piazza flew the first military reconnaissance flight on 23 October 1911. A week later, Sottotenente Giulio Gavotti dropped four grenades on Taguira and Ain Zara in history's first aerial bombing.
+
+Question
+Who had the largest force in Italo-Turkish War, Italian contingent or the corps?
+Answer(s):
+corps

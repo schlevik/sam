@@ -1,0 +1,13 @@
+Paragraph:
+
+Videoconferencing is a highly useful technology for real-time telemedicine and telenursing applications, such as diagnosis, consulting, transmission of medical images, etc... With videoconferencing, patients may contact nurses and physicians in emergency or routine situations; physicians and other paramedical professionals can discuss cases across large distances. Rural areas can use this technology for diagnostic purposes, thus saving lives and making more efficient use of health care money. For example, a rural medical center in Ohio, United States, used videoconferencing to successfully cut the number of transfers of sick infants to a hospital 70 miles (110 km) away. This had previously cost nearly $10,000 per transfer.
+
+Question
+How far away was the hospital from this rural area?
+Answer(s):
+70 miles
+
+Question
+How much money did videoconferencing help this rural area save?
+Answer(s):
+$10,000 per transfer

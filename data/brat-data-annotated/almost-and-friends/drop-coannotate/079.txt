@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] In a stunning reversal of the previous week's performance, the Dallas Cowboys struggled in almost every aspect of the game, getting blown out by an inspired Denver Broncos team in Denver. The Broncos defense stuffed the Dallas run game and pressured quarterback Dak Prescott, who threw two interceptions - one returned late in the game for a pick-six. Defensively Dallas had no answers for the Broncos attack, plagued with poor tackling and bad pursuit angles, giving up yards after pass catches and rushing yards in chunks. Dallas fell to 1-1, looking to be in total disarray - nursing several key injuries to its secondary - heading into its Monday night meeting at Phoenix against the Cardinals.
+
+Question
+Which team caught two interceptions?
+Answer(s):
+Denver Broncos

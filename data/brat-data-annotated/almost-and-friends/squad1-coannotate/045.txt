@@ -1,0 +1,13 @@
+Paragraph:
+
+Since the construction of its oldest buildings, the university's physical plant has grown substantially. Over the years 29 residence halls have been built to accommodate students and each has been constructed with its own chapel. Many academic building were added together with a system of libraries, the most prominent of which is the Theodore Hesburgh Library, built in 1963 and today containing almost 4 million books. Since 2004, several buildings have been added, including the DeBartolo Performing Arts Center, the Guglielmino Complex, and the Jordan Hall of Science. Additionally, a new residence for men, Duncan Hall, was begun on March 8, 2007, and began accepting residents for the Fall 2008 semester. Ryan Hall was completed and began housing undergraduate women in the fall of 2009. A new engineering building, Stinson-Remick Hall, a new combination Center for Social Concerns/Institute for Church Life building, Geddes Hall, and a law school addition have recently been completed as well. Additionally the new hockey arena opened in the fall of 2011. The Stayer Center for Executive Education, which houses the Mendoza College of Business Executive Education Department opened in March 2013 just South of the Mendoza College of Business building. Because of its long athletic tradition, the university features also many building dedicated to sport. The most famous is Notre Dame Stadium, home of the Fighting Irish football team; it has been renovated several times and today it can hold more than 80 thousand people. Prominent venues include also the Edmund P. Joyce Center, with indoor basketball and volleyball courts, and the Compton Family Ice Arena, a two-rink facility dedicated to hockey. Also, there are many outdoor fields, as the Frank Eck Stadium for baseball.
+
+Question
+Which library was built at Notre Dame in 1963?
+Answer(s):
+Theodore Hesburgh Library
+
+Question
+How many books are housed at the Theodore Hesburgh Library?
+Answer(s):
+almost 4 million

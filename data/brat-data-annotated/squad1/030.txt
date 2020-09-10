@@ -1,0 +1,8 @@
+Paragraph:
+
+Many of the world's largest media conglomerates are also based in the city. Manhattan contained over 500 million square feet (46.5 million m2) of office space in 2015, making it the largest office market in the United States, while Midtown Manhattan, with nearly 400 million square feet (37.2 million m2) in 2015, is the largest central business district in the world.
+
+Question
+About how many million square feet of office space is present in Midtown Manhattan?
+Answer(s):
+400

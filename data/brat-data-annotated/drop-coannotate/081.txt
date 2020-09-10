@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] In 1466, perhaps 40,000 people died of the plague in Paris. During the 16th and 17th centuries, the plague was present in Paris around 30 per cent of the time. The Black Death ravaged Europe for three years before it continued on into Russia, where the disease was present somewhere in the country 25 times between 1350 and 1490. Plague epidemics ravaged London in 1563, 1593, 1603, 1625, 1636, and 1665, reducing its population by 10 to 30% during those years. Over 10% of Amsterdams population died in 1623–1625, and again in 1635–1636, 1655, and 1664. Plague occurred in Venice 22 times between 1361 and 1528. The plague of 1576–1577 killed 50,000 in Venice, almost a third of the population. Late outbreaks in central Europe included the Italian Plague of 1629–1631, which is associated with troop movements during the Thirty Years War, and the Great Plague of Vienna in 1679. Over 60% of Norways population died in 1348–1350. The last plague outbreak ravaged Oslo in 1654.
+
+Question
+which is associated with troop movements during the Thirty Years War?
+Answer(s):
+Plague of 1629–1631
+
+Question
+Which plagues are associated with the  Thirty Years War?
+Answer(s):
+Italian Plague of 1629–1631

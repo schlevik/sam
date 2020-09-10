@@ -1,0 +1,13 @@
+Paragraph:
+
+In the 20th century, new types of glass such as laminated glass, reinforced glass and glass bricks have increased the use of glass as a building material and resulted in new applications of glass. Multi-storey buildings are frequently constructed with curtain walls made almost entirely of glass. Similarly, laminated glass has been widely applied to vehicles for windscreens. While glass containers have always been used for storage and are valued for their hygienic properties, glass has been utilized increasingly in industry. Optical glass for spectacles has been used since the late Middle Ages. The production of lenses has become increasingly proficient, aiding astronomers as well as having other application in medicine and science. Glass is also employed as the aperture cover in many solar energy systems.
+
+Question
+What type of glass is used in cars?
+Answer(s):
+laminated
+
+Question
+The walls of skyscrapers are often made of what material?
+Answer(s):
+glass

@@ -1,0 +1,23 @@
+Paragraph:
+
+[aug] yes no [text] At the same time, the Dutch organized incursions against the Portuguese possessions in Africa in order to take control of the slave trade and complete the trade triangle that would ensure the economic prosperity of New Holland. In 1626, a Dutch expedition to take Elmina was almost wiped out in an ambush by the Portuguese, but in 1637, Elmina fell to the Dutch. In 1641 , the Dutch captured the island of São Tomé and before the end of 1642, the rest of Portuguese Gold Coast followed. In August 1641 the Dutch formed a three-way alliance with the Kingdom of Kongo and Queen Nzinga of Ndongo, and with their assistance captured Luanda and Benguela, though without preventing the Portuguese from retreating inland into strongholds like Massangano, Ambaca and Muxima. With a steady source of slaves now secure, the Dutch abstained from further action, presuming that their allies would suffice against the Portuguese. Nonetheless, lacking artillery and firearms, Queen Nzinga and the Kongo proved unable to decisively defeat the Portuguese and their cannibalistic Imbangala allies.
+
+Question
+Which happened first, the Dutch capture of Elmina or São Tomé?
+Answer(s):
+Elmina
+
+Question
+What happened first: Elmina fell to the Dutch or the Dutch captured the island of São Tomé?
+Answer(s):
+Elmina fell to the Dutch
+
+Question
+Who almost wiped out Elmina?
+Answer(s):
+Portuguese
+
+Question
+Who was in the 3-way alliance?
+Answer(s):
+Dutch

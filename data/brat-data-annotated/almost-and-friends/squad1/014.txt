@@ -1,0 +1,18 @@
+Paragraph:
+
+Each year HHC's facilities provide about 225,000 admissions, one million emergency room visits and five million clinic visits to New Yorkers. HHC facilities treat nearly one-fifth of all general hospital discharges and more than one third of emergency room and hospital-based clinic visits in New York City.
+
+Question
+How many people visit HHC clinics annually?
+Answer(s):
+five million
+
+Question
+What fraction of general hospital discharges receive treatment at HHC?
+Answer(s):
+one-fifth
+
+Question
+What fraction of emergency room visits receive treatment at HHC?
+Answer(s):
+one third

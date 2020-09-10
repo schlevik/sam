@@ -1,0 +1,8 @@
+Paragraph:
+
+In the mid-1990s, Dell expanded beyond desktop computers and laptops by selling servers, starting with low-end servers. The major three providers of servers at the time were IBM, Hewlett Packard, and Compaq, many of which were based on proprietary technology, such as IBM's Power4 microprocessors or various proprietary versions of the Unix operating system. Dell's new PowerEdge servers did not require a major investment in proprietary technologies, as they ran Microsoft Windows NT on Intel chips, and could be built cheaper than its competitors. Consequently, Dell's enterprise revenues, almost nonexistent in 1994, accounted for 13 percent of the company's total intake by 1998. Three years later, Dell passed Compaq as the top provider of Intel-based servers, with 31 percent of the market. Dell's first acquisition occurred in 1999 with the purchase of ConvergeNet Technologies for $332 million, after Dell had failed to develop an enterprise storage system in-house; ConvergeNet's elegant but complex technology did not fit in with Dell's commodity-producer business model, forcing Dell to write down the entire value of the acquisition.
+
+Question
+What year did Dell's enterprise revenue make up a large chunk of its profit?
+Answer(s):
+1998

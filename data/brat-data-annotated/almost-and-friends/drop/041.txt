@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] The revenue of Pahang in 1899 amounted to only $62,077; in 1900 to $419,150. In 1905 it was $528,368. The expenditure in 1905 amounted to $1,208,176. Of this sum $736,886 was expended on public works. Pahang is still a source of expense to the federation, its progress having been retarded by the disturbances which lasted from December 1891 until 1895, with short intervals of peace, but the revenue was steadily increasing, and the ultimate financial success of the state is considered to be secure. Pahang owed something over $3,966,500 to Selangor and $1,175,000 to Perak, which had financed it for some years out of surplus revenue. The value of the imports in 1905 was $1,344,346, that of the exports was $3,838,928, thus making a total trade value of $5,183,274. The most valuable export is tin, the value of which in 1905 amounted to $2,820,745. The value of the gutta exported exceeded $140,000, that of dried and salted fish amounted to nearly $70,000, and that of timber to $325,000.
+
+Question
+What was the least valuable export, tin or gutta?
+Answer(s):
+gutta
+
+Question
+Which had a higher export value in 1905, gutta or timber?
+Answer(s):
+timber

@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] The 1915 Singapore Mutiny, also known as the 1915 Sepoy Mutiny or the Mutiny of the 5th Light Infantry, was a mutiny involving up to half of a regiment of 850 sepoys against the British in Singapore during the First World War, linked with the 1915 Ghadar Conspiracy. The mutiny, on 15 February 1915, lasted nearly seven days. It resulted in the deaths of eight British officers and soldiers, two Malay officers and one soldier, 14 British civilians, five Chinese and Malay civilians and one German internee before it was finally quelled by British forces and Allied naval detachments. The reasons for the outbreak are complex and remain open to debate.
+
+Question
+Who lost more soldiers in the the Singapore Mutiny, the British or Malay?
+Answer(s):
+British
+
+Question
+Which country had the largest amount of deaths, British or Malay?
+Answer(s):
+British

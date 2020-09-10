@@ -1,0 +1,8 @@
+Paragraph:
+
+Israeli music contains musical influences from all over the world; Sephardic music, Hasidic melodies, Belly dancing music, Greek music, jazz, and pop rock are all part of the music scene. Among Israel's world-renowned orchestras is the Israel Philharmonic Orchestra, which has been in operation for over seventy years and today performs more than two hundred concerts each year. Israel has also produced many musicians of note, some achieving international stardom. Itzhak Perlman, Pinchas Zukerman and Ofra Haza are among the internationally acclaimed musicians born in Israel.[citation needed] Israel has participated in the Eurovision Song Contest nearly every year since 1973, winning the competition three times and hosting it twice. Eilat has hosted its own international music festival, the Red Sea Jazz Festival, every summer since 1987.
+
+Question
+Who hosts its own international music festival every summer?
+Answer(s):
+Eilat

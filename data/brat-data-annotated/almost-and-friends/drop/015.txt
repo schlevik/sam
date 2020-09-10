@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] According to an independent in-depth interviewing by Radboud University and Vrije Universiteit Amsterdam in 2006, 34% of the Dutch population identified as a Christian, decreasing till in 2015 almost 25% of the population adhered to one of the Christian faiths (11.7% Roman Catholic, 8.6% PKN, 4.2% other small Christian denominations), 5 percent is Muslim and 2 percent adheres to Hinduism or Buddhism, approximately 67.8% of the population in 2015 has irreligion, up from 61% in 2006, 53% in 1996, 43% 1979 and 33% in 1966. The Sociaal en Cultureel Planbureau (Social and Cultural Planning Agency, SCP) expects the number of non-affiliated Dutch to be at 72% in 2020.
+
+Question
+In which year did less Dutch people identify as Christian, 2015 or 2006?
+Answer(s):
+2015
+
+Question
+Did more people identify as PKN or as Roman Catholic in 2015?
+Answer(s):
+Roman Catholic
+
+Question
+What are all the religion the have a higher percentage  than smaller Christian denominations?
+Answer(s):
+Roman Catholic

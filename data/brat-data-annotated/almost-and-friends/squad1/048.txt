@@ -1,0 +1,23 @@
+Paragraph:
+
+In the first centuries AD, political and administrative subdivisions began to emerge in Estonia. Two larger subdivisions appeared: the province (Estonian: kihelkond) and the land (Estonian: maakond). Several elderships or villages made up a province. Nearly all provinces had at least one fortress. The king or other highest administrative official elder directed the defense of the local area. By the thirteenth century Estonia consisted of the following provinces: Revala, Harjumaa, Saaremaa, Hiiumaa, Läänemaa, Alempois, Sakala, Ugandi, Jogentagana, Soopoolitse, Vaiga, Mõhu, Nurmekund, Järvamaa and Virumaa.
+
+Question
+What subdivision was associated with the province?
+Answer(s):
+kihelkond
+
+Question
+What subdivision was associated with the land?
+Answer(s):
+maakond
+
+Question
+What type of structure did most provinces have?
+Answer(s):
+fortress
+
+Question
+Who commanded the defense of an area?
+Answer(s):
+The king or other highest administrative official elder

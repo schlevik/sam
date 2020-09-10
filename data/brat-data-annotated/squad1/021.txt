@@ -1,0 +1,13 @@
+Paragraph:
+
+This new-found importance of naval aviation forced nations to create a number of carriers, in efforts to provide air superiority cover for every major fleet in order to ward off enemy aircraft. This extensive usage required the construction of several new 'light' carriers. Escort aircraft carriers, such as USS Bogue, were sometimes purpose-built, but most were converted from merchant ships as a stop-gap measure to provide anti-submarine air support for convoys and amphibious invasions. Following this concept, light aircraft carriers built by the US, such as USS Independence, represented a larger, more "militarized" version of the escort carrier. Although with similar complement to Escort carriers, they had the advantage of speed from their converted cruiser hulls. The UK 1942 Design Light Fleet Carrier was designed for building quickly by civilian shipyards and with an expected service life of about 3 years. They served the Royal Navy during the war and was the hull design chosen for nearly all aircraft carrier equipped navies after the war until the 1980s. Emergencies also spurred the creation or conversion of highly unconventional aircraft carriers. CAM ships, were cargo-carrying merchant ships that could launch (but not retrieve) a single fighter aircraft from a catapult to defend the convoy from long range German aircraft.
+
+Question
+What was the expected serice life of the UK 1942 Design Light Fleet Carrier?
+Answer(s):
+3 years
+
+Question
+Who did the UK 1941 Design Light Fleet Carriers serve during the war?
+Answer(s):
+Royal Navy

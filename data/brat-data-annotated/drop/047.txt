@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The Iroquois attacked the Neutral Nation in 1650. By the end of 1651, they had completely driven the tribe from traditional territory, killing or assimilating thousands. At the time, the Neutrals inhabited a territory ranging from the present-day Niagara Peninsula, westward to the Grand River valley. In 1654 the Iroquois attacked the Erie, but with less success. The war between the Erie and the Iroquois lasted for two years. By 1656 the Iroquois had almost completely destroyed the Erie confederacy, whose members refused to flee to the west. The Erie territory was located on the southeastern shore of Lake Erie and was estimated to have 12,000 members in 1650. Greatly outnumbered by the tribes they had subdued, the Iroquois had been able to achieve their victories through the use of firearms purchased from the Dutch.
+
+Question
+Which tribe had more members, Iroquois or the Erie?
+Answer(s):
+the Erie, The Erie

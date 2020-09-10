@@ -1,0 +1,8 @@
+Paragraph:
+
+The digital data on a CD begins at the center of the disc and proceeds toward the edge, which allows adaptation to the different size formats available. Standard CDs are available in two sizes. By far, the most common is 120 millimetres (4.7 in) in diameter, with a 74- or 80-minute audio capacity and a 650 or 700 MiB (737,280,000-byte) data capacity. This capacity was reportedly specified by Sony executive Norio Ohga in May 1980 so as to be able to contain the entirety of the London Philharmonic Orchestra's recording of Beethoven's Ninth Symphony on one disc. This is a myth according to Kees Immink, as the code format had not yet been decided in May 1980. The adoption of EFM one month later would have allowed a playing time of 97 minutes for 120 mm diameter or 74 minutes for a disc as small as 100 mm. The 120 mm diameter has been adopted by subsequent formats, including Super Audio CD, DVD, HD DVD, and Blu-ray Disc. Eighty-millimeter discs ("Mini CDs") were originally designed for CD singles and can hold up to 24 minutes of music or 210 MiB of data but never became popular.[citation needed] Today, nearly every single is released on a 120 mm CD, called a Maxi single.[citation needed]
+
+Question
+What is the size of a Maxi Single?
+Answer(s):
+120 mm

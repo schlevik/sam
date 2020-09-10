@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Under continuing pressure from the PRC to bar any representation of the ROC that may imply statehood, international organizations have adopted different policies toward the issue of ROC's participation. In cases where almost all UN members or sovereign states participate, such as the World Health Organization, the ROC has been completely shut out, while in others, such as the World Trade Organization and International Olympic Committee the ROC participates under unusual names: "Chinese Taipei" in the case of APEC and the IOC, and the "Separate Customs Territory of Taiwan, Penghu, Kimmen and Matsu" in the case of the WTO. The issue of ROC's name came under scrutiny during the 2006 World Baseball Classic. The organizers of the 16-team tournament intended to call Taiwan as such, but reverted to "Chinese Taipei" under pressure from PRC. The ROC protested the decision, claiming that the WBC is not an IOC event, but did not prevail. The ISO 3166 directory of names of countries and territories registers Taiwan separately from and in addition to the People's Republic of China , but lists Taiwan as "Taiwan, Province of China" based on the name used by the UN under PRC pressure. In ISO 3166-2:CN, Taiwan is also coded CN-71 under China, thus making Taiwan part of China in ISO 3166-1 and ISO 3166-2 categories. Naming issues surrounding Taiwan/ROC continue to be a contentious issue in non-governmental organizations such as the Lions Club, which faced considerable controversy naming its Taiwanese branch.
+
+Question
+What country does the "Separate Customs Territory of Taiwan, Penghu, Kimmen and Matsu" refer to?
+Answer(s):
+ROC
+
+Question
+What is Taiwan's official documented name?
+Answer(s):
+ROC

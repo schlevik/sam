@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] After a few years of peace, the Ottoman Empire attacked the Habsburg Empire again. The Turks almost captured Vienna, but king of Poland John III Sobieski led a Christian alliance that defeated them in the Battle of Vienna which shook the Ottoman Empire's hegemony in south-eastern Europe. A new Holy League was initiated by Pope Innocent XI and encompassed the Holy Roman Empire , the Venetian Republic and Poland in 1684, joined by Tsarist Russia in 1686. Ottomans suffered two decisive defeats against the Holy Roman Empire: the second Battle of Mohács in 1687 and a decade later, in 1697, the battle of Zenta. On the smaller Polish front, after the battles of 1683 , Sobieski, after his proposal for the League to state a major coordinated offensive, undertook a rather unsuccessful offensive in Moldavia in 1686, with the Ottomans refusing a major engagement and harassing the army. For the next four years Poland would blockade the key fortress at Kamenets, and Ottoman Tatars would raid the borderlands. In 1691, Sobieski undertook another expedition to Moldovia, with slightly better results, but still with no decisive victories. The last battle of the campaign was the battle of Podhajce in 1698, where Polish hetman Feliks Kazimierz Potocki defeated the Ottoman incursion into the Commonwealth. The League won the war in 1699 and forced the Ottoman Empire to sign the Treaty of Karlowitz. The Ottomans lost much of their European possessions, with Podolia returned to Poland with imposion of Austria.
+
+Question
+Who won the Battle of Vienna?
+Answer(s):
+Christian alliance

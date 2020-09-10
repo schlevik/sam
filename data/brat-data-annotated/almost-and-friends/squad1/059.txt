@@ -1,0 +1,18 @@
+Paragraph:
+
+Other international standards bodies have ratified character encodings such as ISO/IEC 646 that are identical or nearly identical to ASCII, with extensions for characters outside the English alphabet and symbols used outside the United States, such as the symbol for the United Kingdom's pound sterling (£). Almost every country needed an adapted version of ASCII, since ASCII suited the needs of only the USA and a few other countries. For example, Canada had its own version that supported French characters. Other adapted encodings include ISCII (India), VISCII (Vietnam), and YUSCII (Yugoslavia). Although these encodings are sometimes referred to as ASCII, true ASCII is defined strictly only by the ANSI standard.
+
+Question
+What is a retified versionof ASCII?
+Answer(s):
+ISO/IEC 646
+
+Question
+What type of extensions do these other character encodings have?
+Answer(s):
+extensions for characters outside the English alphabet and symbols used outside the United States
+
+Question
+Why did most countries need a adapted version of ASCII?
+Answer(s):
+ASCII suited the needs of only the USA and a few other countries

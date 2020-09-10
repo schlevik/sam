@@ -1,0 +1,8 @@
+Paragraph:
+
+It is best for the receiving antenna to match the polarization of the transmitted wave for optimum reception. Intermediate matchings will lose some signal strength, but not as much as a complete mismatch. A circularly polarized antenna can be used to equally well match vertical or horizontal linear polarizations. Transmission from a circularly polarized antenna received by a linearly polarized antenna (or vice versa) entails a 3 dB reduction in signal-to-noise ratio as the received power has thereby been cut in half.
+
+Question
+A transmission can cause reduction in what?
+Answer(s):
+signal-to-noise ratio

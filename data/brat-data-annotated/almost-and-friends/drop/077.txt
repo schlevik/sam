@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] At the June 1983 Consumer Electronics Show, Commodore lowered the retail price of the 64 to $300, and stores sold it for as little as $199. At one point the company was selling as many computers as the rest of the industry combined. Its prices for the VIC-20 and 64 were $50 lower than Ataris prices for the 600XL and 800XL. Commodores strategy was to, according to a spokesman, devote 50% of its efforts to the under-$500 market, 30% on the $500–1000 market, and 20% on the over-$1000 market. Its vertical integration and Tramiels focus on cost control helped Commodore do well during the price war, with $1 billion in 1983 sales. Although the company and Tramiels focus on cost cutting over product testing caused many hardware defects in the 64, by early 1984 Synapse Software—the largest provider of third-party Atari 8-bit software—received 65% of sales from the Commodore market, and Commodore sold almost three times as many computers as Atari that year.
+
+Question
+Who sold fewer computers in 1984, Atari or Commodore?
+Answer(s):
+Atari
+
+Question
+Did Commodore or Atari sell more computers?
+Answer(s):
+Commodore

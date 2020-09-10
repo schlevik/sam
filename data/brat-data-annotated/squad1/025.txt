@@ -1,0 +1,8 @@
+Paragraph:
+
+New York City's food culture includes a variety of international cuisines influenced by the city's immigrant history. Central European and Italian immigrants originally made the city famous for bagels, cheesecake, and New York-style pizza, while Chinese and other Asian restaurants, sandwich joints, trattorias, diners, and coffeehouses have become ubiquitous. Some 4,000 mobile food vendors licensed by the city, many immigrant-owned, have made Middle Eastern foods such as falafel and kebabs popular examples of modern New York street food. The city is also home to nearly one thousand of the finest and most diverse haute cuisine restaurants in the world, according to Michelin. The New York City Department of Health and Mental Hygiene assigns letter grades to the city's 24,000 restaurants based upon their inspection results.
+
+Question
+According to Michelin, about how many fine dining restaurants exist in New York?
+Answer(s):
+one thousand

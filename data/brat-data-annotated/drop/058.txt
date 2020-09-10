@@ -1,0 +1,33 @@
+Paragraph:
+
+[aug] yes no [text] About 4.585 million tonnes of cocoa beans were produced in the 2013–2014 growing year, which runs from October to September. Of this total, African nations produced 3.014 million tonnes (65.75%), Asia and Oceania produced 0.849 million tonnes (18.52%), and the Americas produced 0.721 million tonnes (15.73%). Two African nations, Ivory Coast and Ghana, produce almost half of the worlds cocoa, with 1.448 and 0.835 million tonnes, respectively (31.6% and 18.22%, respectively).
+
+Question
+How many million tonnes of cocoa does the Ivory Coast produce?
+Answer(s):
+1.448
+
+Question
+How many million tonnes of cocoa does Ghana produce?
+Answer(s):
+0.835
+
+Question
+Which nations produced more cocoa beans, African or Asia and Oceania?
+Answer(s):
+African
+
+Question
+Which nation produced more cocoa beans, Ivory Coast or Ghana?
+Answer(s):
+Ivory Coast
+
+Question
+Which African nations produces less cocoa, Ivory Coast or Ghana?
+Answer(s):
+Ghana
+
+Question
+Which nations produce more cocoa, African nations or Asia and Oceania?
+Answer(s):
+African nations

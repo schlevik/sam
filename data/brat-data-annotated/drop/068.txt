@@ -1,0 +1,23 @@
+Paragraph:
+
+[aug] yes no [text] The colonies were religiously diverse, with different Protestant denominations brought by British, German, Dutch, and other immigrants. The Reformed tradition was the foundation for Presbyterian, Congregationalist, and Continental Reformed denominations. French people Huguenots set up their own Reformed congregations. The Dutch Reformed Church was strong among Dutch Americans in New York and New Jersey, while Lutheranism was prevalent among German American. Germans also brought diverse forms of Anabaptism, especially the Mennonite variety. Reformed Baptist preacher Roger Williams founded Providence Plantations which became the Colony of Rhode Island and Providence Plantations. Jews were clustered in a few port cities. The Baltimore family founded Maryland and brought in fellow Catholics from England. Catholics were estimated at 1.6% of the population or 40,000 in 1775. Of the 200-250,000 Irish who came to the Colonies between 1701 and 1775 less than 20,000 were Catholic, many of whom hid their faith or lapsed because of prejudice and discrimination. Between 1770-1775 3,900 Irish Catholics arrived out of almost 45,000 white immigrants (7,000 English, 15,000 Scots, 13,200 Scots-Irish, 5,200 Germans), Jon Butler, Becoming America, The Revolution before 1776, 2000, p. 35, . Most Catholics were English Recusants, Germans, Irish and blacks who lived in Maryland where half the Catholic population lived, New York and Pennsylvania. Presbyterians were chiefly immigrants from Scotland and Ulster who favored the back country and frontier districts.
+
+Question
+Which group of white immigrants, from 1770-1775, was larger: English or Scots?
+Answer(s):
+Scots
+
+Question
+Which group of white immigrants, from 1770-1775, was smaller: English or Scots?
+Answer(s):
+English
+
+Question
+Which group of white immigrants, from 1770-1775, was larger: Scots-Irish or Germans?
+Answer(s):
+Scots-Irish
+
+Question
+Which group of white immigrants, from 1770-1775, was smaller: Scots-Irish or Germans?
+Answer(s):
+Germans

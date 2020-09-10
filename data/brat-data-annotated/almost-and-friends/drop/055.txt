@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Hoping to get their first win of the season, the Rams went home, donned their throwback uniforms, and prepared for a Week 5 duel with the Minnesota Vikings. Even though quarterback Marc Bulger was almost back to 100% health, backup quarterback Kyle Boller got the start. In the first quarter, St. Louis continued to struggle as Vikings running back Adrian Peterson got a 5-yard touchdown run and defensive end Jared Allen returned a fumble 52 yards for a touchdown. The Rams would get on the board in the second quarter with a 29-yard field goal from kicker Josh Brown, but Minnesota came right back with kicking Ryan Longwell nailing a 47-yard field goal. The Vikings would continue to make their presence felt in the third quarter with quarterback Brett Favre completing a 13-yard touchdown to tight end Visanthe Shiancoe. Minnesota would follow it up in the fourth quarter with Peterson's 7-yard touchdown. St. Louis tried to rally as quarterback Marc Bulger completed a 27-yard touchdown pass to wide receiver Donnie Avery, but the Vikings would close out the game with running back Chester Taylor's 1-yard touchdown run.
+
+Question
+Who was the Ram's starting Quarterback?
+Answer(s):
+Kyle Boller got the start

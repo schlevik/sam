@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] The immediate background was Napoleonic France's defeat and surrender in May 1814, which brought an end to 25 years of nearly continuous war. Negotiations continued despite the outbreak of fighting triggered by Napoleon's dramatic return from exile and resumption of power in France during the Hundred Days of March to July 1815. The Congress's "final act" was signed nine days before his final defeat at Waterloo on 18 June 1815. The Congress has often been criticized for causing the subsequent suppression of the emerging national and liberal movements, and it has been seen as a reactionary movement for the benefit of traditional monarchs. However, others praise it for having created relatively long-term stability and peaceful conditions in most of Europe. In a technical sense, the "Congress of Vienna" was not properly a congress: it never met in plenary session, and most of the discussions occurred in informal, face-to-face sessions among the Great Powers of Austria, Britain, France, Russia, and sometimes Prussia, with limited or no participation by other delegates. On the other hand, the congress was the first occasion in history where, on a continental scale, national representatives came together to formulate treaties instead of relying mostly on messages among the several capitals. The Congress of Vienna settlement, despite later changes, formed the framework for European international politics until the outbreak of the First World War in 1914.
+
+Question
+What happened first: Napoleonic France's defeat or the Hundred Days of March?
+Answer(s):
+Napoleonic France's defeat
+
+Question
+Whose final defeat was on 18 June 1815?
+Answer(s):
+Napoleon

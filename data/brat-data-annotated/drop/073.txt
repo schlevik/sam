@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] John III nicknamed "o Colonizador" was the King of Portugal and the Algarves from 13 December 1521 to 11 June 1557. He was the son of King Manuel I and Maria of Aragon, the third daughter of King Ferdinand II of Aragon and Queen Isabella I of Castile. John succeeded his father in 1521, at the age of nineteen. During his rule, Portuguese possessions were extended in Asia and in the New World through the Portuguese colonization of Brazil. John III's policy of reinforcing Portugal's bases in India secured Portugal's monopoly over the spice trade of cloves and nutmeg from the Maluku Islands, as a result of which John III has been called the "Grocer King". On the eve of his death in 1557, the Portuguese empire had a global dimension and spanned almost 1 billion acres . During his reign, the Portuguese became the first Europeans to make contact with both China, under the Ming Dynasty, and Japan, during the Muromachi period. He abandoned Muslim territories in North Africa in favor of trade with India and investment in Brazil. In Europe, he improved relations with the Baltic region and the Rhineland, hoping that this would bolster Portuguese trade.
+
+Question
+What happened second: John succeeded his father or the eve of his death?
+Answer(s):
+the eve of his death

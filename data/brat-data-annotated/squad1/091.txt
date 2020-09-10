@@ -1,0 +1,8 @@
+Paragraph:
+
+According to the American National Standards Institute, pitch is the auditory attribute of sound according to which sounds can be ordered on a scale from low to high. Since pitch is such a close proxy for frequency, it is almost entirely determined by how quickly the sound wave is making the air vibrate and has almost nothing to do with the intensity, or amplitude, of the wave. That is, "high" pitch means very rapid oscillation, and "low" pitch corresponds to slower oscillation. Despite that, the idiom relating vertical height to sound pitch is shared by most languages. At least in English, it is just one of many deep conceptual metaphors that involve up/down. The exact etymological history of the musical sense of high and low pitch is still unclear. There is evidence that humans do actually perceive that the source of a sound is slightly higher or lower in vertical space when the sound frequency is increased or decreased.
+
+Question
+Pitch is a close proxy for what?
+Answer(s):
+frequency

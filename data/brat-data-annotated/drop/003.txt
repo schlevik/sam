@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] In Japan, 1.44 million copies of Final Fantasy IVs Super Famicom version were sold. The PlayStation version sold an additional 261,000 copies in Japan in 1997. By March 31, 2003, the game, including the PlayStation and WonderSwan Color remakes, had shipped 2.16 million copies worldwide, with 1.82 million of those copies being shipped in Japan and 340,000 abroad. As of 2007 just before the release of the Nintendo DS version, nearly 3 million copies of the game had been sold around the world. The Game Boy Advance version of the game sold over 219,000 copies in Japan by the end of 2006. By May 2009, the DS version of the game had sold 1.1 million copies worldwide.
+
+Question
+Where was the game, including the PlayStation and WonderSwan Color remakes, shipped more to by March 2003, Japan or abroad?
+Answer(s):
+Japan
+
+Question
+What was the last system that Final Fantasy IV was released on?
+Answer(s):
+Nintendo DS

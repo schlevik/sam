@@ -1,0 +1,13 @@
+Paragraph:
+
+As a ray of white sunlight travels through the atmosphere to the eye, some of the colors are scattered out of the beam by air molecules and airborne particles due to Rayleigh scattering, changing the final color of the beam that is seen. Colors with a shorter wavelength, such as blue and green, scatter more strongly, and are removed from the light that finally reaches the eye. At sunrise and sunset, when the path of the sunlight through the atmosphere to the eye is longest, the blue and green components are removed almost completely, leaving the longer wavelength orange and red light. The remaining reddened sunlight can also be scattered by cloud droplets and other relatively large particles, which give the sky above the horizon its red glow.
+
+Question
+What is the effect on blue and green light experiencing Rayleigh scattering during sunrise?
+Answer(s):
+removed almost completely
+
+Question
+In comparison to blue and green, what would describe the wavelength of orange or red light?
+Answer(s):
+longer

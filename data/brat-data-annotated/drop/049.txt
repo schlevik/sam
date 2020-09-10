@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] The War of the League of Cambrai, sometimes known as the War of the Holy League and by several other names, was a major conflict in the Italian Wars. The main participants of the war, fought from 1508 to 1516, were France, the Papal States and the Republic of Venice; they were joined, at various times, by nearly every significant power in Western Europe, including Spain, the Holy Roman Empire, England, Scotland, the Duchy of Milan, Florence, the Duchy of Ferrara and Swiss mercenaries. Pope Julius II, intending to curb Venetian influence in northern Italy, had created the League of Cambrai, an anti-Venetian alliance consisting of himself, Louis XII of France, Ferdinand II of Aragon and Maximilian I, the Holy Roman Emperor. Although the League was initially successful, friction between Julius and Louis caused it to collapse by 1510; Julius then allied himself with Venice against France. The Veneto-Papal alliance eventually expanded into the Holy League, which drove the French from Italy in 1512; disagreements about the division of the spoils, however, led Venice to abandon the alliance in favor of one with France. Under the leadership of Francis I, who had succeeded Louis to the throne, the French and Venetians would, through victory at Marignano in 1515, regain the territory they had lost; the treaties of Noyon and Brussels, which ended the war the next year, would essentially return the map of Italy to the status quo of 1508.
+
+Question
+Which Italian State participated in the War of the Holy League?
+Answer(s):
+Republic of Venice
+
+Question
+What Western Europe countries joined the war 1508 to 1516?
+Answer(s):
+Spain

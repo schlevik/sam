@@ -1,0 +1,8 @@
+Paragraph:
+
+During the First World War, Paris sometimes found itself on the front line; 600 to 1,000 Paris taxis played a small but highly important symbolic role in transporting 6,000 soldiers to the front line at the First Battle of the Marne. The city was also bombed by Zeppelins and shelled by German long-range guns. In the years after the war, known as Les Années Folles, Paris continued to be a mecca for writers, musicians and artists from around the world, including Ernest Hemingway, Igor Stravinsky, James Joyce, Josephine Baker, Sidney Bechet and the surrealist Salvador Dalí.
+
+Question
+How many soldiers did Parisian Taxis transport to the front line at the First Battle of the Marne?
+Answer(s):
+6,000

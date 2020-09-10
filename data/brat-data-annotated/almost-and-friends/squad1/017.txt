@@ -1,0 +1,8 @@
+Paragraph:
+
+Despite competition from other materials, copper remains the preferred electrical conductor in nearly all categories of electrical wiring with the major exception being overhead electric power transmission where aluminium is often preferred. Copper wire is used in power generation, power transmission, power distribution, telecommunications, electronics circuitry, and countless types of electrical equipment. Electrical wiring is the most important market for the copper industry. This includes building wire, communications cable, power distribution cable, appliance wire, automotive wire and cable, and magnet wire. Roughly half of all copper mined is used to manufacture electrical wire and cable conductors. Many electrical devices rely on copper wiring because of its multitude of inherent beneficial properties, such as its high electrical conductivity, tensile strength, ductility, creep (deformation) resistance, corrosion resistance, low thermal expansion, high thermal conductivity, solderability, and ease of installation.
+
+Question
+What metal is used most often in electrical wiring?
+Answer(s):
+copper

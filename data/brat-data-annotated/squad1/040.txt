@@ -1,0 +1,8 @@
+Paragraph:
+
+Two major types of atomic bombs were developed by the United States during World War II: a uranium-based device (codenamed "Little Boy") whose fissile material was highly enriched uranium, and a plutonium-based device (see Trinity test and "Fat Man") whose plutonium was derived from uranium-238. The uranium-based Little Boy device became the first nuclear weapon used in war when it was detonated over the Japanese city of Hiroshima on 6 August 1945. Exploding with a yield equivalent to 12,500 tonnes of TNT, the blast and thermal wave of the bomb destroyed nearly 50,000 buildings and killed approximately 75,000 people (see Atomic bombings of Hiroshima and Nagasaki). Initially it was believed that uranium was relatively rare, and that nuclear proliferation could be avoided by simply buying up all known uranium stocks, but within a decade large deposits of it were discovered in many places around the world.
+
+Question
+What was the equivalent yield in TNT of the Little Boy bomb, in tonnes?
+Answer(s):
+12,500

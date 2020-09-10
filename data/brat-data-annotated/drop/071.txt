@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] In Europe, before the outbreak of the war, the Allies had significant advantages in both population and economics. In 1938, the Western Allies had a 30 per cent larger population and a 30 per cent higher gross domestic product than the European Axis powers ; if colonies are included, it then gives the Allies more than a 5:1 advantage in population and nearly 2:1 advantage in GDP. In Asia at the same time, China had roughly six times the population of Japan, but only an 89 per cent higher GDP; this is reduced to three times the population and only a 38 per cent higher GDP if Japanese colonies are included. The United States provided about two-thirds of all the ordnance used by the Allies in terms of warships, transports, warplanes, artillery, tanks, trucks, and ammunition. Though the Allies' economic and population advantages were largely mitigated during the initial rapid blitzkrieg attacks of Germany and Japan, they became the decisive factor by 1942, after the United States and Soviet Union joined the Allies, as the war largely settled into one of attrition. While the Allies' ability to out-produce the Axis is often attributed to the Allies having more access to natural resources, other factors, such as Germany and Japan's reluctance to employ women in the labour force, Allied strategic bombing, and Germany's late shift to a war economy contributed significantly. Additionally, neither Germany nor Japan planned to fight a protracted war, and were not equipped to do so. To improve their production, Germany and Japan used millions of slave labourers; Germany used about 12 million people, mostly from Eastern Europe, while Japan used more than 18 million people in Far East Asia.
+
+Question
+Who was set up to fight a protracted war?
+Answer(s):
+Allies
+
+Question
+Who had a higher population in 1938: Japan or China?
+Answer(s):
+China
+
+Question
+Did the Western Allies or European Axis powers have a higher GDP?
+Answer(s):
+Allies

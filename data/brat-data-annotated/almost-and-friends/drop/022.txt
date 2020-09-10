@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] Lower Silesia is the northwestern part of the historical and geographical region of Silesia; Upper Silesia is to the southeast. Throughout its history Lower Silesia has been under the control of the medieval Kingdom of Poland, the Kingdom of Bohemia and the Austrian Habsburg Monarchy from 1526. In 1742 nearly all of the region was annexed by the Kingdom of Prussia and became part of the German Empire in 1871, except for a small part which formed the southern part of the Lower Silesian Duchy of Nysa and had been incorporated into Austrian Silesia in 1742. After 1945 the main part of the former Prussian Province of Lower Silesia fell to the Republic of Poland, while a smaller part west of the Oder-Neisse line remained within East Germany and historical parts of Austrian Lower Silesia remained as a part of Czechoslovakia.
+
+Question
+What event happened first, Lower Silesia falling to the Republic of Poland, or The Kingdom of Prussia becoming part of the German Empire?
+Answer(s):
+the Kingdom of Prussia
+
+Question
+Who controlled Lower Silesia first, the Kingdom of Poland or the Kingdom of Prussia?
+Answer(s):
+Kingdom of Poland
+
+Question
+Who controlled Lower Silesia first, the Germans or the Kingdom of Poland?
+Answer(s):
+Kingdom of Poland

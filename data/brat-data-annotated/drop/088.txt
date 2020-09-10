@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Rivers passed to Royal for the go-ahead touchdown with 38 seconds left in the game to defeat the Baltimore Ravens on the road, 34-33, for their third straight win. The Chargers had trailed the entire game, including 30-20 with 6:13 left and 33-27 with 2:22 to go. Rivers completed 34 of 45 passes for 383 yards and three touchdowns, including two scores to Allen. Rivers was intercepted on the Chargers' first drive of the game, and Baltimore led 10-0 almost eight minutes into the contest. On their next possession, San Diego went 80 yards on 13 plays for their first TD, a 12-yard pass from Rivers to Allen. The Chargers pulled to 16-13 early in the third quarter after a 59-yard pass by Rivers to Floyd set up a 26-yard Novak field goal. On the following drive, a roughing the passer penalty by Weddle led to a TD pass by the Ravens' Joe Flacco for a 23-20 lead. Flacco later scored on a quarterback sneak after a pass interference penalty on Shareece Wright. The Chargers responded with a 77-yard drive, culminating in a 23-yard TD from Rivers to Allen with 3:40 remaining. Jacoby Jones returned the ensuing kickoff 72 yards to the San Diego 30, setting up Justin Tucker's fourth field goal of the game for the Ravens. Rivers then led the 80-yard game-winning drive. After an interference call against Anthony Levine in the end zone, Rivers connected with Royal for a TD. Rivers moved to 20th among NFL leaders in career passing yards, passing Carson Palmer (35,365) and Jim Kelly (35,467). The Chargers had four players&#8212;Gates, Allen, Royal, and Floyd&#8212;with over 80 yards receiving in the game for the first time in team history. Each team punted only once in the game. It was the Ravens first loss in November since 2009. They had also been 11-0 at home against West Coast teams. The Chargers used their fifth different center of the season, Trevor Robinson, after their fourth center, Chris Watt, left the game with an injury.
+
+Question
+Which team scored more points, Chargers or Baltimore?
+Answer(s):
+Chargers
+
+Question
+Who threw the last touchdown of the game?
+Answer(s):
+Rivers

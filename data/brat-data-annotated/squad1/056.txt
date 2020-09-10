@@ -1,0 +1,8 @@
+Paragraph:
+
+Islington's 1 mile (1.6 km) long Upper Street, extending northwards from Angel, has more bars and restaurants than any other street in the United Kingdom. Europe's busiest shopping area is Oxford Street, a shopping street nearly 1 mile (1.6 km) long, making it the longest shopping street in the United Kingdom. Oxford Street is home to vast numbers of retailers and department stores, including the world-famous Selfridges flagship store. Knightsbridge, home to the equally renowned Harrods department store, lies to the south-west.
+
+Question
+What is the longest street for shopping,, housing many shops and department stores, in the United Kingdom?
+Answer(s):
+Oxford Street

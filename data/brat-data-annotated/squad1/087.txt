@@ -1,0 +1,13 @@
+Paragraph:
+
+Located in the American South, Houston is a diverse city with a large and growing international community. The metropolitan area is home to an estimated 1.1 million (21.4 percent) residents who were born outside the United States, with nearly two-thirds of the area's foreign-born population from south of the United States–Mexico border. Additionally, more than one in five foreign-born residents are from Asia. The city is home to the nation's third-largest concentration of consular offices, representing 86 countries.
+
+Question
+How many of the people who live in Houston were foreign born?
+Answer(s):
+1.1 million
+
+Question
+What percentage of Houston's foreign born population is from south of the U.S.-Mexican border?
+Answer(s):
+two-thirds

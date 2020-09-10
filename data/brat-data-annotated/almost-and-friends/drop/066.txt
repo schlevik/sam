@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Participation by head of household race and gender The racial composition of stock market ownership shows households headed by whites are nearly four and six times as likely to directly own stocks than households headed by blacks and Hispanics respectively. As of 2011 the national rate of direct participation was 19.6%, for white households the participation rate was 24.5%, for black households it was 6.4% and for Hispanic households it was 4.3% Indirect participation in the form of 401k ownership shows a similar pattern with a national participation rate of 42.1%, a rate of 46.4% for white households, 31.7% for black households, and 25.8% for Hispanic households. Households headed by married couples participated at rates above the national averages with 25.6% participating directly and 53.4% participating indirectly through a retirement account. 14.7% of households headed by men participated in the market directly and 33.4% owned stock through a retirement account. 12.6% of female headed households directly owned stock and 28.7% owned stock indirectly.
+
+Question
+What race is least likely to directly own stocks?
+Answer(s):
+Hispanics
+
+Question
+What race was not most or least likely to own stocks?
+Answer(s):
+blacks

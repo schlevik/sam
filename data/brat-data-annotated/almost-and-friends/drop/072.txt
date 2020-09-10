@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] With Paxton Lynch as the starting quarterback, the Broncos' offense did not advance past their own 37-yard line on eight of their first ten possessions &#8212; excluding a fumble recovery in Raiders' territory and a kneel down before halftime. Paxton Lynch was the team's leading rusher, with only 20 yards. On the Raiders' second offensive possession, a brawl erupted between cornerback Aqib Talib and Raiders' wide receiver Michael Crabtree, resulting in both players being ejected from the game. Raiders' guard Gabe Jackson was also ejected for making contact with an official during the brawl. After a strip sack and forced fumble off quarterback Derek Carr deep in Raiders' territory, the Broncos had a first and goal at the 1-yard line, however, Paxton Lynch threw a pass that was deflected and intercepted by linebacker NaVorro Bowman in the end zone. A 9-yard touchdown pass from Carr to wide receiver Amari Cooper, coupled with a 1-yard touchdown run by running back Marshawn Lynch, gave the Raiders a 14-0 lead before halftime. The lead was increased to 21-0 early in the third quarter, with a 6-yard touchdown pass from Carr to running back Jalen Richard. After Paxton Lynch suffered an ankle injury, he was replaced by Trevor Siemian late in the third quarter, and got the Broncos on the scoreboard at the 10:26 mark of the fourth quarter, with a 25-yard touchdown pass to wide receiver Cody Latimer. The Raiders drove to the Broncos' 17-yard line on their next possession, chewing up nearly five minutes off the clock, and were attempting to add to their lead. However, a 35-yard field goal attempt by placekicker Giorgio Tavecchio missed wide left. Siemian engineered a 12-play, 75-yard drive and pulled the Broncos to within a 21-14 deficit with 2:44 remaining in the game, after a 22-yard touchdown pass to wide receiver Bennie Fowler III. The Broncos were hoping for a defensive stop just before the two-minute warning, but after using the last two of their three team timeouts, Carr connected on a 31-yard pass to wide receiver Cordarrelle Patterson on a 3rd-and-8, sealing the win for the Raiders. With the loss, the Broncos exceeded their loss total from 2016.
+
+Question
+Which team went scoreless the first half?
+Answer(s):
+Broncos
+
+Question
+Which team scored last in the fourth quarter?
+Answer(s):
+Raiders

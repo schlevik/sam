@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The United Arab Emirates witnessed significant population increase during the past few years because of major growth in the various economic sectors, which lead to influx of workers from diverse cultural and religious background. From 4.1 million in 2005 to roughly 9.5 million in 2018. Out of this, the number of UAE citizens is around 11.5% and the remaining 88.5% made up of Expatriate workers. The largest group of non-UAE nationals are South Asian 59.4% (includes Indians 38.2%, Bangladeshi 9.5%, Pakistani 9.4%, others 2.3%), Egyptian 10.2%, Philippine 6.1%, other 12.8% . Females citizens and non-citizens account for 28% percent of the UAES population due to the high level of male foreign workers. The majority of the UAE population falls in the age group of 25 to 54 year old. A large part of this can be attributed to the expatriate population of working men and women who fall in the age category . Population is heavily concentrated to the northeast on the Musandam Peninsula, the three largest Emirates - Abu Dhabi (2.9 million), Dubai (2.7 million) and Sharjah (1.4 million), are home to nearly 75% of the population.
+
+Question
+Which Emirates contain the majority of the population?
+Answer(s):
+Abu Dhabi

@@ -1,0 +1,8 @@
+Paragraph:
+
+The NES was released after the "video game crash" of the early 1980s, whereupon many retailers and adults had regarded electronic games as being merely a passing fad, and many believed at first that the NES was another fad. Before the NES/Famicom, Nintendo was known as a moderately successful Japanese toy and playing card manufacturer, and the popularity of the NES/Famicom helped the company grow into an internationally recognized name almost synonymous with video games as Atari had been during the 2600 era and set the stage for Japanese dominance of the video game industry. With the NES, Nintendo also changed the relationship of console manufacturers and third-party software developers by restricting developers from publishing and distributing software without licensed approval. This led to higher quality software titles, which helped to change the attitude of a public that had grown weary from poorly produced titles for other game systems of the day.
+
+Question
+Nintendo's era was compared with who as another video game manufacturer?
+Answer(s):
+Atari

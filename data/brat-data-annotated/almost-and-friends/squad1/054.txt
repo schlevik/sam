@@ -1,0 +1,8 @@
+Paragraph:
+
+One by one, additional large hotels were constructed along the boardwalk, including the Brighton, Chelsea, Shelburne, Ambassador, Ritz Carlton, Mayflower, Madison House, and the Breakers. The Quaker-owned Chalfonte House, opened in 1868, and Haddon House, opened in 1869, flanked North Carolina Avenue at the beach end. Their original wood-frame structures would be enlarged, and even moved closer to the beach, over the years. The modern Chalfonte Hotel, eight stories tall, opened in 1904. The modern Haddon Hall was built in stages and was completed in 1929, at eleven stories. By this time, they were under the same ownership and merged into the Chalfonte-Haddon Hall Hotel, becoming the city's largest hotel with nearly 1,000 rooms. By 1930, the Claridge, the city's last large hotel before the casinos, opened its doors. The 400-room Claridge was built by a partnership that included renowned Philadelphia contractor John McShain. At 24 stories, it would become known as the "Skyscraper By The Sea." The city became known as the "The World's Playground.
+
+Question
+How many rooms were in the merged Chalfonte-Haddon Hall Hotel?
+Answer(s):
+nearly 1,000

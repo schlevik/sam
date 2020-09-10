@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The effectiveness of heat-seeking missiles was only 7% early in the Vietnam War, but improved to approximately 15%–40% over the course of the war. The AIM-4 Falcon used by the USAF had kill rates of approximately 7% and was considered a failure. The AIM-9B Sidewinder introduced later achieved 15% kill rates, and the further improved AIM-9D and J models reached 19%. The AIM-9G used in the last year of the Vietnam air war achieved 40%. Israel used almost totally guns in the 1967 Six-Day War, achieving 60 kills and 10 losses. However, Israel made much more use of steadily improving heat-seeking missiles in the 1973 Yom Kippur War. In this extensive conflict Israel scored 171 of out of 261 total kills with heat-seeking missiles (65.5%), 5 kills with radar guided missiles (1.9%), and 85 kills with guns (32.6%). The AIM-9L Sidewinder scored 19 kills out of 26 fired missiles (73%) in the 1982 Falklands War. But, in a conflict against opponents using thermal countermeasures, the United States only scored 11 kills out of 48 fired (Pk 23%) with the follow-on AIM-9M in the Gulf War.
+
+Question
+Which heat-seeking missiles had the greatest success rate?
+Answer(s):
+AIM-9G

@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Trying to snap a two-game skid, the Dolphins flew to The Meadowlands for Week 3 in an AFC East duel against the New York Jets (who were also 0-2 heading into the game). In the first quarter, the Jets flew out first with QB Chad Pennington completing a 3-yard TD pass to WR Laveranues Coles for the only score of the period. In the second quarter, Miami took the lead with RB Ronnie Brown's 1-yard TD run. However, it was short lived as on the ensuing kickoff, RB Leon Washington returned the kick 98 yards for a touchdown. The Dolphins drew closer with kicker Jay Feely's 31-yard and 39-yard field goal. However, New York responded with Pennington completing a 4-yard TD pass to TE Chris Baker. In the third quarter, the Jets increased their lead with kicker Mike Nugent's 21-yard field goal for the only score of the period. In the fourth quarter, New York settled with Pennington getting a 2-yard TD run. Miami nearly had a comeback as Brown got a 2-yard TD run, a 2-point conversion run, and a 22-yard TD pass from QB Trent Green. However, the Jets managed to hold on to win the game.
+
+Question
+From what distance did two players have touchdown runs?
+Answer(s):
+2-yard

@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Paraguay's formal labour force was estimated to total about 2.7 million workers in 2004. About 45 percent worked in the agricultural sector, 31 percent in the industrial sector, and 19 percent in the services sector. Unemployment was estimated at about 15 percent. Paraguay's constitution guarantees the right of workers to unionize and bargain collectively. About 15 percent of workers are members of one of Paraguay's 1,600 unions. Strikes are legal and not uncommon. The 2001 census found that 5 percent of Paraguay's workforce was under the age of 14. Although Paraguay ratified the International Labour Organization's Minimum Age Convention in 2004, child labour continues to be prevalent. Nearly 14 percent of children between the ages of 5 and 17 are employed, many in poor conditions and for negligible pay. The government has mandated a minimum wage of approximately US$158 per month for private-sector employees. Government employees have no minimum wage. The standard workweek is 48 hours. In 2004 Paraguay's unemployment rate stood at 15 percent.
+
+Question
+How many years children between employed?
+Answer(s):
+5

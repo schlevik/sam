@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] China is the worlds leading producer of electric bicycles. According to the data of the China Bicycle Association, a government-chartered industry group, in 2004 Chinas manufacturers sold 7.5 million electric bicycles nationwide, which was almost twice 2003 sales; domestic sales reached 10 million in 2005, and 16 to 18 million in 2006. By 2007, electric bicycles were thought to make up 10 to 20 percent of all two-wheeled vehicles on the streets of many major cities. A typical unit requires 8 hours to charge the battery, which provides the range of 25–30 miles (40–50 km), at the speed of around , however people usually illegal override, makes it just like normal motorcycles, capable of reach nearly . A large number of such vehicles is exported from China as well (3 million units, worth 40 billion yuan ($5.8 billion), in 2006 alone),
+
+Question
+In 2006, how much did electric bicycles exports contribute to the Chinese economy?
+Answer(s):
+40 billion yuan
+
+Question
+Which years saw electric bicycle sales of 10 million or more?
+Answer(s):
+2005

@@ -1,0 +1,18 @@
+Paragraph:
+
+Guinea-Bissau is warm all year around and there is little temperature fluctuation; it averages 26.3 °C (79.3 °F). The average rainfall for Bissau is 2,024 millimetres (79.7 in) although this is almost entirely accounted for during the rainy season which falls between June and September/October. From December through April, the country experiences drought.
+
+Question
+What is the average rainfall in Bissau, in millimetres?
+Answer(s):
+2,024
+
+Question
+When is the rainy season in Guinea-Bissau?
+Answer(s):
+between June and September/October
+
+Question
+What is the average temperature in Guinea-Bissau?
+Answer(s):
+26.3 °C (79.3 °F)

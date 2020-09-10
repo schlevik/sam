@@ -1,0 +1,48 @@
+Paragraph:
+
+[aug] yes no [text] Arcatas age cohorts are also distorted by a large percentage of college-age students. Only 15.3% of Arcata residents are under the age of 18, while nearly a third (32.3%) fall between ages 18 and 24, and 27.8% are 25 to 44 years old. Among older age cohorts, 15.9% are 45 to 64 years old, and 8.7% were 65 years of age or older. The median age was 26 years. For every 100 females, there were 99.0 males. For every 100 females age 18 and over, there were 96.9 males.
+
+Question
+Which age group makes up most of the population?
+Answer(s):
+18 and 24
+
+Question
+Which age groups make up more than 25% of the population?
+Answer(s):
+18 and 24
+
+Question
+What age group makes up the majority of the population?
+Answer(s):
+18 and 24
+
+Question
+What percentage of the population is the age group that the median age falls into?
+Answer(s):
+32.3%
+
+Question
+Which groups in percent are larger than 15%?
+Answer(s):
+under the age of 18
+
+Question
+Which age group is larger: under the age of 18 or 18 and 24?
+Answer(s):
+18 and 24
+
+Question
+Which age group is smaller: under the age of 18 or 18 and 24?
+Answer(s):
+under the age of 18
+
+Question
+Which age group is larger: 25 to 44 or 45 to 64?
+Answer(s):
+25 to 44
+
+Question
+Which age group is larger: under the age of 18 or 65 years of age or older?
+Answer(s):
+under the age of 18

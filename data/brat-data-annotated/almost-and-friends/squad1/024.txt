@@ -1,0 +1,13 @@
+Paragraph:
+
+More than 12,000 miles (19,000 km) of roads make up the state's major highway skeleton, including state-operated highways, ten turnpikes or major toll roads, and the longest drivable stretch of Route 66 in the nation. In 2008, Interstate 44 in Oklahoma City was Oklahoma's busiest highway, with a daily traffic volume of 123,300 cars. In 2010, the state had the nation's third highest number of bridges classified as structurally deficient, with nearly 5,212 bridges in disrepair, including 235 National Highway System Bridges.
+
+Question
+How many bridges in Oklahoma were found to be deficient in 2010?
+Answer(s):
+5,212
+
+Question
+How many national highway bridges in Oklahoma were found to be deficient in 2010?
+Answer(s):
+235

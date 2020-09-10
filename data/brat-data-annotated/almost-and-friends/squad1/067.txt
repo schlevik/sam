@@ -1,0 +1,8 @@
+Paragraph:
+
+Seattle's foreign-born population grew 40% between the 1990 and 2000 censuses. The Chinese population in the Seattle area has origins in mainland China, Hong Kong, Southeast Asia, and Taiwan. The earliest Chinese-Americans that came in the late 19th and early 20th centuries were almost entirely from Guangdong province. The Seattle area is also home to a large Vietnamese population of more than 55,000 residents, as well as over 30,000 Somali immigrants. The Seattle-Tacoma area is also home to one of the largest Cambodian communities in the United States, numbering about 19,000 Cambodian Americans, and one of the largest Samoan communities in the mainland U.S., with over 15,000 people having Samoan ancestry. Additionally, the Seattle area had the highest percentage of self-identified mixed-race people of any large metropolitan area in the United States, according to the 2000 United States Census Bureau. According to a 2012 HistoryLink study, Seattle's 98118 ZIP code (in the Columbia City neighborhood) was one of the most diverse ZIP Code Tabulation Areas in the United States.
+
+Question
+From where in China did most of the first immigrants come?
+Answer(s):
+Guangdong province

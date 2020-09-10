@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Following their road victory over the Cardinals, the Broncos went home for a snowy Christmas Eve fight with the Cincinnati Bengals. In the first quarter, the Bengals struck first with RB Rudi Johnson's 6-yard TD run. In the second quarter, Denver struck back with QB Jay Cutler completing a 1-yard TD pass to rookie TE Tony Scheffler and a 39-yard TD pass to WR Javon Walker. However, Cincinnati responded with kicker Shayne Graham's 46-yard field goal and QB Carson Palmer's 11-yard TD pass to WR Chris Henry. In the second half, the Broncos took the lead with RB Mike Bell's 2-yard TD run in the third quarter and kicker Jason Elam's 24-yard field goal. Late in the game, the Bengals almost tied the game with Palmer completing a 10-yard TD pass to WR T. J. Houshmandzadeh. Fortunately, a botched snap resulted in failed PAT, giving Denver a one-point win. With the win, the Broncos improved to 9-6.
+
+Question
+Who kicked the shorter field goal, Shayne Graham or Jason Elam?
+Answer(s):
+Jason Elam
+
+Question
+Which player scored the last touchdown of the game?
+Answer(s):
+T. J. Houshmandzadeh

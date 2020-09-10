@@ -1,0 +1,8 @@
+Paragraph:
+
+Sleep involves great changes in brain activity. Until the 1950s it was generally believed that the brain essentially shuts off during sleep, but this is now known to be far from true; activity continues, but patterns become very different. There are two types of sleep: REM sleep (with dreaming) and NREM (non-REM, usually without dreaming) sleep, which repeat in slightly varying patterns throughout a sleep episode. Three broad types of distinct brain activity patterns can be measured: REM, light NREM and deep NREM. During deep NREM sleep, also called slow wave sleep, activity in the cortex takes the form of large synchronized waves, whereas in the waking state it is noisy and desynchronized. Levels of the neurotransmitters norepinephrine and serotonin drop during slow wave sleep, and fall almost to zero during REM sleep; levels of acetylcholine show the reverse pattern.
+
+Question
+During what stage of sleep do serotonin and norepinephrine levels drop?
+Answer(s):
+slow wave sleep

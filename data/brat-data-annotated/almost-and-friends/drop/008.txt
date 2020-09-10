@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The Raiders were stymied almost totally by the Jaguars in Week 16. The Raiders defense allowed seven touchdowns: two passing TDs each from David Garrard and Jaguars backup QB Quinn Gray, and three rushing TDs. The Raiders only managed 215 yards of total offense. The game was punctuated by an ugly incident with 21 seconds left in the first half, where Warren Sapp argued with officials over a penalty the team wanted to accept. The argument led to four unsportmanlike conduct penalties against the Raiders, three of them on Sapp, and Sapp was ejected from the game. Although one of the officials accused Sapp of bumping him, he was not suspended. JaMarcus Russell entered the game during the first quarter, and would play the rest of the game. Although he threw three interceptions, he finally threw his first career touchdown pass in the NFL, to Zach Miller, with 11 seconds to go in the game. He followed it up with a pass to Ronald Curry for a two-point conversion. Dominic Rhodes rushed for 115 yards. Kirk Morrison managed to intercept a pass by David Garrard, one of only three picks the Jaguars QB would throw all season in 2007.
+
+Question
+Who lost the game, the Raiders or the Jaguars?
+Answer(s):
+Raiders

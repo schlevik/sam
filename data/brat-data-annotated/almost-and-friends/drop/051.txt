@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] In the second half of 1724, the New Englanders launched an aggressive campaign up the Kennebec and Penobscot rivers.:80 On August 22, Captains Jeremiah Moulton and Johnson Harmon led 200 rangers to Norridgewock to kill Father Rale and destroy the settlement. There were 160 Abenakis, many of whom chose to flee rather than fight. At least 31 chose to fight, and most of them were killed.:80 Rale was killed in the opening moments of the battle, a leading chief was killed, and nearly two dozen women and children.:84 The Colonists had casualties of two militiamen and one Mohawk. Harmon destroyed the Abenaki farms, and those who had escaped were forced to abandon their village and move northward to the Abenaki village of St. Francis and Becancour, Quebec.:81 :123
+
+Question
+Who had less casualties, the Colonists or the Abenakis?
+Answer(s):
+The Colonists

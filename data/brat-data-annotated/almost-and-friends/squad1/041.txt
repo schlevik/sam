@@ -1,0 +1,18 @@
+Paragraph:
+
+Royal assent is the method by which a country's constitutional monarch (possibly through a delegated official) formally approves an act of that nation's parliament, thus making it a law or letting it be promulgated as law. In the vast majority of contemporary monarchies, this act is considered to be little more than a formality; even in those nations which still permit their ruler to withhold the royal assent (such as the United Kingdom, Norway, and Liechtenstein), the monarch almost never does so, save in a dire political emergency or upon the advice of their government. While the power to withhold royal assent was once exercised often in European monarchies, it is exceedingly rare in the modern, democratic political atmosphere that has developed there since the 18th century.
+
+Question
+Which three modern monarchies allow their ruler to withhold royal assent?
+Answer(s):
+United Kingdom, Norway, and Liechtenstein
+
+Question
+What nations allow the withold of the royal assent?
+Answer(s):
+United Kingdom, Norway, and Liechtenstein
+
+Question
+Under what circumstances does a monarch typically use the royal assent?
+Answer(s):
+a dire political emergency or upon the advice of their government

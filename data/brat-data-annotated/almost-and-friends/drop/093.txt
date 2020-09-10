@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] In 1665, Charles II became the last male Habsburg King of Spain; suffering from ill-health all his life, his death was anticipated almost from birth and his successor debated for decades. In 1700, the Spanish Empire included possessions in Italy, the Spanish Netherlands, the Philippines and the Americas; while no longer the dominant power, it proved remarkably resilient and remained largely intact. Acquisition of an undivided Empire by the Habsburgs or Bourbons would change the balance of power and the conflict ultimately involved much of Europe. In making dynastic claims secondary, the war marks a key point in the development of the nation state. It was also the last of Louis XIV's wars to establish defensible borders and French supremacy in Europe, the most recent being the 1688-1697 Nine Years' War when France was unable to defeat the Grand Alliance. The 1697 Treaty of Ryswick was driven by mutual exhaustion and the recognition by Louis that he needed allies for a war over the Succession. Emperor Leopold initially refused to sign the Treaty since it left this issue unresolved; he reluctantly did so in October 1697 but most viewed Ryswick as only a pause in hostilities.
+
+Question
+What did the people of Habsburg debate for decades?
+Answer(s):
+his successor

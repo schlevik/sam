@@ -1,0 +1,8 @@
+Paragraph:
+
+Human interference has nearly exterminated the trees in many areas, and, except for the beech forests of the Austrian Alps, forests of deciduous trees are rarely found after the extreme deforestation between the 17th and 19th centuries. The vegetation has changed since the second half of the 20th century, as the high alpine meadows cease to be harvested for hay or used for grazing which eventually might result in a regrowth of forest. In some areas the modern practice of building ski runs by mechanical means has destroyed the underlying tundra from which the plant life cannot recover during the non-skiing months, whereas areas that still practice a natural piste type of ski slope building preserve the fragile underlayers.
+
+Question
+What has nearly exterminated the trees in many areas?
+Answer(s):
+Human interference

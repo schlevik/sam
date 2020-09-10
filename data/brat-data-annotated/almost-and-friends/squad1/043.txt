@@ -1,0 +1,13 @@
+Paragraph:
+
+Dams remain the principal source of water both for domestic and agricultural use; Cyprus has a total of 107 dams (plus one currently under construction) and reservoirs, with a total water storage capacity of about 330,000,000 m3 (1.2×1010 cu ft). Water desalination plants are gradually being constructed to deal with recent years of prolonged drought. The Government has invested heavily in the creation of water desalination plants which have supplied almost 50 per cent of domestic water since 2001. Efforts have also been made to raise public awareness of the situation and to encourage domestic water users to take more responsibility for the conservation of this increasingly scarce commodity.
+
+Question
+What percentage of domestic water do desalination plants provide on Cyprus?
+Answer(s):
+almost 50 per cent
+
+Question
+What has the government invested in to help supply water for Cyprus?
+Answer(s):
+desalination plants

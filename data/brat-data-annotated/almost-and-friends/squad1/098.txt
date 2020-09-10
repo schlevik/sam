@@ -1,0 +1,13 @@
+Paragraph:
+
+Rainfall along the coast averages about 10 inches (250 mm) of precipitation annually. The average (mean) rainfall is 10.65 inches (271 mm) and the median is 9.6 inches (240 mm). Most of the rainfall occurs during the cooler months. The months of December through March supply most of the rain, with February the only month averaging 2 inches (51 mm) or more of rain. The months of May through September tend to be almost completely dry. Though there are few wet days per month during the rainy period, rainfall can be heavy when it does fall. Rainfall is usually greater in the higher elevations of San Diego; some of the higher elevation areas of San Diego can receive 11–15 inches (280–380 mm) of rain a year. Variability of rainfall can be extreme: in the wettest years of 1883/1884 and 1940/1941 more than 24 inches (610 mm) fell in the city, whilst in the driest years as little as 3.2 inches (80 mm) has fallen for a full year. The wettest month on record has been December 1921 with 9.21 inches (234 mm).
+
+Question
+What is the average rainfall in February along the coast?
+Answer(s):
+2 inches (51 mm)
+
+Question
+What months are nearly completely dry in San Diego?
+Answer(s):
+May through September

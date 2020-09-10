@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] In 2014, Aston Martin suffered a pre-tax loss of £72 million, almost triple that of 2013 selling 3,500 cars during the year, well below 7,300 sold in 2007 and 4,200 sold in 2013. In March 2014, Aston Martin issued "payment in kind" notes of US$165 million, at 10.25% interest, in addition to the £304 million of senior secured notes at 9.25% issued in 2011. Aston Martin also had to secure an additional investment of £200 million from its shareholders to fund development of new models. It is reported that Aston Martins pre-tax losses for 2016 increased by 27% to £162.8 million, the sixth year it continued to suffer a loss.
+
+Question
+Which years did Aston Martin not sell more than 5000 cars in?
+Answer(s):
+2014

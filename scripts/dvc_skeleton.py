@@ -2,7 +2,8 @@ import os
 
 import click
 
-DEFAULT_EXTRA_ARGS="--fp16 --save-steps 0 --debug-features"
+DEFAULT_EXTRA_ARGS = "--fp16 --save-steps 0 --debug-features"
+
 
 @click.command()
 @click.argument('command', type=str)
@@ -118,6 +119,20 @@ def generate_dvc(command, dataset_name,
             f"bash scripts/cache_and_train_drop.sh"
         )
         stage_name = f"train-{model_name}-on-drop"
+        dvc_cmd = (
+            f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
+            f"{cmd}"
+        )
+    elif command == 'train-transformers-combined':
+        train_path = f"data/datasets/combined/train.json"
+        model_folder = f"{model_name}-combined"
+        model_path = f"models/{model_folder}"
+        cmd = (
+            f"MODEL={model_name} CACHE_LOCATION=~/localscratch/combined/ SAVE_TO={model_path} "
+            f"BATCH_SIZE={batch_size} ACC_STEPS={gradient_accumulation_steps} MODEL_TYPE={model_type} "
+            f"bash scripts/cache_and_train_combined.sh"
+        )
+        stage_name = f"train-{model_name}-on-combined"
         dvc_cmd = (
             f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
             f"{cmd}"
@@ -285,6 +300,27 @@ def generate_dvc(command, dataset_name,
             f"dvc run -n {stage_name} -d {train_path} -d {eval_path} -o {model_path} "
             f"{cmd}"
         )
+    elif command == 'predict-t5':
+        model_names = [f"t5-{s}" for s in ('small', 'base', 'large')]
+        dataset_names = ['drop', 'hotpotqa', 'newsqa', 'squad1']
+        models_str = " ".join(f"--model-path models/{m}-{dataset_name}" for m in model_names)
+        if extra_args == DEFAULT_EXTRA_ARGS:
+            extra_args = ''
+        cmd = (f"python main.py --debug "
+               f"t5-predictions {baseline_file} {intervention_file} {control_file} "
+               f" {models_str} "
+               f"--out-folder {predictions_folder} --max-answer-length 10 {extra_args}")
+
+        stage_name = f"predict-t5-{dataset_name}"
+        deps_str = " ".join(f"-d models/{m}-{dataset_name}" for m in model_names)
+        outs_str = ' '.join(
+            f"-o {get_output_predictions_file_name(baseline_file, predictions_folder, f'{m}-{dataset_name}')} "
+            f"-o {get_output_predictions_file_name(intervention_file, predictions_folder, f'{m}-{dataset_name}')} "
+            f"-o {get_output_predictions_file_name(control_file, predictions_folder, f'{m}-{dataset_name}')}"
+            for m in model_names
+        )
+        dvc_cmd = (f"dvc run -n {stage_name} {deps_str} -d {baseline_file} "
+                   f"-d {intervention_file} -d {control_file}  {outs_str} {cmd}")
     elif command == "generate-baselines":
         cmds = []
         dvc_cmds = []

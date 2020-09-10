@@ -1,0 +1,8 @@
+Paragraph:
+
+The Late Triassic spans from 237 million to 200 million years ago. Following the bloom of the Middle Triassic, the Late Triassic featured frequent heat spells, as well as moderate precipitation (10-20 inches per year). The recent warming led to a boom of reptilian evolution on land as the first true dinosaurs evolve, as well as pterosaurs. All this climatic change, however, resulted in a large die-out known as the Triassic-Jurassic extinction event, in which all archosaurs (excluding ancient crocodiles), most synapsids, and almost all large amphibians went extinct, as well as 34% of marine life in the fourth mass extinction event of the world. The cause is debatable.
+
+Question
+What was the only archosaur to survive the fourth mass extinction?
+Answer(s):
+crocodiles

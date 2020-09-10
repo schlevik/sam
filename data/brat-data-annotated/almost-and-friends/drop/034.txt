@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] In Milan, in May 1917, Bolshevik revolutionaries organised and engaged in rioting calling for an end to the war, and managed to close down factories and stop public transportation. The Italian army was forced to enter Milan with tanks and machine guns to face Bolsheviks and anarchists, who fought violently until 23 May when the army gained control of the city. Almost 50 people were killed and over 800 people arrested. In September 1917, Russian soldiers in France began questioning why they were fighting for the French at all and mutinied. In Russia, opposition to the war led to soldiers also establishing their own revolutionary committees, which helped foment the October Revolution of 1917, with the call going up for "bread, land, and peace". The Bolsheviks agreed to a peace treaty with Germany, the peace of Brest-Litovsk, despite its harsh conditions. In northern Germany, the German Revolution of 1918-1919 began at the end of October 1918. Units of the German Navy refused to set sail for a last, large-scale operation in a war they believed to be as good as lost, initiating the uprising. The sailors' revolt, which then ensued in the naval ports of Wilhelmshaven and Kiel, spread across the whole country within days and led to the proclamation of a republic on 9 November 1918 and shortly thereafter to the abdication of Kaiser Wilhelm II.
+
+Question
+Were more people killed or arrested when the Italian army was forced to enter Milan and face Bolsheviks and anarchists?
+Answer(s):
+arrested

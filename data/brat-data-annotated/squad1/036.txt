@@ -1,0 +1,8 @@
+Paragraph:
+
+Historically, computers evolved from mechanical computers and eventually from vacuum tubes to transistors. However, conceptually computational systems as flexible as a personal computer can be built out of almost anything. For example, a computer can be made out of billiard balls (billiard ball computer); an often quoted example.[citation needed] More realistically, modern computers are made out of transistors made of photolithographed semiconductors.
+
+Question
+A computer that is made using pool balls is known as what?
+Answer(s):
+billiard ball computer)

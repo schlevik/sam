@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Against Tim Tebow and the Broncos, the two teams would be in a 0-0 deadlock in the first half, though the Broncos would nearly score in the second quarter on a 28-yard field goal, which would then be blocked by Julius Peppers. The Bears would then score 10 points on Marion Barber's 9-yard touchdown run, and Robbie Gould's team record-breaking 57-yard field goal, but Tebow's touchdown pass to Demaryius Thomas and Matt Prater's 59-yard field goal would tie the game. Barber would commit two costly mistakes during the late portion of the game. In the fourth quarter, Barber would run out of bounds with 1:55 left, and Barber would also fumble in overtime. The Broncos would then move downfield and kick a game-winning field goal.
+
+Question
+Which team scored in overtime?
+Answer(s):
+Broncos

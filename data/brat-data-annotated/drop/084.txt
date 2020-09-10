@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Coming off their season-sweep over the Lions, the Bears stayed at home for a Week 10 interconference duel with the unbeaten Tennessee Titans. With QB Kyle Orton nursing an almost-healed right ankle, QB Rex Grossman was given the start. In the first quarter, Chicago struck first as Grossman completed a 5-yard TD pass to rookie RB Matt Fort&#233;. In the second quarter, the Titans responded with QB Kerry Collins completing a 10-yard TD pass to TE Bo Scaife. In the third quarter, Tennessee took the lead as Collins completed a 12-yard TD pass to former Bears WR Justin Gage. In the fourth quarter, the Titans increased their lead as RB LenDale White got a 2-yard TD run. Chicago tried to rally as Grossman got a 1-yard TD run. However, Tennessee's defense stiffened for the win. Q1 - CHI - 7:11 - 5 yd TD pass from Rex Grossman to Matt Fort&#233; (Robbie Gould kick) (CHI 7-0) Q2 - TEN - 8:45 - 10 yd TD pass from Kerry Collins to Bo Scaife (Rob Bironas kick) (7-7) Q3 - TEN - 11:34 - 12 yd TD pass from Kerry Collins to Justin Gage (Bironas kick) (TEN 14-7) Q4 - TEN - 12:09 - LenDale White 2 yd TD run (Bironas kick) (TEN 21-7) Q4 - CHI - 5:00 - Rex Grossman 1 yd TD run (Gould kick) (TEN 21-14)
+
+Question
+Who scored first
+Answer(s):
+Chicago
+
+Question
+Which quarter had a rushing and passing touchdown, Grossman or Collins?
+Answer(s):
+Rex Grossman

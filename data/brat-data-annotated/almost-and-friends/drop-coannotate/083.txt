@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] The forces of Zurich were defeated in the Battle of St. Jakob an der Sihl on 22 July 1443 and Zurich was besieged. Frederick appealed to Charles VII of France to attack the confederates and the latter sent a force of about 30,000 Armagnac mercenaries under the command of the Dauphin via Basel to relieve the city. In the Battle of St. Jakob an der Birs near Basel on 26 August 1444 a blocking force of roughly 1,600 Swiss confederates were wiped out, but inflicted such heavy losses on the French that the Dauphin decided to retreat. In May 1444, the confederacy laid siege to Greifensee, and captured the town after four weeks, on May 27, beheading all but two of the 64 defenders on the next day, including their leader, Wildhans von Breitenlandenberg. Even in this time of war, such a mass execution was widely considered a cruel and unjust deed. By 1446, both sides were exhausted, and a preliminary peace was concluded. The confederation had not managed to conquer any of the cities of Zurich except Greifensee; Rapperswil and Zurich itself withstood the attacks. In 1450, the parties made a definitive peace and Zurich was admitted into the confederation again, but had to dissolve its alliance with the Habsburgs. The significance of the war is that it showed that the confederation had grown into a political alliance so close that it no longer tolerated separatist tendencies of a single member.
+
+Question
+Which occurred first, the Battle of St. Jakob an der Birs, or the siege of Greifensee?
+Answer(s):
+siege to Greifensee

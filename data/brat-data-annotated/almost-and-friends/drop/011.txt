@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] With the unsuccessful and bloody Russo-Japanese War there was unrest in army reserve units. On 2 January 1905, Port Arthur was lost; in February 1905, the Russian army was defeated at Mukden, losing almost 80,000 men. On 27-28 May 1905, the Russian Baltic Fleet was defeated at Tsushima. Witte was dispatched to make peace, negotiating the Treaty of Portsmouth . In 1905, there were naval mutinies at Sevastopol , Vladivostok, and Kronstadt, peaking in June with the mutiny aboard the battleship Potemkin. The mutineers eventually surrendered the battleship to Romanian authorities on 8 July in exchange for asylum, then the Romanians returned her to Imperial Russian authorities on the following day. Some sources claim over 2,000 sailors died in the suppression. The mutinies were disorganised and quickly crushed. Despite these mutinies, the armed forces were largely apolitical and remained mostly loyal, if dissatisfied — and were widely used by the government to control the 1905 unrest.
+
+Question
+Which event happened first, the defeat at Tsushima or the defeat at Mukden?
+Answer(s):
+Mukden

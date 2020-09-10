@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] Following the withdrawal of the SNA, the WSLF continued their insurgency. By May 1980, the rebels, with the assistance of a small number of SNA soldiers who continued to help the guerrilla war, controlled a substantial region of the Ogaden. However, by 1981 the insurgents were reduced to sporadic hit-and-run attacks and were finally defeated. In addition, the WSLF and SALF were significantly weakened after the Ogaden War. The former was practically defunct by the late 1980s, with its splinter group, the Ogaden National Liberation Front operating from headquarters in Kuwait. Even though elements of the ONLF would later manage to slip back into the Ogaden, their actions had little impact. For the Barre regime, the invasion was perhaps the greatest strategic blunder since independence, and it weakened the military. Almost one-third of the regular SNA soldiers, three-eighths of the armored units and half of the Somali Air Force were lost. The weakness of the Barre administration led it to effectively abandon the dream of a unified Greater Somalia. The failure of the war aggravated discontent with the Barre regime; the first organized opposition group, the Somali Salvation Democratic Front , was formed by army officers in 1979. The United States adopted Somalia as a Cold War ally from the late 1970s to 1988 in exchange for use of Somali bases, and a way to exert influence upon the region. A second armed clash in 1988 was resolved when the two countries agreed to withdraw their militaries from the border.
+
+Question
+Which lost more - the SNA soldiers, or the Comali Air Force?
+Answer(s):
+Somali Air Force
+
+Question
+What did the SNA lose more of, soldiers, or armored units?
+Answer(s):
+soldiers

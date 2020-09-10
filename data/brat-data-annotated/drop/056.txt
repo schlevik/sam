@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] The Demographics of Gabon is the makeup of the population of Gabon. As of , Gabon has a population of . Gabons population is relatively young with 35.5% of its population under 15 years of age and only 4.3% of its population over 65 years old. Gabon has a nearly even split between males and females with 0.99 males for every female in the population. In the age range of 15-65, the ration is exactly 1 male to 1 female. The life expectancy of Gabon is lower than the world average. Gabons populations life expectancy at birth is 53.11 years while the world average is 67.2 years as of 2010. Ethnically, the biggest group in Gabon are the Fang people with over 500,000 people, or about a third of Gabons population, belonging to this ethnic group. The biggest religion in Gabon is Christianity, with between 55-75% of the population of Gabon being Christian.
+
+Question
+Does Gabon have more males or females in the population, just barely?
+Answer(s):
+females
+
+Question
+Which of Gabon's demographics are discussed?
+Answer(s):
+age

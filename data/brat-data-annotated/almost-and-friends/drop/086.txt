@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] As early as 1070, Adam von Bremen referred to Roskilde as "Zealands largest town". At the time of the Reformation in 1536, it had some 6,000 inhabitants but as a result of war, fire and disease, by 1753 its population had dropped to only 1,550. By the 1860s, it had grown to around 5,000 and by the 1900s to some 9,000. Thereafter it increased appreciably until 1970 when there were almost 45,000 inhabitants. The population dipped slightly to 40,000 in the 1980s, but thanks to improved connections with Copenhagen and the establishment of the university, it grew steadily to reach 47,117 by 2014 making Roskilde Denmarks tenth largest city.
+
+Question
+Did Roskilde have moreresidents in the 1970s or the 1980s?
+Answer(s):
+1970

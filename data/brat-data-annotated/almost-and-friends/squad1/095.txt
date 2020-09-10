@@ -1,0 +1,18 @@
+Paragraph:
+
+iPod batteries are not designed to be removed or replaced by the user, although some users have been able to open the case themselves, usually following instructions from third-party vendors of iPod replacement batteries. Compounding the problem, Apple initially would not replace worn-out batteries. The official policy was that the customer should buy a refurbished replacement iPod, at a cost almost equivalent to a brand new one. All lithium-ion batteries lose capacity during their lifetime even when not in use (guidelines are available for prolonging life-span) and this situation led to a market for third-party battery replacement kits.
+
+Question
+What did Apple originally tell consumers to purchase when their iPod batteries no longer worked?
+Answer(s):
+refurbished replacement iPod
+
+Question
+What kind of battery does the iPod use?
+Answer(s):
+lithium-ion
+
+Question
+What type of rechargeable battery does Apple use in its iPods?
+Answer(s):
+lithium-ion

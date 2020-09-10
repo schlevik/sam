@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Eventually the Commonwealth Sejm voted to raise the funds necessary to resume large scale military operations. The final attempt by Sigismund and Władysław to gain the throne was a new campaign launched on 6 April 1617. Władysław was the nominal commander, but it was hetman Chodkiewicz who had actual control over the army. In October, the towns of Dorogobuzh and Vyazma surrendered quickly, recognizing Władysław as the tsar. However, the Commonwealth forces suffered defeats between Vyazma and Mozhaisk, and Chodkiewicz's plans for a counterattack and an advance to Moscow failed. Władysław did not have enough forces to advance to Moscow again, especially because the Russian support for the Poles was all but gone by that time. In response to Władysław's invasion, the burghers of Smolensk revolted against Polish rule, and the Polish troops had to fight their way back as they retreated from the city. However, in 1617 Polish forces, besieged in Smolensk by Russian forces, were relieved by Lisowczycy, when Russian forces retreated to Bely soon after receiving news that Lisowczycy, then commanded by Stanisław Czapiński, had appeared in the area. In 1618 Petro Sahaidachny's campaign against Muscovy resulted in sacking numerous forts such as Putivl, Kursk, Yelets, and others. Together with Chodkiewicz he laid siege to Moscow in September 1618. Due to unclear reasons, both Hetmans failed to take the city. Negotiations began and a peace treaty was signed in 1618.
+
+Question
+Who organized the attempt to gain the throne?
+Answer(s):
+Władysław

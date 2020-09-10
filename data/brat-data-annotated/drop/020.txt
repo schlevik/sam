@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] Public finances have shown a deficit in recent years. This averaged around $650 million per annum between 1999 and 2007, however this amounted to less than 23 percent of GDP. There was a slight surplus in 2008 with revenues totalling $23.16 billion and expenditures $22.93 billion. Government of Slovenia expenditure equalled 38 percent of GDP. , the total government debt of Slovenia was unknown. The Statistical Office of the Republic of Slovenia (SURS) reported it to be (not counting state-guaranteed loans) 19.5 billion euros or 54.2% of gross domestic product at the end of September 2010. According to the data provided by the Slovenian Ministry of Finance (Slovenia) in January 2011, it was just below 15 billion euros or 41,6% of the 2009 GDP. However, the Slovenian financial newspaper Finance (newspaper) calculated in January 2011 that it is actually 22.4 billion euros or almost 63% of GDP, surpassing the limit of 60% allowed by the European Union. On 12 January 2011, the Slovenian Court of Audit of the Republic of Slovenia rejected the data reported by the ministry as incorrect and demanded the dismissal of the finance minister Franc Križanič.
+
+Question
+The debt of Slovenia went beyond whose acceptable limit?
+Answer(s):
+European Union

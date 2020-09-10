@@ -1,0 +1,8 @@
+Paragraph:
+
+On March 31, 2010, the YouTube website launched a new design, with the aim of simplifying the interface and increasing the time users spend on the site. Google product manager Shiva Rajaraman commented: "We really felt like we needed to step back and remove the clutter." In May 2010, it was reported that YouTube was serving more than two billion videos a day, which it described as "nearly double the prime-time audience of all three major US television networks combined". In May 2011, YouTube reported in its company blog that the site was receiving more than three billion views per day. In January 2012, YouTube stated that the figure had increased to four billion videos streamed per day.
+
+Question
+How many videos was youtube serving per day as of May 2010?
+Answer(s):
+more than two billion

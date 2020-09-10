@@ -1,0 +1,33 @@
+Paragraph:
+
+[aug] yes no [text] The Atlantic Ocean and the warming influence of the Gulf Stream affect weather patterns in Ireland. Temperatures differ regionally, with central and eastern areas tending to be more extreme. However, due to a temperate oceanic climate, temperatures are seldom lower than −5 °C in winter or higher than 26 °C in summer. The highest temperature recorded in Ireland was 33.3 °C on 26 June 1887 at Kilkenny Castle in Kilkenny, while the lowest temperature recorded was −19.1 °C at Markree Castle in Sligo. Rainfall is more prevalent during winter months and less so during the early months of summer. Southwestern areas experience the most rainfall as a result of south westerly winds, while Dublin receives the least. Sunshine duration is highest in the southeast of the country. The far north and west are two of the windiest regions in Europe, with great potential for wind energy generation.Ireland normally gets between 1100 and 1600 hours of sunshine each year, most areas averaging between 3.25 and 3.75 hours a day. The sunniest months are May and June, which average between 5 and 6.5 hours per day over most of the country. The extreme southeast gets most sunshine, averaging over 7 hours a day in early summer. December is the dullest month, with an average daily sunshine ranging from about 1 hour in the north to almost 2 hours in the extreme southeast. The sunniest summer in the 100 years from 1881 to 1980 was 1887, according to measurements made at the Phoenix Park in Dublin; 1980 was the dullest.
+
+Question
+Which area gets less sun, the southeast or the north?
+Answer(s):
+north
+
+Question
+Which area is the least sunny the southeast or the north?
+Answer(s):
+north
+
+Question
+Which type of weather in Ireland came first, sunniest summer 1887 or 1980 the dullest?
+Answer(s):
+sunniest summer
+
+Question
+Which area of Ireland receives more than double the amount of the average sunshine in summer?
+Answer(s):
+extreme southeast
+
+Question
+Which area in Europe gets more hours of sunshine during the year, extreme southeast or far north and west?
+Answer(s):
+extreme southeast
+
+Question
+Which year was the dullest summer, 1980 or 1887?
+Answer(s):
+1980

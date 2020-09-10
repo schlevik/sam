@@ -1,0 +1,13 @@
+Paragraph:
+
+Like other newly independent states of the former Soviet Union, Armenia's economy suffers from the breakdown of former Soviet trading patterns. Soviet investment in and support of Armenian industry has virtually disappeared, so that few major enterprises are still able to function. In addition, the effects of the 1988 Spitak earthquake, which killed more than 25,000 people and made 500,000 homeless, are still being felt. The conflict with Azerbaijan over Nagorno-Karabakh has not been resolved. The closure of Azerbaijani and Turkish borders has devastated the economy, because Armenia depends on outside supplies of energy and most raw materials. Land routes through Georgia and Iran are inadequate or unreliable. The GDP fell nearly 60% between 1989 and 1993, but then resumed robust growth. The national currency, the dram, suffered hyperinflation for the first years after its introduction in 1993.
+
+Question
+How much did the Armenian GDP decrease from 1989-1993
+Answer(s):
+60%
+
+Question
+What is the national currency of Armenia?
+Answer(s):
+the dram

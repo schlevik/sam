@@ -1,0 +1,33 @@
+Paragraph:
+
+The book value of the company nearly doubled from $8.19 a share in 1999 to $15 a share in 2009. Revenues grew sixfold from 1999's $6 billion to almost $36 billion in 2009. Net profit margin rose from 4.2% in 1999 to 8.4% in 2009, with operating margins improving 31 percent and return on equity doubling to 6.7 percent in the same time span. Between 1999 and 2009, return on capital nearly tripled to 7 percent. Comcast reported first quarter 2012 profit increases of 30% due to increase in high-speed internet customers. In February 2014, Comcast generated 1.1 billion in revenue during the first quarter due to the Sochi Olympics,.
+
+Question
+What was Comcast's share value in 1999?
+Answer(s):
+$8.19
+
+Question
+What was Comcast's share value in 1999?
+Answer(s):
+$8.19
+
+Question
+What was Comcast's share value in 2009?
+Answer(s):
+$15
+
+Question
+What was Comcast's share value in 2009?
+Answer(s):
+$15
+
+Question
+Comcast's revenues in 2009 were how much?
+Answer(s):
+$36 billion
+
+Question
+What was Comcast's profit margin in 2009?
+Answer(s):
+8.4%

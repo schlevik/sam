@@ -1,0 +1,8 @@
+Paragraph:
+
+[aug] yes no [text] After a few years of peace, the Ottoman Empire attacked the Habsburg Empire. The Turks almost captured Vienna, but John III Sobieski led a Christian alliance that defeated them in the Battle of Vienna , stalling the Ottoman Empire's hegemony in south-eastern Europe. A new Holy League was initiated by Pope Innocent XI and encompassed the Holy Roman Empire , Polish-Lithuanian Commonwealth and the Venetian Republic in 1684, joined by Russia in 1686. The second Battle of Mohács was a crushing defeat for the Sultan. The Turks were more successful on the Polish front and were able to retain Podolia during their battles with the Polish-Lithuanian Commonwealth. Russia's involvement marked the first time the country formally joined an alliance of European powers. This was the beginning of a series of Russo-Turkish Wars, which continued into the 20th century. As a result of the Crimean campaigns and Azov campaigns, Russia captured the key Ottoman fortress of Azov. Following the decisive Battle of Zenta in 1697 and lesser skirmishes , the League won the war in 1699 and forced the Ottoman Empire to sign the Treaty of Karlowitz. The Ottomans ceded most of Hungary, Transylvania and Slavonia, as well as parts of Croatia, to the Habsburg Empire while Podolia returned to Poland. Most of Dalmatia passed to Venice, along with the Morea , which the Ottomans reconquered in 1715 and regained in the Treaty of Passarowitz of 1718.
+
+Question
+Who lost the Battle of Vienna?
+Answer(s):
+The Turks

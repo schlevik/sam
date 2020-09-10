@@ -1,0 +1,23 @@
+Paragraph:
+
+[aug] yes no [text] Sporadic and isolated outbursts by Tibetans against the Chinese continued especially during the unrest between September 1987 until March 1989 in the Tibetan areas of the PRC. But it wasn't until 2008 that a large-scale and coordinated uprising erupted coinciding with international protests accompanying the Olympics torch relay that would end in Beijing where the 2008 Summer Olympics were held. What originally began as an annual observance of Tibetan Uprising Day turned into street protests by large numbers of monks from various monasteries for several days. Crowd control and arrests escalated the tensions eventually setting off a riot by thousands of Tibetans in the Ramoche section of Lhasa on March 14, 2008. When the police fled the scene, rioters looted and burned more than 1200 Chinese shops, offices, and residences and set fire to nearly 100 vehicles. In the end, an estimated 22 were dead and 325 injured, mostly Han. Total damage was estimated at $40 million USD. Eventually the paramilitary People's Armed Police were sent in and 50-100 Tibetan rioters were killed before things quieted down. Meanwhile, in the Gansu Province, a demonstration by 400 monks were met with force that ignited riots by more than 5000 Tibetans who again burned down the establishments of local Han and Hui people before security forces arrived.
+
+Question
+Was the smallest amount dead or injured during the Chinese and Tibetan unrest?
+Answer(s):
+dead
+
+Question
+Did the rioters burn more Chinese shops, offices, and residences or vehicles in the Ramoche riot?
+Answer(s):
+Chinese shops, offices, and residences
+
+Question
+Were more people killed or injured inn the riot?
+Answer(s):
+injured
+
+Question
+Which were there more fires or, Chinese shops, offices and residences or vehicles?
+Answer(s):
+Chinese shops, offices, and residences

@@ -1,0 +1,23 @@
+Paragraph:
+
+In addition to the call buttons, elevators usually have floor indicators (often illuminated by LED) and direction lanterns. The former are almost universal in cab interiors with more than two stops and may be found outside the elevators as well on one or more of the floors. Floor indicators can consist of a dial with a rotating needle, but the most common types are those with successively illuminated floor indications or LCDs. Likewise, a change of floors or an arrival at a floor is indicated by a sound, depending on the elevator.
+
+Question
+Modern elevator position or floor indicaters often use what type of bulbs?
+Answer(s):
+LED
+
+Question
+Modern elevator position or floor indicaters often use what type of bulbs?
+Answer(s):
+LED
+
+Question
+What type of lanterns are used outside elevators as well as inside most cabs?
+Answer(s):
+direction lanterns
+
+Question
+What type of lanterns are used outside elevators as well as inside most cabs?
+Answer(s):
+direction lanterns

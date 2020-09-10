@@ -1,0 +1,13 @@
+Paragraph:
+
+[aug] yes no [text] In the United States, conscription began in 1917 and was generally well received, with a few pockets of opposition in isolated rural areas. The administration decided to rely primarily on conscription, rather than voluntary enlistment, to raise military manpower for when only 73,000 volunteers enlisted out of the initial 1 million target in the first six weeks of the war. In 1917 10 million men were registered. This was deemed to be inadequate, so age ranges were increased and exemptions reduced, and so by the end of 1918 this increased to 24 million men that were registered with nearly 3 million inducted into the military services. The draft was universal and included blacks on the same terms as whites, although they served in different units. In all 367,710 black Americans were drafted , compared to 2,442,586 white . Forms of resistance ranged from peaceful protest to violent demonstrations and from humble letter-writing campaigns asking for mercy to radical newspapers demanding reform. The most common tactics were dodging and desertion, and many communities sheltered and defended their draft dodgers as political heroes. Many socialists were jailed for "obstructing the recruitment or enlistment service". The most famous was Eugene Debs, head of the Socialist Party of America, who ran for president in 1920 from his prison cell. In 1917 a number of radicals and anarchists challenged the new draft law in federal court, arguing that it was a direct violation of the Thirteenth Amendment's prohibition against slavery and involuntary servitude. The Supreme Court unanimously upheld the constitutionality of the draft act in the Selective Draft Law Cases on January 7, 1918.
+
+Question
+Why was the draft universal?
+Answer(s):
+included blacks
+
+Question
+What race was drafted in smaller numbers, black or white?
+Answer(s):
+black

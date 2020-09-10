@@ -1,0 +1,18 @@
+Paragraph:
+
+[aug] yes no [text] The Syrian economy is based on services, agriculture, oil and industry. The Syrian economy was doing well before the civil war that started in 2011 fluctuating through time but generally thought to be on its way to thrive. Its GDP increased from 21.83 USD billion in 2003 to 59.15 USD billion in 2010. The GDP per capita was last recorded in 2012 reaching 73.67 USD billion. Negative effects of the conflict in Syria continue to take a heavy toll on the Syrian economy. The UN estimates that more than 250,000 people have died, while other sources place the death toll at almost 500,000 (470,000) with 1.2 million people injured. More than 6.3 million people are internally displaced and 4.9 million are officially registered as refugees. The economic growth has deeply detoriated declining by more than 70% from 2010 to 2017 and GDP loss estimated to be 226 USD billion.
+
+Question
+Have fewer people been injured or killed in the civil war?
+Answer(s):
+died
+
+Question
+What is the largest UN estimate of the Syrian economy, death toll or people injured?
+Answer(s):
+people injured
+
+Question
+What are all the  heavy toll estimates of the Syrian economy?
+Answer(s):
+death toll

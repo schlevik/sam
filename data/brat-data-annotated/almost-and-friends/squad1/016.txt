@@ -1,0 +1,13 @@
+Paragraph:
+
+Since it was quite easy to stack interconnections (wires) inside the embedding matrix, the approach allowed designers to forget completely about the routing of wires (usually a time-consuming operation of PCB design): Anywhere the designer needs a connection, the machine will draw a wire in straight line from one location/pin to another. This led to very short design times (no complex algorithms to use even for high density designs) as well as reduced crosstalk (which is worse when wires run parallel to each other—which almost never happens in Multiwire), though the cost is too high to compete with cheaper PCB technologies when large quantities are needed.
+
+Question
+Along with quick design times, what problem does Multiwire cut down on?
+Answer(s):
+crosstalk
+
+Question
+What makes Multiwire impractical to use when large quantities of a board are needed?
+Answer(s):
+cost

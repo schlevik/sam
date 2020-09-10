@@ -1,0 +1,8 @@
+Paragraph:
+
+50 Hz systems support three scanning rates: 50i, 25p and 50p. 60 Hz systems support a much wider set of frame rates: 59.94i, 60i, 23.976p, 24p, 29.97p, 30p, 59.94p and 60p. In the days of standard definition television, the fractional rates were often rounded up to whole numbers, e.g. 23.976p was often called 24p, or 59.94i was often called 60i. 60 Hz high definition television supports both fractional and slightly different integer rates, therefore strict usage of notation is required to avoid ambiguity. Nevertheless, 29.97i/59.94i is almost universally called 60i, likewise 23.976p is called 24p.
+
+Question
+Strict notation is required with HD fractional rates to avoid what?
+Answer(s):
+ambiguity
