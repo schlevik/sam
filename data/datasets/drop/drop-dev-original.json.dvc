@@ -1,0 +1,8 @@
+md5: 77ae16e36992cac23cb0e49498a4d2b8
+frozen: true
+deps:
+- etag: '"d1ac57-589c5efa9d280"'
+  path: https://tinyurl.com/y3texfkv
+outs:
+- md5: dec6d515b003c9b9bc6df514e7c60282
+  path: drop-dev-original.json
