@@ -1,3 +1,4 @@
+import random
 from operator import itemgetter
 import numpy as np
 import click
@@ -17,8 +18,12 @@ from stresstest.util import load_json
 @click.option("--reference", type=str, default="data/drop_nfl.json")
 @click.option("--output", type=str, default=None)
 @click.option("--attr", type=str, default='passage')
+@click.option('--random-seed', type=int, default=56)
+@click.option('--subsample', type=int, default=200)
 @click.option("--metric", type=MetricParam(), default='Jaccard')
-def diversity(input, reference, output, attr, metric: List[Type[Distance]]):
+def diversity(input, reference, output, attr, random_seed, subsample, metric: List[Type[Distance]]):
+    if random_seed:
+        random.seed(random_seed)
     # TODO: make metrics appendable
     sample = load_json(input)
     reference = load_json(reference)
@@ -27,6 +32,8 @@ def diversity(input, reference, output, attr, metric: List[Type[Distance]]):
     # samples
     corpus: List[str] = [s['paragraphs'][0]['context'] for s in sample['data']]
     corpus_reference: List[str] = [getter(s) for s in reference]
+    if subsample:
+        corpus = random.sample(corpus, subsample)
 
     n = len(corpus)
     n_reference = len(corpus_reference)

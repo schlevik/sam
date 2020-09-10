@@ -1,6 +1,6 @@
 import glob
-import math
 import os
+import random
 import subprocess
 import tempfile
 from collections import defaultdict
@@ -9,27 +9,45 @@ import numpy as np
 import click
 
 from typing import Dict, List, Any, Callable
+
+import tabulate
 from loguru import logger
 import json
 import pandas as pd
-from scipy.stats import t
-from tqdm import tqdm
 
 from scripts.utils import write_json
 from stresstest.eval_utils import get_mean_var_ci
 from stresstest.util import load_json
 
-DEFAULT_INDICES = [
+# POS: w2v semantic similarity sentence(s)
+POS = [
+    'word2vec_1_all_sent',
+    'word2vec_2_all_sent'
+]
+
+NEG = [
     # NEG: adjacent sentence verb lemma overlap
     'adjacent_overlap_verb_sent', 'adjacent_overlap_verb_sent_div_seg', 'adjacent_overlap_binary_verb_sent',
     'adjacent_overlap_2_verb_sent', 'adjacent_overlap_2_verb_sent_div_seg', 'adjacent_overlap_binary_2_verb_sent',
-    # POS: w2v semantic similarity sentence(s)
-    'word2vec_1_all_sent', 'word2vec_2_all_sent',
     # NEG: Lemma TTR
     'lemma_ttr', 'lemma_mattr',
     # NEG: Pronoun to noun ratio
     'pronoun_noun_ratio'
 ]
+
+DEFAULT_INDICES = POS + NEG
+
+MEASURE_TO_INDEX = {
+    "w2v similarity": POS,
+    'ttr': ['lemma_ttr', 'lemma_mattr'],
+    'pronoun noun ratio': ['pronoun_noun_ratio'],
+    'adjacent sentence verb lemma overlap': ['adjacent_overlap_verb_sent', 'adjacent_overlap_verb_sent_div_seg',
+                                             'adjacent_overlap_binary_verb_sent', 'adjacent_overlap_2_verb_sent',
+                                             'adjacent_overlap_2_verb_sent_div_seg',
+                                             'adjacent_overlap_binary_2_verb_sent']
+}
+
+INDEX_TO_MEASURE = {v: k for k, vs in MEASURE_TO_INDEX.items() for v in vs}
 
 
 def apply_taaco(corpus: List[str], taaco_dir, indices) -> Dict[str, List[float]]:
@@ -56,9 +74,13 @@ def apply_taaco(corpus: List[str], taaco_dir, indices) -> Dict[str, List[float]]
 @click.option("--reference", type=str, default="data/drop_nfl.json")
 @click.option("--output", type=str, default="metrics/quality.json")
 @click.option("--attr", type=str, default='passage')
+@click.option('--random-seed', type=int, default=56)
+@click.option('--subsample', type=int, default=200)
 @click.option("--taaco-dir", type=str, default='lib/taaco/')
 @click.option('--indices', type=str, default=None)
-def quality(input, reference, output, attr, taaco_dir, indices):
+def quality(input, reference, output, attr, random_seed, subsample, taaco_dir, indices):
+    if random_seed:
+        random.seed(random_seed)
     if not indices:
         indices = DEFAULT_INDICES
     else:
@@ -72,6 +94,8 @@ def quality(input, reference, output, attr, taaco_dir, indices):
     corpus: List[str] = [s['paragraphs'][0]['context'] for s in sample['data']]
     n = len(corpus)
     logger.debug(f"Evaluating sample with n={n} paragraphs.")
+    if subsample:
+        corpus = random.sample(corpus, subsample)
 
     result = apply_taaco(corpus, taaco_dir, indices)
     # for index, values in result.items():
@@ -82,7 +106,14 @@ def quality(input, reference, output, attr, taaco_dir, indices):
     scores_reference = apply_taaco(corpus_reference, taaco_dir, indices)
 
     final_result = dict()
-
+    overall = 0
+    overall_ref = 0
+    overall_pos = 0
+    overall_pos_reference = 0
+    overall_neg = 0
+    overall_neg_reference = 0
+    by_measure = defaultdict(list)
+    by_measure_ref = defaultdict(list)
     for index, values in result.items():
         # t_975 = t.ppf(1 - .025, df=n - 1)
         # ci95 = t_975 * values.std() / math.sqrt(len(values))
@@ -94,6 +125,19 @@ def quality(input, reference, output, attr, taaco_dir, indices):
         mean_ref, var_ref, ci95_ref = get_mean_var_ci(values_reference, alpha=0.025)
         printable_result_reference = f'{mean_ref:.4f} +/- {ci95_ref:.4f}'
 
+        by_measure[INDEX_TO_MEASURE[index]].append(mean)
+        by_measure_ref[INDEX_TO_MEASURE[index]].append(mean_ref)
+
+        if index in NEG:
+            overall_neg = mean
+            overall_neg_reference += mean_ref
+            overall += (1 - mean)
+            overall_ref += (1 - mean_ref)
+        else:
+            overall_pos += mean
+            overall_pos_reference += mean_ref
+            overall += mean
+            overall_ref += mean_ref
         # t_975_reference = t.ppf(1 - .025, df=n_reference - 1)
         # ci95_reference = t_975_reference * values_reference.std()
         click.echo(f"Mean for index {click.style(index, fg='green')} (n={n}): "
@@ -119,6 +163,38 @@ def quality(input, reference, output, attr, taaco_dir, indices):
                 # "within_ci": bool(within_ci)
             }
         }
+    ours = ((overall_pos / len(POS)) + overall_neg / len(NEG)) / 2
+    ref = ((overall_pos_reference / len(POS)) + overall_neg_reference / len(NEG)) / 2
+
+    ours_smooth = overall / len(indices)
+    ref_smooth = overall_ref / len(indices)
+
+    by_measure_avg = [
+        (sum(v) / len(v)) if k == 'w2v similarity' else 1 - (sum(v) / len(v)) for k, v in by_measure.items()
+    ]
+    by_measure_ref_avg = [
+        (sum(v) / len(v)) if k == 'w2v similarity' else 1 - (sum(v) / len(v)) for k, v in by_measure_ref.items()
+    ]
+    rows = [[k, o, r] for k, o, r in zip(by_measure, by_measure_avg, by_measure_ref_avg)]
+    click.echo(tabulate.tabulate(rows, headers=['Measure', "Ours", "Reference"]))
+    by_measure_avg = sum(by_measure_avg) / len(by_measure_avg)
+
+    by_measure_avg_ref = sum(by_measure_ref_avg) / len(by_measure_ref_avg)
+    final_result['overall'] = {
+        'ours': ours,
+        "reference": ref,
+        'ours_smooth': ours_smooth,
+        'ref_smooth': ref_smooth,
+        'by_measure_avg': by_measure_avg,
+        'by_measure_avg_ref': by_measure_avg_ref
+    }
+    click.echo(f"Overall: {click.style(f'{ours:03f}', fg='green')} (n={n}): ")
+    click.echo(f"Reference overall: {click.style(f'{ref:03f}', fg='green')} (n={n_reference}): ")
+    click.echo(f"Overall smooth: {click.style(f'{ours_smooth:03f}', fg='green')} (n={n}): ")
+    click.echo(f"Reference overall smooth: {click.style(f'{ref_smooth:03f}', fg='green')} (n={n_reference}): ")
+    click.echo(f"Overall by measure: {click.style(f'{by_measure_avg:03f}', fg='green')} (n={n}): ")
+    click.echo(
+        f"Reference overall by measure: {click.style(f'{by_measure_avg_ref:03f}', fg='green')} (n={n_reference}): ")
     write_json(final_result, output)
 
 

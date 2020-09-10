@@ -4,7 +4,9 @@ from typing import Dict, List, Iterable
 import spacy
 import numpy as np
 import editdistance
+from joblib import Parallel, delayed
 from spacy.tokens import Doc
+from tqdm import tqdm
 
 
 class Distance(ABC):
@@ -21,7 +23,7 @@ class Levenshtein(Distance):
 
 class Jaccard(Distance):
 
-    def __call__(self, text: Doc, other_text: Doc) -> float:
+    def __call__(self, text: List[str], other_text: List[str]) -> float:
         tokens = set(str(t) for t in text)
         other_tokens = set(str(t) for t in other_text)
         return (len(tokens.intersection(other_tokens)) /
@@ -49,9 +51,17 @@ def _get_spacy():
     return nlp
 
 
+def test(text: List[str], other_text: List[str]) -> float:
+    tokens = set(str(t) for t in text)
+    other_tokens = set(str(t) for t in other_text)
+    return (len(tokens.intersection(other_tokens)) /
+            len(tokens.union(other_tokens)))
+
+
 def pointwise_average_distance(corpus: Iterable[str],
                                distance: Distance) -> List[float]:
     nlp = _get_spacy()
-    docs = list(nlp.pipe(corpus))
-    return [distance(text, other_text) for i, text in enumerate(docs) for
-            j, other_text in enumerate(docs) if i != j]
+    docs = (nlp.pipe(corpus))
+    docs = [[str(t) for t in text] for text in docs]
+    return Parallel(4)(delayed(distance)(text, other_text) for i, text in enumerate(tqdm(docs)) for
+                        j, other_text in enumerate(docs) if i != j)
