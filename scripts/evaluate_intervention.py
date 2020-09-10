@@ -116,8 +116,8 @@ def evaluate_intervention(predictions_folder, baseline_file, output, do_print, d
         printable_result = f'{mean:.4f} +/- {ci:.4f}'
         if "bert" in model_name:
             dev_results = load_json(f"models/{model_name}/dev-results.json")
-            original_dev_em = dev_results['exact']
-            original_dev_f1 = dev_results['f1']
+            original_dev_em = dev_results.get('exact',None)
+            original_dev_f1 = dev_results.get('f1',None)
         elif "t5" in model_name:
             dev_results = load_json(f"models/{model_name}/dev-results.json")
             original_dev_em = dev_results['exact_final']

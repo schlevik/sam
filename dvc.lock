@@ -516,10 +516,10 @@ evaluate-intervention-squad1:
   - path: data/football/full/predictions/squad1
     md5: 67a27ceb012f1159c34dbc487d25b5d4.dir
   - path: scripts/evaluate_intervention.py
-    md5: 1286bebe5e85f7d524dc738d83c31de1
+    md5: aa9fbfe2cea52bce9e4d5bcce78bfb10
   outs:
   - path: metrics/football/squad1/eoi.json
-    md5: fee60c0fbdc6b54836024e60d2028322
+    md5: 49b7407147f66b5e92cb3597d16b391b
 train-bert-base-uncased-on-hotpotqa:
   cmd: python main.py --debug --notify viktor.schlegel@manchester.ac.uk train data/datasets/hotpotqa/train.json
     --model-path bert-base-uncased --model-type bert --eval-file data/datasets/hotpotqa/dev.json
@@ -1097,10 +1097,10 @@ evaluate-intervention-hotpotqa:
   - path: data/football/full/predictions/hotpotqa
     md5: 0c82d0a238a9a8abb5a1b312ea54cd96.dir
   - path: scripts/evaluate_intervention.py
-    md5: 1286bebe5e85f7d524dc738d83c31de1
+    md5: aa9fbfe2cea52bce9e4d5bcce78bfb10
   outs:
   - path: metrics/football/hotpotqa/eoi.json
-    md5: 21e7c81536220e7095d8bf453b4361b6
+    md5: ec1acb08da264ae2323335162d0be831
 evaluate-intervention-drop:
   cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
     --predictions-folder data/football/full/predictions/drop --control --output metrics/football/drop/eoi.json
@@ -1115,10 +1115,10 @@ evaluate-intervention-drop:
   - path: data/football/full/predictions/drop
     md5: b2ac70062019d82278d2a7723507ab5b.dir
   - path: scripts/evaluate_intervention.py
-    md5: 1286bebe5e85f7d524dc738d83c31de1
+    md5: aa9fbfe2cea52bce9e4d5bcce78bfb10
   outs:
   - path: metrics/football/drop/eoi.json
-    md5: 3af1794bf59e4f4da6b7ecde0046051e
+    md5: a640044bc24abf511d577cbd3d67d5cf
 evaluate-intervention-newsqa:
   cmd: python main.py evaluate-intervention --baseline-file data/football/full/baseline.json
     --predictions-folder data/football/full/predictions/newsqa --control --output
@@ -1134,10 +1134,10 @@ evaluate-intervention-newsqa:
   - path: data/football/full/predictions/newsqa
     md5: 89b3fef1167ca478fcc1bcd6966dfcf8.dir
   - path: scripts/evaluate_intervention.py
-    md5: 1286bebe5e85f7d524dc738d83c31de1
+    md5: aa9fbfe2cea52bce9e4d5bcce78bfb10
   outs:
   - path: metrics/football/newsqa/eoi.json
-    md5: 94cb98787d48fa9197fd39bef9a708ac
+    md5: 408379516d662bbd0ae3c3118521279f
 train-albert-xxlarge-v2-on-newsqa:
   cmd: MODEL=albert-xxlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/newsqa/
     SAVE_TO=models/albert-xxlarge-v2-newsqa BATCH_SIZE=2 ACC_STEPS=128 MODEL_TYPE=albert
@@ -1732,6 +1732,49 @@ predict-t5-newsqa:
     md5: c5a0ea4649590f7bb25a746294283035
   - path: data/football/full/predictions/newsqa/intervention-t5-small-newsqa.json
     md5: 264ab3a3db436f6b0e1359934d174ce4
+combine-datasets:
+  cmd: python main.py combine data/datasets/drop/train.json data/datasets/hotpotqa/train.json
+    data/datasets/newsqa/train.json data/datasets/squad1/train-v1.1.json data/datasets/combined/train.json
+    --sub-sample 22500
+  deps:
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  - path: data/datasets/squad1/train-v1.1.json
+    md5: 981b29407e0affa3b1b156f72073b945
+  outs:
+  - path: data/datasets/combined/train.json
+    md5: ca684dec3f1d4166f6645e4780a71f35
+train-albert-xlarge-v2-on-combined:
+  cmd: MODEL=albert-xlarge-v2 CACHE_LOCATION=/mnt/iusers01/gb01/z07959vs/localscratch/combined/
+    SAVE_TO=models/albert-xlarge-v2-combined BATCH_SIZE=4 ACC_STEPS=64 MODEL_TYPE=albert
+    bash scripts/cache_and_train_combined.sh
+  deps:
+  - path: data/datasets/combined/train.json
+    md5: ca684dec3f1d4166f6645e4780a71f35
+  - path: data/datasets/squad1/dev-v1.1.json
+    md5: 3e85deb501d4e538b6bc56f786231552
+  outs:
+  - path: models/albert-xlarge-v2-combined
+    md5: 8d073e6c26c38ebb63c030a6792f50ff.dir
+combine-datasets-full:
+  cmd: python main.py combine data/datasets/drop/train.json data/datasets/hotpotqa/train.json
+    data/datasets/newsqa/train.json data/datasets/squad1/train-v1.1.json data/datasets/combined/train-full.json
+  deps:
+  - path: data/datasets/drop/train.json
+    md5: 633ef4403ee8b9d2084d45057defe3f0
+  - path: data/datasets/hotpotqa/train.json
+    md5: f085e98b5251f96490622c11af481c75
+  - path: data/datasets/newsqa/train.json
+    md5: e52440d449ce02486ac48507889bfc2e
+  - path: data/datasets/squad1/train-v1.1.json
+    md5: 981b29407e0affa3b1b156f72073b945
+  outs:
+  - path: data/datasets/combined/train-full.json
+    md5: d94dffb07139ff5c00f465b6e283f6d5
 filter-drop:
   cmd: python main.py process-drop --input data/datasets/drop/drop-dev-original.json
     --output data/datasets/drop/drop-filtered-nfl.json
