@@ -1732,3 +1732,24 @@ predict-t5-newsqa:
     md5: c5a0ea4649590f7bb25a746294283035
   - path: data/football/full/predictions/newsqa/intervention-t5-small-newsqa.json
     md5: 264ab3a3db436f6b0e1359934d174ce4
+filter-drop:
+  cmd: python main.py process-drop --input data/datasets/drop/drop-dev-original.json
+    --output data/datasets/drop/drop-filtered-nfl.json
+  deps:
+  - path: data/datasets/drop/drop-dev-original.json
+    md5: dec6d515b003c9b9bc6df514e7c60282
+  outs:
+  - path: data/datasets/drop/drop-filtered-nfl.json
+    md5: 78da5cd8ed2c98d50dd74d43d92f755b
+diversity:
+  cmd: python main.py diversity --input data/football/full/baseline.json --output
+    playground/drop-diversity.json --reference data/datasets/drop/drop-filtered-nfl.json
+    --metric Jaccard --output metrics/football/diversity.json
+  deps:
+  - path: data/datasets/drop/drop-filtered-nfl.json
+    md5: 78da5cd8ed2c98d50dd74d43d92f755b
+  - path: data/football/full/baseline.json
+    md5: a1b261d06fa1c86976e73b1695319434
+  outs:
+  - path: metrics/football/diversity.json
+    md5: 7797defd69832106689e5355c340a518

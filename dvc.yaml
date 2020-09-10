@@ -1225,3 +1225,20 @@ stages:
     - data/football/full/predictions/newsqa/intervention-t5-base-newsqa.json
     - data/football/full/predictions/newsqa/intervention-t5-large-newsqa.json
     - data/football/full/predictions/newsqa/intervention-t5-small-newsqa.json
+  filter-drop:
+    cmd: python main.py process-drop --input data/datasets/drop/drop-dev-original.json
+      --output data/datasets/drop/drop-filtered-nfl.json
+    deps:
+    - data/datasets/drop/drop-dev-original.json
+    outs:
+    - data/datasets/drop/drop-filtered-nfl.json
+  diversity:
+    cmd: python main.py diversity --input data/football/full/baseline.json --output
+      playground/drop-diversity.json --reference data/datasets/drop/drop-filtered-nfl.json
+      --metric Jaccard --output metrics/football/diversity.json
+    deps:
+    - data/datasets/drop/drop-filtered-nfl.json
+    - data/football/full/baseline.json
+    metrics:
+    - metrics/football/diversity.json:
+        cache: false
