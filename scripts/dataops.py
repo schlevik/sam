@@ -8,8 +8,11 @@ from collections import defaultdict
 from itertools import accumulate
 
 import click
+import torch
+from torch.utils.data import ConcatDataset
 
 from scripts.utils import FormatParam, write_json, match_prediction_to_gold
+from scripts.utils_transformers import load_examples
 from stresstest.ds_utils import filter_generic, export_brat_format, subsample
 from stresstest.util import load_json, sample_iter
 from stresstest.eval_utils import align as do_align
@@ -64,12 +67,25 @@ def combine(in_files, out_file, sub_sample):
             if sub_sample:
                 ds = subsample(ds)
             combined_dataset['data'].extend(ds['data'])
-        click.echo(f"New dataset has {sum(len(p['qas']) for doc in combined_dataset['data'] for p in doc['paragraphs'])} instances...")
+        click.echo(
+            f"New dataset has {sum(len(p['qas']) for doc in combined_dataset['data'] for p in doc['paragraphs'])} instances...")
         click.echo(f"Writing out: {click.style(out_file, fg='green')}")
         os.makedirs(os.path.dirname(out_file), exist_ok=True)
         write_json(combined_dataset, out_file, pretty=False)
     else:
         click.echo(f"Nothing to write...")
+
+
+@click.command()
+@click.argument('in-files', nargs=-1)
+@click.argument('out-file', nargs=1)
+def combine_datasets(in_files, out_file):
+    datasets = []
+    for in_file in in_files:
+        datasets.append(load_examples(in_file, dataset_only=True))
+
+    train_dataset = ConcatDataset(datasets)
+    torch.save({"dataset": train_dataset}, out_file)
 
 
 @click.command()
