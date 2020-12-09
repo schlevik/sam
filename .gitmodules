@@ -1,4 +1,4 @@
 [submodule "lib/taaco"]
 	path = lib/taaco
-	url = git@github.com:schlevik/taaco.git
+	url = https://github.com/schlevik/taaco/
 	branch = master
