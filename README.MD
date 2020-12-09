@@ -9,17 +9,21 @@ used in the paper.
 ## Setup
 
 ```shell script
-conda create -n submission-704-aaai python=3.7 anaconda
+git clone https://github.com/schlevik/sam 
+cd sam
+git submodule init
+git submodule update
+conda create -n sam python=3.7 anaconda
+conda activate sam
 pip install dvc
 conda install pytorch=1.6 torchvision cudatoolkit=10.1 -c pytorch
 pip install -r requirements.txt
-git submodule update
 ```
 If running into problems with mysql, install mysql 
 (e.g. `sudo apt-get install mysql` on ubuntu systems) 
 ([Reference](https://github.com/JudgeGirl/Judge-sender/issues/4#issuecomment-186542797))
 
-We use `dvc` to for reproducibility.
+We use `dvc` for reproducibility.
 
 ## Evaluation
 to reproduce the evaluation
